@@ -1,11 +1,11 @@
-const CACHE_NAME = 'promptomizer-v2-cache';
+const CACHE_NAME = 'promptomizer-v2.3-cache';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
 ];
 
 self.addEventListener('install', (event) => {
