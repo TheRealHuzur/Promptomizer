@@ -1,351 +1,618 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer</title>
-    <meta name="description" content="CRISPE Framework Prompt Generator">
+    <title>Promptomizer V2.0</title>
+    <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
+    <meta name="theme-color" content="#0f172a">
     
-    <!-- PWA Settings -->
-    <meta name="theme-color" content="#4f46e5">
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon.png">
 
-    <!-- Tailwind CSS (via CDN) -->
+    <!-- Tailwind CSS (CDN for standalone usage) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        petrol: {
+                            500: '#14b8a6', // Teal 500
+                            600: '#0d9488', // Teal 600
+                            700: '#0f766e', // Teal 700
+                        },
+                        navy: {
+                            800: '#1e293b', // Slate 800
+                            900: '#0f172a', // Slate 900
+                            950: '#020617', // Slate 950
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
-    <!-- Lucide Icons (via CDN) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom Styles for App feel */
-        body {
-            -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: none;
-        }
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        /* Hide scrollbar for clean look */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        .page-transition { transition: opacity 0.2s ease-in-out; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-20">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm z-10 flex-none px-4 py-4 border-b border-slate-200">
-        <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">Promptomizer</h1>
-        <p class="text-xs text-slate-500 mt-1 leading-snug">
-            Nutzen Sie das bewährte CRISPE-Framework, um präzise, kontextreiche und effektive Prompts für ChatGPT, Claude oder Gemini zu erstellen.
-        </p>
+    <!-- HEADER -->
+    <header class="fixed top-0 w-full z-40 bg-navy-900 text-white shadow-md border-b border-navy-800">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-cube text-petrol-500 text-xl"></i>
+                <h1 class="font-semibold text-lg tracking-wide">Promptomizer <span class="text-petrol-500 text-xs align-top">V2.0</span></h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Global Scenarios Button -->
+                <button onclick="openScenarioModal()" class="text-sm bg-navy-800 hover:bg-navy-800/80 px-3 py-1.5 rounded-md border border-slate-700 transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-petrol-500"></i>
+                    <span class="hidden sm:inline">Szenarien</span>
+                </button>
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
     </header>
 
-    <!-- Main Content Area (Scrollable) -->
-    <main id="main-container" class="flex-1 overflow-y-auto p-4 pb-40 no-scrollbar relative">
+    <!-- MAIN CONTENT -->
+    <main class="max-w-3xl mx-auto pt-20 px-4">
         
         <!-- VIEW: CREATE (Editor) -->
-        <div id="view-create" class="space-y-4">
+        <div id="view-create" class="page-transition block">
             
-            <!-- Clear All Button -->
-            <div class="flex justify-end mb-2">
-                <button onclick="clearAllInputs()" class="text-red-500 text-sm font-medium flex items-center hover:bg-red-50 px-3 py-1 rounded-full transition-colors">
-                    <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i>
-                    Alles löschen
+            <!-- Toolbar -->
+            <div class="flex justify-end mb-4">
+                <button onclick="resetFields()" class="text-slate-400 hover:text-red-500 text-sm flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-trash-can"></i> Felder leeren
                 </button>
             </div>
 
-            <!-- Card 1: Rolle -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <label class="block text-indigo-700 font-semibold mb-1">Rolle und Funktion</label>
-                <p class="text-xs text-slate-500 mb-3">Definieren Sie zunächst, in welcher Rolle die Künstliche Intelligenz agieren soll. Soll sie als Texter arbeiten? Als Rechercheur? Als Übersetzer? Eine klare Rollenbeschreibung zu Beginn hilft, die Antworten der KI präzise auszurichten.</p>
-                <input type="text" id="input-role" placeholder="z.B. Erfahrener Marketing-Texter" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+            <!-- Form Container -->
+            <div id="fields-container" class="space-y-6">
+                <!-- Fields are injected here via JS -->
             </div>
 
-            <!-- Card 2: Kontext -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <label class="block text-indigo-700 font-semibold mb-1">Kontext</label>
-                <p class="text-xs text-slate-500 mb-3">Geben Sie alle relevanten Hintergrundinformationen oder den notwendigen Kontext mit. Je präziser die Ausgangslage beschrieben ist, desto passgenauer kann die KI reagieren.</p>
-                <textarea id="input-context" rows="3" placeholder="Hintergrundinfos hier eingeben..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"></textarea>
+            <!-- Floating Generate Button -->
+            <div class="fixed bottom-20 right-4 md:absolute md:bottom-auto md:right-0 md:relative md:mt-8 md:mb-8 flex justify-end z-30">
+                <button onclick="generatePrompt()" class="bg-petrol-600 hover:bg-petrol-700 text-white font-medium py-3 px-6 rounded-full shadow-lg shadow-petrol-600/30 flex items-center gap-2 transform active:scale-95 transition-all">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Erstellen & Kopieren</span>
+                </button>
             </div>
-
-            <!-- Card 3: Aufgabe -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <label class="block text-indigo-700 font-semibold mb-1">Aufgabe</label>
-                <p class="text-xs text-slate-500 mb-3">Formulieren Sie deutlich, was die Künstliche Intelligenz konkret tun soll. Je genauer die Aufgabenstellung, desto präziser das Ergebnis.</p>
-                <textarea id="input-task" rows="3" placeholder="Was soll genau getan werden?" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"></textarea>
-            </div>
-
-            <!-- Card 4: Stil -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <label class="block text-indigo-700 font-semibold mb-1">Stil und Tonalität</label>
-                <p class="text-xs text-slate-500 mb-3">Legen Sie fest, wie die KI in ihrer Antwort klingen soll – eher formal und sachlich oder locker und nahbar. Dieser Aspekt ermöglicht eine stimmige Tonalität in der Interaktion.</p>
-                <input type="text" id="input-style" placeholder="z.B. Professionell, aber herzlich" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-            </div>
-
-            <!-- Card 5: Varianten -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <label class="block text-indigo-700 font-semibold mb-1">Varianten</label>
-                <p class="text-xs text-slate-500 mb-3">Fordern Sie auf Wunsch mehrere Antwortoptionen oder Beispiele an. So können Sie die beste Variante auswählen oder verschiedene Ansätze kombinieren.</p>
-                <input type="text" id="input-variants" placeholder="z.B. Erstelle 3 verschiedene Entwürfe" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-            </div>
-            
-            <!-- Spacer for sticky footer -->
-            <div class="h-24"></div>
         </div>
 
         <!-- VIEW: HISTORY -->
-        <div id="view-history" class="hidden space-y-4">
-            <h2 class="text-lg font-bold text-slate-800 px-1">Verlauf</h2>
-            <div id="history-list" class="space-y-3 pb-24">
-                <!-- Items will be injected here via JS -->
+        <div id="view-history" class="page-transition hidden">
+            <h2 class="text-xl font-semibold mb-6 text-navy-900 dark:text-white">Verlauf</h2>
+            <div id="history-list" class="space-y-4">
+                <!-- History Items injected via JS -->
+                <div class="text-center text-slate-400 py-10">Keine Einträge vorhanden.</div>
             </div>
         </div>
 
         <!-- VIEW: FAVORITES -->
-        <div id="view-favorites" class="hidden space-y-4">
-            <h2 class="text-lg font-bold text-slate-800 px-1">Favoriten</h2>
-            <div id="favorites-list" class="space-y-3 pb-24">
-                <!-- Items will be injected here via JS -->
+        <div id="view-favorites" class="page-transition hidden">
+            <h2 class="text-xl font-semibold mb-6 text-navy-900 dark:text-white">Favoriten</h2>
+            <div id="favorites-list" class="space-y-4">
+                <!-- Favorites Items injected via JS -->
+                <div class="text-center text-slate-400 py-10">Keine Favoriten gespeichert.</div>
             </div>
         </div>
 
     </main>
 
-    <!-- Sticky Action Button (Only visible on Create Tab) -->
-    <div id="sticky-action-container" class="fixed bottom-[70px] left-0 w-full px-4 pointer-events-none z-20">
-        <button onclick="createAndCopy()" class="pointer-events-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 flex items-center justify-center transition-transform active:scale-95">
-            <i data-lucide="copy" class="w-5 h-5 mr-2"></i>
-            Erstellen und kopieren
-        </button>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-200 pb-safe z-30">
-        <div class="flex justify-around items-center h-16">
-            <button onclick="switchTab('create')" id="nav-create" class="flex flex-col items-center justify-center w-full h-full text-indigo-600">
-                <i data-lucide="pen-tool" class="w-6 h-6 mb-1"></i>
-                <span class="text-[10px] font-medium">Erstellen</span>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full bg-white dark:bg-navy-900 border-t border-slate-200 dark:border-navy-800 z-40 safe-area-pb">
+        <div class="max-w-3xl mx-auto flex justify-around items-center h-16">
+            <button onclick="switchTab('create')" class="nav-btn active flex flex-col items-center gap-1 w-full h-full justify-center text-petrol-600 dark:text-petrol-500" data-target="create">
+                <i class="fa-regular fa-pen-to-square text-lg"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">Erstellen</span>
             </button>
-            <button onclick="switchTab('history')" id="nav-history" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-500">
-                <i data-lucide="history" class="w-6 h-6 mb-1"></i>
-                <span class="text-[10px] font-medium">Historie</span>
+            <button onclick="switchTab('history')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="history">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">Historie</span>
             </button>
-            <button onclick="switchTab('favorites')" id="nav-favorites" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-500">
-                <i data-lucide="star" class="w-6 h-6 mb-1"></i>
-                <span class="text-[10px] font-medium">Favoriten</span>
+            <button onclick="switchTab('favorites')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="favorites">
+                <i class="fa-regular fa-star text-lg"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">Favoriten</span>
             </button>
         </div>
     </nav>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-full shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 text-sm flex items-center">
-        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
-        <span id="toast-msg">Kopiert!</span>
+    <!-- MODAL: SCENARIOS (Global) -->
+    <div id="modal-scenarios" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-navy-900 text-white">
+                <h3 class="font-medium flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> Globale Szenarien</h3>
+                <button onclick="closeModal('modal-scenarios')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700">
+                <div class="flex gap-2">
+                    <input type="text" id="scenario-name-input" placeholder="Neues Szenario speichern..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
+                    <button onclick="saveScenario()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk"></i></button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="scenarios-list">
+                <!-- List injected via JS -->
+            </div>
+        </div>
     </div>
 
+    <!-- MODAL: SNIPPETS (Local per field) -->
+    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-petrol-700 text-white">
+                <h3 class="font-medium flex items-center gap-2"><i class="fa-solid fa-book-bookmark"></i> Bausteine: <span id="snippet-modal-title" class="opacity-90"></span></h3>
+                <button onclick="closeModal('modal-snippets')" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700">
+                <div class="flex gap-2">
+                    <input type="text" id="snippet-name-input" placeholder="Baustein benennen..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
+                    <button onclick="saveSnippet()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk"></i></button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="snippets-list">
+                <!-- List injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-900 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-petrol-500"></i>
+        <span id="toast-msg">Erfolg!</span>
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script>
-        // --- DATA & STATE ---
-        let prompts = JSON.parse(localStorage.getItem('promptomizer_prompts')) || [];
+        // --- CONFIGURATION ---
+        const FIELDS = [
+            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', desc: 'Marketingfachkraft, erfahrener Entwickler, Projektleiter...' },
+            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', desc: 'Wer soll das Ergebnis nutzen? Welche Situation liegt vor?' },
+            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', desc: 'Analysiere, erstelle, vergib, bewerte...' },
+            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', desc: 'Sachlich, werbend, empathisch...' },
+            { id: 'format', label: 'Format & Varianten', icon: 'fa-list-check', desc: 'Liste, Tabelle, kurzer Text, 3 Varianten...' }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentSnippetFieldId = null;
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            renderLists();
+            initTheme();
+            renderFields();
+            loadHistory();
+            registerSW();
         });
 
-        // --- NAVIGATION LOGIC ---
-        function switchTab(tabName) {
-            // Views
-            document.getElementById('view-create').classList.add('hidden');
-            document.getElementById('view-history').classList.add('hidden');
-            document.getElementById('view-favorites').classList.add('hidden');
+        // --- THEME LOGIC ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('promptomizer_theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-
-            // Nav Styling
-            const navIds = ['nav-create', 'nav-history', 'nav-favorites'];
-            navIds.forEach(id => {
-                const el = document.getElementById(id);
-                el.classList.remove('text-indigo-600');
-                el.classList.add('text-slate-400');
-            });
-            const activeNav = document.getElementById(`nav-${tabName}`);
-            activeNav.classList.remove('text-slate-400');
-            activeNav.classList.add('text-indigo-600');
-
-            // Sticky Button Visibility
-            const stickyBtn = document.getElementById('sticky-action-container');
-            if(tabName === 'create') {
-                stickyBtn.classList.remove('hidden');
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
             } else {
-                stickyBtn.classList.add('hidden');
-                renderLists(); // Refresh lists when entering tab
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
             }
-
-            // Reset scroll
-            document.getElementById('main-container').scrollTop = 0;
-            lucide.createIcons();
         }
 
-        // --- CORE LOGIC ---
-
-        function createAndCopy() {
-            // 1. Get Values
-            const role = document.getElementById('input-role').value.trim();
-            const context = document.getElementById('input-context').value.trim();
-            const task = document.getElementById('input-task').value.trim();
-            const style = document.getElementById('input-style').value.trim();
-            const variants = document.getElementById('input-variants').value.trim();
-
-            if (!role && !task) {
-                showToast("Bitte mindestens Rolle oder Aufgabe ausfüllen.");
-                return;
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('promptomizer_theme', 'light');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('promptomizer_theme', 'dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
             }
+        }
 
-            // 2. Build Prompt
-            let promptText = "";
-            if(role) promptText += `Handle als: ${role}.\n`;
-            if(context) promptText += `Kontext: ${context}\n`;
-            if(task) promptText += `Deine Aufgabe: ${task}\n`;
-            if(style) promptText += `Tonalität & Stil: ${style}\n`;
-            if(variants) promptText += `Anforderung: ${variants}`;
+        // --- RENDER INPUT FIELDS ---
+        function renderFields() {
+            const container = document.getElementById('fields-container');
+            container.innerHTML = FIELDS.map(field => `
+                <div class="bg-white dark:bg-navy-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700 transition-colors">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-semibold text-navy-900 dark:text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid ${field.icon} text-petrol-500 w-5"></i>
+                            ${field.label}
+                        </label>
+                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-400 hover:text-petrol-600 dark:hover:text-petrol-400 text-sm px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-navy-900 transition-colors" title="Bausteine">
+                            <i class="fa-solid fa-book"></i>
+                        </button>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">${field.desc}</div>
+                    <textarea 
+                        id="input-${field.id}" 
+                        class="w-full h-32 p-3 bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-petrol-500 focus:border-transparent resize-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-all text-sm"
+                        placeholder="..."></textarea>
+                </div>
+            `).join('');
+        }
 
-            // 3. Copy to Clipboard
-            navigator.clipboard.writeText(promptText).then(() => {
-                showToast("Prompt erstellt & kopiert!");
-            }).catch(err => {
-                showToast("Fehler beim Kopieren");
-                console.error(err);
+        // --- TAB NAVIGATION ---
+        function switchTab(tabId) {
+            // Update UI
+            document.querySelectorAll('.page-transition').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            // Update Nav Buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tabId) {
+                    btn.classList.remove('text-slate-400', 'hover:text-navy-800');
+                    btn.classList.add('text-petrol-600', 'dark:text-petrol-500');
+                } else {
+                    btn.classList.add('text-slate-400', 'hover:text-navy-800');
+                    btn.classList.remove('text-petrol-600', 'dark:text-petrol-500');
+                }
             });
 
-            // 4. Save to History
-            const newEntry = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                text: promptText,
-                isFavorite: false,
-                // We keep inputs separately if we want to "Edit" later (optional feature)
-                inputs: { role, context, task, style, variants }
+            if(tabId === 'history') loadHistory();
+            if(tabId === 'favorites') loadFavorites();
+        }
+
+        // --- GENERATOR LOGIC ---
+        function generatePrompt() {
+            let finalText = "";
+            let fieldValues = [];
+            let hasContent = false;
+
+            // Mapping for Output Headers
+            const headerMap = {
+                'role': '🤖 ROLLE',
+                'context': '🌍 KONTEXT',
+                'task': '🎯 AUFGABE',
+                'style': '🎨 STIL UND TONALITÄT',
+                'format': '🧪 VARIANTEN'
             };
 
-            prompts.unshift(newEntry); // Add to top
-            savePrompts();
-        }
+            FIELDS.forEach(field => {
+                const val = document.getElementById(`input-${field.id}`).value.trim();
+                fieldValues.push(val);
+                if (val) {
+                    hasContent = true;
+                    finalText += `**${headerMap[field.id]}**\n${val}\n\n`;
+                }
+            });
 
-        function clearAllInputs() {
-            if(confirm('Möchten Sie wirklich alle Eingabefelder leeren?')) {
-                document.getElementById('input-role').value = '';
-                document.getElementById('input-context').value = '';
-                document.getElementById('input-task').value = '';
-                document.getElementById('input-style').value = '';
-                document.getElementById('input-variants').value = '';
-            }
-        }
-
-        // --- LIST MANAGEMENT (History & Favorites) ---
-
-        function renderLists() {
-            renderList('history-list', prompts);
-            
-            const favs = prompts.filter(p => p.isFavorite);
-            renderList('favorites-list', favs, true);
-            
-            lucide.createIcons();
-        }
-
-        function renderList(containerId, data, isFavView = false) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-
-            if (data.length === 0) {
-                container.innerHTML = `<div class="text-center text-slate-400 mt-10 p-4">Keine Einträge vorhanden.</div>`;
+            if (!hasContent) {
+                showToast("Bitte füllen Sie mindestens ein Feld aus.", true);
                 return;
             }
 
-            data.forEach(item => {
-                // Shorten text for preview
-                const previewText = item.text.length > 120 ? item.text.substring(0, 120) + "..." : item.text;
-                const dateStr = new Date(item.timestamp).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' });
-                const starFill = item.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-slate-400';
+            finalText = finalText.trim();
 
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="text-xs text-slate-400 font-mono">${dateStr}</span>
-                        <div class="flex space-x-2">
-                             <button onclick="toggleFavorite(${item.id})" class="p-1 rounded-full hover:bg-slate-50 transition-colors">
-                                <i data-lucide="star" class="w-5 h-5 ${starFill}"></i>
-                            </button>
-                            <button onclick="deletePrompt(${item.id})" class="p-1 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
-                                <i data-lucide="trash" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg text-sm text-slate-700 font-medium whitespace-pre-wrap leading-relaxed border border-slate-100">${previewText}</div>
-                    <button onclick="copyFromList(${item.id})" class="self-start text-indigo-600 text-sm font-semibold flex items-center hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-indigo-100">
-                        <i data-lucide="copy" class="w-4 h-4 mr-2"></i>
-                        Kopieren
-                    </button>
-                `;
-                container.appendChild(card);
+            // Copy to Clipboard
+            navigator.clipboard.writeText(finalText).then(() => {
+                showToast("Prompt kopiert & gespeichert!");
+            }).catch(() => {
+                showToast("Fehler beim Kopieren", true);
             });
+
+            // Save to History
+            const entry = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                text: finalText,
+                fields: fieldValues, // Save raw fields to restore later
+                favorite: false
+            };
+
+            const history = getStorage('history') || [];
+            history.unshift(entry);
+            // Limit history to 50 items
+            if(history.length > 50) history.pop();
+            saveStorage('history', history);
+        }
+
+        function resetFields() {
+            if(confirm('Alle Felder leeren?')) {
+                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+            }
+        }
+
+        // --- SCENARIO SYSTEM (GLOBAL) ---
+        function openScenarioModal() {
+            renderScenarioList();
+            document.getElementById('modal-scenarios').classList.remove('hidden');
+        }
+
+        function saveScenario() {
+            const name = document.getElementById('scenario-name-input').value.trim();
+            if(!name) return;
+
+            const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+            // Check if completely empty
+            if(currentValues.every(v => v.trim() === '')) {
+                showToast("Szenario ist leer!", true);
+                return;
+            }
+
+            const scenarios = getStorage('scenarios') || [];
+            scenarios.push({ id: Date.now(), name, fields: currentValues });
+            saveStorage('scenarios', scenarios);
+            
+            document.getElementById('scenario-name-input').value = '';
+            renderScenarioList();
+        }
+
+        function loadScenario(id) {
+            const scenarios = getStorage('scenarios') || [];
+            const scenario = scenarios.find(s => s.id === id);
+            if(scenario) {
+                scenario.fields.forEach((val, index) => {
+                    document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                });
+                closeModal('modal-scenarios');
+                showToast(`Szenario "${scenario.name}" geladen`);
+            }
+        }
+
+        function deleteScenario(id) {
+            let scenarios = getStorage('scenarios') || [];
+            scenarios = scenarios.filter(s => s.id !== id);
+            saveStorage('scenarios', scenarios);
+            renderScenarioList();
+        }
+
+        function renderScenarioList() {
+            const scenarios = getStorage('scenarios') || [];
+            const list = document.getElementById('scenarios-list');
+            
+            if(scenarios.length === 0) {
+                list.innerHTML = '<div class="text-slate-400 text-center text-sm py-4">Noch keine Szenarien gespeichert.</div>';
+                return;
+            }
+
+            list.innerHTML = scenarios.map(s => `
+                <div class="flex items-center justify-between bg-white dark:bg-navy-800 border border-slate-200 dark:border-slate-700 p-3 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <button onclick="loadScenario(${s.id})" class="flex-1 text-left font-medium text-navy-900 dark:text-slate-100 text-sm truncate pr-2">
+                        ${s.name}
+                    </button>
+                    <button onclick="deleteScenario(${s.id})" class="text-slate-400 hover:text-red-500 p-1">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // --- SNIPPET SYSTEM (LOCAL) ---
+        function openSnippetModal(fieldId) {
+            currentSnippetFieldId = fieldId;
+            const field = FIELDS.find(f => f.id === fieldId);
+            document.getElementById('snippet-modal-title').innerText = field.label;
+            renderSnippetList();
+            document.getElementById('modal-snippets').classList.remove('hidden');
+        }
+
+        function saveSnippet() {
+            const name = document.getElementById('snippet-name-input').value.trim();
+            const text = document.getElementById(`input-${currentSnippetFieldId}`).value.trim();
+
+            if(!name || !text) {
+                showToast("Name oder Feld leer!", true);
+                return;
+            }
+
+            const allSnippets = getStorage('snippets') || {};
+            if(!allSnippets[currentSnippetFieldId]) allSnippets[currentSnippetFieldId] = [];
+            
+            allSnippets[currentSnippetFieldId].push({ id: Date.now(), name, text });
+            saveStorage('snippets', allSnippets);
+
+            document.getElementById('snippet-name-input').value = '';
+            renderSnippetList();
+        }
+
+        function loadSnippet(id) {
+            const allSnippets = getStorage('snippets') || {};
+            const list = allSnippets[currentSnippetFieldId] || [];
+            const snip = list.find(s => s.id === id);
+            
+            if(snip) {
+                const el = document.getElementById(`input-${currentSnippetFieldId}`);
+                // Optional: Append or Replace? Let's Replace for simplicity as per requirement implies "setting" text.
+                // But professional tools usually append or user decides. Let's append if not empty?
+                // Request said "Load existing... text blocks".
+                // Strategy: If empty, set. If not, confirm replace.
+                if(el.value.trim() !== '' && !confirm("Feld überschreiben?")) return;
+                
+                el.value = snip.text;
+                closeModal('modal-snippets');
+            }
+        }
+
+        function deleteSnippet(id) {
+            const allSnippets = getStorage('snippets') || {};
+            if(allSnippets[currentSnippetFieldId]) {
+                allSnippets[currentSnippetFieldId] = allSnippets[currentSnippetFieldId].filter(s => s.id !== id);
+                saveStorage('snippets', allSnippets);
+                renderSnippetList();
+            }
+        }
+
+        function renderSnippetList() {
+            const allSnippets = getStorage('snippets') || {};
+            const list = allSnippets[currentSnippetFieldId] || [];
+            const container = document.getElementById('snippets-list');
+
+            if(list.length === 0) {
+                container.innerHTML = '<div class="text-slate-400 text-center text-sm py-4">Keine Bausteine für dieses Feld.</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(s => `
+                <div class="flex items-center justify-between bg-white dark:bg-navy-800 border border-slate-200 dark:border-slate-700 p-3 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <button onclick="loadSnippet(${s.id})" class="flex-1 text-left">
+                        <div class="font-medium text-navy-900 dark:text-slate-100 text-sm truncate">${s.name}</div>
+                        <div class="text-xs text-slate-500 truncate w-48">${s.text.substring(0,30)}...</div>
+                    </button>
+                    <button onclick="deleteSnippet(${s.id})" class="text-slate-400 hover:text-red-500 p-1">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // --- HISTORY & FAVORITES UI ---
+        function renderCard(item, isHistoryView) {
+            const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+            // Extract a preview title from Role or Context or Task
+            const preview = (item.fields[0] || item.fields[2] || "Unbenannter Prompt").substring(0, 40);
+
+            return `
+            <div class="bg-white dark:bg-navy-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-slate-400 font-mono">${date}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleFavorite(${item.id})" class="${item.favorite ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-400'} transition-colors">
+                            <i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                        </button>
+                        <button onclick="deleteHistoryItem(${item.id})" class="text-slate-300 hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-navy-900 dark:text-white mb-2 text-sm">${preview}...</h3>
+                <div class="bg-slate-50 dark:bg-navy-900 p-2 rounded border border-slate-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 font-mono overflow-hidden h-16 mb-3">
+                    ${item.text.replace(/\n/g, '<br>')}
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button onclick="restorePrompt(${item.id})" class="text-xs bg-navy-100 dark:bg-navy-700 text-navy-700 dark:text-slate-200 px-2 py-1 rounded hover:bg-navy-200 transition-colors">
+                        <i class="fa-solid fa-pen"></i> Bearbeiten
+                    </button>
+                    <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="text-xs bg-petrol-100 dark:bg-petrol-900/30 text-petrol-700 dark:text-petrol-400 px-2 py-1 rounded hover:bg-petrol-200 transition-colors">
+                        <i class="fa-solid fa-copy"></i> Kopieren
+                    </button>
+                </div>
+            </div>`;
+        }
+
+        function loadHistory() {
+            const history = getStorage('history') || [];
+            const container = document.getElementById('history-list');
+            if(history.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Einträge vorhanden.</div>';
+            } else {
+                container.innerHTML = history.map(item => renderCard(item, true)).join('');
+            }
+        }
+
+        function loadFavorites() {
+            const history = getStorage('history') || [];
+            const favs = history.filter(h => h.favorite);
+            const container = document.getElementById('favorites-list');
+            if(favs.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Favoriten gespeichert.</div>';
+            } else {
+                container.innerHTML = favs.map(item => renderCard(item, false)).join('');
+            }
         }
 
         function toggleFavorite(id) {
-            const index = prompts.findIndex(p => p.id === id);
-            if (index !== -1) {
-                prompts[index].isFavorite = !prompts[index].isFavorite;
-                savePrompts();
-                renderLists();
+            let history = getStorage('history') || [];
+            const idx = history.findIndex(h => h.id === id);
+            if(idx > -1) {
+                history[idx].favorite = !history[idx].favorite;
+                saveStorage('history', history);
+                // Refresh current view
+                if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites();
+                else loadHistory();
             }
         }
 
-        function deletePrompt(id) {
-            if(confirm("Diesen Prompt wirklich löschen?")) {
-                prompts = prompts.filter(p => p.id !== id);
-                savePrompts();
-                renderLists();
-            }
+        function deleteHistoryItem(id) {
+            if(!confirm("Eintrag löschen?")) return;
+            let history = getStorage('history') || [];
+            history = history.filter(h => h.id !== id);
+            saveStorage('history', history);
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites();
+            else loadHistory();
         }
 
-        function copyFromList(id) {
-            const item = prompts.find(p => p.id === id);
-            if(item) {
-                navigator.clipboard.writeText(item.text).then(() => {
-                    showToast("Prompt kopiert!");
+        function restorePrompt(id) {
+            const history = getStorage('history') || [];
+            const item = history.find(h => h.id === id);
+            if(item && item.fields) {
+                item.fields.forEach((val, index) => {
+                    if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
                 });
+                switchTab('create');
+                showToast("Prompt in Editor geladen");
             }
         }
 
         // --- UTILS ---
-
-        function savePrompts() {
-            localStorage.setItem('promptomizer_prompts', JSON.stringify(prompts));
+        function getStorage(key) {
+            const data = localStorage.getItem(`promptomizer_${key}`);
+            return data ? JSON.parse(data) : null;
         }
 
-        function showToast(message) {
+        function saveStorage(key, data) {
+            localStorage.setItem(`promptomizer_${key}`, JSON.stringify(data));
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => showToast("Kopiert!"));
+        }
+
+        function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = message;
-            toast.classList.remove('opacity-0');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            
+            if(isError) {
+                toast.classList.add('bg-red-600');
+                toast.classList.remove('bg-navy-900');
+            } else {
+                toast.classList.remove('bg-red-600');
+                toast.classList.add('bg-navy-900');
+            }
+
             setTimeout(() => {
                 toast.classList.add('opacity-0');
-            }, 2000);
+            }, 3000);
         }
 
-        // --- SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+        // --- SERVICE WORKER REG ---
+        function registerSW() {
+            if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registered', reg))
-                    .catch(err => console.log('SW registration failed', err));
-            });
+                    .then(reg => console.log('SW registriert', reg))
+                    .catch(err => console.error('SW Fehler', err));
+            }
         }
     </script>
 </body>
