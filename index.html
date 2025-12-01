@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V2.3</title>
+    <title>Promptomizer V2.4</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#1e293b">
     
@@ -25,7 +25,7 @@
                             700: '#0f766e',
                         },
                         navy: {
-                            800: '#1e293b', // Secondary / Header
+                            800: '#1e293b', // Header
                             900: '#0f172a', // Dark Mode Bg
                         }
                     },
@@ -51,25 +51,33 @@
         .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
+<body class="bg-slate-100 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
 
     <!-- HEADER -->
     <header class="fixed top-0 w-full z-40 bg-navy-800 text-white shadow-md border-b border-slate-700">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-petrol-600 rounded flex items-center justify-center shadow-lg shadow-petrol-600/20">
-                    <i class="fa-solid fa-cube text-white text-lg"></i>
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-8 h-8 bg-petrol-600 rounded flex-shrink-0 flex items-center justify-center shadow-lg shadow-petrol-600/20">
+                    <i class="fa-solid fa-cube text-white text-sm"></i>
                 </div>
-                <div>
-                    <h1 id="app-title" class="font-bold text-lg tracking-tight leading-none">Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.3</span></h1>
-                </div>
+                <h1 id="app-title" class="font-bold text-lg tracking-tight leading-none truncate">Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.4</span></h1>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="openScenarioListModal()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded flex items-center gap-2 transition-colors">
+            
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2">
+                <!-- Scenarios -->
+                <button onclick="openScenarioListModal()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors" title="Szenarien">
                     <i class="fa-solid fa-layer-group text-petrol-500"></i>
-                    <span class="font-medium text-sm hidden sm:inline">Szenarien</span>
                 </button>
-                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+                
+                <!-- Delete All (Moved here) -->
+                <button onclick="resetFields()" class="bg-slate-700 hover:bg-red-900/50 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-slate-300 hover:text-red-400" title="Alles löschen">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+
+                <!-- Dark Mode -->
+                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-1">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
             </div>
@@ -77,21 +85,14 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-3xl mx-auto pt-24 px-4">
+    <main class="max-w-3xl mx-auto pt-20 px-4">
         
         <!-- VIEW: CREATE (EDITOR) -->
         <div id="view-create" class="block">
             
-            <!-- Toolbar -->
-            <div class="flex justify-between items-center mb-6">
-                <div id="mode-indicator" class="hidden text-petrol-600 dark:text-petrol-500 font-bold text-sm uppercase tracking-wider animate-pulse">
-                    <i class="fa-solid fa-circle text-[10px] mr-1"></i> Szenario-Modus
-                </div>
-                <div class="ml-auto">
-                    <button onclick="resetFields()" class="text-slate-400 hover:text-red-500 text-sm font-medium flex items-center gap-2 transition-colors px-3 py-1 rounded hover:bg-slate-200 dark:hover:bg-navy-800">
-                        <i class="fa-solid fa-trash-can"></i> Alles löschen
-                    </button>
-                </div>
+            <!-- Mode Indicator (Only visible in Scenario Mode) -->
+            <div id="mode-indicator" class="hidden mb-4 bg-petrol-600/10 border border-petrol-600/20 text-petrol-600 dark:text-petrol-500 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-circle text-[10px] animate-pulse"></i> Modus: Szenario erstellen
             </div>
 
             <!-- Form Container -->
@@ -115,7 +116,7 @@
                             <i class="fa-solid fa-xmark"></i> Abbrechen
                         </button>
                         <button onclick="initiateSaveScenario()" class="flex-[2] bg-petrol-600 hover:bg-petrol-700 text-white font-bold py-4 px-4 rounded-xl shadow-xl shadow-petrol-600/30 flex items-center justify-center gap-2 transform active:scale-95 transition-all">
-                            <i class="fa-solid fa-floppy-disk"></i> Szenario speichern
+                            <i class="fa-solid fa-floppy-disk"></i> Speichern
                         </button>
                     </div>
 
@@ -156,7 +157,7 @@
     </nav>
 
     <!-- MODAL: SCENARIO LIST -->
-    <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
+    <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-navy-800 text-white flex justify-between items-center">
                 <h3 class="font-bold text-lg">Szenarien verwalten</h3>
@@ -168,7 +169,6 @@
                 <button onclick="startScenarioMode()" class="w-full py-3 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-2 transition-all">
                     <i class="fa-solid fa-plus-circle"></i> Neues Szenario anlegen
                 </button>
-                <p class="text-xs text-center text-slate-500 mt-2">Leert Felder & aktiviert Speichermodus</p>
             </div>
 
             <!-- List -->
@@ -179,7 +179,7 @@
     </div>
 
     <!-- MODAL: SAVE SCENARIO NAME -->
-    <div id="modal-save-scenario" class="fixed inset-0 z-50 hidden bg-navy-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="modal-save-scenario" class="fixed inset-0 z-50 hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6">
             <h3 class="text-xl font-bold text-navy-800 dark:text-white mb-4">Szenario benennen</h3>
             <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white mb-6 focus:ring-2 focus:ring-petrol-500 focus:outline-none">
@@ -191,7 +191,7 @@
     </div>
 
     <!-- MODAL: HELP -->
-    <div id="modal-help" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
+    <div id="modal-help" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
             <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="flex items-center gap-3 mb-4">
@@ -203,7 +203,7 @@
     </div>
 
     <!-- MODAL: SNIPPETS (LEGO) -->
-    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
+    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-petrol-600 text-white flex justify-between items-center">
                 <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
@@ -272,11 +272,11 @@
             }
         }
 
-        // --- RENDER FIELDS (BOXED LAYOUT) ---
+        // --- RENDER FIELDS (HIGH CONTRAST) ---
         function renderFields() {
             const container = document.getElementById('fields-container');
             container.innerHTML = FIELDS.map((field, index) => `
-                <div class="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors">
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-4 transition-colors">
                     <div class="flex justify-between items-center mb-1">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
@@ -291,7 +291,7 @@
                     </div>
                     <textarea 
                         id="input-${field.id}" 
-                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-petrol-500 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 transition-all leading-relaxed"
+                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-petrol-600 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 transition-all leading-relaxed"
                         placeholder="${field.desc}"></textarea>
                 </div>
             `).join('');
@@ -342,7 +342,7 @@
                 btnsScenario.classList.remove('hidden');
                 btnsScenario.classList.add('flex');
             } else {
-                title.innerHTML = 'Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.3</span>';
+                title.innerHTML = 'Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.4</span>';
                 indicator.classList.add('hidden');
                 btnGenerate.classList.remove('hidden');
                 btnsScenario.classList.add('hidden');
@@ -527,7 +527,7 @@
         function renderCard(item) {
             const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
             return `
-            <div class="bg-white dark:bg-navy-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700">
+            <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-slate-200 dark:border-slate-700">
                 <div class="flex justify-between items-start mb-3">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${date}</span>
                     <div class="flex gap-3">
