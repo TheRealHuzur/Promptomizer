@@ -1,9 +1,9 @@
 {
-  "name": "Promptomizer V2.0",
+  "name": "Promptomizer V2.3",
   "short_name": "Promptomizer",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#1e293b",
   "theme_color": "#0d9488",
   "orientation": "portrait-primary",
   "icons": [
