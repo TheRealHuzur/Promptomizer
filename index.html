@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V2.0</title>
+    <title>Promptomizer V2.3</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#1e293b">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <!-- Tailwind CSS (CDN for standalone usage) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,14 +20,13 @@
                 extend: {
                     colors: {
                         petrol: {
-                            500: '#14b8a6', // Teal 500
-                            600: '#0d9488', // Teal 600
-                            700: '#0f766e', // Teal 700
+                            500: '#14b8a6',
+                            600: '#0d9488', // Primary Accent
+                            700: '#0f766e',
                         },
                         navy: {
-                            800: '#1e293b', // Slate 800
-                            900: '#0f172a', // Slate 900
-                            950: '#020617', // Slate 950
+                            800: '#1e293b', // Secondary / Header
+                            900: '#0f172a', // Dark Mode Bg
                         }
                     },
                     fontFamily: {
@@ -38,38 +37,39 @@
         }
     </script>
 
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        /* Hide Scrollbar but keep functionality */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         /* Smooth transitions */
-        .page-transition { transition: opacity 0.2s ease-in-out; }
+        input, textarea, button, div { transition: all 0.2s ease-in-out; }
+        /* Safe area for fixed footer */
+        .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-20">
+<body class="bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
 
     <!-- HEADER -->
-    <header class="fixed top-0 w-full z-40 bg-navy-900 text-white shadow-md border-b border-navy-800">
+    <header class="fixed top-0 w-full z-40 bg-navy-800 text-white shadow-md border-b border-slate-700">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-cube text-petrol-500 text-xl"></i>
-                <h1 class="font-semibold text-lg tracking-wide">Promptomizer <span class="text-petrol-500 text-xs align-top">V2.0</span></h1>
+                <div class="w-9 h-9 bg-petrol-600 rounded flex items-center justify-center shadow-lg shadow-petrol-600/20">
+                    <i class="fa-solid fa-cube text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 id="app-title" class="font-bold text-lg tracking-tight leading-none">Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.3</span></h1>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <!-- Global Scenarios Button -->
-                <button onclick="openScenarioModal()" class="text-sm bg-navy-800 hover:bg-navy-800/80 px-3 py-1.5 rounded-md border border-slate-700 transition-colors flex items-center gap-2">
+            <div class="flex items-center gap-3">
+                <button onclick="openScenarioListModal()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded flex items-center gap-2 transition-colors">
                     <i class="fa-solid fa-layer-group text-petrol-500"></i>
-                    <span class="hidden sm:inline">Szenarien</span>
+                    <span class="font-medium text-sm hidden sm:inline">Szenarien</span>
                 </button>
-                <!-- Dark Mode Toggle -->
-                <button onclick="toggleDarkMode()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
             </div>
@@ -77,126 +77,165 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-3xl mx-auto pt-20 px-4">
+    <main class="max-w-3xl mx-auto pt-24 px-4">
         
-        <!-- VIEW: CREATE (Editor) -->
-        <div id="view-create" class="page-transition block">
+        <!-- VIEW: CREATE (EDITOR) -->
+        <div id="view-create" class="block">
             
             <!-- Toolbar -->
-            <div class="flex justify-end mb-4">
-                <button onclick="resetFields()" class="text-slate-400 hover:text-red-500 text-sm flex items-center gap-1 transition-colors">
-                    <i class="fa-solid fa-trash-can"></i> Felder leeren
-                </button>
+            <div class="flex justify-between items-center mb-6">
+                <div id="mode-indicator" class="hidden text-petrol-600 dark:text-petrol-500 font-bold text-sm uppercase tracking-wider animate-pulse">
+                    <i class="fa-solid fa-circle text-[10px] mr-1"></i> Szenario-Modus
+                </div>
+                <div class="ml-auto">
+                    <button onclick="resetFields()" class="text-slate-400 hover:text-red-500 text-sm font-medium flex items-center gap-2 transition-colors px-3 py-1 rounded hover:bg-slate-200 dark:hover:bg-navy-800">
+                        <i class="fa-solid fa-trash-can"></i> Alles löschen
+                    </button>
+                </div>
             </div>
 
             <!-- Form Container -->
             <div id="fields-container" class="space-y-6">
-                <!-- Fields are injected here via JS -->
+                <!-- Fields injected via JS -->
             </div>
 
-            <!-- Floating Generate Button -->
-            <div class="fixed bottom-20 right-4 md:absolute md:bottom-auto md:right-0 md:relative md:mt-8 md:mb-8 flex justify-end z-30">
-                <button onclick="generatePrompt()" class="bg-petrol-600 hover:bg-petrol-700 text-white font-medium py-3 px-6 rounded-full shadow-lg shadow-petrol-600/30 flex items-center gap-2 transform active:scale-95 transition-all">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Erstellen & Kopieren</span>
-                </button>
+            <!-- FOOTER ACTION AREA (Dynamic) -->
+            <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-10 md:mb-8 pointer-events-none">
+                <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
+                    
+                    <!-- Normal Mode Button -->
+                    <button id="btn-generate" onclick="generatePrompt()" class="w-full md:w-auto bg-petrol-600 hover:bg-petrol-700 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-xl shadow-petrol-600/30 flex items-center justify-center gap-3 transform active:scale-95 transition-all">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Erstellen & Kopieren</span>
+                    </button>
+
+                    <!-- Scenario Mode Buttons (Hidden by default) -->
+                    <div id="btns-scenario" class="hidden w-full flex gap-3">
+                        <button onclick="cancelScenarioMode()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 font-bold py-4 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-xmark"></i> Abbrechen
+                        </button>
+                        <button onclick="initiateSaveScenario()" class="flex-[2] bg-petrol-600 hover:bg-petrol-700 text-white font-bold py-4 px-4 rounded-xl shadow-xl shadow-petrol-600/30 flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-floppy-disk"></i> Szenario speichern
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </div>
 
         <!-- VIEW: HISTORY -->
-        <div id="view-history" class="page-transition hidden">
-            <h2 class="text-xl font-semibold mb-6 text-navy-900 dark:text-white">Verlauf</h2>
-            <div id="history-list" class="space-y-4">
-                <!-- History Items injected via JS -->
-                <div class="text-center text-slate-400 py-10">Keine Einträge vorhanden.</div>
-            </div>
+        <div id="view-history" class="hidden">
+            <h2 class="text-2xl font-bold mb-6 text-navy-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Verlauf</h2>
+            <div id="history-list" class="space-y-4"></div>
         </div>
 
         <!-- VIEW: FAVORITES -->
-        <div id="view-favorites" class="page-transition hidden">
-            <h2 class="text-xl font-semibold mb-6 text-navy-900 dark:text-white">Favoriten</h2>
-            <div id="favorites-list" class="space-y-4">
-                <!-- Favorites Items injected via JS -->
-                <div class="text-center text-slate-400 py-10">Keine Favoriten gespeichert.</div>
-            </div>
+        <div id="view-favorites" class="hidden">
+            <h2 class="text-2xl font-bold mb-6 text-navy-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Favoriten</h2>
+            <div id="favorites-list" class="space-y-4"></div>
         </div>
 
     </main>
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 w-full bg-white dark:bg-navy-900 border-t border-slate-200 dark:border-navy-800 z-40 safe-area-pb">
+    <nav class="fixed bottom-0 w-full bg-white dark:bg-navy-800 border-t border-slate-200 dark:border-slate-700 z-40 safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div class="max-w-3xl mx-auto flex justify-around items-center h-16">
             <button onclick="switchTab('create')" class="nav-btn active flex flex-col items-center gap-1 w-full h-full justify-center text-petrol-600 dark:text-petrol-500" data-target="create">
-                <i class="fa-regular fa-pen-to-square text-lg"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wider">Erstellen</span>
+                <i class="fa-regular fa-pen-to-square text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Editor</span>
             </button>
             <button onclick="switchTab('history')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="history">
-                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wider">Historie</span>
+                <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Historie</span>
             </button>
             <button onclick="switchTab('favorites')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="favorites">
-                <i class="fa-regular fa-star text-lg"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wider">Favoriten</span>
+                <i class="fa-regular fa-star text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Favoriten</span>
             </button>
         </div>
     </nav>
 
-    <!-- MODAL: SCENARIOS (Global) -->
-    <div id="modal-scenarios" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- MODAL: SCENARIO LIST -->
+    <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-navy-900 text-white">
-                <h3 class="font-medium flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> Globale Szenarien</h3>
-                <button onclick="closeModal('modal-scenarios')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="p-4 bg-navy-800 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg">Szenarien verwalten</h3>
+                <button onclick="closeModal('modal-scenario-list')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-4 bg-slate-50 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700">
-                <div class="flex gap-2">
-                    <input type="text" id="scenario-name-input" placeholder="Neues Szenario speichern..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
-                    <button onclick="saveScenario()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk"></i></button>
-                </div>
+            
+            <!-- Action: Start New Mode -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-900/50">
+                <button onclick="startScenarioMode()" class="w-full py-3 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-plus-circle"></i> Neues Szenario anlegen
+                </button>
+                <p class="text-xs text-center text-slate-500 mt-2">Leert Felder & aktiviert Speichermodus</p>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="scenarios-list">
+
+            <!-- List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="scenarios-list-container">
                 <!-- List injected via JS -->
             </div>
         </div>
     </div>
 
-    <!-- MODAL: SNIPPETS (Local per field) -->
-    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-petrol-700 text-white">
-                <h3 class="font-medium flex items-center gap-2"><i class="fa-solid fa-book-bookmark"></i> Bausteine: <span id="snippet-modal-title" class="opacity-90"></span></h3>
-                <button onclick="closeModal('modal-snippets')" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-4 bg-slate-50 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700">
-                <div class="flex gap-2">
-                    <input type="text" id="snippet-name-input" placeholder="Baustein benennen..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
-                    <button onclick="saveSnippet()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk"></i></button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="snippets-list">
-                <!-- List injected via JS -->
+    <!-- MODAL: SAVE SCENARIO NAME -->
+    <div id="modal-save-scenario" class="fixed inset-0 z-50 hidden bg-navy-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6">
+            <h3 class="text-xl font-bold text-navy-800 dark:text-white mb-4">Szenario benennen</h3>
+            <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white mb-6 focus:ring-2 focus:ring-petrol-500 focus:outline-none">
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-save-scenario')" class="flex-1 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-navy-900">Zurück</button>
+                <button onclick="confirmSaveScenario()" class="flex-1 py-2 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold">Speichern</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-900 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3">
+    <!-- MODAL: HELP -->
+    <div id="modal-help" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
+            <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center gap-3 mb-4">
+                <i id="help-icon" class="fa-solid fa-info text-petrol-600 dark:text-petrol-500 text-2xl"></i>
+                <h3 id="help-title" class="text-xl font-bold text-navy-800 dark:text-white">Hilfe</h3>
+            </div>
+            <p id="help-text" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+    </div>
+
+    <!-- MODAL: SNIPPETS (LEGO) -->
+    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 bg-petrol-600 text-white flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
+                <button onclick="closeModal('modal-snippets')" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-3 bg-slate-100 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700 flex gap-2">
+                <input type="text" id="snippet-name-input" placeholder="Neuer Baustein..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
+                <button onclick="saveSnippet()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="snippets-list"></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3 border border-slate-600">
         <i class="fa-solid fa-circle-check text-petrol-500"></i>
-        <span id="toast-msg">Erfolg!</span>
+        <span id="toast-msg" class="font-medium">Erfolg!</span>
     </div>
 
     <!-- JAVASCRIPT -->
     <script>
         // --- CONFIGURATION ---
         const FIELDS = [
-            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', desc: 'Marketingfachkraft, erfahrener Entwickler, Projektleiter...' },
-            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', desc: 'Wer soll das Ergebnis nutzen? Welche Situation liegt vor?' },
-            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', desc: 'Analysiere, erstelle, vergib, bewerte...' },
-            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', desc: 'Sachlich, werbend, empathisch...' },
-            { id: 'format', label: 'Format & Varianten', icon: 'fa-list-check', desc: 'Liste, Tabelle, kurzer Text, 3 Varianten...' }
+            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', desc: 'Beschreiben Sie, in welcher Rolle die KI arbeiten soll. Je genauer Sie das Profil festlegen, desto gezielter kann die KI antworten. Beispiele: Marketingfachkraft, erfahrener Entwickler, Projektleiter.' },
+            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', desc: 'Geben Sie die wichtigsten Hintergründe mit: Wer soll das Ergebnis nutzen? Welche Situation liegt vor? Je klarer der Rahmen, desto treffender fällt die Antwort aus.' },
+            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', desc: 'Formulieren Sie klar, was getan werden soll. Nutzen Sie eindeutige Verben wie analysiere, erstelle, vergib oder bewerte. Die KI folgt genau diesem Auftrag.' },
+            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', desc: 'Legen Sie fest, wie der Text klingen soll. Sachlich, werbend oder empathisch – der gewünschte Stil steuert die Wirkung der Antwort.' },
+            { id: 'format', label: 'Format & Varianten', icon: 'fa-list-check', desc: 'Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll – zum Beispiel als Liste, Tabelle oder kurzer Text. Hier können Sie auch die Länge oder die Anzahl von Varianten angeben.' }
         ];
 
-        // --- STATE MANAGEMENT ---
+        // --- STATE ---
+        let isScenarioMode = false;
         let currentSnippetFieldId = null;
 
         // --- INIT ---
@@ -207,11 +246,10 @@
             registerSW();
         });
 
-        // --- THEME LOGIC ---
+        // --- THEME ---
         function initTheme() {
             const savedTheme = localStorage.getItem('promptomizer_theme');
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
             if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
                 document.documentElement.classList.add('dark');
                 document.getElementById('theme-icon').className = 'fa-solid fa-sun';
@@ -234,180 +272,157 @@
             }
         }
 
-        // --- RENDER INPUT FIELDS ---
+        // --- RENDER FIELDS (BOXED LAYOUT) ---
         function renderFields() {
             const container = document.getElementById('fields-container');
-            container.innerHTML = FIELDS.map(field => `
-                <div class="bg-white dark:bg-navy-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="font-semibold text-navy-900 dark:text-slate-100 flex items-center gap-2">
-                            <i class="fa-solid ${field.icon} text-petrol-500 w-5"></i>
-                            ${field.label}
-                        </label>
-                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-400 hover:text-petrol-600 dark:hover:text-petrol-400 text-sm px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-navy-900 transition-colors" title="Bausteine">
-                            <i class="fa-solid fa-book"></i>
+            container.innerHTML = FIELDS.map((field, index) => `
+                <div class="bg-white dark:bg-navy-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                            <label class="font-bold text-lg text-navy-800 dark:text-slate-100">${field.label}</label>
+                            <button onclick="openHelp(${index})" class="ml-1 text-slate-400 hover:text-petrol-600 transition-colors" title="Hilfe">
+                                <i class="fa-solid fa-circle-question text-lg"></i>
+                            </button>
+                        </div>
+                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-400 hover:text-petrol-600 p-1.5 rounded hover:bg-slate-100 dark:hover:bg-navy-900 transition-colors" title="Bausteine">
+                            <i class="fa-solid fa-book text-lg"></i>
                         </button>
                     </div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">${field.desc}</div>
                     <textarea 
                         id="input-${field.id}" 
-                        class="w-full h-32 p-3 bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-petrol-500 focus:border-transparent resize-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-all text-sm"
-                        placeholder="..."></textarea>
+                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-petrol-500 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 transition-all leading-relaxed"
+                        placeholder="${field.desc}"></textarea>
                 </div>
             `).join('');
         }
 
-        // --- TAB NAVIGATION ---
-        function switchTab(tabId) {
-            // Update UI
-            document.querySelectorAll('.page-transition').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            
-            // Update Nav Buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === tabId) {
-                    btn.classList.remove('text-slate-400', 'hover:text-navy-800');
-                    btn.classList.add('text-petrol-600', 'dark:text-petrol-500');
-                } else {
-                    btn.classList.add('text-slate-400', 'hover:text-navy-800');
-                    btn.classList.remove('text-petrol-600', 'dark:text-petrol-500');
-                }
-            });
-
-            if(tabId === 'history') loadHistory();
-            if(tabId === 'favorites') loadFavorites();
+        // --- HELP SYSTEM ---
+        function openHelp(index) {
+            const field = FIELDS[index];
+            document.getElementById('help-title').innerText = field.label;
+            document.getElementById('help-text').innerText = field.desc;
+            document.getElementById('help-icon').className = `fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 text-2xl`;
+            document.getElementById('modal-help').classList.remove('hidden');
         }
 
-        // --- GENERATOR LOGIC ---
-        function generatePrompt() {
-            let finalText = "";
-            let fieldValues = [];
-            let hasContent = false;
-
-            // Mapping for Output Headers
-            const headerMap = {
-                'role': '🤖 ROLLE',
-                'context': '🌍 KONTEXT',
-                'task': '🎯 AUFGABE',
-                'style': '🎨 STIL UND TONALITÄT',
-                'format': '🧪 VARIANTEN'
-            };
-
-            FIELDS.forEach(field => {
-                const val = document.getElementById(`input-${field.id}`).value.trim();
-                fieldValues.push(val);
-                if (val) {
-                    hasContent = true;
-                    finalText += `**${headerMap[field.id]}**\n${val}\n\n`;
-                }
-            });
-
-            if (!hasContent) {
-                showToast("Bitte füllen Sie mindestens ein Feld aus.", true);
-                return;
-            }
-
-            finalText = finalText.trim();
-
-            // Copy to Clipboard
-            navigator.clipboard.writeText(finalText).then(() => {
-                showToast("Prompt kopiert & gespeichert!");
-            }).catch(() => {
-                showToast("Fehler beim Kopieren", true);
-            });
-
-            // Save to History
-            const entry = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                text: finalText,
-                fields: fieldValues, // Save raw fields to restore later
-                favorite: false
-            };
-
-            const history = getStorage('history') || [];
-            history.unshift(entry);
-            // Limit history to 50 items
-            if(history.length > 50) history.pop();
-            saveStorage('history', history);
-        }
-
-        function resetFields() {
-            if(confirm('Alle Felder leeren?')) {
-                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
-            }
-        }
-
-        // --- SCENARIO SYSTEM (GLOBAL) ---
-        function openScenarioModal() {
+        // --- SCENARIO MODE LOGIC ---
+        function openScenarioListModal() {
             renderScenarioList();
-            document.getElementById('modal-scenarios').classList.remove('hidden');
+            document.getElementById('modal-scenario-list').classList.remove('hidden');
         }
 
-        function saveScenario() {
-            const name = document.getElementById('scenario-name-input').value.trim();
-            if(!name) return;
+        function startScenarioMode() {
+            closeModal('modal-scenario-list');
+            FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+            
+            isScenarioMode = true;
+            updateUIForMode();
+            showToast("Szenario-Modus aktiviert");
+        }
 
-            const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
-            // Check if completely empty
-            if(currentValues.every(v => v.trim() === '')) {
-                showToast("Szenario ist leer!", true);
+        function cancelScenarioMode() {
+            if(confirm("Szenario-Erstellung abbrechen? Alle Eingaben gehen verloren.")) {
+                isScenarioMode = false;
+                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+                updateUIForMode();
+            }
+        }
+
+        function updateUIForMode() {
+            const title = document.getElementById('app-title');
+            const indicator = document.getElementById('mode-indicator');
+            const btnGenerate = document.getElementById('btn-generate');
+            const btnsScenario = document.getElementById('btns-scenario');
+
+            if (isScenarioMode) {
+                title.innerHTML = '<span class="text-petrol-500">Szenario</span> erstellen';
+                indicator.classList.remove('hidden');
+                btnGenerate.classList.add('hidden');
+                btnsScenario.classList.remove('hidden');
+                btnsScenario.classList.add('flex');
+            } else {
+                title.innerHTML = 'Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.3</span>';
+                indicator.classList.add('hidden');
+                btnGenerate.classList.remove('hidden');
+                btnsScenario.classList.add('hidden');
+                btnsScenario.classList.remove('flex');
+            }
+        }
+
+        function initiateSaveScenario() {
+            const hasContent = FIELDS.some(f => document.getElementById(`input-${f.id}`).value.trim() !== '');
+            if(!hasContent) {
+                showToast("Bitte füllen Sie Felder aus!", true);
                 return;
             }
+            document.getElementById('new-scenario-name').value = '';
+            document.getElementById('modal-save-scenario').classList.remove('hidden');
+        }
 
+        function confirmSaveScenario() {
+            const name = document.getElementById('new-scenario-name').value.trim();
+            if(!name) {
+                showToast("Bitte Namen eingeben", true);
+                return;
+            }
+            
+            const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
             const scenarios = getStorage('scenarios') || [];
             scenarios.push({ id: Date.now(), name, fields: currentValues });
             saveStorage('scenarios', scenarios);
             
-            document.getElementById('scenario-name-input').value = '';
-            renderScenarioList();
+            closeModal('modal-save-scenario');
+            isScenarioMode = false;
+            updateUIForMode();
+            showToast(`Szenario "${name}" gespeichert!`);
         }
 
         function loadScenario(id) {
             const scenarios = getStorage('scenarios') || [];
             const scenario = scenarios.find(s => s.id === id);
             if(scenario) {
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
                 scenario.fields.forEach((val, index) => {
                     document.getElementById(`input-${FIELDS[index].id}`).value = val;
                 });
-                closeModal('modal-scenarios');
-                showToast(`Szenario "${scenario.name}" geladen`);
+                closeModal('modal-scenario-list');
+                showToast(`"${scenario.name}" geladen`);
             }
         }
 
         function deleteScenario(id) {
-            let scenarios = getStorage('scenarios') || [];
-            scenarios = scenarios.filter(s => s.id !== id);
-            saveStorage('scenarios', scenarios);
-            renderScenarioList();
+            if(confirm("Szenario wirklich löschen?")) {
+                let scenarios = getStorage('scenarios') || [];
+                scenarios = scenarios.filter(s => s.id !== id);
+                saveStorage('scenarios', scenarios);
+                renderScenarioList();
+            }
         }
 
         function renderScenarioList() {
             const scenarios = getStorage('scenarios') || [];
-            const list = document.getElementById('scenarios-list');
-            
+            const list = document.getElementById('scenarios-list-container');
             if(scenarios.length === 0) {
-                list.innerHTML = '<div class="text-slate-400 text-center text-sm py-4">Noch keine Szenarien gespeichert.</div>';
+                list.innerHTML = '<div class="text-slate-400 text-center py-4 text-sm">Keine Szenarien gespeichert.</div>';
                 return;
             }
-
             list.innerHTML = scenarios.map(s => `
-                <div class="flex items-center justify-between bg-white dark:bg-navy-800 border border-slate-200 dark:border-slate-700 p-3 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <button onclick="loadScenario(${s.id})" class="flex-1 text-left font-medium text-navy-900 dark:text-slate-100 text-sm truncate pr-2">
+                <div class="flex items-center justify-between bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 p-3 rounded hover:border-petrol-500 transition-colors">
+                    <button onclick="loadScenario(${s.id})" class="flex-1 text-left font-medium text-navy-800 dark:text-slate-100">
                         ${s.name}
                     </button>
-                    <button onclick="deleteScenario(${s.id})" class="text-slate-400 hover:text-red-500 p-1">
+                    <button onclick="deleteScenario(${s.id})" class="text-slate-400 hover:text-red-500 p-2">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             `).join('');
         }
 
-        // --- SNIPPET SYSTEM (LOCAL) ---
+        // --- SNIPPET SYSTEM (LEGO) ---
         function openSnippetModal(fieldId) {
             currentSnippetFieldId = fieldId;
-            const field = FIELDS.find(f => f.id === fieldId);
-            document.getElementById('snippet-modal-title').innerText = field.label;
+            document.getElementById('snippet-modal-title').innerText = FIELDS.find(f => f.id === fieldId).label;
             renderSnippetList();
             document.getElementById('modal-snippets').classList.remove('hidden');
         }
@@ -415,204 +430,171 @@
         function saveSnippet() {
             const name = document.getElementById('snippet-name-input').value.trim();
             const text = document.getElementById(`input-${currentSnippetFieldId}`).value.trim();
-
-            if(!name || !text) {
-                showToast("Name oder Feld leer!", true);
-                return;
-            }
+            if(!name || !text) { showToast("Name oder Feld leer!", true); return; }
 
             const allSnippets = getStorage('snippets') || {};
             if(!allSnippets[currentSnippetFieldId]) allSnippets[currentSnippetFieldId] = [];
-            
             allSnippets[currentSnippetFieldId].push({ id: Date.now(), name, text });
             saveStorage('snippets', allSnippets);
-
+            
             document.getElementById('snippet-name-input').value = '';
             renderSnippetList();
         }
 
         function loadSnippet(id) {
             const allSnippets = getStorage('snippets') || {};
-            const list = allSnippets[currentSnippetFieldId] || [];
-            const snip = list.find(s => s.id === id);
-            
-            if(snip) {
+            const item = allSnippets[currentSnippetFieldId].find(s => s.id === id);
+            if(item) {
                 const el = document.getElementById(`input-${currentSnippetFieldId}`);
-                // Optional: Append or Replace? Let's Replace for simplicity as per requirement implies "setting" text.
-                // But professional tools usually append or user decides. Let's append if not empty?
-                // Request said "Load existing... text blocks".
-                // Strategy: If empty, set. If not, confirm replace.
-                if(el.value.trim() !== '' && !confirm("Feld überschreiben?")) return;
-                
-                el.value = snip.text;
+                if(el.value.trim() !== '' && !confirm("Feldinhalt ersetzen?")) return;
+                el.value = item.text;
                 closeModal('modal-snippets');
             }
         }
 
         function deleteSnippet(id) {
+            if(!confirm("Baustein löschen?")) return;
             const allSnippets = getStorage('snippets') || {};
-            if(allSnippets[currentSnippetFieldId]) {
-                allSnippets[currentSnippetFieldId] = allSnippets[currentSnippetFieldId].filter(s => s.id !== id);
-                saveStorage('snippets', allSnippets);
-                renderSnippetList();
-            }
+            allSnippets[currentSnippetFieldId] = allSnippets[currentSnippetFieldId].filter(s => s.id !== id);
+            saveStorage('snippets', allSnippets);
+            renderSnippetList();
         }
 
         function renderSnippetList() {
             const allSnippets = getStorage('snippets') || {};
             const list = allSnippets[currentSnippetFieldId] || [];
             const container = document.getElementById('snippets-list');
-
             if(list.length === 0) {
-                container.innerHTML = '<div class="text-slate-400 text-center text-sm py-4">Keine Bausteine für dieses Feld.</div>';
+                container.innerHTML = '<div class="text-slate-400 text-center py-4 text-sm">Keine Bausteine.</div>';
                 return;
             }
-
             container.innerHTML = list.map(s => `
-                <div class="flex items-center justify-between bg-white dark:bg-navy-800 border border-slate-200 dark:border-slate-700 p-3 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div class="flex items-center justify-between bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 p-2 rounded hover:bg-slate-50 dark:hover:bg-navy-800 transition-colors">
                     <button onclick="loadSnippet(${s.id})" class="flex-1 text-left">
-                        <div class="font-medium text-navy-900 dark:text-slate-100 text-sm truncate">${s.name}</div>
+                        <div class="font-bold text-navy-800 dark:text-white text-sm">${s.name}</div>
                         <div class="text-xs text-slate-500 truncate w-48">${s.text.substring(0,30)}...</div>
                     </button>
-                    <button onclick="deleteSnippet(${s.id})" class="text-slate-400 hover:text-red-500 p-1">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <button onclick="deleteSnippet(${s.id})" class="text-slate-400 hover:text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
         }
 
-        // --- HISTORY & FAVORITES UI ---
-        function renderCard(item, isHistoryView) {
-            const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-            // Extract a preview title from Role or Context or Task
-            const preview = (item.fields[0] || item.fields[2] || "Unbenannter Prompt").substring(0, 40);
+        // --- GENERATE & HISTORY ---
+        function generatePrompt() {
+            let finalText = "";
+            let rawFields = [];
+            let hasContent = false;
+            const headerMap = { 'role': '🤖 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL UND TONALITÄT', 'format': '🧪 VARIANTEN' };
 
+            FIELDS.forEach(field => {
+                const val = document.getElementById(`input-${field.id}`).value.trim();
+                rawFields.push(val);
+                if (val) {
+                    hasContent = true;
+                    finalText += `**${headerMap[field.id]}**\n${val}\n\n`;
+                }
+            });
+
+            if (!hasContent) { showToast("Bitte Felder ausfüllen!", true); return; }
+
+            navigator.clipboard.writeText(finalText.trim()).then(() => showToast("Kopiert & Gespeichert!"));
+
+            const history = getStorage('history') || [];
+            history.unshift({ id: Date.now(), timestamp: new Date().toISOString(), text: finalText.trim(), fields: rawFields, favorite: false });
+            if(history.length > 50) history.pop();
+            saveStorage('history', history);
+        }
+
+        function resetFields() {
+            if(confirm('Wirklich alles löschen?')) {
+                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+            }
+        }
+
+        // --- HISTORY & TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const active = btn.dataset.target === tabId;
+                btn.className = `nav-btn flex flex-col items-center gap-1 w-full h-full justify-center transition-colors ${active ? 'text-petrol-600 dark:text-petrol-500' : 'text-slate-400 hover:text-navy-800 dark:hover:text-slate-200'}`;
+            });
+            if(tabId === 'history') loadHistory();
+            if(tabId === 'favorites') loadFavorites();
+        }
+
+        function renderCard(item) {
+            const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
             return `
             <div class="bg-white dark:bg-navy-800 rounded-lg shadow-sm p-4 border border-slate-200 dark:border-slate-700">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs text-slate-400 font-mono">${date}</span>
-                    <div class="flex gap-2">
-                        <button onclick="toggleFavorite(${item.id})" class="${item.favorite ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-400'} transition-colors">
-                            <i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i>
-                        </button>
-                        <button onclick="deleteHistoryItem(${item.id})" class="text-slate-300 hover:text-red-500 transition-colors">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${date}</span>
+                    <div class="flex gap-3">
+                        <button onclick="toggleFavorite(${item.id})" class="text-lg ${item.favorite ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-400'}"><i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
+                        <button onclick="deleteHistoryItem(${item.id})" class="text-lg text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
-                <h3 class="font-semibold text-navy-900 dark:text-white mb-2 text-sm">${preview}...</h3>
-                <div class="bg-slate-50 dark:bg-navy-900 p-2 rounded border border-slate-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 font-mono overflow-hidden h-16 mb-3">
-                    ${item.text.replace(/\n/g, '<br>')}
+                <div class="bg-slate-50 dark:bg-navy-900 p-3 rounded border border-slate-100 dark:border-slate-700 text-sm font-mono text-slate-600 dark:text-slate-400 overflow-hidden h-20 mb-3 relative">
+                     ${item.text.replace(/\n/g, '<br>')}
+                     <div class="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-slate-50 dark:from-navy-900 to-transparent"></div>
                 </div>
                 <div class="flex justify-end gap-2">
-                    <button onclick="restorePrompt(${item.id})" class="text-xs bg-navy-100 dark:bg-navy-700 text-navy-700 dark:text-slate-200 px-2 py-1 rounded hover:bg-navy-200 transition-colors">
-                        <i class="fa-solid fa-pen"></i> Bearbeiten
-                    </button>
-                    <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="text-xs bg-petrol-100 dark:bg-petrol-900/30 text-petrol-700 dark:text-petrol-400 px-2 py-1 rounded hover:bg-petrol-200 transition-colors">
-                        <i class="fa-solid fa-copy"></i> Kopieren
-                    </button>
+                    <button onclick="restorePrompt(${item.id})" class="px-3 py-1.5 rounded bg-navy-800 dark:bg-slate-700 text-white text-sm hover:bg-navy-700 transition-colors"><i class="fa-solid fa-pen mr-1"></i> Bearbeiten</button>
+                    <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="px-3 py-1.5 rounded bg-petrol-600 text-white text-sm hover:bg-petrol-700 transition-colors"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
                 </div>
             </div>`;
         }
 
         function loadHistory() {
             const history = getStorage('history') || [];
-            const container = document.getElementById('history-list');
-            if(history.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Einträge vorhanden.</div>';
-            } else {
-                container.innerHTML = history.map(item => renderCard(item, true)).join('');
-            }
+            const el = document.getElementById('history-list');
+            el.innerHTML = history.length ? history.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Einträge.</div>';
         }
-
         function loadFavorites() {
             const history = getStorage('history') || [];
             const favs = history.filter(h => h.favorite);
-            const container = document.getElementById('favorites-list');
-            if(favs.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Favoriten gespeichert.</div>';
-            } else {
-                container.innerHTML = favs.map(item => renderCard(item, false)).join('');
-            }
+            const el = document.getElementById('favorites-list');
+            el.innerHTML = favs.length ? favs.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Favoriten.</div>';
         }
-
         function toggleFavorite(id) {
-            let history = getStorage('history') || [];
-            const idx = history.findIndex(h => h.id === id);
-            if(idx > -1) {
-                history[idx].favorite = !history[idx].favorite;
-                saveStorage('history', history);
-                // Refresh current view
-                if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites();
-                else loadHistory();
-            }
+            let h = getStorage('history') || [];
+            const idx = h.findIndex(x => x.id === id);
+            if(idx > -1) { h[idx].favorite = !h[idx].favorite; saveStorage('history', h); }
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
         }
-
         function deleteHistoryItem(id) {
             if(!confirm("Eintrag löschen?")) return;
-            let history = getStorage('history') || [];
-            history = history.filter(h => h.id !== id);
-            saveStorage('history', history);
-            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites();
-            else loadHistory();
+            let h = getStorage('history') || [];
+            h = h.filter(x => x.id !== id);
+            saveStorage('history', h);
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
         }
-
         function restorePrompt(id) {
-            const history = getStorage('history') || [];
-            const item = history.find(h => h.id === id);
+            const h = getStorage('history') || [];
+            const item = h.find(x => x.id === id);
             if(item && item.fields) {
-                item.fields.forEach((val, index) => {
-                    if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
-                });
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
                 switchTab('create');
-                showToast("Prompt in Editor geladen");
+                showToast("Prompt geladen");
             }
         }
 
         // --- UTILS ---
-        function getStorage(key) {
-            const data = localStorage.getItem(`promptomizer_${key}`);
-            return data ? JSON.parse(data) : null;
+        function getStorage(k) { return JSON.parse(localStorage.getItem('promptomizer_'+k)); }
+        function saveStorage(k, v) { localStorage.setItem('promptomizer_'+k, JSON.stringify(v)); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function copyText(t) { navigator.clipboard.writeText(t).then(() => showToast("Kopiert!")); }
+        function showToast(m, err=false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = m;
+            t.classList.remove('opacity-0', 'border-red-500', 'border-slate-600');
+            t.classList.add(err ? 'border-red-500' : 'border-slate-600');
+            setTimeout(() => t.classList.add('opacity-0'), 2500);
         }
-
-        function saveStorage(key, data) {
-            localStorage.setItem(`promptomizer_${key}`, JSON.stringify(data));
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => showToast("Kopiert!"));
-        }
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            toastMsg.innerText = msg;
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            
-            if(isError) {
-                toast.classList.add('bg-red-600');
-                toast.classList.remove('bg-navy-900');
-            } else {
-                toast.classList.remove('bg-red-600');
-                toast.classList.add('bg-navy-900');
-            }
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-            }, 3000);
-        }
-
-        // --- SERVICE WORKER REG ---
         function registerSW() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registriert', reg))
-                    .catch(err => console.error('SW Fehler', err));
-            }
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.error);
         }
     </script>
 </body>
