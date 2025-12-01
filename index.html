@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V2.4</title>
+    <title>Promptomizer V2.8</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#1e293b">
     
@@ -25,7 +25,7 @@
                             700: '#0f766e',
                         },
                         navy: {
-                            800: '#1e293b', // Header
+                            800: '#1e293b', // Header Background
                             900: '#0f172a', // Dark Mode Bg
                         }
                     },
@@ -54,14 +54,12 @@
 <body class="bg-slate-100 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
 
     <!-- HEADER -->
-    <header class="fixed top-0 w-full z-40 bg-navy-800 text-white shadow-md border-b border-slate-700">
+    <header class="fixed top-0 w-full z-40 bg-navy-800 shadow-md border-b border-slate-700">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
             <!-- Logo & Title -->
-            <div class="flex items-center gap-3 overflow-hidden">
-                <div class="w-8 h-8 bg-petrol-600 rounded flex-shrink-0 flex items-center justify-center shadow-lg shadow-petrol-600/20">
-                    <i class="fa-solid fa-cube text-white text-sm"></i>
-                </div>
-                <h1 id="app-title" class="font-bold text-lg tracking-tight leading-none truncate">Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.4</span></h1>
+            <div class="flex items-center gap-3">
+                <img src="./icon.png" alt="Logo" class="h-8 w-8 rounded-md shadow-sm bg-white/10">
+                <h1 class="font-bold text-xl tracking-tight text-petrol-500">Promptomizer</h1>
             </div>
             
             <!-- Header Actions -->
@@ -71,13 +69,13 @@
                     <i class="fa-solid fa-layer-group text-petrol-500"></i>
                 </button>
                 
-                <!-- Delete All (Moved here) -->
+                <!-- Delete All -->
                 <button onclick="resetFields()" class="bg-slate-700 hover:bg-red-900/50 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-slate-300 hover:text-red-400" title="Alles löschen">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
 
                 <!-- Dark Mode -->
-                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-1">
+                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-1 text-white">
                     <i id="theme-icon" class="fa-solid fa-moon"></i>
                 </button>
             </div>
@@ -132,7 +130,12 @@
 
         <!-- VIEW: FAVORITES -->
         <div id="view-favorites" class="hidden">
-            <h2 class="text-2xl font-bold mb-6 text-navy-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Favoriten</h2>
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-navy-800 dark:text-white">Favoriten</h2>
+                <button onclick="openHelp('favorites')" class="text-slate-400 hover:text-petrol-600 transition-colors">
+                    <i class="fa-solid fa-circle-question text-xl"></i>
+                </button>
+            </div>
             <div id="favorites-list" class="space-y-4"></div>
         </div>
 
@@ -156,11 +159,16 @@
         </div>
     </nav>
 
-    <!-- MODAL: SCENARIO LIST -->
+    <!-- MODAL: SCENARIO LIST (Z-50) -->
     <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-navy-800 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg">Szenarien verwalten</h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-lg">Szenarien</h3>
+                    <button onclick="openHelp('scenarios')" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                </div>
                 <button onclick="closeModal('modal-scenario-list')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -178,8 +186,8 @@
         </div>
     </div>
 
-    <!-- MODAL: SAVE SCENARIO NAME -->
-    <div id="modal-save-scenario" class="fixed inset-0 z-50 hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- MODAL: SAVE SCENARIO NAME (Z-60) -->
+    <div id="modal-save-scenario" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6">
             <h3 class="text-xl font-bold text-navy-800 dark:text-white mb-4">Szenario benennen</h3>
             <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white mb-6 focus:ring-2 focus:ring-petrol-500 focus:outline-none">
@@ -190,23 +198,16 @@
         </div>
     </div>
 
-    <!-- MODAL: HELP -->
-    <div id="modal-help" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
-        <div class="bg-white dark:bg-navy-800 w-full max-w-lg rounded-xl shadow-2xl p-6 relative">
-            <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="flex items-center gap-3 mb-4">
-                <i id="help-icon" class="fa-solid fa-info text-petrol-600 dark:text-petrol-500 text-2xl"></i>
-                <h3 id="help-title" class="text-xl font-bold text-navy-800 dark:text-white">Hilfe</h3>
-            </div>
-            <p id="help-text" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"></p>
-        </div>
-    </div>
-
-    <!-- MODAL: SNIPPETS (LEGO) -->
+    <!-- MODAL: SNIPPETS / BAUSTEINE (Z-50) -->
     <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
         <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 bg-petrol-600 text-white flex justify-between items-center">
-                <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
+                    <button onclick="openHelp('blocks')" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                </div>
                 <button onclick="closeModal('modal-snippets')" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-3 bg-slate-100 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700 flex gap-2">
@@ -217,22 +218,65 @@
         </div>
     </div>
 
+    <!-- MODAL: HELP (Z-100 - ALWAYS ON TOP) -->
+    <div id="modal-help" class="fixed inset-0 z-[100] hidden bg-navy-900/90 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-lg rounded-xl shadow-2xl p-6 relative border border-slate-200 dark:border-slate-700">
+            <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fa-solid fa-circle-info text-petrol-600 dark:text-petrol-500 text-2xl"></i>
+                <h3 id="help-title" class="text-xl font-bold text-navy-800 dark:text-white">Hilfe</h3>
+            </div>
+            <p id="help-text" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+    </div>
+
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3 border border-slate-600">
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[110] flex items-center gap-3 border border-slate-600">
         <i class="fa-solid fa-circle-check text-petrol-500"></i>
         <span id="toast-msg" class="font-medium">Erfolg!</span>
     </div>
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- CONFIGURATION ---
+        // --- CONFIGURATION & CONTENT (HARDCODED) ---
         const FIELDS = [
-            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', desc: 'Beschreiben Sie, in welcher Rolle die KI arbeiten soll. Je genauer Sie das Profil festlegen, desto gezielter kann die KI antworten. Beispiele: Marketingfachkraft, erfahrener Entwickler, Projektleiter.' },
-            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', desc: 'Geben Sie die wichtigsten Hintergründe mit: Wer soll das Ergebnis nutzen? Welche Situation liegt vor? Je klarer der Rahmen, desto treffender fällt die Antwort aus.' },
-            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', desc: 'Formulieren Sie klar, was getan werden soll. Nutzen Sie eindeutige Verben wie analysiere, erstelle, vergib oder bewerte. Die KI folgt genau diesem Auftrag.' },
-            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', desc: 'Legen Sie fest, wie der Text klingen soll. Sachlich, werbend oder empathisch – der gewünschte Stil steuert die Wirkung der Antwort.' },
-            { id: 'format', label: 'Format & Varianten', icon: 'fa-list-check', desc: 'Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll – zum Beispiel als Liste, Tabelle oder kurzer Text. Hier können Sie auch die Länge oder die Anzahl von Varianten angeben.' }
+            { 
+                id: 'role', 
+                label: 'Rolle & Funktion', 
+                icon: 'fa-user-tie',
+                text: "Beschreiben Sie, in welcher Rolle die KI arbeiten soll. Je genauer Sie das Profil festlegen, desto gezielter kann die KI antworten. Beispiele: Marketingfachkraft, erfahrener Entwickler, Projektleiter."
+            },
+            { 
+                id: 'context', 
+                label: 'Kontext', 
+                icon: 'fa-earth-europe',
+                text: "Geben Sie die wichtigsten Hintergründe mit: Wer soll das Ergebnis nutzen? Welche Situation liegt vor? Je klarer der Rahmen, desto treffender fällt die Antwort aus."
+            },
+            { 
+                id: 'task', 
+                label: 'Aufgabe', 
+                icon: 'fa-bullseye',
+                text: "Formulieren Sie klar, was getan werden soll. Nutzen Sie eindeutige Verben wie analysiere, erstelle, vergib oder bewerte. Die KI folgt genau diesem Auftrag."
+            },
+            { 
+                id: 'style', 
+                label: 'Stil & Tonalität', 
+                icon: 'fa-palette',
+                text: "Legen Sie fest, wie der Text klingen soll. Sachlich, werbend oder empathisch – der gewünschte Stil steuert die Wirkung der Antwort."
+            },
+            { 
+                id: 'format', 
+                label: 'Format & Varianten', 
+                icon: 'fa-list-check',
+                text: "Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll – zum Beispiel als Liste, Tabelle oder kurzer Text. Hier können Sie auch die Länge oder die Anzahl von Varianten angeben."
+            }
         ];
+
+        const STATIC_HELP = {
+            'scenarios': "Szenarien sind gespeicherte Einstellungen für wiederkehrende Anfragen. Sie legen einmal fest, wie die KI auftreten soll. Beim nächsten Mal wählen Sie das Szenario einfach aus.",
+            'favorites': "Favoriten sind Ihre am häufigsten genutzten Vorlagen. Markieren Sie einen generierten Prompt mit dem Stern, um ihn hier wiederzufinden.",
+            'blocks': "Bausteine sind Textschnipsel für einzelne Felder (z.B. Ihre Standard-Rolle 'Anwalt'). Speichern Sie hier oft genutzte Bausteine, um sie per Klick einzufügen."
+        };
 
         // --- STATE ---
         let isScenarioMode = false;
@@ -281,7 +325,7 @@
                         <div class="flex items-center gap-2">
                             <i class="fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
                             <label class="font-bold text-lg text-navy-800 dark:text-slate-100">${field.label}</label>
-                            <button onclick="openHelp(${index})" class="ml-1 text-slate-400 hover:text-petrol-600 transition-colors" title="Hilfe">
+                            <button onclick="openHelp('${field.id}')" class="ml-1 text-slate-400 hover:text-petrol-600 transition-colors" title="Hilfe">
                                 <i class="fa-solid fa-circle-question text-lg"></i>
                             </button>
                         </div>
@@ -292,17 +336,31 @@
                     <textarea 
                         id="input-${field.id}" 
                         class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-petrol-600 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 transition-all leading-relaxed"
-                        placeholder="${field.desc}"></textarea>
+                        placeholder="${field.text}"></textarea>
                 </div>
             `).join('');
         }
 
         // --- HELP SYSTEM ---
-        function openHelp(index) {
-            const field = FIELDS[index];
-            document.getElementById('help-title').innerText = field.label;
-            document.getElementById('help-text').innerText = field.desc;
-            document.getElementById('help-icon').className = `fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 text-2xl`;
+        function openHelp(key) {
+            let title = 'Hilfe';
+            let text = 'Keine Information verfügbar.';
+
+            // Check if it's a field
+            const field = FIELDS.find(f => f.id === key);
+            if (field) {
+                title = field.label;
+                text = field.text;
+            } 
+            // Check if it's static help
+            else if (STATIC_HELP[key]) {
+                const titleMap = { 'scenarios': 'Szenarien', 'favorites': 'Favoriten', 'blocks': 'Bausteine' };
+                title = titleMap[key] || 'Hilfe';
+                text = STATIC_HELP[key];
+            }
+
+            document.getElementById('help-title').innerText = title;
+            document.getElementById('help-text').innerText = text;
             document.getElementById('modal-help').classList.remove('hidden');
         }
 
@@ -330,19 +388,16 @@
         }
 
         function updateUIForMode() {
-            const title = document.getElementById('app-title');
             const indicator = document.getElementById('mode-indicator');
             const btnGenerate = document.getElementById('btn-generate');
             const btnsScenario = document.getElementById('btns-scenario');
 
             if (isScenarioMode) {
-                title.innerHTML = '<span class="text-petrol-500">Szenario</span> erstellen';
                 indicator.classList.remove('hidden');
                 btnGenerate.classList.add('hidden');
                 btnsScenario.classList.remove('hidden');
                 btnsScenario.classList.add('flex');
             } else {
-                title.innerHTML = 'Promptomizer <span class="text-petrol-500 text-xs font-normal">V2.4</span>';
                 indicator.classList.add('hidden');
                 btnGenerate.classList.remove('hidden');
                 btnsScenario.classList.add('hidden');
@@ -484,7 +539,8 @@
             let finalText = "";
             let rawFields = [];
             let hasContent = false;
-            const headerMap = { 'role': '🤖 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL UND TONALITÄT', 'format': '🧪 VARIANTEN' };
+            // Updated Emoji for Role (Masks)
+            const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL UND TONALITÄT', 'format': '🧪 VARIANTEN' };
 
             FIELDS.forEach(field => {
                 const val = document.getElementById(`input-${field.id}`).value.trim();
