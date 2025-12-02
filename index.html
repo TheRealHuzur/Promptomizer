@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V2.8</title>
+    <title>Promptomizer V3.0</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#1e293b">
     
@@ -31,6 +31,10 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    zIndex: {
+                        '60': '60',
+                        '100': '100', // Für Hilfe-Overlay
                     }
                 }
             }
@@ -46,16 +50,19 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         /* Smooth transitions */
-        input, textarea, button, div { transition: all 0.2s ease-in-out; }
+        input, textarea, button, div, summary { transition: all 0.2s ease-in-out; }
         /* Safe area for fixed footer */
         .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
+        /* Hide default details marker */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
 
     <!-- HEADER -->
     <header class="fixed top-0 w-full z-40 bg-navy-800 shadow-md border-b border-slate-700">
-        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between relative">
             <!-- Logo & Title -->
             <div class="flex items-center gap-3">
                 <img src="./icon.png" alt="Logo" class="h-8 w-8 rounded-md shadow-sm bg-white/10">
@@ -74,10 +81,35 @@
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
 
-                <!-- Dark Mode -->
-                <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-1 text-white">
-                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                <!-- Hamburger Menu Button -->
+                <button id="menu-btn" onclick="toggleMenu()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-white ml-1">
+                    <i class="fa-solid fa-bars"></i>
                 </button>
+            </div>
+
+            <!-- DROPDOWN MENU -->
+            <div id="header-menu" class="hidden absolute top-16 right-4 w-64 bg-white dark:bg-navy-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 origin-top-right transition-all">
+                <div class="py-2">
+                    <!-- Help Link -->
+                    <button onclick="switchToHelpView()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-navy-800 dark:text-white font-medium transition-colors">
+                        <i class="fa-solid fa-book-open text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                        Anleitung & Hilfe
+                    </button>
+                    
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <div class="px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer" onclick="toggleDarkMode()">
+                        <div class="flex items-center gap-3 text-navy-800 dark:text-white font-medium">
+                            <i class="fa-solid fa-moon text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                            Dark Mode
+                        </div>
+                        <!-- Toggle Switch Visual -->
+                        <div class="w-10 h-5 bg-slate-300 dark:bg-petrol-600 rounded-full relative transition-colors">
+                            <div class="absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform dark:translate-x-5"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -86,7 +118,7 @@
     <main class="max-w-3xl mx-auto pt-20 px-4">
         
         <!-- VIEW: CREATE (EDITOR) -->
-        <div id="view-create" class="block">
+        <div id="view-create" class="block page-view">
             
             <!-- Mode Indicator (Only visible in Scenario Mode) -->
             <div id="mode-indicator" class="hidden mb-4 bg-petrol-600/10 border border-petrol-600/20 text-petrol-600 dark:text-petrol-500 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider flex items-center gap-2">
@@ -98,7 +130,7 @@
                 <!-- Fields injected via JS -->
             </div>
 
-            <!-- FOOTER ACTION AREA (Dynamic) -->
+            <!-- FOOTER ACTION AREA -->
             <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-10 md:mb-8 pointer-events-none">
                 <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
                     
@@ -108,7 +140,7 @@
                         <span>Erstellen & Kopieren</span>
                     </button>
 
-                    <!-- Scenario Mode Buttons (Hidden by default) -->
+                    <!-- Scenario Mode Buttons -->
                     <div id="btns-scenario" class="hidden w-full flex gap-3">
                         <button onclick="cancelScenarioMode()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 font-bold py-4 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
                             <i class="fa-solid fa-xmark"></i> Abbrechen
@@ -123,13 +155,13 @@
         </div>
 
         <!-- VIEW: HISTORY -->
-        <div id="view-history" class="hidden">
+        <div id="view-history" class="hidden page-view">
             <h2 class="text-2xl font-bold mb-6 text-navy-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Verlauf</h2>
             <div id="history-list" class="space-y-4"></div>
         </div>
 
         <!-- VIEW: FAVORITES -->
-        <div id="view-favorites" class="hidden">
+        <div id="view-favorites" class="hidden page-view">
             <div class="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
                 <h2 class="text-2xl font-bold text-navy-800 dark:text-white">Favoriten</h2>
                 <button onclick="openHelp('favorites')" class="text-slate-400 hover:text-petrol-600 transition-colors">
@@ -137,6 +169,129 @@
                 </button>
             </div>
             <div id="favorites-list" class="space-y-4"></div>
+        </div>
+
+        <!-- VIEW: HELP (UPDATED) -->
+        <div id="view-help" class="hidden page-view">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-navy-800 dark:text-white mb-2">Anleitung & Hilfe</h2>
+                <p class="text-slate-500 dark:text-slate-400 italic">Eine App ist nur so schlau wie der Prompt, den sie bekommt!</p>
+            </div>
+
+            <!-- Intro Box -->
+            <div class="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl mb-8 text-slate-700 dark:text-slate-300 leading-relaxed shadow-inner">
+                Diese App hilft dir dabei, bessere Eingaben für KI-Tools zu erstellen. Alles wird übersichtlich in einzelne Bausteine gegliedert, damit du schnell und ohne Umwege zu einem guten Ergebnis kommst.
+                <br><br>
+                <strong>Felder ausfüllen —> “Erstellen und kopieren” klicken —> Prompt in deine Lieblings KI einfügen!</strong>
+            </div>
+
+            <div class="space-y-4 mb-10" id="help-accordion-container">
+                
+                <!-- 1. Rolle -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-user-tie text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Rolle und Funktion
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen. Beispiele: 'Du bist Journalist', 'Du bist Steuerberater'. Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.
+                    </div>
+                </details>
+
+                <!-- 2. Kontext -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-earth-europe text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Kontext
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Im Kontextfeld erklärst du kurz, worum es geht. Je klarer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation. Gib hier an: Für wen ist der Text? Worum geht es genau? Je mehr Kontext, desto weniger Halluzination!
+                    </div>
+                </details>
+
+                <!-- 3. Aufgabe -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-bullseye text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Aufgabe
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier sagst du klar, was die KI tun soll. Beispiele: 'Schreibe einen kurzen Text', 'Erstelle eine Schritt-für-Schritt-Anleitung'. Nutze direkte Verben wie 'Schreibe', 'Erkläre', 'Vergleiche'.
+                    </div>
+                </details>
+
+                <!-- 4. Stil -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-palette text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Stil & Tonalität
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier legst du fest, wie die Antwort klingen soll. Beispiele: 'Professionell', 'Kurze Sätze', 'Für Kinder verständlich'. Wenn du nichts eingibst, wählt die KI einen neutralen Stil.
+                    </div>
+                </details>
+
+                <!-- 5. Format -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-list-check text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Format und Varianten
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Gib an, <em>wie</em> das Ergebnis aussehen soll (z.B. 'Stichpunkte', 'E-Mail', 'Tabelle'). Das hilft der KI, die Form direkt richtig zu treffen.
+                    </div>
+                </details>
+
+                <!-- 6. Szenarien -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-layer-group text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Szenarien
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Ein Szenario speichert eine Kombination aus Rolle, Kontext, Stil etc., die du oft brauchst (z.B. 'Mail-Assistenz'). Später musst du nur noch die Aufgabe anpassen.
+                    </div>
+                </details>
+
+                <!-- 7. Bausteine -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-book text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Bausteine
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Bausteine sind kleine, wiederverwendbare Elemente für einzelne Kategorien. Speichere dir z.B. deine Standard-Rolle oder einen häufigen Kontext ab, um ihn mit einem Klick einzufügen.
+                    </div>
+                </details>
+
+                <!-- 8. Historie -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-clock-rotate-left text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Historie
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier findest du alle Prompts, die du bisher erstellt hast. Du kannst ältere Prompts ansehen, kopieren oder wiederherstellen.
+                    </div>
+                </details>
+
+                <!-- 9. Favoriten -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-star text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Favoriten
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Speichere oft genutzte Prompts aus der Historie als Favorit ab, um sie jederzeit griffbereit zu haben.
+                    </div>
+                </details>
+            </div>
+
+            <div class="flex justify-center">
+                <button onclick="switchTab('create')" class="bg-petrol-600 hover:bg-petrol-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> Zurück zum Editor
+                </button>
+            </div>
         </div>
 
     </main>
@@ -288,7 +443,27 @@
             renderFields();
             loadHistory();
             registerSW();
+            
+            // Close menu on click outside
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('header-menu');
+                const btn = document.getElementById('menu-btn');
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
         });
+
+        // --- MENU LOGIC ---
+        function toggleMenu() {
+            const menu = document.getElementById('header-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function switchToHelpView() {
+            toggleMenu(); // Close menu
+            switchTab('help');
+        }
 
         // --- THEME ---
         function initTheme() {
@@ -296,10 +471,8 @@
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
                 document.documentElement.classList.add('dark');
-                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
             } else {
                 document.documentElement.classList.remove('dark');
-                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
             }
         }
 
@@ -308,11 +481,9 @@
             if (isDark) {
                 document.documentElement.classList.remove('dark');
                 localStorage.setItem('promptomizer_theme', 'light');
-                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
             } else {
                 document.documentElement.classList.add('dark');
                 localStorage.setItem('promptomizer_theme', 'dark');
-                document.getElementById('theme-icon').className = 'fa-solid fa-sun';
             }
         }
 
@@ -341,7 +512,7 @@
             `).join('');
         }
 
-        // --- HELP SYSTEM ---
+        // --- HELP SYSTEM (POPUP) ---
         function openHelp(key) {
             let title = 'Hilfe';
             let text = 'Keine Information verfügbar.';
@@ -570,12 +741,23 @@
 
         // --- HISTORY & TABS ---
         function switchTab(tabId) {
-            document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden'));
+            // Hide all views
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            // Show target view
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            // Update Nav Buttons (only for main tabs)
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const active = btn.dataset.target === tabId;
-                btn.className = `nav-btn flex flex-col items-center gap-1 w-full h-full justify-center transition-colors ${active ? 'text-petrol-600 dark:text-petrol-500' : 'text-slate-400 hover:text-navy-800 dark:hover:text-slate-200'}`;
+                if(active) {
+                    btn.classList.remove('text-slate-400', 'hover:text-navy-800', 'dark:hover:text-slate-200');
+                    btn.classList.add('text-petrol-600', 'dark:text-petrol-500');
+                } else {
+                    btn.classList.add('text-slate-400', 'hover:text-navy-800', 'dark:hover:text-slate-200');
+                    btn.classList.remove('text-petrol-600', 'dark:text-petrol-500');
+                }
             });
+
             if(tabId === 'history') loadHistory();
             if(tabId === 'favorites') loadFavorites();
         }
