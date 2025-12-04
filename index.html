@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V3.0</title>
+    <title>Promptomizer V3.1</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#1e293b">
     
@@ -171,11 +171,11 @@
             <div id="favorites-list" class="space-y-4"></div>
         </div>
 
-        <!-- VIEW: HELP (UPDATED) -->
+        <!-- VIEW: HELP (UPDATED V3.1) -->
         <div id="view-help" class="hidden page-view">
             <div class="mb-8 text-center">
                 <h2 class="text-3xl font-bold text-navy-800 dark:text-white mb-2">Anleitung & Hilfe</h2>
-                <p class="text-slate-500 dark:text-slate-400 italic">Eine App ist nur so schlau wie der Prompt, den sie bekommt!</p>
+                <p class="text-slate-500 dark:text-slate-400 italic">Ein KI ist nur so schlau, wie der Prompt, den sie bekommt!</p>
             </div>
 
             <!-- Intro Box -->
@@ -194,7 +194,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen. Beispiele: 'Du bist Journalist', 'Du bist Steuerberater'. Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.
+                        Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen.<br><br><strong>Beispiele:</strong><br>• "Du bist Journalist."<br>• "Du bist Steuerberater."<br>• "Du bist Fitnesscoach."<br><br>Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.
                     </div>
                 </details>
 
@@ -205,7 +205,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Im Kontextfeld erklärst du kurz, worum es geht. Je klarer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation. Gib hier an: Für wen ist der Text? Worum geht es genau? Je mehr Kontext, desto weniger Halluzination!
+                        Im Kontextfeld erklärst du kurz, worum es geht. Je klarer und genauer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation – und desto besser wird das Ergebnis.<br><br>Gib hier alles an, was wichtig ist, zum Beispiel:<br>• Für wen ist der Text gedacht?<br>• Worum geht es genau?<br>• Welche Rahmenbedingungen gibt es?<br><br>Je mehr Kontext, je weniger Halluzination!
                     </div>
                 </details>
 
@@ -216,7 +216,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Hier sagst du klar, was die KI tun soll. Beispiele: 'Schreibe einen kurzen Text', 'Erstelle eine Schritt-für-Schritt-Anleitung'. Nutze direkte Verben wie 'Schreibe', 'Erkläre', 'Vergleiche'.
+                        Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• "Schreibe einen kurzen Text."<br>• "Erstelle eine Schritt-für-Schritt-Anleitung."<br>• "Formuliere meine Nachricht höflicher."<br><br>Nutze am besten direkte Verben wie "Schreibe", "Erkläre", "Vergleiche", "Erstelle".
                     </div>
                 </details>
 
@@ -227,7 +227,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Hier legst du fest, wie die Antwort klingen soll. Beispiele: 'Professionell', 'Kurze Sätze', 'Für Kinder verständlich'. Wenn du nichts eingibst, wählt die KI einen neutralen Stil.
+                        Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• "Professionell, aber locker."<br>• "Kurze Sätze."<br>• "Ohne komplizierte Begriffe."<br>• "Für Kinder verständlich."<br>• "Keine Emojis."<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.
                     </div>
                 </details>
 
@@ -238,7 +238,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Gib an, <em>wie</em> das Ergebnis aussehen soll (z.B. 'Stichpunkte', 'E-Mail', 'Tabelle'). Das hilft der KI, die Form direkt richtig zu treffen.
+                        Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.
                     </div>
                 </details>
 
@@ -249,7 +249,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Ein Szenario speichert eine Kombination aus Rolle, Kontext, Stil etc., die du oft brauchst (z.B. 'Mail-Assistenz'). Später musst du nur noch die Aufgabe anpassen.
+                        Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.
                     </div>
                 </details>
 
@@ -260,7 +260,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Bausteine sind kleine, wiederverwendbare Elemente für einzelne Kategorien. Speichere dir z.B. deine Standard-Rolle oder einen häufigen Kontext ab, um ihn mit einem Klick einzufügen.
+                        Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.
                     </div>
                 </details>
 
@@ -271,7 +271,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Hier findest du alle Prompts, die du bisher erstellt hast. Du kannst ältere Prompts ansehen, kopieren oder wiederherstellen.
+                        In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.
                     </div>
                 </details>
 
@@ -282,7 +282,7 @@
                         <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
                     </summary>
                     <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
-                        Speichere oft genutzte Prompts aus der Historie als Favorit ab, um sie jederzeit griffbereit zu haben.
+                        Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden.
                     </div>
                 </details>
             </div>
@@ -393,44 +393,50 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- CONFIGURATION & CONTENT (HARDCODED) ---
+        // --- CONFIGURATION & CONTENT (UPDATED V3.1) ---
         const FIELDS = [
             { 
                 id: 'role', 
                 label: 'Rolle & Funktion', 
                 icon: 'fa-user-tie',
-                text: "Beschreiben Sie, in welcher Rolle die KI arbeiten soll. Je genauer Sie das Profil festlegen, desto gezielter kann die KI antworten. Beispiele: Marketingfachkraft, erfahrener Entwickler, Projektleiter."
+                text: "Beschreiben Sie in welcher Rolle die KI arbeiten soll."
             },
             { 
                 id: 'context', 
                 label: 'Kontext', 
                 icon: 'fa-earth-europe',
-                text: "Geben Sie die wichtigsten Hintergründe mit: Wer soll das Ergebnis nutzen? Welche Situation liegt vor? Je klarer der Rahmen, desto treffender fällt die Antwort aus."
+                text: "Geben Sie die Hintergründe mit: Je klarer der Rahmen, je besser die Antwort!"
             },
             { 
                 id: 'task', 
                 label: 'Aufgabe', 
                 icon: 'fa-bullseye',
-                text: "Formulieren Sie klar, was getan werden soll. Nutzen Sie eindeutige Verben wie analysiere, erstelle, vergib oder bewerte. Die KI folgt genau diesem Auftrag."
+                text: "Formulieren Sie klar, was getan werden soll."
             },
             { 
                 id: 'style', 
                 label: 'Stil & Tonalität', 
                 icon: 'fa-palette',
-                text: "Legen Sie fest, wie der Text klingen soll. Sachlich, werbend oder empathisch – der gewünschte Stil steuert die Wirkung der Antwort."
+                text: "Legen sie den gewünschten Stil der Antwort fest."
             },
             { 
                 id: 'format', 
                 label: 'Format & Varianten', 
                 icon: 'fa-list-check',
-                text: "Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll – zum Beispiel als Liste, Tabelle oder kurzer Text. Hier können Sie auch die Länge oder die Anzahl von Varianten angeben."
+                text: "Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll."
             }
         ];
 
-        const STATIC_HELP = {
-            'scenarios': "Szenarien sind gespeicherte Einstellungen für wiederkehrende Anfragen. Sie legen einmal fest, wie die KI auftreten soll. Beim nächsten Mal wählen Sie das Szenario einfach aus.",
-            'favorites': "Favoriten sind Ihre am häufigsten genutzten Vorlagen. Markieren Sie einen generierten Prompt mit dem Stern, um ihn hier wiederzufinden.",
-            'blocks': "Bausteine sind Textschnipsel für einzelne Felder (z.B. Ihre Standard-Rolle 'Anwalt'). Speichern Sie hier oft genutzte Bausteine, um sie per Klick einzufügen."
+        const HELP_SECTIONS = {
+            'role': "Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen.<br><br><strong>Beispiele:</strong><br>• \"Du bist Journalist.\"\<br>• \"Du bist Steuerberater.\"\<br>• \"Du bist Fitnesscoach.\"\<br><br>Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.",
+            'context': "Im Kontextfeld erklärst du kurz, worum es geht. Je klarer und genauer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation – und desto besser wird das Ergebnis.<br><br>Gib hier alles an, was wichtig ist, zum Beispiel:<br>• Für wen ist der Text gedacht?<br>• Worum geht es genau?<br>• Welche Rahmenbedingungen gibt es?<br><br>Je mehr Kontext, je weniger Halluzination!",
+            'task': "Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• \"Schreibe einen kurzen Text.\"\<br>• \"Erstelle eine Schritt-für-Schritt-Anleitung.\"\<br>• \"Formuliere meine Nachricht höflicher.\"\<br><br>Nutze am besten direkte Verben wie \"Schreibe\", \"Erkläre\", \"Vergleiche\", \"Erstelle\".",
+            'style': "Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• \"Professionell, aber locker.\"\<br>• \"Kurze Sätze.\"\<br>• \"Ohne komplizierte Begriffe.\"\<br>• \"Für Kinder verständlich.\"\<br>• \"Keine Emojis.\"\<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.",
+            'format': "Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.",
+            'scenarios': "Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.",
+            'bausteine': "Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.",
+            'historie': "In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.",
+            'favoriten': "Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden."
         };
 
         // --- STATE ---
@@ -487,7 +493,7 @@
             }
         }
 
-        // --- RENDER FIELDS (HIGH CONTRAST) ---
+        // --- RENDER FIELDS (HIGH CONTRAST + UX FIXES) ---
         function renderFields() {
             const container = document.getElementById('fields-container');
             container.innerHTML = FIELDS.map((field, index) => `
@@ -506,7 +512,7 @@
                     </div>
                     <textarea 
                         id="input-${field.id}" 
-                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-petrol-600 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 transition-all leading-relaxed"
+                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-petrol-600 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:placeholder-transparent transition-all leading-relaxed"
                         placeholder="${field.text}"></textarea>
                 </div>
             `).join('');
@@ -521,17 +527,22 @@
             const field = FIELDS.find(f => f.id === key);
             if (field) {
                 title = field.label;
-                text = field.text;
+                text = HELP_SECTIONS[key] || field.text;
             } 
             // Check if it's static help
-            else if (STATIC_HELP[key]) {
+            else {
                 const titleMap = { 'scenarios': 'Szenarien', 'favorites': 'Favoriten', 'blocks': 'Bausteine' };
+                // Map 'blocks' to 'bausteine' key in HELP_SECTIONS
+                let lookupKey = key;
+                if (key === 'blocks') lookupKey = 'bausteine';
+                if (key === 'favorites') lookupKey = 'favoriten';
+                
                 title = titleMap[key] || 'Hilfe';
-                text = STATIC_HELP[key];
+                text = HELP_SECTIONS[lookupKey] || "Hilfe nicht gefunden.";
             }
 
             document.getElementById('help-title').innerText = title;
-            document.getElementById('help-text').innerText = text;
+            document.getElementById('help-text').innerHTML = text;
             document.getElementById('modal-help').classList.remove('hidden');
         }
 
@@ -760,6 +771,9 @@
 
             if(tabId === 'history') loadHistory();
             if(tabId === 'favorites') loadFavorites();
+            
+            // Scroll to top (UX Fix)
+            window.scrollTo(0,0);
         }
 
         function renderCard(item) {
@@ -769,6 +783,9 @@
                 <div class="flex justify-between items-start mb-3">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${date}</span>
                     <div class="flex gap-3">
+                        <button onclick="saveHistoryAsScenario(${item.id})" class="text-lg text-slate-300 hover:text-petrol-600 transition-colors" title="Als Szenario speichern">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </button>
                         <button onclick="toggleFavorite(${item.id})" class="text-lg ${item.favorite ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-400'}"><i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
                         <button onclick="deleteHistoryItem(${item.id})" class="text-lg text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
                     </div>
@@ -782,6 +799,20 @@
                     <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="px-3 py-1.5 rounded bg-petrol-600 text-white text-sm hover:bg-petrol-700 transition-colors"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
                 </div>
             </div>`;
+        }
+
+        function saveHistoryAsScenario(id) {
+            const history = getStorage('history') || [];
+            const item = history.find(h => h.id === id);
+            if(item && item.fields) {
+                // Load fields into inputs
+                item.fields.forEach((val, index) => {
+                    if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                });
+                // Open Modal
+                document.getElementById('new-scenario-name').value = '';
+                document.getElementById('modal-save-scenario').classList.remove('hidden');
+            }
         }
 
         function loadHistory() {
