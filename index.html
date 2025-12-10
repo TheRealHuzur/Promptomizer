@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V3.2</title>
+    <title>Promptomizer V3.2.1</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#1e293b">
     
@@ -76,8 +76,8 @@
                     <i class="fa-solid fa-layer-group text-petrol-500"></i>
                 </button>
                 
-                <!-- Delete All (Trigger Custom Modal) -->
-                <button onclick="resetFields()" class="bg-slate-700 hover:bg-red-900/50 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-slate-300 hover:text-red-400" title="Alles löschen">
+                <!-- Reset Fields -->
+                <button onclick="resetFields()" class="bg-slate-700 hover:bg-red-900/50 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-slate-300 hover:text-red-400" title="Felder leeren">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
 
@@ -388,17 +388,17 @@
         </div>
     </div>
 
-    <!-- MODAL: RESET CONFIRM (Z-60) -->
-    <div id="modal-reset-confirm" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- MODAL: GENERAL CONFIRM (Z-60) -->
+    <div id="modal-general-confirm" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
-            <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-question text-petrol-600 dark:text-petrol-500 text-3xl"></i>
             </div>
-            <h3 class="text-xl font-bold text-navy-800 dark:text-white mb-2">Alles löschen?</h3>
-            <p class="text-slate-500 dark:text-slate-400 mb-6">Möchtest du wirklich alle Eingabefelder leeren? Dies kann nicht rückgängig gemacht werden.</p>
+            <h3 id="confirm-title" class="text-xl font-bold text-navy-800 dark:text-white mb-2">Bestätigen</h3>
+            <p id="confirm-text" class="text-slate-500 dark:text-slate-400 mb-6">Bist du sicher?</p>
             <div class="flex gap-3">
-                <button onclick="closeModal('modal-reset-confirm')" class="flex-1 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-navy-900">Abbrechen</button>
-                <button onclick="performReset()" class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold">Leeren</button>
+                <button onclick="closeModal('modal-general-confirm')" class="flex-1 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-navy-900">Abbrechen</button>
+                <button id="btn-confirm-action" class="flex-1 py-2 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold">OK</button>
             </div>
         </div>
     </div>
@@ -443,7 +443,7 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- CONFIGURATION & CONTENT (UPDATED V3.1) ---
+        // --- CONFIGURATION & CONTENT ---
         const FIELDS = [
             { 
                 id: 'role', 
@@ -543,7 +543,7 @@
             }
         }
 
-        // --- RENDER FIELDS (HIGH CONTRAST + UX FIXES) ---
+        // --- RENDER FIELDS ---
         function renderFields() {
             const container = document.getElementById('fields-container');
             container.innerHTML = FIELDS.map((field, index) => `
@@ -582,7 +582,6 @@
             // Check if it's static help
             else {
                 const titleMap = { 'scenarios': 'Szenarien', 'favorites': 'Favoriten', 'blocks': 'Bausteine' };
-                // Map 'blocks' to 'bausteine' key in HELP_SECTIONS
                 let lookupKey = key;
                 if (key === 'blocks') lookupKey = 'bausteine';
                 if (key === 'favorites') lookupKey = 'favoriten';
@@ -594,6 +593,26 @@
             document.getElementById('help-title').innerText = title;
             document.getElementById('help-text').innerHTML = text;
             document.getElementById('modal-help').classList.remove('hidden');
+        }
+
+        // --- GENERIC CONFIRM MODAL ---
+        function showConfirm(title, text, btnText, btnColorClass, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-text').innerText = text;
+            const btn = document.getElementById('btn-confirm-action');
+            btn.innerText = btnText;
+            btn.className = `flex-1 py-2 text-white rounded-lg font-bold ${btnColorClass}`;
+            
+            // Remove old event listeners to prevent stacking
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.onclick = () => {
+                callback();
+                closeModal('modal-general-confirm');
+            };
+            
+            document.getElementById('modal-general-confirm').classList.remove('hidden');
         }
 
         // --- SCENARIO MODE LOGIC ---
@@ -608,16 +627,22 @@
             
             isScenarioMode = true;
             updateUIForMode();
-            switchTab('create'); // UX Fix: Switch to editor
+            switchTab('create');
             showToast("Szenario-Modus aktiviert");
         }
 
         function cancelScenarioMode() {
-            if(confirm("Szenario-Erstellung abbrechen? Alle Eingaben gehen verloren.")) {
-                isScenarioMode = false;
-                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
-                updateUIForMode();
-            }
+            showConfirm(
+                "Abbrechen?", 
+                "Szenario-Erstellung abbrechen? Alle Eingaben gehen verloren.", 
+                "Ja, abbrechen", 
+                "bg-red-500 hover:bg-red-600", 
+                () => {
+                    isScenarioMode = false;
+                    FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+                    updateUIForMode();
+                }
+            );
         }
 
         function updateUIForMode() {
@@ -661,15 +686,25 @@
             // Check for duplicates
             const existingIndex = scenarios.findIndex(s => s.name === name);
             if (existingIndex > -1) {
-                if (!confirm(`Szenario "${name}" existiert bereits. Überschreiben?`)) {
-                    return;
-                }
-                scenarios[existingIndex].fields = currentValues;
-                scenarios[existingIndex].id = Date.now(); // Update timestamp
-            } else {
-                scenarios.push({ id: Date.now(), name, fields: currentValues });
+                showConfirm(
+                    "Überschreiben?",
+                    `Szenario "${name}" existiert bereits. Überschreiben?`,
+                    "Überschreiben",
+                    "bg-petrol-600 hover:bg-petrol-700",
+                    () => {
+                        scenarios[existingIndex].fields = currentValues;
+                        scenarios[existingIndex].id = Date.now();
+                        saveStorage('scenarios', scenarios);
+                        closeModal('modal-save-scenario');
+                        isScenarioMode = false;
+                        updateUIForMode();
+                        showToast(`Szenario "${name}" gespeichert!`);
+                    }
+                );
+                return;
             }
 
+            scenarios.push({ id: Date.now(), name, fields: currentValues });
             saveStorage('scenarios', scenarios);
             
             closeModal('modal-save-scenario');
@@ -692,12 +727,18 @@
         }
 
         function deleteScenario(id) {
-            if(confirm("Szenario wirklich löschen?")) {
-                let scenarios = getStorage('scenarios') || [];
-                scenarios = scenarios.filter(s => s.id !== id);
-                saveStorage('scenarios', scenarios);
-                renderScenarioList();
-            }
+            showConfirm(
+                "Löschen?",
+                "Szenario wirklich löschen?",
+                "Löschen",
+                "bg-red-500 hover:bg-red-600",
+                () => {
+                    let scenarios = getStorage('scenarios') || [];
+                    scenarios = scenarios.filter(s => s.id !== id);
+                    saveStorage('scenarios', scenarios);
+                    renderScenarioList();
+                }
+            );
         }
 
         function renderScenarioList() {
@@ -784,7 +825,6 @@
             let finalText = "";
             let rawFields = [];
             let hasContent = false;
-            // Updated Emoji for Role (Masks)
             const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL UND TONALITÄT', 'format': '🧪 VARIANTEN' };
 
             FIELDS.forEach(field => {
@@ -807,23 +847,25 @@
         }
 
         function resetFields() {
-            document.getElementById('modal-reset-confirm').classList.remove('hidden');
+            showConfirm(
+                "Felder leeren",
+                "Möchtest du die Eingabefelder leeren?",
+                "Leeren",
+                "bg-red-500 hover:bg-red-600",
+                performReset
+            );
         }
 
         function performReset() {
             FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
-            closeModal('modal-reset-confirm');
-            if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+            // Do NOT change isScenarioMode here
         }
 
         // --- HISTORY & TABS ---
         function switchTab(tabId) {
-            // Hide all views
             document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
-            // Show target view
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             
-            // Update Nav Buttons (only for main tabs)
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const active = btn.dataset.target === tabId;
                 if(active) {
@@ -838,7 +880,6 @@
             if(tabId === 'history') loadHistory();
             if(tabId === 'favorites') loadFavorites();
             
-            // Scroll to top (UX Fix)
             window.scrollTo(0,0);
         }
 
@@ -870,11 +911,9 @@
             const history = getStorage('history') || [];
             const item = history.find(h => h.id === id);
             if(item && item.fields) {
-                // Load fields into inputs
                 item.fields.forEach((val, index) => {
                     if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
                 });
-                // Open Modal
                 document.getElementById('new-scenario-name').value = '';
                 document.getElementById('modal-save-scenario').classList.remove('hidden');
             }
@@ -944,14 +983,17 @@
             const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
             const selectedScenarios = scenarios.filter(s => selectedIds.includes(s.id));
 
-            // Create a single JSON file containing the array of selected scenarios
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedScenarios));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "promptomizer_scenarios.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            selectedScenarios.forEach((scenario, index) => {
+                setTimeout(() => {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(scenario));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", `${scenario.name}.json`);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                }, index * 200);
+            });
             
             closeModal('modal-export-scenarios');
             showToast(`${selectedScenarios.length} Szenarien exportiert!`);
@@ -969,32 +1011,20 @@
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    if (!Array.isArray(importedData)) throw new Error("Ungültiges Format");
+                    // Support both single object and array (though export is single object now)
+                    const content = Array.isArray(importedData) ? importedData[0] : importedData;
                     
-                    // Process import
-                    let scenarios = getStorage('scenarios') || [];
-                    let addedCount = 0;
-                    let updatedCount = 0;
+                    if(!content.fields) throw new Error("Ungültiges Format");
 
-                    importedData.forEach(imported => {
-                        if(!imported.name || !imported.fields) return;
-                        
-                        const existingIndex = scenarios.findIndex(s => s.name === imported.name);
-                        if(existingIndex > -1) {
-                            if(confirm(`Szenario "${imported.name}" existiert bereits. Überschreiben?`)) {
-                                scenarios[existingIndex] = imported;
-                                scenarios[existingIndex].id = Date.now() + Math.random(); // Ensure unique ID
-                                updatedCount++;
-                            }
-                        } else {
-                            imported.id = Date.now() + Math.random();
-                            scenarios.push(imported);
-                            addedCount++;
-                        }
+                    // Fill inputs
+                    FIELDS.forEach((f, i) => {
+                        if(content.fields[i]) document.getElementById(`input-${f.id}`).value = content.fields[i];
                     });
 
-                    saveStorage('scenarios', scenarios);
-                    showToast(`${addedCount} importiert, ${updatedCount} aktualisiert.`);
+                    // Open Save Modal with filename as suggestion
+                    const suggestedName = file.name.replace('.json', '');
+                    document.getElementById('new-scenario-name').value = suggestedName;
+                    document.getElementById('modal-save-scenario').classList.remove('hidden');
                     
                 } catch (err) {
                     showToast("Fehler beim Importieren!", true);
