@@ -10,3 +10,4 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 3. Test-Signal senden
 console.log("Supabase Client wurde geladen! 🚀", supabase);
+// Update Test
