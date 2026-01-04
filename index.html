@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="de" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Promptomizer V3.2.1</title>
+    <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        petrol: {
+                            500: '#14b8a6',
+                            600: '#0d9488', // Primary Accent
+                            700: '#0f766e',
+                        },
+                        navy: {
+                            800: '#1e293b', // Header Background
+                            900: '#0f172a', // Dark Mode Bg
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    zIndex: {
+                        '60': '60',
+                        '100': '100', // Für Hilfe-Overlay
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth transitions */
+        input, textarea, button, div, summary { transition: all 0.2s ease-in-out; }
+        /* Safe area for fixed footer */
+        .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
+        /* Hide default details marker */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-navy-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-32">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 w-full z-40 bg-navy-800 shadow-md border-b border-slate-700">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between relative">
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3">
+                <img src="./icon.png" alt="Logo" class="h-8 w-8 rounded-md shadow-sm bg-white/10">
+                <h1 class="font-bold text-xl tracking-tight text-petrol-500">Promptomizer</h1>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2">
+                <!-- Scenarios -->
+                <button onclick="openScenarioListModal()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors" title="Szenarien">
+                    <i class="fa-solid fa-layer-group text-petrol-500"></i>
+                </button>
+                
+                <!-- Reset Fields -->
+                <button onclick="resetFields()" class="bg-slate-700 hover:bg-red-900/50 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-slate-300 hover:text-red-400" title="Felder leeren">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+
+                <!-- Hamburger Menu Button -->
+                <button id="menu-btn" onclick="toggleMenu()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors text-white ml-1">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- DROPDOWN MENU -->
+            <div id="header-menu" class="hidden absolute top-16 right-4 w-64 bg-white dark:bg-navy-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 origin-top-right transition-all">
+                <div class="py-2">
+                    <!-- Help Link -->
+                    <button onclick="switchToHelpView()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-navy-800 dark:text-white font-medium transition-colors">
+                        <i class="fa-solid fa-book-open text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                        Anleitung & Hilfe
+                    </button>
+                    
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+
+                    <!-- Import -->
+                    <button onclick="triggerImport()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-navy-800 dark:text-white font-medium transition-colors">
+                        <i class="fa-solid fa-file-import text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                        Szenario Importieren
+                    </button>
+
+                    <!-- Export -->
+                    <button onclick="openExportModal()" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-navy-800 dark:text-white font-medium transition-colors">
+                        <i class="fa-solid fa-file-export text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                        Szenarien Exportieren
+                    </button>
+
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <div class="px-4 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer" onclick="toggleDarkMode()">
+                        <div class="flex items-center gap-3 text-navy-800 dark:text-white font-medium">
+                            <i class="fa-solid fa-moon text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                            Dark Mode
+                        </div>
+                        <!-- Toggle Switch Visual -->
+                        <div class="w-10 h-5 bg-slate-300 dark:bg-petrol-600 rounded-full relative transition-colors">
+                            <div class="absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform dark:translate-x-5"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HIDDEN FILE INPUT FOR IMPORT -->
+    <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleFileSelect(event)">
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-3xl mx-auto pt-20 px-4">
+        
+        <!-- VIEW: CREATE (EDITOR) -->
+        <div id="view-create" class="block page-view">
+            
+            <!-- Mode Indicator (Only visible in Scenario Mode) -->
+            <div id="mode-indicator" class="hidden mb-4 bg-petrol-600/10 border border-petrol-600/20 text-petrol-600 dark:text-petrol-500 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-circle text-[10px] animate-pulse"></i> Modus: Szenario erstellen
+            </div>
+
+            <!-- Form Container -->
+            <div id="fields-container" class="space-y-6">
+                <!-- Fields injected via JS -->
+            </div>
+
+            <!-- FOOTER ACTION AREA -->
+            <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-10 md:mb-8 pointer-events-none">
+                <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
+                    
+                    <!-- Normal Mode Button -->
+                    <button id="btn-generate" onclick="generatePrompt()" class="w-full md:w-auto bg-petrol-600 hover:bg-petrol-700 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-xl shadow-petrol-600/30 flex items-center justify-center gap-3 transform active:scale-95 transition-all">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Erstellen & Kopieren</span>
+                    </button>
+
+                    <!-- Scenario Mode Buttons -->
+                    <div id="btns-scenario" class="hidden w-full flex gap-3">
+                        <button onclick="cancelScenarioMode()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 font-bold py-4 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-xmark"></i> Abbrechen
+                        </button>
+                        <button onclick="initiateSaveScenario()" class="flex-[2] bg-petrol-600 hover:bg-petrol-700 text-white font-bold py-4 px-4 rounded-xl shadow-xl shadow-petrol-600/30 flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-floppy-disk"></i> Speichern
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: HISTORY -->
+        <div id="view-history" class="hidden page-view">
+            <h2 class="text-2xl font-bold mb-6 text-navy-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Historie</h2>
+            <div id="history-list" class="space-y-4"></div>
+        </div>
+
+        <!-- VIEW: FAVORITES -->
+        <div id="view-favorites" class="hidden page-view">
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-navy-800 dark:text-white">Favoriten</h2>
+                <button onclick="openHelp('favorites')" class="text-slate-400 hover:text-petrol-600 transition-colors">
+                    <i class="fa-solid fa-circle-question text-xl"></i>
+                </button>
+            </div>
+            <div id="favorites-list" class="space-y-4"></div>
+        </div>
+
+        <!-- VIEW: HELP -->
+        <div id="view-help" class="hidden page-view">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-navy-800 dark:text-white mb-2">Anleitung & Hilfe</h2>
+                <p class="text-slate-500 dark:text-slate-400 italic">Ein KI ist nur so schlau, wie der Prompt, den sie bekommt!</p>
+            </div>
+
+            <!-- Intro Box -->
+            <div class="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl mb-8 text-slate-700 dark:text-slate-300 leading-relaxed shadow-inner">
+                Diese App hilft dir dabei, bessere Eingaben für KI-Tools zu erstellen. Alles wird übersichtlich in einzelne Bausteine gegliedert, damit du schnell und ohne Umwege zu einem guten Ergebnis kommst.
+                <br><br>
+                <strong>Felder ausfüllen —> “Erstellen und kopieren” klicken —> Prompt in deine Lieblings KI einfügen!</strong>
+            </div>
+
+            <div class="space-y-4 mb-10" id="help-accordion-container">
+                
+                <!-- 1. Rolle -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-user-tie text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Rolle und Funktion
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen.<br><br><strong>Beispiele:</strong><br>• "Du bist Journalist."<br>• "Du bist Steuerberater."<br>• "Du bist Fitnesscoach."<br><br>Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.
+                    </div>
+                </details>
+
+                <!-- 2. Kontext -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-earth-europe text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Kontext
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Im Kontextfeld erklärst du kurz, worum es geht. Je klarer und genauer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation – und desto besser wird das Ergebnis.<br><br>Gib hier alles an, was wichtig ist, zum Beispiel:<br>• Für wen ist der Text gedacht?<br>• Worum geht es genau?<br>• Welche Rahmenbedingungen gibt es?<br><br>Je mehr Kontext, je weniger Halluzination!
+                    </div>
+                </details>
+
+                <!-- 3. Aufgabe -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-bullseye text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Aufgabe
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• "Schreibe einen kurzen Text."<br>• "Erstelle eine Schritt-für-Schritt-Anleitung."<br>• "Formuliere meine Nachricht höflicher."<br><br>Nutze am besten direkte Verben wie "Schreibe", "Erkläre", "Vergleiche", "Erstelle".
+                    </div>
+                </details>
+
+                <!-- 4. Stil -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-palette text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Stil & Tonalität
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• "Professionell, aber locker."<br>• "Kurze Sätze."<br>• "Ohne komplizierte Begriffe."<br>• "Für Kinder verständlich."<br>• "Keine Emojis."<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.
+                    </div>
+                </details>
+
+                <!-- 5. Format -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-list-check text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Format und Varianten
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.
+                    </div>
+                </details>
+
+                <!-- 6. Bausteine (SWAPPED) -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-book text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Bausteine
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.
+                    </div>
+                </details>
+
+                <!-- 7. Szenarien (SWAPPED) -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-layer-group text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Szenarien
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.
+                    </div>
+                </details>
+
+                <!-- 8. Historie -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-clock-rotate-left text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Historie
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.
+                    </div>
+                </details>
+
+                <!-- 9. Favoriten -->
+                <details class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-navy-800 dark:text-slate-100 text-lg">
+                        <i class="fa-solid fa-star text-petrol-600 dark:text-petrol-500 w-6 text-center"></i> Favoriten
+                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-4 pt-0 text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-700 mt-2">
+                        Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden.
+                    </div>
+                </details>
+            </div>
+
+            <div class="flex justify-center">
+                <button onclick="switchTab('create')" class="bg-petrol-600 hover:bg-petrol-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> Zurück zum Editor
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full bg-white dark:bg-navy-800 border-t border-slate-200 dark:border-slate-700 z-40 safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div class="max-w-3xl mx-auto flex justify-around items-center h-16">
+            <button onclick="switchTab('create')" class="nav-btn active flex flex-col items-center gap-1 w-full h-full justify-center text-petrol-600 dark:text-petrol-500" data-target="create">
+                <i class="fa-regular fa-pen-to-square text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Editor</span>
+            </button>
+            <button onclick="switchTab('history')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="history">
+                <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Historie</span>
+            </button>
+            <button onclick="switchTab('favorites')" class="nav-btn flex flex-col items-center gap-1 w-full h-full justify-center text-slate-400 hover:text-navy-800 dark:hover:text-slate-200 transition-colors" data-target="favorites">
+                <i class="fa-regular fa-star text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Favoriten</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MODAL: SCENARIO LIST (Z-50) -->
+    <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 bg-navy-800 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-lg">Szenarien</h3>
+                    <button onclick="openHelp('scenarios')" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                </div>
+                <button onclick="closeModal('modal-scenario-list')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <!-- Action: Start New Mode -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-900/50">
+                <button onclick="startScenarioMode()" class="w-full py-3 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-plus-circle"></i> Neues Szenario anlegen
+                </button>
+            </div>
+
+            <!-- List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="scenarios-list-container">
+                <!-- List injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SAVE SCENARIO NAME (Z-60) -->
+    <div id="modal-save-scenario" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6">
+            <h3 class="text-xl font-bold text-navy-800 dark:text-white mb-4">Szenario benennen</h3>
+            <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white mb-6 focus:ring-2 focus:ring-petrol-500 focus:outline-none">
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-save-scenario')" class="flex-1 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-navy-900">Zurück</button>
+                <button onclick="confirmSaveScenario()" class="flex-1 py-2 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPORT SCENARIOS (Z-60) -->
+    <div id="modal-export-scenarios" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-navy-800 dark:text-white">Szenarien exportieren</h3>
+                <button onclick="closeModal('modal-export-scenarios')" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto" id="export-list-container">
+                <!-- Checkboxes injected here -->
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="executeExport()" class="w-full py-3 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> Exportieren
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GENERAL CONFIRM (Z-60) -->
+    <div id="modal-general-confirm" class="fixed inset-0 z-[60] hidden bg-navy-800/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-question text-petrol-600 dark:text-petrol-500 text-3xl"></i>
+            </div>
+            <h3 id="confirm-title" class="text-xl font-bold text-navy-800 dark:text-white mb-2">Bestätigen</h3>
+            <p id="confirm-text" class="text-slate-500 dark:text-slate-400 mb-6">Bist du sicher?</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-general-confirm')" class="flex-1 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-navy-900">Abbrechen</button>
+                <button id="btn-confirm-action" class="flex-1 py-2 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SNIPPETS / BAUSTEINE (Z-50) -->
+    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-800/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 bg-petrol-600 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
+                    <button onclick="openHelp('blocks')" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                </div>
+                <button onclick="closeModal('modal-snippets')" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-3 bg-slate-100 dark:bg-navy-900 border-b border-slate-200 dark:border-slate-700 flex gap-2">
+                <input type="text" id="snippet-name-input" placeholder="Neuer Baustein..." class="flex-1 bg-white dark:bg-navy-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-petrol-500 text-slate-800 dark:text-white">
+                <button onclick="saveSnippet()" class="bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-2 rounded text-sm"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="snippets-list"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: HELP (Z-100 - ALWAYS ON TOP) -->
+    <div id="modal-help" class="fixed inset-0 z-[100] hidden bg-navy-900/90 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-lg rounded-xl shadow-2xl p-6 relative border border-slate-200 dark:border-slate-700">
+            <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fa-solid fa-circle-info text-petrol-600 dark:text-petrol-500 text-2xl"></i>
+                <h3 id="help-title" class="text-xl font-bold text-navy-800 dark:text-white">Hilfe</h3>
+            </div>
+            <p id="help-text" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[110] flex items-center gap-3 border border-slate-600">
+        <i class="fa-solid fa-circle-check text-petrol-500"></i>
+        <span id="toast-msg" class="font-medium">Erfolg!</span>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- CONFIGURATION & CONTENT ---
+        const FIELDS = [
+            { 
+                id: 'role', 
+                label: 'Rolle & Funktion', 
+                icon: 'fa-user-tie',
+                text: "Beschreiben Sie in welcher Rolle die KI arbeiten soll."
+            },
+            { 
+                id: 'context', 
+                label: 'Kontext', 
+                icon: 'fa-earth-europe',
+                text: "Geben Sie die Hintergründe mit: Je klarer der Rahmen, je besser die Antwort!"
+            },
+            { 
+                id: 'task', 
+                label: 'Aufgabe', 
+                icon: 'fa-bullseye',
+                text: "Formulieren Sie klar, was getan werden soll."
+            },
+            { 
+                id: 'style', 
+                label: 'Stil & Tonalität', 
+                icon: 'fa-palette',
+                text: "Legen sie den gewünschten Stil der Antwort fest."
+            },
+            { 
+                id: 'format', 
+                label: 'Format & Varianten', 
+                icon: 'fa-list-check',
+                text: "Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll."
+            }
+        ];
+
+        const HELP_SECTIONS = {
+            'role': "Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen.<br><br><strong>Beispiele:</strong><br>• \"Du bist Journalist.\"\<br>• \"Du bist Steuerberater.\"\<br>• \"Du bist Fitnesscoach.\"\<br><br>Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.",
+            'context': "Im Kontextfeld erklärst du kurz, worum es geht. Je klarer und genauer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation – und desto besser wird das Ergebnis.<br><br>Gib hier alles an, was wichtig ist, zum Beispiel:<br>• Für wen ist der Text gedacht?<br>• Worum geht es genau?<br>• Welche Rahmenbedingungen gibt es?<br><br>Je mehr Kontext, je weniger Halluzination!",
+            'task': "Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• \"Schreibe einen kurzen Text.\"\<br>• \"Erstelle eine Schritt-für-Schritt-Anleitung.\"\<br>• \"Formuliere meine Nachricht höflicher.\"\<br><br>Nutze am besten direkte Verben wie \"Schreibe\", \"Erkläre\", \"Vergleiche\", \"Erstelle\".",
+            'style': "Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• \"Professionell, aber locker.\"\<br>• \"Kurze Sätze.\"\<br>• \"Ohne komplizierte Begriffe.\"\<br>• \"Für Kinder verständlich.\"\<br>• \"Keine Emojis.\"\<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.",
+            'format': "Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.",
+            'scenarios': "Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.",
+            'bausteine': "Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.",
+            'historie': "In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.",
+            'favoriten': "Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden."
+        };
+
+        // --- STATE ---
+        let isScenarioMode = false;
+        let currentSnippetFieldId = null;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderFields();
+            loadHistory();
+            registerSW();
+            
+            // Close menu on click outside
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('header-menu');
+                const btn = document.getElementById('menu-btn');
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        });
+
+        // --- MENU LOGIC ---
+        function toggleMenu() {
+            const menu = document.getElementById('header-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function switchToHelpView() {
+            toggleMenu(); // Close menu
+            switchTab('help');
+        }
+
+        // --- THEME ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('promptomizer_theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('promptomizer_theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('promptomizer_theme', 'dark');
+            }
+        }
+
+        // --- RENDER FIELDS ---
+        function renderFields() {
+            const container = document.getElementById('fields-container');
+            container.innerHTML = FIELDS.map((field, index) => `
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-4 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${field.icon} text-petrol-600 dark:text-petrol-500 w-5 text-center"></i>
+                            <label class="font-bold text-lg text-navy-800 dark:text-slate-100">${field.label}</label>
+                            <button onclick="openHelp('${field.id}')" class="ml-1 text-slate-400 hover:text-petrol-600 transition-colors" title="Hilfe">
+                                <i class="fa-solid fa-circle-question text-lg"></i>
+                            </button>
+                        </div>
+                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-400 hover:text-petrol-600 p-1.5 rounded hover:bg-slate-100 dark:hover:bg-navy-900 transition-colors" title="Bausteine">
+                            <i class="fa-solid fa-book text-lg"></i>
+                        </button>
+                    </div>
+                    <textarea 
+                        id="input-${field.id}" 
+                        class="w-full h-40 p-4 mt-2 rounded-lg bg-slate-50 dark:bg-navy-900 border border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-petrol-600 focus:border-transparent resize-none text-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:placeholder-transparent transition-all leading-relaxed"
+                        placeholder="${field.text}"></textarea>
+                </div>
+            `).join('');
+        }
+
+        // --- HELP SYSTEM (POPUP) ---
+        function openHelp(key) {
+            let title = 'Hilfe';
+            let text = 'Keine Information verfügbar.';
+
+            // Check if it's a field
+            const field = FIELDS.find(f => f.id === key);
+            if (field) {
+                title = field.label;
+                text = HELP_SECTIONS[key] || field.text;
+            } 
+            // Check if it's static help
+            else {
+                const titleMap = { 'scenarios': 'Szenarien', 'favorites': 'Favoriten', 'blocks': 'Bausteine' };
+                let lookupKey = key;
+                if (key === 'blocks') lookupKey = 'bausteine';
+                if (key === 'favorites') lookupKey = 'favoriten';
+                
+                title = titleMap[key] || 'Hilfe';
+                text = HELP_SECTIONS[lookupKey] || "Hilfe nicht gefunden.";
+            }
+
+            document.getElementById('help-title').innerText = title;
+            document.getElementById('help-text').innerHTML = text;
+            document.getElementById('modal-help').classList.remove('hidden');
+        }
+
+        // --- GENERIC CONFIRM MODAL ---
+        function showConfirm(title, text, btnText, btnColorClass, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-text').innerText = text;
+            const btn = document.getElementById('btn-confirm-action');
+            btn.innerText = btnText;
+            btn.className = `flex-1 py-2 text-white rounded-lg font-bold ${btnColorClass}`;
+            
+            // Remove old event listeners to prevent stacking
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.onclick = () => {
+                callback();
+                closeModal('modal-general-confirm');
+            };
+            
+            document.getElementById('modal-general-confirm').classList.remove('hidden');
+        }
+
+        // --- SCENARIO MODE LOGIC ---
+        function openScenarioListModal() {
+            renderScenarioList();
+            document.getElementById('modal-scenario-list').classList.remove('hidden');
+        }
+
+        function startScenarioMode() {
+            closeModal('modal-scenario-list');
+            FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+            
+            isScenarioMode = true;
+            updateUIForMode();
+            switchTab('create');
+            showToast("Szenario-Modus aktiviert");
+        }
+
+        function cancelScenarioMode() {
+            showConfirm(
+                "Abbrechen?", 
+                "Szenario-Erstellung abbrechen? Alle Eingaben gehen verloren.", 
+                "Ja, abbrechen", 
+                "bg-red-500 hover:bg-red-600", 
+                () => {
+                    isScenarioMode = false;
+                    FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+                    updateUIForMode();
+                }
+            );
+        }
+
+        function updateUIForMode() {
+            const indicator = document.getElementById('mode-indicator');
+            const btnGenerate = document.getElementById('btn-generate');
+            const btnsScenario = document.getElementById('btns-scenario');
+
+            if (isScenarioMode) {
+                indicator.classList.remove('hidden');
+                btnGenerate.classList.add('hidden');
+                btnsScenario.classList.remove('hidden');
+                btnsScenario.classList.add('flex');
+            } else {
+                indicator.classList.add('hidden');
+                btnGenerate.classList.remove('hidden');
+                btnsScenario.classList.add('hidden');
+                btnsScenario.classList.remove('flex');
+            }
+        }
+
+        function initiateSaveScenario() {
+            const hasContent = FIELDS.some(f => document.getElementById(`input-${f.id}`).value.trim() !== '');
+            if(!hasContent) {
+                showToast("Bitte füllen Sie Felder aus!", true);
+                return;
+            }
+            document.getElementById('new-scenario-name').value = '';
+            document.getElementById('modal-save-scenario').classList.remove('hidden');
+        }
+
+        function confirmSaveScenario() {
+            const name = document.getElementById('new-scenario-name').value.trim();
+            if(!name) {
+                showToast("Bitte Namen eingeben", true);
+                return;
+            }
+            
+            const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+            let scenarios = getStorage('scenarios') || [];
+            
+            // Check for duplicates
+            const existingIndex = scenarios.findIndex(s => s.name === name);
+            if (existingIndex > -1) {
+                showConfirm(
+                    "Überschreiben?",
+                    `Szenario "${name}" existiert bereits. Überschreiben?`,
+                    "Überschreiben",
+                    "bg-petrol-600 hover:bg-petrol-700",
+                    () => {
+                        scenarios[existingIndex].fields = currentValues;
+                        scenarios[existingIndex].id = Date.now();
+                        saveStorage('scenarios', scenarios);
+                        closeModal('modal-save-scenario');
+                        isScenarioMode = false;
+                        updateUIForMode();
+                        showToast(`Szenario "${name}" gespeichert!`);
+                    }
+                );
+                return;
+            }
+
+            scenarios.push({ id: Date.now(), name, fields: currentValues });
+            saveStorage('scenarios', scenarios);
+            
+            closeModal('modal-save-scenario');
+            isScenarioMode = false;
+            updateUIForMode();
+            showToast(`Szenario "${name}" gespeichert!`);
+        }
+
+        function loadScenario(id) {
+            const scenarios = getStorage('scenarios') || [];
+            const scenario = scenarios.find(s => s.id === id);
+            if(scenario) {
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+                scenario.fields.forEach((val, index) => {
+                    document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                });
+                closeModal('modal-scenario-list');
+                showToast(`"${scenario.name}" geladen`);
+            }
+        }
+
+        function deleteScenario(id) {
+            showConfirm(
+                "Löschen?",
+                "Szenario wirklich löschen?",
+                "Löschen",
+                "bg-red-500 hover:bg-red-600",
+                () => {
+                    let scenarios = getStorage('scenarios') || [];
+                    scenarios = scenarios.filter(s => s.id !== id);
+                    saveStorage('scenarios', scenarios);
+                    renderScenarioList();
+                }
+            );
+        }
+
+        function renderScenarioList() {
+            const scenarios = getStorage('scenarios') || [];
+            const list = document.getElementById('scenarios-list-container');
+            if(scenarios.length === 0) {
+                list.innerHTML = '<div class="text-slate-400 text-center py-4 text-sm">Keine Szenarien gespeichert.</div>';
+                return;
+            }
+            list.innerHTML = scenarios.map(s => `
+                <div class="flex items-center justify-between bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 p-3 rounded hover:border-petrol-500 transition-colors">
+                    <button onclick="loadScenario(${s.id})" class="flex-1 text-left font-medium text-navy-800 dark:text-slate-100">
+                        ${s.name}
+                    </button>
+                    <button onclick="deleteScenario(${s.id})" class="text-slate-400 hover:text-red-500 p-2">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // --- SNIPPET SYSTEM (LEGO) ---
+        function openSnippetModal(fieldId) {
+            currentSnippetFieldId = fieldId;
+            document.getElementById('snippet-modal-title').innerText = FIELDS.find(f => f.id === fieldId).label;
+            renderSnippetList();
+            document.getElementById('modal-snippets').classList.remove('hidden');
+        }
+
+        function saveSnippet() {
+            const name = document.getElementById('snippet-name-input').value.trim();
+            const text = document.getElementById(`input-${currentSnippetFieldId}`).value.trim();
+            if(!name || !text) { showToast("Name oder Feld leer!", true); return; }
+
+            const allSnippets = getStorage('snippets') || {};
+            if(!allSnippets[currentSnippetFieldId]) allSnippets[currentSnippetFieldId] = [];
+            allSnippets[currentSnippetFieldId].push({ id: Date.now(), name, text });
+            saveStorage('snippets', allSnippets);
+            
+            document.getElementById('snippet-name-input').value = '';
+            renderSnippetList();
+        }
+
+        function loadSnippet(id) {
+            const allSnippets = getStorage('snippets') || {};
+            const item = allSnippets[currentSnippetFieldId].find(s => s.id === id);
+            if(item) {
+                const el = document.getElementById(`input-${currentSnippetFieldId}`);
+                if(el.value.trim() !== '' && !confirm("Feldinhalt ersetzen?")) return;
+                el.value = item.text;
+                closeModal('modal-snippets');
+            }
+        }
+
+        function deleteSnippet(id) {
+            if(!confirm("Baustein löschen?")) return;
+            const allSnippets = getStorage('snippets') || {};
+            allSnippets[currentSnippetFieldId] = allSnippets[currentSnippetFieldId].filter(s => s.id !== id);
+            saveStorage('snippets', allSnippets);
+            renderSnippetList();
+        }
+
+        function renderSnippetList() {
+            const allSnippets = getStorage('snippets') || {};
+            const list = allSnippets[currentSnippetFieldId] || [];
+            const container = document.getElementById('snippets-list');
+            if(list.length === 0) {
+                container.innerHTML = '<div class="text-slate-400 text-center py-4 text-sm">Keine Bausteine.</div>';
+                return;
+            }
+            container.innerHTML = list.map(s => `
+                <div class="flex items-center justify-between bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 p-2 rounded hover:bg-slate-50 dark:hover:bg-navy-800 transition-colors">
+                    <button onclick="loadSnippet(${s.id})" class="flex-1 text-left">
+                        <div class="font-bold text-navy-800 dark:text-white text-sm">${s.name}</div>
+                        <div class="text-xs text-slate-500 truncate w-48">${s.text.substring(0,30)}...</div>
+                    </button>
+                    <button onclick="deleteSnippet(${s.id})" class="text-slate-400 hover:text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // --- GENERATE & HISTORY ---
+        function generatePrompt() {
+            let finalText = "";
+            let rawFields = [];
+            let hasContent = false;
+            const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL UND TONALITÄT', 'format': '🧪 VARIANTEN' };
+
+            FIELDS.forEach(field => {
+                const val = document.getElementById(`input-${field.id}`).value.trim();
+                rawFields.push(val);
+                if (val) {
+                    hasContent = true;
+                    finalText += `**${headerMap[field.id]}**\n${val}\n\n`;
+                }
+            });
+
+            if (!hasContent) { showToast("Bitte Felder ausfüllen!", true); return; }
+
+            navigator.clipboard.writeText(finalText.trim()).then(() => showToast("Kopiert & Gespeichert!"));
+
+            const history = getStorage('history') || [];
+            history.unshift({ id: Date.now(), timestamp: new Date().toISOString(), text: finalText.trim(), fields: rawFields, favorite: false });
+            if(history.length > 50) history.pop();
+            saveStorage('history', history);
+        }
+
+        function resetFields() {
+            showConfirm(
+                "Felder leeren",
+                "Möchtest du die Eingabefelder leeren?",
+                "Leeren",
+                "bg-red-500 hover:bg-red-600",
+                performReset
+            );
+        }
+
+        function performReset() {
+            FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+            // Do NOT change isScenarioMode here
+        }
+
+        // --- HISTORY & TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const active = btn.dataset.target === tabId;
+                if(active) {
+                    btn.classList.remove('text-slate-400', 'hover:text-navy-800', 'dark:hover:text-slate-200');
+                    btn.classList.add('text-petrol-600', 'dark:text-petrol-500');
+                } else {
+                    btn.classList.add('text-slate-400', 'hover:text-navy-800', 'dark:hover:text-slate-200');
+                    btn.classList.remove('text-petrol-600', 'dark:text-petrol-500');
+                }
+            });
+
+            if(tabId === 'history') loadHistory();
+            if(tabId === 'favorites') loadFavorites();
+            
+            window.scrollTo(0,0);
+        }
+
+        function renderCard(item) {
+            const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year: 'numeric', hour:'2-digit', minute:'2-digit' });
+            return `
+            <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 border border-slate-200 dark:border-slate-700">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${date}</span>
+                    <div class="flex gap-3">
+                        <button onclick="saveHistoryAsScenario(${item.id})" class="text-lg text-slate-300 hover:text-petrol-600 transition-colors" title="Als Szenario speichern">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </button>
+                        <button onclick="toggleFavorite(${item.id})" class="text-lg ${item.favorite ? 'text-yellow-400' : 'text-slate-300 hover:text-yellow-400'}"><i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
+                        <button onclick="deleteHistoryItem(${item.id})" class="text-lg text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="bg-slate-50 dark:bg-navy-900 p-3 rounded border border-slate-100 dark:border-slate-700 text-sm font-mono text-slate-600 dark:text-slate-400 h-40 overflow-y-auto relative">
+                     ${item.text.replace(/\n/g, '<br>')}
+                </div>
+                <div class="flex justify-end gap-2 mt-3">
+                    <button onclick="restorePrompt(${item.id})" class="px-3 py-1.5 rounded bg-navy-800 dark:bg-slate-700 text-white text-sm hover:bg-navy-700 transition-colors"><i class="fa-solid fa-pen mr-1"></i> Bearbeiten</button>
+                    <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="px-3 py-1.5 rounded bg-petrol-600 text-white text-sm hover:bg-petrol-700 transition-colors"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
+                </div>
+            </div>`;
+        }
+
+        function saveHistoryAsScenario(id) {
+            const history = getStorage('history') || [];
+            const item = history.find(h => h.id === id);
+            if(item && item.fields) {
+                item.fields.forEach((val, index) => {
+                    if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                });
+                document.getElementById('new-scenario-name').value = '';
+                document.getElementById('modal-save-scenario').classList.remove('hidden');
+            }
+        }
+
+        function loadHistory() {
+            const history = getStorage('history') || [];
+            const el = document.getElementById('history-list');
+            el.innerHTML = history.length ? history.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Einträge.</div>';
+        }
+        function loadFavorites() {
+            const history = getStorage('history') || [];
+            const favs = history.filter(h => h.favorite);
+            const el = document.getElementById('favorites-list');
+            el.innerHTML = favs.length ? favs.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Favoriten.</div>';
+        }
+        function toggleFavorite(id) {
+            let h = getStorage('history') || [];
+            const idx = h.findIndex(x => x.id === id);
+            if(idx > -1) { h[idx].favorite = !h[idx].favorite; saveStorage('history', h); }
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+        }
+        function deleteHistoryItem(id) {
+            if(!confirm("Eintrag löschen?")) return;
+            let h = getStorage('history') || [];
+            h = h.filter(x => x.id !== id);
+            saveStorage('history', h);
+            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+        }
+        function restorePrompt(id) {
+            const h = getStorage('history') || [];
+            const item = h.find(x => x.id === id);
+            if(item && item.fields) {
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
+                switchTab('create');
+                showToast("Prompt geladen");
+            }
+        }
+
+        // --- IMPORT / EXPORT ---
+        function openExportModal() {
+            const scenarios = getStorage('scenarios') || [];
+            const container = document.getElementById('export-list-container');
+            
+            if(scenarios.length === 0) {
+                container.innerHTML = '<div class="text-slate-400 text-center py-4">Keine Szenarien vorhanden.</div>';
+            } else {
+                container.innerHTML = scenarios.map(s => `
+                    <label class="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-700 rounded cursor-pointer">
+                        <input type="checkbox" class="export-checkbox w-5 h-5 text-petrol-600 rounded focus:ring-petrol-500" value="${s.id}">
+                        <span class="text-navy-800 dark:text-white font-medium">${s.name}</span>
+                    </label>
+                `).join('');
+            }
+            document.getElementById('modal-export-scenarios').classList.remove('hidden');
+        }
+
+        function executeExport() {
+            const checkboxes = document.querySelectorAll('.export-checkbox:checked');
+            if(checkboxes.length === 0) {
+                showToast("Bitte Szenarien auswählen!", true);
+                return;
+            }
+
+            const scenarios = getStorage('scenarios') || [];
+            const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            const selectedScenarios = scenarios.filter(s => selectedIds.includes(s.id));
+
+            selectedScenarios.forEach((scenario, index) => {
+                setTimeout(() => {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(scenario));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", `${scenario.name}.json`);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                }, index * 200);
+            });
+            
+            closeModal('modal-export-scenarios');
+            showToast(`${selectedScenarios.length} Szenarien exportiert!`);
+        }
+
+        function triggerImport() {
+            document.getElementById('import-file').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    // Support both single object and array (though export is single object now)
+                    const content = Array.isArray(importedData) ? importedData[0] : importedData;
+                    
+                    if(!content.fields) throw new Error("Ungültiges Format");
+
+                    // Fill inputs
+                    FIELDS.forEach((f, i) => {
+                        if(content.fields[i]) document.getElementById(`input-${f.id}`).value = content.fields[i];
+                    });
+
+                    // Open Save Modal with filename as suggestion
+                    const suggestedName = file.name.replace('.json', '');
+                    document.getElementById('new-scenario-name').value = suggestedName;
+                    document.getElementById('modal-save-scenario').classList.remove('hidden');
+                    
+                } catch (err) {
+                    showToast("Fehler beim Importieren!", true);
+                    console.error(err);
+                }
+                // Reset input
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // --- UTILS ---
+        function getStorage(k) { return JSON.parse(localStorage.getItem('promptomizer_'+k)); }
+        function saveStorage(k, v) { localStorage.setItem('promptomizer_'+k, JSON.stringify(v)); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function copyText(t) { navigator.clipboard.writeText(t).then(() => showToast("Kopiert!")); }
+        function showToast(m, err=false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = m;
+            t.classList.remove('opacity-0', 'border-red-500', 'border-slate-600');
+            t.classList.add(err ? 'border-red-500' : 'border-slate-600');
+            setTimeout(() => t.classList.add('opacity-0'), 2500);
+        }
+        function registerSW() {
+            if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.error);
+        }
+    </script>
+</body>
+</html>
