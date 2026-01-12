@@ -1,115 +1,95 @@
-// db.js - Supabase Integration & Auth Logic
+// db.js - Supabase Integration & Auth Logic 🧠
 
-// 1. Konfiguration (Deine Credentials)
+// 1. Konfiguration
 const SUPABASE_URL = 'https://nrrsroaubbpmjyexhuhi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycnNyb2F1YmJwbWp5ZXhodWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MzU2ODcsImV4cCI6MjA4MzExMTY4N30.UcUIVDHiV6o5thTyeO8r5cylhPpNGl6Tpc3J0qsSxoM';
 
-// Initialisierung
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialisierung (Globale Variable für Zugriff)
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
+console.log("🚀 Supabase Client initialisiert");
+
 // ---------------------------------------------------------
-// AUTHENTIFIZIERUNG
+// AUTHENTIFIZIERUNG & LISTENER
 // ---------------------------------------------------------
 
-// Listener für Status-Änderungen (Login/Logout)
-// ---------------------------------------------------------
-// AUTH UI LOGIK (Passend zu deinem Header)
-// ---------------------------------------------------------
-
-// Diese Funktion wird automatisch aufgerufen, wenn sich der Login-Status ändert
+// Dieser Listener feuert IMMER, wenn die Seite lädt oder jemand Login/Logout klickt
 supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log("🔐 Auth Status geändert:", event, session?.user?.email);
-    updateHeaderUI(session?.user);
+    console.log("🔐 Auth Status:", event, session?.user?.email);
+    
+    // 1. WICHTIG: Die globale Variable aktualisieren!
+    currentUser = session?.user || null;
+    
+    // 2. Die UI Buttons anpassen
+    updateHeaderUI(currentUser);
 });
 
+// UI Update Funktion
 function updateHeaderUI(user) {
-    const btnAuth = document.getElementById('btn-auth');
-    const userMenu = document.getElementById('user-menu');
-    const userEmailSpan = document.getElementById('user-email');
+    const btnAuth = document.getElementById('btn-auth'); // Login Button
+    const userMenu = document.getElementById('user-menu'); // User Bereich
+    const userEmailSpan = document.getElementById('user-email'); // E-Mail Anzeige
 
     if (user) {
-        // ZUSTAND: EINGELOGGT
-        // 1. Login-Button verstecken
+        // --- EINGELOGGT ---
         if(btnAuth) btnAuth.classList.add('hidden');
-        
-        // 2. User-Menü zeigen
         if(userMenu) userMenu.classList.remove('hidden');
-        
-        // 3. E-Mail anzeigen
         if(userEmailSpan) userEmailSpan.innerText = user.email;
-        
     } else {
-        // ZUSTAND: GAST (Ausgeloggt)
-        // 1. Login-Button zeigen
+        // --- GAST ---
         if(btnAuth) btnAuth.classList.remove('hidden');
-        
-        // 2. User-Menü verstecken
         if(userMenu) userMenu.classList.add('hidden');
+        if(userEmailSpan) userEmailSpan.innerText = "";
     }
 }
 
-// Logout Logik
-async function handleLogout() {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) console.error('Logout Fehler:', error);
-    // UI Update passiert automatisch durch onAuthStateChange
-};
+// ---------------------------------------------------------
+// AUTH FUNKTIONEN (Werden vom Modal aufgerufen)
+// ---------------------------------------------------------
 
 async function registerUser(email, password) {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
     return { data, error };
 }
 
 async function loginUser(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     return { data, error };
 }
 
-async function logoutUser() {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error('Logout Error:', error);
-}
-
-// UI Update Funktion
-function updateAuthUI() {
-    const btnAuth = document.getElementById('btn-auth');
-    const userMenu = document.getElementById('user-menu');
-    const userEmail = document.getElementById('user-email');
-
-    if (currentUser) {
-        // User ist eingeloggt
-        btnAuth.classList.add('hidden');
-        userMenu.classList.remove('hidden');
-        userEmail.innerText = currentUser.email;
-    } else {
-        // Gast
-        btnAuth.classList.remove('hidden');
-        userMenu.classList.add('hidden');
-    }
+async function handleLogout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) console.error('Logout Fehler:', error);
+    // UI Update passiert automatisch durch onAuthStateChange
 }
 
 // ---------------------------------------------------------
-// DATENBANK OPERATIONEN (Hybrid)
+// DATENBANK OPERATIONEN (Hybrid: Cloud vs. Session)
 // ---------------------------------------------------------
 
-const db = {
+// Wir machen das globale 'db' Objekt verfügbar für script.js
+window.db = {
+    
     // --- PROMPTS (Historie) ---
     async savePrompt(entry) {
         if (currentUser) {
-            // Cloud Save
-            const { error } = await supabase
+            // ☁️ CLOUD SAVE (User)
+            console.log("Speichere Prompt in Cloud...");
+            const { error } = await supabaseClient
                 .from('prompts')
                 .insert({
                     user_id: currentUser.id,
                     text: entry.text,
-                    fields: entry.fields, // JSONB column assumed
+                    // Achtung: 'fields' Spalte muss in Supabase existieren!
+                    // Falls nicht, speichern wir es aktuell nicht mit, um Fehler zu vermeiden.
                     created_at: new Date().toISOString(),
                     favorite: false
                 });
-            if (error) console.error("DB Save Error:", error);
+            if (error) console.error("Cloud Save Error:", error);
         } else {
-            // Session Save (Gast)
+            // 🍪 SESSION SAVE (Gast)
+            console.log("Speichere Prompt lokal (Session)...");
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             history.unshift(entry);
             if (history.length > 50) history.pop();
@@ -119,34 +99,34 @@ const db = {
 
     async getHistory() {
         if (currentUser) {
-            // Cloud Fetch
-            const { data, error } = await supabase
+            // ☁️ CLOUD FETCH
+            const { data, error } = await supabaseClient
                 .from('prompts')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(50);
             
             if (error) {
-                console.error("DB Fetch Error:", error);
+                console.error("Cloud Fetch Error:", error);
                 return [];
             }
-            // Mapping für Kompatibilität mit UI
+            // Mapping: Supabase Daten -> App Format
             return data.map(item => ({
                 id: item.id,
                 timestamp: item.created_at,
                 text: item.text,
-                fields: item.fields,
+                fields: item.fields || [], // Fallback
                 favorite: item.favorite
             }));
         } else {
-            // Session Fetch (Gast)
+            // 🍪 SESSION FETCH
             return JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
         }
     },
 
     async deletePrompt(id) {
         if (currentUser) {
-            await supabase.from('prompts').delete().eq('id', id);
+            await supabaseClient.from('prompts').delete().eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             history = history.filter(h => h.id !== id);
@@ -156,7 +136,7 @@ const db = {
 
     async toggleFavorite(id, currentStatus) {
         if (currentUser) {
-            await supabase.from('prompts').update({ favorite: !currentStatus }).eq('id', id);
+            await supabaseClient.from('prompts').update({ favorite: !currentStatus }).eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             const idx = history.findIndex(h => h.id === id);
@@ -167,11 +147,13 @@ const db = {
         }
     },
 
-    // --- SZENARIEN ---
+    // --- SZENARIEN (Nur Cloud!) ---
     async saveScenario(scenario) {
-        if (!currentUser) return false; // Should be blocked by UI, but safety check
+        if (!currentUser) return false; 
 
-        const { error } = await supabase
+        // Versuche in Tabelle 'scenarios' zu speichern
+        // Wenn die Tabelle noch nicht existiert, wird das hier fehlschlagen (siehe Hinweis unten)
+        const { error } = await supabaseClient
             .from('scenarios')
             .insert({
                 user_id: currentUser.id,
@@ -187,9 +169,9 @@ const db = {
     },
 
     async getScenarios() {
-        if (!currentUser) return []; // Gäste haben keine Szenarien (laut Anforderung)
+        if (!currentUser) return [];
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('scenarios')
             .select('*')
             .order('created_at', { ascending: false });
@@ -200,7 +182,7 @@ const db = {
     
     async deleteScenario(id) {
         if(currentUser) {
-            await supabase.from('scenarios').delete().eq('id', id);
+            await supabaseClient.from('scenarios').delete().eq('id', id);
         }
     }
 };
