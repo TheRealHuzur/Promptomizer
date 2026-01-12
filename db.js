@@ -154,7 +154,7 @@ window.db = {
         // Versuche in Tabelle 'scenarios' zu speichern
         // Wenn die Tabelle noch nicht existiert, wird das hier fehlschlagen (siehe Hinweis unten)
         const { error } = await supabaseClient
-            .from('scenarios')
+            .from('libary')
             .insert({
                 user_id: currentUser.id,
                 name: scenario.name,
