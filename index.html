@@ -127,7 +127,13 @@
             </div>
         </div>
     </header>
-
+<div class="mt-8">
+    <h2 class="text-xl font-bold mb-4">🗄️ Meine gespeicherten Prompts:</h2>
+    
+    <ul id="prompt-liste" class="space-y-2">
+        <li class="text-gray-400 italic">Lade Daten...</li>
+    </ul>
+</div>
     <!-- HIDDEN FILE INPUT FOR IMPORT -->
     <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleFileSelect(event)">
 
