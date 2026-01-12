@@ -8,42 +8,43 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 console.log("Supabase Client wurde geladen! 🚀", supabaseClient);
 
 // ---------------------------------------------------------
-// LOGIK FÜR DEINE BESTEHENDE APP
+// LOGIK: Speichern im Hintergrund
 // ---------------------------------------------------------
 
-// Wir warten, bis die HTML-Seite komplett fertig ist
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Den existierenden "Erstellen"-Button finden
-    const generateBtn = document.getElementById('btn-generate');
+    // Wir suchen jetzt gezielt den "Speichern"-Button aus dem Szenario-Modus
+    // (Voraussetzung: Du hast ihm in der HTML die id="btn-save-scenario" gegeben!)
+    const saveScenarioBtn = document.getElementById('btn-save-scenario');
 
-    if (generateBtn) {
-        // Wir hängen uns an den Klick-Event dran
-        generateBtn.addEventListener('click', speichereInSupabase);
-        console.log("✅ Supabase hat sich mit dem Button verbunden.");
+    if (saveScenarioBtn) {
+        // Wenn der Button geklickt wird, schicken wir die Daten zur Cloud
+        saveScenarioBtn.addEventListener('click', speichereInSupabase);
+        console.log("✅ Bereit zum Speichern in die Cloud (Szenario-Modus).");
+    } else {
+        console.warn("⚠️ Button 'btn-save-scenario' nicht gefunden. Hast du die ID in der HTML gesetzt?");
     }
-
-    // 2. Bestehende Daten beim Start laden
-    ladePrompts();
 });
 
 
-// Funktion: Daten aus DEINEN Feldern lesen und speichern
+// Funktion: Daten aus den Feldern lesen und senden
 async function speichereInSupabase() {
-    console.log("💾 Starte Speichervorgang...");
+    console.log("☁️ Sende Daten an Supabase...");
 
-    // 1. Die Werte aus deinen Feldern holen
+    // 1. Werte aus den Feldern holen
     const role = document.getElementById('input-role')?.value || '';
     const context = document.getElementById('input-context')?.value || '';
     const task = document.getElementById('input-task')?.value || '';
     const style = document.getElementById('input-style')?.value || '';
     const format = document.getElementById('input-format')?.value || '';
 
-    // Wenn alles leer ist, brechen wir ab (nichts zu speichern)
-    if (!role && !context && !task) return;
+    // Abbruch, wenn alles leer ist
+    if (!role && !context && !task) {
+        console.log("Leere Eingabe - nichts gesendet.");
+        return;
+    }
 
-    // 2. Den Text so zusammenbauen, wie er auch in deine Zwischenablage kommt
-    // (Damit es in der DB genauso hübsch aussieht)
+    // 2. Text zusammenbauen
     let vollerText = "";
     if(role) vollerText += `**🎭 ROLLE**\n${role}\n\n`;
     if(context) vollerText += `**🌍 KONTEXT**\n${context}\n\n`;
@@ -51,50 +52,14 @@ async function speichereInSupabase() {
     if(style) vollerText += `**🎨 STIL UND TONALITÄT**\n${style}\n\n`;
     if(format) vollerText += `**🧪 VARIANTEN**\n${format}\n\n`;
 
-    // 3. An Supabase senden
+    // 3. Abflug zur Datenbank
     const { error } = await supabaseClient
         .from('prompts')
         .insert({ text: vollerText.trim() });
 
     if (error) {
-        console.error("❌ Fehler beim Speichern in Cloud:", error);
+        console.error("❌ Fehler beim Cloud-Upload:", error);
     } else {
         console.log("✅ Erfolgreich in der Cloud gesichert!");
-        // Liste sofort aktualisieren, damit du es siehst
-        ladePrompts();
     }
-}
-
-
-// Funktion: Liste laden und in dein existierendes <ul> rendern
-async function ladePrompts() {
-    const listenElement = document.getElementById('prompt-liste');
-    if (!listenElement) return; // Falls wir auf einer Seite ohne Liste sind
-
-    // Daten holen (Neueste zuerst)
-    const { data, error } = await supabaseClient
-        .from('prompts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Fehler beim Laden:", error);
-        return;
-    }
-
-    // Liste leeren
-    listenElement.innerHTML = '';
-
-    // Einträge bauen
-    data.forEach(eintrag => {
-        const li = document.createElement('li');
-        
-        // Wir nutzen Tailwind-Klassen passend zu deinem Design (Slate/Navy)
-        li.className = "bg-white dark:bg-navy-800 p-4 rounded-lg shadow border-l-4 border-petrol-600 dark:border-petrol-500 text-sm text-slate-700 dark:text-slate-300 mb-2";
-        
-        // Zeilenumbrüche für HTML lesbar machen
-        li.innerHTML = eintrag.text.replace(/\n/g, '<br>');
-        
-        listenElement.appendChild(li);
-    });
 }
