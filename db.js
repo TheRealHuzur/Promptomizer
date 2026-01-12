@@ -147,14 +147,16 @@ window.db = {
         }
     },
 
-    // --- SZENARIEN (Nur Cloud!) ---
+    // --- BIBLIOTHEK (Ehemals Szenarien) ---
+    // Speichert Vorlagen in der Cloud-Tabelle 'library'
     async saveScenario(scenario) {
         if (!currentUser) return false; 
 
-        // Versuche in Tabelle 'scenarios' zu speichern
-        // Wenn die Tabelle noch nicht existiert, wird das hier fehlschlagen (siehe Hinweis unten)
+        console.log("Speichere in Bibliothek:", scenario.name);
+
+        // WICHTIG: Hier stand vorher 'scenarios', jetzt 'library'
         const { error } = await supabaseClient
-            .from('libary')
+            .from('library') 
             .insert({
                 user_id: currentUser.id,
                 name: scenario.name,
@@ -162,7 +164,8 @@ window.db = {
             });
         
         if (error) {
-            console.error("Scenario Save Error:", error);
+            console.error("Library Save Error:", error);
+            alert("Fehler beim Speichern: " + error.message); // Zeigt dir den Fehler direkt an
             return false;
         }
         return true;
@@ -171,18 +174,24 @@ window.db = {
     async getScenarios() {
         if (!currentUser) return [];
 
+        // Auch hier: Laden aus 'library'
         const { data, error } = await supabaseClient
-            .from('scenarios')
+            .from('library')
             .select('*')
             .order('created_at', { ascending: false });
         
-        if (error) return [];
+        if (error) {
+            console.error("Library Load Error:", error);
+            return [];
+        }
         return data;
     },
     
     async deleteScenario(id) {
         if(currentUser) {
-            await supabaseClient.from('scenarios').delete().eq('id', id);
+            // Auch hier: Löschen aus 'library'
+            await supabaseClient.from('library').delete().eq('id', id);
         }
     }
+};
 };
