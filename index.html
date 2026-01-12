@@ -71,6 +71,17 @@
             
             <!-- Header Actions -->
             <div class="flex items-center gap-2">
+                <!-- Auth Button (Dynamic) -->
+                <button id="btn-auth" onclick="openAuthModal()" class="hidden bg-petrol-600 hover:bg-petrol-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-user"></i> <span>Login</span>
+                </button>
+                <div id="user-menu" class="hidden flex items-center gap-2">
+                    <span id="user-email" class="text-xs text-slate-400 hidden sm:inline"></span>
+                    <button onclick="handleLogout()" class="bg-navy-900 hover:bg-navy-700 border border-slate-600 w-9 h-9 rounded flex items-center justify-center text-slate-300 transition-colors" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+
                 <!-- Scenarios -->
                 <button onclick="openScenarioListModal()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 w-9 h-9 rounded flex items-center justify-center transition-colors" title="Szenarien">
                     <i class="fa-solid fa-layer-group text-petrol-500"></i>
@@ -434,7 +445,41 @@
             <p id="help-text" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"></p>
         </div>
     </div>
+    <!-- MODAL: AUTH (Login/Register) -->
+    <div id="modal-auth" class="fixed inset-0 z-[70] hidden bg-navy-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-navy-800 w-full max-w-sm rounded-xl shadow-2xl overflow-hidden flex flex-col">
+            <!-- Header -->
+            <div class="p-4 bg-navy-900 text-white flex justify-between items-center border-b border-slate-700">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-user-astronaut text-petrol-500"></i> <span id="auth-title">Anmelden</span>
+                </h3>
+                <button onclick="closeModal('modal-auth')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 space-y-4">
+                <div id="auth-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm"></div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">E-Mail</label>
+                    <input type="email" id="auth-email" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-petrol-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Passwort</label>
+                    <input type="password" id="auth-password" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-navy-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-petrol-500 outline-none">
+                </div>
 
+                <button onclick="handleAuthSubmit()" class="w-full py-3 bg-petrol-600 hover:bg-petrol-700 text-white rounded-lg font-bold shadow-md transition-all mt-2">
+                    Starten
+                </button>
+
+                <div class="text-center text-sm text-slate-500 mt-4">
+                    <span id="auth-switch-text">Noch kein Konto?</span>
+                    <button onclick="toggleAuthMode()" class="text-petrol-600 font-bold hover:underline ml-1" id="auth-switch-btn">Registrieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- TOAST -->
     <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[110] flex items-center gap-3 border border-slate-600">
         <i class="fa-solid fa-circle-check text-petrol-500"></i>
@@ -443,6 +488,63 @@
 
     <!-- JAVASCRIPT -->
     <script>
+        // --- AUTH UI LOGIC ---
+        let isRegisterMode = false;
+
+        function openAuthModal() {
+            document.getElementById('modal-auth').classList.remove('hidden');
+            document.getElementById('auth-error').classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            const title = document.getElementById('auth-title');
+            const switchText = document.getElementById('auth-switch-text');
+            const switchBtn = document.getElementById('auth-switch-btn');
+            
+            if (isRegisterMode) {
+                title.innerText = "Registrieren";
+                switchText.innerText = "Bereits ein Konto?";
+                switchBtn.innerText = "Anmelden";
+            } else {
+                title.innerText = "Anmelden";
+                switchText.innerText = "Noch kein Konto?";
+                switchBtn.innerText = "Registrieren";
+            }
+        }
+
+        async function handleAuthSubmit() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            const errorBox = document.getElementById('auth-error');
+            
+            if (!email || !pass) {
+                errorBox.innerText = "Bitte alles ausfüllen.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            let result;
+            if (isRegisterMode) {
+                result = await registerUser(email, pass);
+            } else {
+                result = await loginUser(email, pass);
+            }
+
+            if (result.error) {
+                errorBox.innerText = result.error.message;
+                errorBox.classList.remove('hidden');
+            } else {
+                closeModal('modal-auth');
+                showToast(isRegisterMode ? "Registrierung erfolgreich!" : "Willkommen zurück!");
+                // UI updates automatically via onAuthStateChange in db.js
+            }
+        }
+
+        function handleLogout() {
+            logoutUser();
+            showToast("Abgemeldet.");
+        }
         // --- CONFIGURATION & CONTENT ---
         const FIELDS = [
             { 
@@ -664,6 +766,14 @@
         }
 
         function initiateSaveScenario() {
+            // AUTH GUARD
+            if (!currentUser) {
+                openAuthModal();
+                document.getElementById('auth-error').innerText = "Erstelle ein kostenloses Konto, um Szenarien dauerhaft zu speichern.";
+                document.getElementById('auth-error').classList.remove('hidden');
+                return;
+            }
+
             const hasContent = FIELDS.some(f => document.getElementById(`input-${f.id}`).value.trim() !== '');
             if(!hasContent) {
                 showToast("Bitte füllen Sie Felder aus!", true);
@@ -673,44 +783,23 @@
             document.getElementById('modal-save-scenario').classList.remove('hidden');
         }
 
-        function confirmSaveScenario() {
+        async function confirmSaveScenario() {
             const name = document.getElementById('new-scenario-name').value.trim();
-            if(!name) {
-                showToast("Bitte Namen eingeben", true);
-                return;
-            }
+            if(!name) { showToast("Bitte Namen eingeben", true); return; }
             
             const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
-            let scenarios = getStorage('scenarios') || [];
             
-            // Check for duplicates
-            const existingIndex = scenarios.findIndex(s => s.name === name);
-            if (existingIndex > -1) {
-                showConfirm(
-                    "Überschreiben?",
-                    `Szenario "${name}" existiert bereits. Überschreiben?`,
-                    "Überschreiben",
-                    "bg-petrol-600 hover:bg-petrol-700",
-                    () => {
-                        scenarios[existingIndex].fields = currentValues;
-                        scenarios[existingIndex].id = Date.now();
-                        saveStorage('scenarios', scenarios);
-                        closeModal('modal-save-scenario');
-                        isScenarioMode = false;
-                        updateUIForMode();
-                        showToast(`Szenario "${name}" gespeichert!`);
-                    }
-                );
-                return;
+            // Save to Cloud via db.js
+            const success = await db.saveScenario({ name, fields: currentValues });
+            
+            if (success) {
+                closeModal('modal-save-scenario');
+                isScenarioMode = false;
+                updateUIForMode();
+                showToast(`Szenario "${name}" in der Cloud gespeichert!`);
+            } else {
+                showToast("Fehler beim Speichern", true);
             }
-
-            scenarios.push({ id: Date.now(), name, fields: currentValues });
-            saveStorage('scenarios', scenarios);
-            
-            closeModal('modal-save-scenario');
-            isScenarioMode = false;
-            updateUIForMode();
-            showToast(`Szenario "${name}" gespeichert!`);
         }
 
         function loadScenario(id) {
@@ -741,9 +830,12 @@
             );
         }
 
-        function renderScenarioList() {
-            const scenarios = getStorage('scenarios') || [];
+        async function renderScenarioList() {
             const list = document.getElementById('scenarios-list-container');
+            list.innerHTML = '<div class="text-center text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+
+            const scenarios = await db.getScenarios();
+            
             if(scenarios.length === 0) {
                 list.innerHTML = '<div class="text-slate-400 text-center py-4 text-sm">Keine Szenarien gespeichert.</div>';
                 return;
@@ -758,6 +850,27 @@
                     </button>
                 </div>
             `).join('');
+        }
+        
+        async function loadScenario(id) {
+             const scenarios = await db.getScenarios();
+             const scenario = scenarios.find(s => s.id == id);
+             // ... Rest wie gehabt ...
+             if(scenario) {
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+                scenario.fields.forEach((val, index) => {
+                    document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                });
+                closeModal('modal-scenario-list');
+                showToast(`"${scenario.name}" geladen`);
+            }
+        }
+        
+        async function deleteScenario(id) {
+             showConfirm("Löschen?", "Szenario löschen?", "Löschen", "bg-red-500", async () => {
+                 await db.deleteScenario(id);
+                 renderScenarioList();
+             });
         }
 
         // --- SNIPPET SYSTEM (LEGO) ---
@@ -821,7 +934,7 @@
         }
 
         // --- GENERATE & HISTORY ---
-        function generatePrompt() {
+        async function generatePrompt() {
             let finalText = "";
             let rawFields = [];
             let hasContent = false;
@@ -840,10 +953,15 @@
 
             navigator.clipboard.writeText(finalText.trim()).then(() => showToast("Kopiert & Gespeichert!"));
 
-            const history = getStorage('history') || [];
-            history.unshift({ id: Date.now(), timestamp: new Date().toISOString(), text: finalText.trim(), fields: rawFields, favorite: false });
-            if(history.length > 50) history.pop();
-            saveStorage('history', history);
+            // HYBRID STORAGE LOGIC
+            const entry = {
+                id: Date.now(), // Temp ID for session, DB generates own ID
+                text: finalText.trim(),
+                fields: rawFields
+            };
+
+            await db.savePrompt(entry);
+            loadHistory(); // Refresh view
         }
 
         function resetFields() {
@@ -919,29 +1037,59 @@
             }
         }
 
-        function loadHistory() {
-            const history = getStorage('history') || [];
-            const el = document.getElementById('history-list');
-            el.innerHTML = history.length ? history.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Einträge.</div>';
+        async function loadHistory() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>';
+            
+            const history = await db.getHistory();
+            
+            if(history.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Einträge vorhanden.</div>';
+            } else {
+                container.innerHTML = history.map(item => renderCard(item)).join('');
+            }
         }
-        function loadFavorites() {
-            const history = getStorage('history') || [];
+
+        async function loadFavorites() {
+            const container = document.getElementById('favorites-list');
+            container.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>';
+
+            const history = await db.getHistory();
             const favs = history.filter(h => h.favorite);
-            const el = document.getElementById('favorites-list');
-            el.innerHTML = favs.length ? favs.map(renderCard).join('') : '<div class="text-center text-slate-400 py-10">Keine Favoriten.</div>';
+            
+            if(favs.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-10">Keine Favoriten gespeichert.</div>';
+            } else {
+                container.innerHTML = favs.map(item => renderCard(item)).join('');
+            }
         }
-        function toggleFavorite(id) {
-            let h = getStorage('history') || [];
-            const idx = h.findIndex(x => x.id === id);
-            if(idx > -1) { h[idx].favorite = !h[idx].favorite; saveStorage('history', h); }
-            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+        async function toggleFavorite(id) {
+            // Wir müssen den aktuellen Status kennen. Einfachheitshalber laden wir neu oder übergeben ihn.
+            // Hier nehmen wir an, wir finden ihn im DOM oder laden neu.
+            // Besser: db.toggleFavorite handles logic.
+            // Da wir im UI nicht den Status haben, laden wir die History neu.
+            // Optimierung: Status im Button-Attribut speichern.
+            
+            // Quick fix: Wir holen die History, finden das Item.
+            const history = await db.getHistory();
+            const item = history.find(h => h.id == id); // Loose equality for string/int IDs
+            if (item) {
+                await db.toggleFavorite(id, item.favorite);
+                if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+            }
         }
-        function deleteHistoryItem(id) {
-            if(!confirm("Eintrag löschen?")) return;
-            let h = getStorage('history') || [];
-            h = h.filter(x => x.id !== id);
-            saveStorage('history', h);
-            if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+
+        async function deleteHistoryItem(id) {
+            showConfirm(
+                "Löschen?",
+                "Eintrag wirklich löschen?",
+                "Löschen",
+                "bg-red-500 hover:bg-red-600",
+                async () => {
+                    await db.deletePrompt(id);
+                    if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
+                }
+            );
         }
         function restorePrompt(id) {
             const h = getStorage('history') || [];
