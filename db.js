@@ -13,21 +13,48 @@ let currentUser = null;
 // ---------------------------------------------------------
 
 // Listener für Status-Änderungen (Login/Logout)
-supabase.auth.onAuthStateChange((event, session) => {
-    console.log("Auth Event:", event);
-    currentUser = session?.user || null;
-    updateAuthUI();
-    
-    // Wenn Login erfolgreich, lade Daten neu
-    if (event === 'SIGNED_IN') {
-        if (typeof loadHistory === 'function') loadHistory();
-        // Optional: Scenarios neu laden
-    }
-    // Wenn Logout, leere View oder lade SessionStorage
-    if (event === 'SIGNED_OUT') {
-        if (typeof loadHistory === 'function') loadHistory();
-    }
+// ---------------------------------------------------------
+// AUTH UI LOGIK (Passend zu deinem Header)
+// ---------------------------------------------------------
+
+// Diese Funktion wird automatisch aufgerufen, wenn sich der Login-Status ändert
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log("🔐 Auth Status geändert:", event, session?.user?.email);
+    updateHeaderUI(session?.user);
 });
+
+function updateHeaderUI(user) {
+    const btnAuth = document.getElementById('btn-auth');
+    const userMenu = document.getElementById('user-menu');
+    const userEmailSpan = document.getElementById('user-email');
+
+    if (user) {
+        // ZUSTAND: EINGELOGGT
+        // 1. Login-Button verstecken
+        if(btnAuth) btnAuth.classList.add('hidden');
+        
+        // 2. User-Menü zeigen
+        if(userMenu) userMenu.classList.remove('hidden');
+        
+        // 3. E-Mail anzeigen
+        if(userEmailSpan) userEmailSpan.innerText = user.email;
+        
+    } else {
+        // ZUSTAND: GAST (Ausgeloggt)
+        // 1. Login-Button zeigen
+        if(btnAuth) btnAuth.classList.remove('hidden');
+        
+        // 2. User-Menü verstecken
+        if(userMenu) userMenu.classList.add('hidden');
+    }
+}
+
+// Logout Logik
+async function handleLogout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) console.error('Logout Fehler:', error);
+    // UI Update passiert automatisch durch onAuthStateChange
+};
 
 async function registerUser(email, password) {
     const { data, error } = await supabase.auth.signUp({ email, password });
