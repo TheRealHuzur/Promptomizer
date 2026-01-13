@@ -74,7 +74,7 @@ async function loginWithGoogle() {
         }
     }
     // Bei Erfolg leitet Supabase automatisch weiter, kein weiterer Code nötig.
-}
+
 
 // ---------------------------------------------------------
 // AUTH FUNKTIONEN (Werden vom Modal aufgerufen)
