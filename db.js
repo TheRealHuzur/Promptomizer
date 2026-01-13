@@ -43,6 +43,27 @@ function updateHeaderUI(user) {
         if(userEmailSpan) userEmailSpan.innerText = "";
     }
 }
+// Google Login Funktion
+async function loginWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            // Leitet den User nach dem Login zurück zur aktuellen URL
+            redirectTo: window.location.origin 
+        }
+    });
+
+    if (error) {
+        console.error("Google Login Error:", error);
+        // Optional: Fehler im UI anzeigen, falls der Redirect nicht sofort greift
+        const errorBox = document.getElementById('auth-error');
+        if(errorBox) {
+            errorBox.innerText = "Fehler beim Google Login: " + error.message;
+            errorBox.classList.remove('hidden');
+        }
+    }
+    // Bei Erfolg leitet Supabase automatisch weiter, kein weiterer Code nötig.
+}
 
 // ---------------------------------------------------------
 // AUTH FUNKTIONEN (Werden vom Modal aufgerufen)
