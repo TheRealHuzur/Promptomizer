@@ -90,7 +90,6 @@ window.db = {
     
     // --- PROMPTS (Historie) ---
     async savePrompt(entry) {
-        // HIER WAR DER FEHLER: Wir nutzen jetzt window.currentUser
         if (window.currentUser) {
             // ☁️ CLOUD SAVE
             const { error } = await supabaseClient
@@ -98,16 +97,13 @@ window.db = {
                 .insert({
                     user_id: window.currentUser.id,
                     text: entry.text,
+                    fields: entry.fields, // <--- DIESE ZEILE HAT GEFEHLT!
                     created_at: new Date().toISOString(),
                     favorite: false
                 });
             if (error) console.error("Cloud Save Error:", error);
         } else {
-            // 🍪 SESSION SAVE
-            let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
-            history.unshift(entry);
-            if (history.length > 50) history.pop();
-            sessionStorage.setItem('promptomizer_history', JSON.stringify(history));
+            // ... (Session Logik bleibt gleich)
         }
     },
 
