@@ -43,15 +43,26 @@ function updateHeaderUI(user) {
         if(userEmailSpan) userEmailSpan.innerText = "";
     }
 }
-// Google Login Funktion
+// Google Login Funktion (Korrigiert)
 async function loginWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    // FEHLER BEHOBEN: Hier stand vorher 'supabase', muss aber 'supabaseClient' heißen!
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
             // Leitet den User nach dem Login zurück zur aktuellen URL
             redirectTo: window.location.origin 
         }
     });
+
+    if (error) {
+        console.error("Google Login Error:", error);
+        const errorBox = document.getElementById('auth-error');
+        if(errorBox) {
+            errorBox.innerText = "Fehler beim Google Login: " + error.message;
+            errorBox.classList.remove('hidden');
+        }
+    }
+}
 
     if (error) {
         console.error("Google Login Error:", error);
