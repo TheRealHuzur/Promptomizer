@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V4.1 (Design Fix)</title>
+    <title>Promptomizer V4.2 (Clean Slate)</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#0B162A">
     
@@ -17,7 +17,6 @@
             theme: {
                 extend: {
                     colors: {
-                        // Das neue Design System
                         navy: {
                             deep: '#0B162A',   // Global Background
                             light: '#15233b',  // Cards / Modals
@@ -27,14 +26,12 @@
                             hover: '#38bdf8',  // Button Hover
                         },
                         slate: {
-                            750: '#2d3748',    // Custom Border
+                            500: '#64748b',    // Unser gewählter Rahmen
+                            750: '#2d3748',    
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 0 3px rgba(14, 165, 233, 0.15)', // Ultra-Subtle Glow
                     },
                     zIndex: {
                         '60': '60',
@@ -53,8 +50,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Smooth transitions für alles Visuelle */
-        input, textarea, button, div, summary, a { transition: all 0.2s ease-in-out; }
+        /* Smooth transitions für alles Außer Inputs (wegen Hard Swap) */
+        button, div, summary, a { transition: all 0.2s ease-in-out; }
         
         /* Safe area styling */
         .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
@@ -63,17 +60,21 @@
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         
-        /* Custom Focus Class für JS-Elemente */
-        .input-focus-custom:focus {
-            outline: none;
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        /* DER NEUE INPUT STYLE (Slate-500 & Hard Swap) */
+        textarea { 
+            resize: none; 
+            outline: none; 
+            /* Keine Transition beim Border für den "Hard Swap" Effekt */
+        }
+        
+        .input-hard-swap:focus {
+            border-color: #0ea5e9; /* Sofortiges Blau beim Klicken */
         }
     </style>
 </head>
 <body class="bg-navy-deep text-slate-200 min-h-screen pb-32 selection:bg-brand-sky selection:text-navy-deep">
 
-    <header class="fixed top-0 w-full z-40 bg-navy-deep/90 backdrop-blur-md border-b border-slate-800">
+    <header class="fixed top-0 w-full z-40 bg-navy-deep/95 backdrop-blur-md border-b border-slate-800">
         <div class="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between relative">
             <div class="flex items-center gap-3">
                 <h1 class="text-2xl font-bold tracking-tight">
@@ -134,7 +135,7 @@
         
         <div id="view-create" class="block page-view">
             
-            <div id="mode-indicator" class="hidden mb-6 bg-brand-sky/10 border border-brand-sky/20 text-brand-sky px-4 py-3 rounded-md font-bold text-sm uppercase tracking-wider flex items-center gap-3">
+            <div id="mode-indicator" class="hidden mb-8 bg-brand-sky/10 border border-brand-sky/20 text-brand-sky px-4 py-3 rounded-md font-bold text-sm uppercase tracking-wider flex items-center gap-3">
                 <span class="relative flex h-3 w-3">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-sky opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-sky"></span>
@@ -142,10 +143,10 @@
                 Modus: Szenario erstellen
             </div>
 
-            <div id="fields-container" class="space-y-6">
+            <div id="fields-container" class="space-y-12">
                 </div>
 
-            <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-12 md:mb-8 pointer-events-none">
+            <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-16 md:mb-8 pointer-events-none">
                 <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
                     
                     <button id="btn-generate" onclick="generatePrompt()" class="w-full md:w-auto bg-brand-sky hover:bg-brand-hover text-navy-deep text-lg font-bold py-4 px-10 rounded-md shadow-lg shadow-sky-900/20 flex items-center justify-center gap-3 transform active:scale-95 transition-all border border-transparent">
@@ -189,15 +190,12 @@
                 <h2 class="text-4xl font-bold text-white mb-3 tracking-tight">Anleitung & Hilfe</h2>
                 <p class="text-brand-sky font-medium">Ein KI ist nur so schlau, wie der Prompt, den sie bekommt!</p>
             </div>
-
             <div class="bg-navy-light border border-slate-700 p-6 rounded-md mb-8 text-slate-300 leading-relaxed shadow-sm">
                 Diese App hilft dir dabei, bessere Eingaben für KI-Tools zu erstellen. Alles wird übersichtlich in einzelne Bausteine gegliedert, damit du schnell und ohne Umwege zu einem guten Ergebnis kommst.
                 <br><br>
                 <strong class="text-brand-sky">Felder ausfüllen —> “Erstellen und kopieren” klicken —> Prompt in deine Lieblings KI einfügen!</strong>
             </div>
-
-            <div class="space-y-4 mb-10" id="help-accordion-container">
-                </div>
+            <div class="space-y-4 mb-10" id="help-accordion-container"></div>
         </div>
 
     </main>
@@ -391,28 +389,27 @@
             });
         });
 
-        // --- RENDER FUNCTIONS (DESIGN FIX) ---
+        // --- RENDER FUNCTIONS (CLEAN SLATE) ---
         function renderFields() {
             const container = document.getElementById('fields-container');
             container.innerHTML = FIELDS.map((field) => `
-                <div class="bg-navy-light rounded-md shadow-sm border border-slate-700 p-6 group transition-colors hover:border-slate-600">
-                    <div class="flex justify-between items-center mb-3">
+                <div class="group">
+                    <div class="flex justify-between items-end mb-2 px-1">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid ${field.icon} text-brand-sky text-xl"></i>
-                            
-                            <label class="font-bold text-lg text-brand-sky">${field.label}</label>
-                            
-                            <button onclick="openHelp('${field.id}')" class="text-slate-500 hover:text-brand-sky transition-colors ml-1" title="Hilfe">
+                             <i class="fa-solid ${field.icon} text-brand-sky text-xl"></i>
+                             <label class="font-bold text-lg text-brand-sky">${field.label}</label>
+                             <button onclick="openHelp('${field.id}')" class="text-slate-500 hover:text-brand-sky transition-colors ml-1" title="Hilfe">
                                 <i class="fa-solid fa-circle-question"></i>
                             </button>
                         </div>
-                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-500 hover:text-brand-sky p-2 rounded hover:bg-slate-800 transition-colors" title="Bausteine">
-                            <i class="fa-solid fa-book"></i>
+                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-500 hover:text-brand-sky text-sm font-medium transition-colors flex items-center gap-2" title="Bausteine">
+                            <i class="fa-solid fa-book"></i> Bausteine
                         </button>
                     </div>
+
                     <textarea 
                         id="input-${field.id}" 
-                        class="w-full h-32 p-4 rounded-md bg-navy-deep border border-slate-700 text-slate-400 placeholder-slate-600 resize-none text-base leading-relaxed input-focus-custom transition-all"
+                        class="w-full h-40 bg-navy-deep border-2 border-slate-500 rounded-md p-4 text-slate-300 placeholder-slate-600 input-hard-swap text-base leading-relaxed"
                         placeholder="${field.text}"></textarea>
                 </div>
             `).join('');
