@@ -7,11 +7,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Initialisierung
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// WICHTIG: Wir hängen den User direkt an das window-Objekt, 
-// damit index.html und db.js beide darauf zugreifen können.
+// Globaler User State
 window.currentUser = null;
 
-console.log("🚀 Supabase Client initialisiert");
+console.log("🚀 Supabase Client V4 initialisiert");
 
 // ---------------------------------------------------------
 // AUTHENTIFIZIERUNG & LISTENER
@@ -19,54 +18,23 @@ console.log("🚀 Supabase Client initialisiert");
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
     console.log("🔐 Auth Status:", event, session?.user?.email);
-    
-    // Status global aktualisieren
     window.currentUser = session?.user || null;
     
-    // UI Update aufrufen
-    updateHeaderUI(window.currentUser);
+    // Custom Event feuern, damit index.html das UI updaten kann
+    const authEvent = new CustomEvent('auth-state-changed', { detail: window.currentUser });
+    window.dispatchEvent(authEvent);
 });
 
-// UI Update Funktion
-function updateHeaderUI(user) {
-    const btnAuth = document.getElementById('btn-auth');
-    const userMenu = document.getElementById('user-menu');
-    const userEmailSpan = document.getElementById('user-email');
-
-    if (user) {
-        if(btnAuth) btnAuth.classList.add('hidden');
-        if(userMenu) userMenu.classList.remove('hidden');
-        if(userEmailSpan) userEmailSpan.innerText = user.email;
-    } else {
-        if(btnAuth) btnAuth.classList.remove('hidden');
-        if(userMenu) userMenu.classList.add('hidden');
-        if(userEmailSpan) userEmailSpan.innerText = "";
-    }
-}
-
-// Google Login Funktion
+// Google Login
 async function loginWithGoogle() {
     const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-            redirectTo: window.location.origin 
-        }
+        options: { redirectTo: window.location.origin }
     });
-
-    if (error) {
-        console.error("Google Login Error:", error);
-        const errorBox = document.getElementById('auth-error');
-        if(errorBox) {
-            errorBox.innerText = "Fehler: " + error.message;
-            errorBox.classList.remove('hidden');
-        }
-    }
+    if (error) throw error;
 }
 
-// ---------------------------------------------------------
-// AUTH FUNKTIONEN
-// ---------------------------------------------------------
-
+// Email Auth
 async function registerUser(email, password) {
     const { data, error } = await supabaseClient.auth.signUp({ email, password });
     return { data, error };
@@ -83,7 +51,7 @@ async function handleLogout() {
 }
 
 // ---------------------------------------------------------
-// DATENBANK OPERATIONEN (Hybrid)
+// DATENBANK OPERATIONEN (Hybrid: Cloud + Session)
 // ---------------------------------------------------------
 
 window.db = {
@@ -97,13 +65,19 @@ window.db = {
                 .insert({
                     user_id: window.currentUser.id,
                     text: entry.text,
-                    fields: entry.fields, // <--- DIESE ZEILE HAT GEFEHLT!
+                    fields: entry.fields,
                     created_at: new Date().toISOString(),
                     favorite: false
                 });
             if (error) console.error("Cloud Save Error:", error);
         } else {
-            // ... (Session Logik bleibt gleich)
+            // 🍪 SESSION SAVE (Gast)
+            let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
+            // Lokale ID generieren falls nicht vorhanden
+            if(!entry.id) entry.id = Date.now();
+            history.unshift(entry);
+            if (history.length > 50) history.pop();
+            sessionStorage.setItem('promptomizer_history', JSON.stringify(history));
         }
     },
 
@@ -138,7 +112,7 @@ window.db = {
             await supabaseClient.from('prompts').delete().eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
-            history = history.filter(h => h.id !== id);
+            history = history.filter(h => h.id != id); // Loose equality für Session IDs
             sessionStorage.setItem('promptomizer_history', JSON.stringify(history));
         }
     },
@@ -148,7 +122,7 @@ window.db = {
             await supabaseClient.from('prompts').update({ favorite: !currentStatus }).eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
-            const idx = history.findIndex(h => h.id === id);
+            const idx = history.findIndex(h => h.id == id);
             if (idx > -1) {
                 history[idx].favorite = !history[idx].favorite;
                 sessionStorage.setItem('promptomizer_history', JSON.stringify(history));
@@ -156,14 +130,12 @@ window.db = {
         }
     },
 
-    // --- BIBLIOTHEK ---
+    // --- BIBLIOTHEK (Szenarien) ---
     async saveScenario(scenario) {
         if (!window.currentUser) return false; 
 
-        console.log("Speichere in Bibliothek:", scenario.name);
-
         const { error } = await supabaseClient
-            .from('library') 
+            .from('library') // Achte darauf, dass deine Tabelle in Supabase 'library' oder 'scenarios' heißt. Im V3 Code war es 'scenarios' oder 'library'. Ich nutze hier 'library' basierend auf deinem letzten Input.
             .insert({
                 user_id: window.currentUser.id,
                 name: scenario.name,
@@ -171,8 +143,17 @@ window.db = {
             });
         
         if (error) {
+            // Fallback falls Tabelle 'scenarios' heißt
+            if(error.code === '42P01') { // Undefined table
+                 const { error: err2 } = await supabaseClient.from('scenarios').insert({
+                    user_id: window.currentUser.id,
+                    name: scenario.name,
+                    fields: scenario.fields
+                });
+                if(err2) { console.error(err2); return false; }
+                return true;
+            }
             console.error("Library Save Error:", error);
-            alert("Fehler: " + error.message);
             return false;
         }
         return true;
@@ -181,21 +162,28 @@ window.db = {
     async getScenarios() {
         if (!window.currentUser) return [];
 
-        const { data, error } = await supabaseClient
+        // Versuch 'library', Fallback auf 'scenarios'
+        let { data, error } = await supabaseClient
             .from('library')
             .select('*')
             .order('created_at', { ascending: false });
         
         if (error) {
-            console.error("Library Load Error:", error);
-            return [];
+             const { data: data2, error: error2 } = await supabaseClient
+            .from('scenarios')
+            .select('*')
+            .order('created_at', { ascending: false });
+            if(error2) return [];
+            return data2;
         }
         return data;
     },
     
     async deleteScenario(id) {
         if(window.currentUser) {
+            // Try both tables to be safe
             await supabaseClient.from('library').delete().eq('id', id);
+            await supabaseClient.from('scenarios').delete().eq('id', id);
         }
     }
 };

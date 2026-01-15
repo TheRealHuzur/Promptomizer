@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V4.2 (Clean Slate)</title>
+    <title>Promptomizer V4</title>
     <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
     <meta name="theme-color" content="#0B162A">
     
@@ -19,15 +19,16 @@
                     colors: {
                         navy: {
                             deep: '#0B162A',   // Global Background
-                            light: '#15233b',  // Cards / Modals
+                            light: '#15233b',  // Modals / Dropdowns
+                            input: '#0B162A',  // Input Background (same as global for seamless look)
                         },
                         brand: {
-                            sky: '#0ea5e9',    // Accent / Labels / Button BG
-                            hover: '#38bdf8',  // Button Hover
+                            sky: '#0ea5e9',    // Accent / Focus Border
+                            hover: '#38bdf8',  
                         },
                         slate: {
-                            500: '#64748b',    // Unser gewählter Rahmen
-                            750: '#2d3748',    
+                            500: '#64748b',    // Default Border
+                            800: '#1e293b',    // Separators
                         }
                     },
                     fontFamily: {
@@ -50,39 +51,44 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Smooth transitions für alles Außer Inputs (wegen Hard Swap) */
-        button, div, summary, a { transition: all 0.2s ease-in-out; }
+        /* Smooth transitions for UI elements */
+        button, .modal-panel, summary, a { transition: all 0.2s ease-in-out; }
         
-        /* Safe area styling */
         .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
         
-        /* Accordion Marker Reset */
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         
-        /* DER NEUE INPUT STYLE (Slate-500 & Hard Swap) */
+        /* V4 INPUT STYLE: Hard Swap Focus */
         textarea { 
             resize: none; 
             outline: none; 
-            /* Keine Transition beim Border für den "Hard Swap" Effekt */
+            transition: background-color 0.2s; /* Nur BG transition, Border ist instant */
         }
         
+        /* Der "Hard Swap": Border ändert sich sofort ohne Transition */
         .input-hard-swap:focus {
-            border-color: #0ea5e9; /* Sofortiges Blau beim Klicken */
+            border-color: #0ea5e9; 
+            box-shadow: 0 0 0 1px #0ea5e9; /* Optional: Leichter Glow für Schärfe */
         }
     </style>
 </head>
 <body class="bg-navy-deep text-slate-200 min-h-screen pb-32 selection:bg-brand-sky selection:text-navy-deep">
 
+    <!-- HEADER -->
     <header class="fixed top-0 w-full z-40 bg-navy-deep/95 backdrop-blur-md border-b border-slate-800">
         <div class="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between relative">
             <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-bold tracking-tight">
-                    <span class="text-white">Prompt</span><span class="text-brand-sky">omizer</span>
+                <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-sky to-blue-600 flex items-center justify-center shadow-lg shadow-brand-sky/20">
+                    <i class="fa-solid fa-cube text-white text-sm"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-white">
+                    Prompt<span class="text-brand-sky">omizer</span>
                 </h1>
             </div>
             
             <div class="flex items-center gap-2">
+                <!-- Auth State UI -->
                 <button id="btn-auth" onclick="openAuthModal()" class="hidden bg-brand-sky/10 border border-brand-sky/20 hover:bg-brand-sky hover:text-navy-deep text-brand-sky px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-user"></i> <span>Login</span>
                 </button>
@@ -104,23 +110,21 @@
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
 
-                <button id="menu-btn" onclick="toggleMenu()" class="ml-2 text-slate-300 hover:text-white">
+                <button id="menu-btn" onclick="toggleMenu()" class="ml-2 text-slate-300 hover:text-white w-9 h-9 flex items-center justify-center">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
             </div>
 
+            <!-- Dropdown -->
             <div id="header-menu" class="hidden absolute top-20 right-4 w-64 bg-navy-light rounded-md shadow-2xl border border-slate-700 overflow-hidden z-50 origin-top-right">
                 <div class="py-2">
                     <button onclick="switchToHelpView()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
                         <i class="fa-solid fa-book-open text-brand-sky w-5 text-center"></i> Anleitung & Hilfe
                     </button>
-                    
                     <div class="border-t border-slate-700 my-1"></div>
-
                     <button onclick="triggerImport()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
                         <i class="fa-solid fa-file-import text-brand-sky w-5 text-center"></i> Szenario Importieren
                     </button>
-
                     <button onclick="openExportModal()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
                         <i class="fa-solid fa-file-export text-brand-sky w-5 text-center"></i> Szenarien Exportieren
                     </button>
@@ -131,8 +135,10 @@
 
     <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleFileSelect(event)">
 
+    <!-- MAIN CONTENT -->
     <main class="max-w-3xl mx-auto pt-28 px-4 pb-10">
         
+        <!-- EDITOR VIEW -->
         <div id="view-create" class="block page-view">
             
             <div id="mode-indicator" class="hidden mb-8 bg-brand-sky/10 border border-brand-sky/20 text-brand-sky px-4 py-3 rounded-md font-bold text-sm uppercase tracking-wider flex items-center gap-3">
@@ -143,9 +149,12 @@
                 Modus: Szenario erstellen
             </div>
 
-            <div id="fields-container" class="space-y-12">
-                </div>
+            <!-- INPUTS CONTAINER (No Cards!) -->
+            <div id="fields-container" class="space-y-10">
+                <!-- Injected via JS -->
+            </div>
 
+            <!-- FOOTER ACTIONS -->
             <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-16 md:mb-8 pointer-events-none">
                 <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
                     
@@ -167,14 +176,16 @@
             </div>
         </div>
 
+        <!-- HISTORY VIEW -->
         <div id="view-history" class="hidden page-view">
             <div class="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-white tracking-tight">Historie</h2>
-                <span class="bg-navy-light text-slate-400 text-xs px-2 py-1 rounded border border-slate-700">Lokal & Cloud</span>
+                <span class="bg-navy-light text-slate-400 text-xs px-2 py-1 rounded border border-slate-700 font-mono">Lokal & Cloud</span>
             </div>
             <div id="history-list" class="space-y-4"></div>
         </div>
 
+        <!-- FAVORITES VIEW -->
         <div id="view-favorites" class="hidden page-view">
             <div class="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-white tracking-tight">Favoriten</h2>
@@ -185,6 +196,7 @@
             <div id="favorites-list" class="space-y-4"></div>
         </div>
 
+        <!-- HELP VIEW -->
         <div id="view-help" class="hidden page-view">
             <div class="mb-10 text-center">
                 <h2 class="text-4xl font-bold text-white mb-3 tracking-tight">Anleitung & Hilfe</h2>
@@ -200,6 +212,7 @@
 
     </main>
 
+    <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 w-full bg-navy-deep/90 backdrop-blur-md border-t border-slate-800 z-40 safe-area-pb">
         <div class="max-w-3xl mx-auto flex justify-around items-center h-16">
             <button onclick="switchTab('create')" class="nav-btn active flex flex-col items-center gap-1.5 w-full h-full justify-center text-brand-sky transition-all" data-target="create">
@@ -217,8 +230,11 @@
         </div>
     </nav>
 
+    <!-- MODALS -->
+    
+    <!-- Scenario List -->
     <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
-        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh] modal-panel">
             <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-navy-deep/50">
                 <div class="flex items-center gap-2">
                     <h3 class="font-bold text-lg text-white">Szenarien</h3>
@@ -237,8 +253,9 @@
         </div>
     </div>
 
+    <!-- Save Scenario -->
     <div id="modal-save-scenario" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6">
+        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6 modal-panel">
             <h3 class="text-xl font-bold text-white mb-4">Szenario benennen</h3>
             <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-600 rounded-md bg-navy-deep text-white mb-6 focus:border-brand-sky focus:ring-1 focus:ring-brand-sky/20 outline-none">
             <div class="flex gap-3">
@@ -248,8 +265,9 @@
         </div>
     </div>
 
+    <!-- Export -->
     <div id="modal-export-scenarios" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 flex flex-col max-h-[80vh]">
+        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 flex flex-col max-h-[80vh] modal-panel">
             <div class="p-5 border-b border-slate-700 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Exportieren</h3>
                 <button onclick="closeModal('modal-export-scenarios')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -263,8 +281,9 @@
         </div>
     </div>
 
+    <!-- Snippets -->
     <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
-        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh] modal-panel">
             <div class="p-4 bg-brand-sky text-navy-deep flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
@@ -279,8 +298,9 @@
         </div>
     </div>
 
+    <!-- Help Popup -->
     <div id="modal-help" class="fixed inset-0 z-[100] hidden bg-navy-deep/95 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
-        <div class="bg-navy-light w-full max-w-lg rounded-md shadow-2xl border border-slate-700 p-8 relative">
+        <div class="bg-navy-light w-full max-w-lg rounded-md shadow-2xl border border-slate-700 p-8 relative modal-panel">
             <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="flex items-center gap-3 mb-6">
                 <i class="fa-solid fa-circle-info text-brand-sky text-2xl"></i>
@@ -290,8 +310,9 @@
         </div>
     </div>
     
+    <!-- Auth Modal -->
     <div id="modal-auth" class="fixed inset-0 z-[70] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col">
+        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col modal-panel">
             <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-navy-deep/50">
                 <h3 class="font-bold text-lg text-white flex items-center gap-2">
                     <i class="fa-solid fa-user-astronaut text-brand-sky"></i> <span id="auth-title">Anmelden</span>
@@ -330,8 +351,9 @@
         </div>
     </div>
     
+    <!-- General Confirm -->
     <div id="modal-general-confirm" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6 text-center">
+        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6 text-center modal-panel">
             <div class="w-16 h-16 bg-navy-deep rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
                 <i class="fa-solid fa-circle-question text-brand-sky text-3xl"></i>
             </div>
@@ -344,6 +366,7 @@
         </div>
     </div>
 
+    <!-- Toast -->
     <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-light text-white px-6 py-3 rounded-md shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[110] flex items-center gap-3 border border-slate-600">
         <i class="fa-solid fa-circle-check text-brand-sky"></i>
         <span id="toast-msg" class="font-medium">Erfolg!</span>
@@ -365,21 +388,29 @@
             'task': "Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• \"Schreibe einen kurzen Text.\"\<br>• \"Erstelle eine Schritt-für-Schritt-Anleitung.\"\<br>• \"Formuliere meine Nachricht höflicher.\"\<br><br>Nutze am besten direkte Verben wie \"Schreibe\", \"Erkläre\", \"Vergleiche\", \"Erstelle\".",
             'style': "Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• \"Professionell, aber locker.\"\<br>• \"Kurze Sätze.\"\<br>• \"Ohne komplizierte Begriffe.\"\<br>• \"Für Kinder verständlich.\"\<br>• \"Keine Emojis.\"\<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.",
             'format': "Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.",
-            'scenarios': "Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen...",
-            'bausteine': "Bausteine sind kleine, wiederverwendbare Elemente...",
-            'historie': "In der Historie findest du alle Prompts...",
-            'favoriten': "Wenn du bestimmte Prompts regelmäßig nutzt..."
+            'scenarios': "Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.",
+            'bausteine': "Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.",
+            'historie': "In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.",
+            'favoriten': "Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden."
         };
 
         let isScenarioMode = false;
         let isRegisterMode = false;
         let currentSnippetFieldId = null;
+        let cachedHistory = []; // Fix for onclick bug
 
         document.addEventListener('DOMContentLoaded', () => {
             renderFields();
             renderHelpAccordion(); 
             loadHistory();
             registerSW();
+            
+            // Listen for Auth Changes from db.js
+            window.addEventListener('auth-state-changed', (e) => {
+                updateHeaderUI(e.detail);
+                loadHistory(); // Reload data for new user
+            });
+
             document.addEventListener('click', (e) => {
                 const menu = document.getElementById('header-menu');
                 const btn = document.getElementById('menu-btn');
@@ -388,6 +419,23 @@
                 }
             });
         });
+
+        // --- UI UPDATE ---
+        function updateHeaderUI(user) {
+            const btnAuth = document.getElementById('btn-auth');
+            const userMenu = document.getElementById('user-menu');
+            const userEmailSpan = document.getElementById('user-email');
+
+            if (user) {
+                if(btnAuth) btnAuth.classList.add('hidden');
+                if(userMenu) userMenu.classList.remove('hidden');
+                if(userEmailSpan) userEmailSpan.innerText = user.email;
+            } else {
+                if(btnAuth) btnAuth.classList.remove('hidden');
+                if(userMenu) userMenu.classList.add('hidden');
+                if(userEmailSpan) userEmailSpan.innerText = "";
+            }
+        }
 
         // --- RENDER FUNCTIONS (CLEAN SLATE) ---
         function renderFields() {
@@ -648,6 +696,27 @@
             window.scrollTo(0,0);
         }
 
+        // --- BUGFIX: ID-BASED HANDLERS ---
+        function handleCopyPrompt(id) {
+            const item = cachedHistory.find(i => i.id == id);
+            if(item) copyText(item.text);
+        }
+        function handleRestorePrompt(id) {
+            const item = cachedHistory.find(i => i.id == id);
+            if(item && item.fields) {
+                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
+                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
+                switchTab('create'); showToast("Geladen");
+            }
+        }
+        function handleSaveHistoryAsScenario(id) {
+            const item = cachedHistory.find(i => i.id == id);
+            if(item && item.fields) {
+                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
+                initiateSaveScenario();
+            }
+        }
+
         function renderCard(item) {
             const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
             return `
@@ -655,7 +724,7 @@
                 <div class="flex justify-between items-start mb-3">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">${date}</span>
                     <div class="flex gap-3">
-                        <button onclick="saveHistoryAsScenario(${item.id})" class="text-slate-500 hover:text-brand-sky" title="Als Szenario"><i class="fa-solid fa-layer-group"></i></button>
+                        <button onclick="handleSaveHistoryAsScenario(${item.id})" class="text-slate-500 hover:text-brand-sky" title="Als Szenario"><i class="fa-solid fa-layer-group"></i></button>
                         <button onclick="toggleFavorite(${item.id})" class="${item.favorite ? 'text-brand-sky' : 'text-slate-500 hover:text-brand-sky'}"><i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
                         <button onclick="deleteHistoryItem(${item.id})" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
                     </div>
@@ -664,8 +733,8 @@
                      ${item.text.replace(/\n/g, '<br>')}
                 </div>
                 <div class="flex justify-end gap-2 mt-3">
-                    <button onclick="restorePrompt(${item.id})" class="px-3 py-1.5 rounded-md bg-navy-deep border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800"><i class="fa-solid fa-pen mr-1"></i> Nutzen</button>
-                    <button onclick="copyText('${item.text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="px-3 py-1.5 rounded-md bg-brand-sky text-navy-deep text-xs font-bold hover:bg-brand-hover"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
+                    <button onclick="handleRestorePrompt(${item.id})" class="px-3 py-1.5 rounded-md bg-navy-deep border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800"><i class="fa-solid fa-pen mr-1"></i> Nutzen</button>
+                    <button onclick="handleCopyPrompt(${item.id})" class="px-3 py-1.5 rounded-md bg-brand-sky text-navy-deep text-xs font-bold hover:bg-brand-hover"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
                 </div>
             </div>`;
         }
@@ -673,20 +742,19 @@
         async function loadHistory() {
             const container = document.getElementById('history-list');
             container.innerHTML = '<div class="text-center text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-            const history = await db.getHistory();
-            if(history.length === 0) container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Einträge.</div>';
-            else container.innerHTML = history.map(item => renderCard(item)).join('');
+            cachedHistory = await db.getHistory(); // Cache data
+            if(cachedHistory.length === 0) container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Einträge.</div>';
+            else container.innerHTML = cachedHistory.map(item => renderCard(item)).join('');
         }
         async function loadFavorites() {
             const container = document.getElementById('favorites-list');
-            const history = await db.getHistory();
-            const favs = history.filter(h => h.favorite);
+            cachedHistory = await db.getHistory(); // Cache data
+            const favs = cachedHistory.filter(h => h.favorite);
             if(favs.length === 0) container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Favoriten.</div>';
             else container.innerHTML = favs.map(item => renderCard(item)).join('');
         }
         async function toggleFavorite(id) {
-            const history = await db.getHistory();
-            const item = history.find(h => h.id == id);
+            const item = cachedHistory.find(h => h.id == id);
             if (item) {
                 await db.toggleFavorite(id, item.favorite);
                 if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
@@ -696,25 +764,6 @@
             showConfirm("Löschen?", "Weg damit?", "Löschen", "", async () => {
                 await db.deletePrompt(id);
                 if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
-            });
-        }
-        function restorePrompt(id) {
-            db.getHistory().then(h => {
-                const item = h.find(x => x.id == id);
-                if(item && item.fields) {
-                    if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
-                    item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
-                    switchTab('create'); showToast("Geladen");
-                }
-            });
-        }
-        function saveHistoryAsScenario(id) {
-            db.getHistory().then(h => {
-                const item = h.find(x => x.id == id);
-                if(item && item.fields) {
-                    item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
-                    initiateSaveScenario();
-                }
             });
         }
 
