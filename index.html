@@ -88,23 +88,24 @@
 </head>
 <body class="text-slate-200 h-screen flex flex-col w-full bg-navy-deep">
 
-    <header class="h-16 border-b border-navy-border flex items-center justify-between px-6 flex-shrink-0 z-40 bg-navy-deep">
-        <div class="flex items-center gap-1">
-            <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-            <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-        </div>
+    <header class="h-16 border-b border-navy-border flex items-center justify-center flex-shrink-0 z-40 bg-navy-deep relative">
+        
+        <div class="w-full max-w-4xl px-6 md:px-0 flex items-center justify-between">
+            
+            <div class="flex items-center select-none">
+                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
+                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
+            </div>
 
-        <div class="flex bg-slate-800 p-1 rounded-lg border border-navy-border">
-            <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-6 py-1.5 rounded-md text-xs font-bold transition-all bg-brand-sky text-navy-deep">
-                Strukturiert
-            </button>
-            <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-6 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition-all">
-                Frei
-            </button>
+            <div class="flex bg-slate-800 p-1 rounded-lg border border-navy-border">
+                <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold transition-all bg-brand-sky text-navy-deep">
+                    Strukturiert
+                </button>
+                <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition-all">
+                    Frei
+                </button>
+            </div>
         </div>
-
-        <div class="w-20 flex justify-end">
-             </div>
     </header>
 
     <div class="flex-1 flex overflow-hidden relative">
@@ -180,8 +181,8 @@
 
             </div>
 
-            <footer class="h-20 border-t border-navy-border flex items-center justify-end px-8 z-30 flex-shrink-0 bg-navy-deep">
-                <div class="flex gap-4">
+            <footer class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
+                <div class="w-full max-w-4xl flex justify-end gap-4">
                     <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-400 hover:text-red-500 font-medium transition-colors text-sm uppercase tracking-wider">
                         Reset
                     </button>
@@ -418,7 +419,7 @@
                 if (window.db && window.db.savePrompt) {
                     await window.db.savePrompt({
                         text: finalText,
-                        title: "Auto-Save", // Fallback title
+                        title: "Auto-Save",
                         mode: currentMode,
                         timestamp: new Date().toISOString()
                     });
