@@ -88,24 +88,28 @@
 </head>
 <body class="text-slate-200 h-screen flex flex-col w-full bg-navy-deep">
 
-    <header class="h-16 border-b border-navy-border flex items-center justify-center flex-shrink-0 z-40 bg-navy-deep relative">
+    <header class="h-16 border-b border-navy-border flex items-center flex-shrink-0 z-40 bg-navy-deep w-full">
         
-        <div class="w-full max-w-4xl px-6 md:px-0 flex items-center justify-between">
-            
-            <div class="flex items-center select-none">
-                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-            </div>
+        <div id="header-spacer-left" class="w-64 sidebar-transition flex-shrink-0 border-r border-transparent"></div>
 
-            <div class="flex bg-slate-800 p-1 rounded-lg border border-navy-border">
-                <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold transition-all bg-brand-sky text-navy-deep">
-                    Strukturiert
-                </button>
-                <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition-all">
-                    Frei
-                </button>
+        <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0"> <div class="w-full max-w-4xl flex items-center justify-between">
+                
+                <div class="flex items-center select-none leading-none">
+                    <span class="text-xl font-bold tracking-tight text-white">Prompt</span><span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
+                </div>
+
+                <div class="flex bg-slate-800 p-1 rounded-lg border border-navy-border">
+                    <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold transition-all bg-brand-sky text-navy-deep">
+                        Strukturiert
+                    </button>
+                    <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-4 md:px-6 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition-all">
+                        Frei
+                    </button>
+                </div>
             </div>
         </div>
+
+        <div id="header-spacer-right" class="w-80 sidebar-transition flex-shrink-0 border-l border-transparent"></div>
     </header>
 
     <div class="flex-1 flex overflow-hidden relative">
@@ -314,26 +318,28 @@
         function toggleSidebar(side) {
             const el = document.getElementById(`sidebar-${side}`);
             const icon = document.getElementById(`icon-toggle-${side}`);
+            // SYNC HEADER SPACERS
+            const spacer = document.getElementById(`header-spacer-${side}`);
             
             if (side === 'left') {
                 if (isLeftOpen) {
-                    el.classList.remove('w-64');
-                    el.classList.add('w-0');
+                    el.classList.replace('w-64', 'w-0');
+                    spacer.classList.replace('w-64', 'w-0'); // SYNC HEADER
                     icon.classList.add('rotate-180');
                 } else {
-                    el.classList.remove('w-0');
-                    el.classList.add('w-64');
+                    el.classList.replace('w-0', 'w-64');
+                    spacer.classList.replace('w-0', 'w-64'); // SYNC HEADER
                     icon.classList.remove('rotate-180');
                 }
                 isLeftOpen = !isLeftOpen;
             } else {
                 if (isRightOpen) {
-                    el.classList.remove('w-80');
-                    el.classList.add('w-0');
+                    el.classList.replace('w-80', 'w-0');
+                    spacer.classList.replace('w-80', 'w-0'); // SYNC HEADER
                     icon.classList.add('rotate-180');
                 } else {
-                    el.classList.remove('w-0');
-                    el.classList.add('w-80');
+                    el.classList.replace('w-0', 'w-80');
+                    spacer.classList.replace('w-0', 'w-80'); // SYNC HEADER
                     icon.classList.remove('rotate-180');
                 }
                 isRightOpen = !isRightOpen;
