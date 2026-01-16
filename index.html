@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V4</title>
-    <meta name="description" content="Professioneller Prompt-Generator für Business-Anwender">
+    <title>Promptomizer V5 - Zen Cockpit</title>
     <meta name="theme-color" content="#0B162A">
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,818 +19,423 @@
                     colors: {
                         navy: {
                             deep: '#0B162A',   // Global Background
-                            light: '#15233b',  // Modals / Dropdowns
-                            input: '#0B162A',  // Input Background (same as global for seamless look)
+                            light: '#15233b',  // Panels / Sidebars
+                            border: '#1e293b', // Borders
                         },
                         brand: {
-                            sky: '#0ea5e9',    // Accent / Focus Border
+                            sky: '#0ea5e9',    // Accent
                             hover: '#38bdf8',  
                         },
                         slate: {
-                            500: '#64748b',    // Default Border
-                            800: '#1e293b',    // Separators
+                            500: '#64748b',
+                            800: '#1e293b',
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    zIndex: {
-                        '60': '60',
-                        '100': '100', 
                     }
                 }
             }
         }
     </script>
 
+    <!-- FontAwesome & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; } /* No body scroll */
         
-        /* Smooth transitions for UI elements */
-        button, .modal-panel, summary, a { transition: all 0.2s ease-in-out; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0B162A; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* Transitions */
+        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease; }
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
         
-        .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Input Styles */
+        textarea { resize: vertical; outline: none; transition: border-color 0.1s; }
+        textarea:focus { border-color: #0ea5e9; }
         
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        
-        /* V4 INPUT STYLE: Hard Swap Focus */
-        textarea { 
-            resize: none; 
-            outline: none; 
-            transition: background-color 0.2s; /* Nur BG transition, Border ist instant */
-        }
-        
-        /* Der "Hard Swap": Border ändert sich sofort ohne Transition */
-        .input-hard-swap:focus {
-            border-color: #0ea5e9; 
-            box-shadow: 0 0 0 1px #0ea5e9; /* Optional: Leichter Glow für Schärfe */
-        }
+        /* Segmented Control Active State */
+        .segment-active { background-color: #0ea5e9; color: #0B162A; }
     </style>
 </head>
-<body class="bg-navy-deep text-slate-200 min-h-screen pb-32 selection:bg-brand-sky selection:text-navy-deep">
+<body class="bg-navy-deep text-slate-200 h-screen flex overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="fixed top-0 w-full z-40 bg-navy-deep/95 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between relative">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-sky to-blue-600 flex items-center justify-center shadow-lg shadow-brand-sky/20">
+    <!-- LEFT SIDEBAR (Navigation) -->
+    <aside id="sidebar-left" class="w-16 md:w-64 bg-navy-light border-r border-navy-border flex flex-col justify-between sidebar-transition z-30 flex-shrink-0">
+        <!-- Top: Logo & Nav -->
+        <div>
+            <div class="h-16 flex items-center px-4 border-b border-navy-border">
+                <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-sky to-blue-600 flex items-center justify-center shadow-lg shadow-brand-sky/20 flex-shrink-0">
                     <i class="fa-solid fa-cube text-white text-sm"></i>
                 </div>
-                <h1 class="text-xl font-bold tracking-tight text-white">
-                    Prompt<span class="text-brand-sky">omizer</span>
-                </h1>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <!-- Auth State UI -->
-                <button id="btn-auth" onclick="openAuthModal()" class="hidden bg-brand-sky/10 border border-brand-sky/20 hover:bg-brand-sky hover:text-navy-deep text-brand-sky px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-user"></i> <span>Login</span>
-                </button>
-                
-                <div id="user-menu" class="hidden flex items-center gap-3">
-                    <span id="user-email" class="text-xs text-slate-500 hidden sm:inline font-mono"></span>
-                    <button onclick="handleLogout()" class="bg-navy-light border border-slate-700 hover:bg-slate-800 w-9 h-9 rounded-md flex items-center justify-center text-slate-400 hover:text-white transition-colors" title="Logout">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
-                </div>
-
-                <div class="h-6 w-px bg-slate-800 mx-1"></div>
-
-                <button onclick="openScenarioListModal()" class="bg-navy-light hover:bg-slate-800 border border-slate-700 w-9 h-9 rounded-md flex items-center justify-center transition-colors text-brand-sky" title="Szenarien">
-                    <i class="fa-solid fa-layer-group"></i>
-                </button>
-                
-                <button onclick="resetFields()" class="bg-navy-light hover:bg-red-900/20 border border-slate-700 hover:border-red-900/50 w-9 h-9 rounded-md flex items-center justify-center transition-colors text-slate-400 hover:text-red-500" title="Felder leeren">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-
-                <button id="menu-btn" onclick="toggleMenu()" class="ml-2 text-slate-300 hover:text-white w-9 h-9 flex items-center justify-center">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
+                <span class="ml-3 font-bold text-lg tracking-tight text-white hidden md:block whitespace-nowrap">Promptomizer</span>
             </div>
 
-            <!-- Dropdown -->
-            <div id="header-menu" class="hidden absolute top-20 right-4 w-64 bg-navy-light rounded-md shadow-2xl border border-slate-700 overflow-hidden z-50 origin-top-right">
-                <div class="py-2">
-                    <button onclick="switchToHelpView()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
-                        <i class="fa-solid fa-book-open text-brand-sky w-5 text-center"></i> Anleitung & Hilfe
-                    </button>
-                    <div class="border-t border-slate-700 my-1"></div>
-                    <button onclick="triggerImport()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
-                        <i class="fa-solid fa-file-import text-brand-sky w-5 text-center"></i> Szenario Importieren
-                    </button>
-                    <button onclick="openExportModal()" class="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center gap-3 text-slate-200 font-medium">
-                        <i class="fa-solid fa-file-export text-brand-sky w-5 text-center"></i> Szenarien Exportieren
-                    </button>
-                </div>
-            </div>
+            <nav class="p-2 space-y-1">
+                <button onclick="switchView('editor')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white transition-colors group active-nav">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center group-hover:text-brand-sky"></i>
+                    <span class="hidden md:block text-sm font-medium">Editor</span>
+                </button>
+                <button onclick="switchView('history')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white transition-colors group">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky"></i>
+                    <span class="hidden md:block text-sm font-medium">Historie</span>
+                </button>
+                <button onclick="switchView('favorites')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white transition-colors group">
+                    <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky"></i>
+                    <span class="hidden md:block text-sm font-medium">Favoriten</span>
+                </button>
+            </nav>
         </div>
-    </header>
 
-    <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleFileSelect(event)">
+        <!-- Bottom: User & Settings -->
+        <div class="p-2 border-t border-navy-border">
+            <button onclick="openAuthModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-user text-xs"></i>
+                </div>
+                <div class="hidden md:block text-left overflow-hidden">
+                    <div id="user-name-display" class="text-sm font-medium truncate">Gast</div>
+                    <div class="text-xs text-slate-500">Login</div>
+                </div>
+            </button>
+        </div>
+    </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="max-w-3xl mx-auto pt-28 px-4 pb-10">
+    <!-- CENTER STAGE (Main Content) -->
+    <main class="flex-1 flex flex-col min-w-0 bg-navy-deep relative">
         
-        <!-- EDITOR VIEW -->
-        <div id="view-create" class="block page-view">
-            
-            <div id="mode-indicator" class="hidden mb-8 bg-brand-sky/10 border border-brand-sky/20 text-brand-sky px-4 py-3 rounded-md font-bold text-sm uppercase tracking-wider flex items-center gap-3">
-                <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-sky opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-sky"></span>
-                </span>
-                Modus: Szenario erstellen
-            </div>
-
-            <!-- INPUTS CONTAINER (No Cards!) -->
-            <div id="fields-container" class="space-y-10">
-                <!-- Injected via JS -->
-            </div>
-
-            <!-- FOOTER ACTIONS -->
-            <div class="fixed bottom-20 left-0 w-full px-4 z-30 md:static md:w-auto md:px-0 md:mt-16 md:mb-8 pointer-events-none">
-                <div class="max-w-3xl mx-auto flex justify-center md:justify-end pointer-events-auto">
-                    
-                    <button id="btn-generate" onclick="generatePrompt()" class="w-full md:w-auto bg-brand-sky hover:bg-brand-hover text-navy-deep text-lg font-bold py-4 px-10 rounded-md shadow-lg shadow-sky-900/20 flex items-center justify-center gap-3 transform active:scale-95 transition-all border border-transparent">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>Erstellen & Kopieren</span>
-                    </button>
-
-                    <div id="btns-scenario" class="hidden w-full flex gap-3">
-                        <button onclick="cancelScenarioMode()" class="flex-1 bg-navy-light border border-slate-700 hover:bg-slate-800 text-slate-300 font-bold py-4 px-4 rounded-md shadow-lg flex items-center justify-center gap-2 transform active:scale-95">
-                            Abbrechen
-                        </button>
-                        <button id="btn-save-scenario" onclick="initiateSaveScenario()" class="flex-[2] bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-4 px-4 rounded-md shadow-lg flex items-center justify-center gap-2 transform active:scale-95">
-                            <i class="fa-solid fa-floppy-disk"></i> Speichern
-                        </button>
-                    </div>
-
+        <!-- HEADER (Toolbar) -->
+        <header class="h-16 border-b border-navy-border bg-navy-deep/95 backdrop-blur flex items-center justify-between px-4 z-20 flex-shrink-0">
+            <div class="flex items-center gap-4 flex-1">
+                <button onclick="toggleSidebar('left')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                
+                <!-- Project Title Input -->
+                <div class="flex items-center gap-2 group">
+                    <i class="fa-solid fa-pen text-xs text-slate-600 group-hover:text-slate-400"></i>
+                    <input type="text" id="project-title" value="Unbenanntes Projekt" class="bg-transparent border-none text-white font-medium focus:ring-0 p-0 w-48 md:w-64 placeholder-slate-600">
                 </div>
             </div>
-        </div>
 
-        <!-- HISTORY VIEW -->
-        <div id="view-history" class="hidden page-view">
-            <div class="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-white tracking-tight">Historie</h2>
-                <span class="bg-navy-light text-slate-400 text-xs px-2 py-1 rounded border border-slate-700 font-mono">Lokal & Cloud</span>
-            </div>
-            <div id="history-list" class="space-y-4"></div>
-        </div>
-
-        <!-- FAVORITES VIEW -->
-        <div id="view-favorites" class="hidden page-view">
-            <div class="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-white tracking-tight">Favoriten</h2>
-                <button onclick="openHelp('favorites')" class="text-slate-500 hover:text-brand-sky transition-colors">
-                    <i class="fa-solid fa-circle-question text-xl"></i>
+            <!-- Mode Switcher -->
+            <div class="flex bg-navy-light p-1 rounded-lg border border-navy-border">
+                <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-4 py-1.5 rounded-md text-xs font-bold transition-all segment-active">
+                    Strukturiert
+                </button>
+                <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-400 hover:text-white transition-all">
+                    Frei
                 </button>
             </div>
-            <div id="favorites-list" class="space-y-4"></div>
+
+            <div class="flex items-center gap-4 flex-1 justify-end">
+                <button onclick="toggleSidebar('right')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-book-open"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA (Scrollable) -->
+        <div id="main-scroll-area" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+            
+            <!-- VIEW: EDITOR -->
+            <div id="view-editor" class="max-w-4xl mx-auto fade-in">
+                
+                <!-- MODE A: STRUCTURED -->
+                <div id="editor-structured" class="space-y-8">
+                    <!-- Fields injected via JS -->
+                </div>
+
+                <!-- MODE B: FREE TEXT -->
+                <div id="editor-free" class="hidden h-full flex flex-col">
+                    <!-- Markdown Toolbar -->
+                    <div class="sticky top-0 z-10 bg-navy-light border border-slate-600 rounded-t-md p-2 flex gap-1 shadow-md">
+                        <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="H1"><i class="fa-solid fa-heading"></i></button>
+                        <button onclick="insertMarkdown('## ')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="H2"><i class="fa-solid fa-heading text-sm"></i></button>
+                        <div class="w-px bg-slate-600 mx-1"></div>
+                        <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="Bold"><i class="fa-solid fa-bold"></i></button>
+                        <button onclick="insertMarkdown('*text*')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="Italic"><i class="fa-solid fa-italic"></i></button>
+                        <div class="w-px bg-slate-600 mx-1"></div>
+                        <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="List"><i class="fa-solid fa-list-ul"></i></button>
+                        <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="Ordered"><i class="fa-solid fa-list-ol"></i></button>
+                        <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-slate-700 rounded text-slate-300" title="Quote"><i class="fa-solid fa-quote-right"></i></button>
+                    </div>
+                    <textarea id="input-free" class="w-full min-h-[60vh] bg-navy-deep border-x-2 border-b-2 border-slate-600 rounded-b-md p-6 text-lg text-slate-200 font-mono leading-relaxed focus:border-brand-sky placeholder-slate-600" placeholder="Schreibe deinen Prompt hier..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- VIEW: HISTORY (Placeholder) -->
+            <div id="view-history" class="hidden max-w-4xl mx-auto fade-in">
+                <h2 class="text-2xl font-bold text-white mb-6">Historie</h2>
+                <div id="history-list" class="space-y-4"></div>
+            </div>
+
+            <!-- VIEW: FAVORITES (Placeholder) -->
+            <div id="view-favorites" class="hidden max-w-4xl mx-auto fade-in">
+                <h2 class="text-2xl font-bold text-white mb-6">Favoriten</h2>
+                <div id="favorites-list" class="space-y-4"></div>
+            </div>
+
         </div>
 
-        <!-- HELP VIEW -->
-        <div id="view-help" class="hidden page-view">
-            <div class="mb-10 text-center">
-                <h2 class="text-4xl font-bold text-white mb-3 tracking-tight">Anleitung & Hilfe</h2>
-                <p class="text-brand-sky font-medium">Ein KI ist nur so schlau, wie der Prompt, den sie bekommt!</p>
+        <!-- FOOTER (Sticky Action Bar) -->
+        <footer class="h-20 bg-navy-deep border-t border-navy-border flex items-center justify-end px-8 z-30 flex-shrink-0">
+            <div class="flex gap-4">
+                <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-400 hover:text-red-500 font-medium transition-colors">
+                    Reset
+                </button>
+                <button onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-lg shadow-brand-sky/20 flex items-center gap-3 transform active:scale-95 transition-all">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>COPY & SAVE</span>
+                </button>
             </div>
-            <div class="bg-navy-light border border-slate-700 p-6 rounded-md mb-8 text-slate-300 leading-relaxed shadow-sm">
-                Diese App hilft dir dabei, bessere Eingaben für KI-Tools zu erstellen. Alles wird übersichtlich in einzelne Bausteine gegliedert, damit du schnell und ohne Umwege zu einem guten Ergebnis kommst.
-                <br><br>
-                <strong class="text-brand-sky">Felder ausfüllen —> “Erstellen und kopieren” klicken —> Prompt in deine Lieblings KI einfügen!</strong>
-            </div>
-            <div class="space-y-4 mb-10" id="help-accordion-container"></div>
-        </div>
+        </footer>
 
     </main>
 
-    <!-- BOTTOM NAV -->
-    <nav class="fixed bottom-0 w-full bg-navy-deep/90 backdrop-blur-md border-t border-slate-800 z-40 safe-area-pb">
-        <div class="max-w-3xl mx-auto flex justify-around items-center h-16">
-            <button onclick="switchTab('create')" class="nav-btn active flex flex-col items-center gap-1.5 w-full h-full justify-center text-brand-sky transition-all" data-target="create">
-                <i class="fa-solid fa-pen-to-square text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-widest">Editor</span>
-            </button>
-            <button onclick="switchTab('history')" class="nav-btn flex flex-col items-center gap-1.5 w-full h-full justify-center text-slate-500 hover:text-slate-300 transition-all" data-target="history">
-                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-widest">Historie</span>
-            </button>
-            <button onclick="switchTab('favorites')" class="nav-btn flex flex-col items-center gap-1.5 w-full h-full justify-center text-slate-500 hover:text-slate-300 transition-all" data-target="favorites">
-                <i class="fa-solid fa-star text-lg"></i>
-                <span class="text-[10px] font-bold uppercase tracking-widest">Favoriten</span>
-            </button>
+    <!-- RIGHT SIDEBAR (Library) -->
+    <aside id="sidebar-right" class="w-80 bg-navy-light border-l border-navy-border flex flex-col sidebar-transition z-30 flex-shrink-0 transform translate-x-0">
+        <div class="p-4 border-b border-navy-border">
+            <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-3">Bibliothek</h3>
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-3 text-slate-500 text-sm"></i>
+                <input type="text" placeholder="Suchen..." class="w-full bg-navy-deep border border-slate-700 rounded-md py-2 pl-9 pr-3 text-sm text-white focus:border-brand-sky focus:ring-0">
+            </div>
         </div>
-    </nav>
-
-    <!-- MODALS -->
-    
-    <!-- Scenario List -->
-    <div id="modal-scenario-list" class="fixed inset-0 z-50 hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-scenario-list')">
-        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh] modal-panel">
-            <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-navy-deep/50">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-lg text-white">Szenarien</h3>
-                    <button onclick="openHelp('scenarios')" class="text-slate-500 hover:text-brand-sky transition-colors">
-                        <i class="fa-solid fa-circle-question"></i>
-                    </button>
+        
+        <div class="flex-1 overflow-y-auto p-4 space-y-6">
+            <!-- Scenarios Section -->
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-white text-sm">Szenarien</h4>
+                    <button class="text-xs text-brand-sky hover:text-white"><i class="fa-solid fa-plus"></i> Neu</button>
                 </div>
-                <button onclick="closeModal('modal-scenario-list')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-4 border-b border-slate-700 bg-navy-deep/30">
-                <button onclick="startScenarioMode()" class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep rounded-md font-bold shadow-md flex items-center justify-center gap-2 transition-all">
-                    <i class="fa-solid fa-plus-circle"></i> Neues Szenario anlegen
-                </button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="scenarios-list-container"></div>
-        </div>
-    </div>
-
-    <!-- Save Scenario -->
-    <div id="modal-save-scenario" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6 modal-panel">
-            <h3 class="text-xl font-bold text-white mb-4">Szenario benennen</h3>
-            <input type="text" id="new-scenario-name" placeholder="z.B. Meeting Protokoll" class="w-full p-3 border border-slate-600 rounded-md bg-navy-deep text-white mb-6 focus:border-brand-sky focus:ring-1 focus:ring-brand-sky/20 outline-none">
-            <div class="flex gap-3">
-                <button onclick="closeModal('modal-save-scenario')" class="flex-1 py-2 border border-slate-600 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white">Zurück</button>
-                <button onclick="confirmSaveScenario()" class="flex-1 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep rounded-md font-bold">Speichern</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Export -->
-    <div id="modal-export-scenarios" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 flex flex-col max-h-[80vh] modal-panel">
-            <div class="p-5 border-b border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white">Exportieren</h3>
-                <button onclick="closeModal('modal-export-scenarios')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-4 flex-1 overflow-y-auto" id="export-list-container"></div>
-            <div class="p-4 border-t border-slate-700">
-                <button onclick="executeExport()" class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep rounded-md font-bold shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-download"></i> Herunterladen
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Snippets -->
-    <div id="modal-snippets" class="fixed inset-0 z-50 hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-snippets')">
-        <div class="bg-navy-light w-full max-w-md rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[80vh] modal-panel">
-            <div class="p-4 bg-brand-sky text-navy-deep flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-book"></i> Bausteine: <span id="snippet-modal-title" class="font-normal opacity-90"></span></h3>
+                <div id="library-scenarios" class="space-y-2">
+                    <!-- Injected via JS -->
+                    <div class="text-xs text-slate-500 italic">Lade...</div>
                 </div>
-                <button onclick="closeModal('modal-snippets')" class="text-navy-deep/70 hover:text-navy-deep"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-3 bg-navy-deep border-b border-slate-700 flex gap-2">
-                <input type="text" id="snippet-name-input" placeholder="Neuer Baustein..." class="flex-1 bg-navy-light border border-slate-600 rounded-md px-3 py-2 text-sm text-white focus:border-brand-sky focus:outline-none">
-                <button onclick="saveSnippet()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep px-3 py-2 rounded-md text-sm font-bold"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="snippets-list"></div>
-        </div>
-    </div>
 
-    <!-- Help Popup -->
-    <div id="modal-help" class="fixed inset-0 z-[100] hidden bg-navy-deep/95 backdrop-blur-md flex items-center justify-center p-4" onclick="if(event.target === this) closeModal('modal-help')">
-        <div class="bg-navy-light w-full max-w-lg rounded-md shadow-2xl border border-slate-700 p-8 relative modal-panel">
-            <button onclick="closeModal('modal-help')" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="flex items-center gap-3 mb-6">
-                <i class="fa-solid fa-circle-info text-brand-sky text-2xl"></i>
-                <h3 id="help-title" class="text-2xl font-bold text-white">Hilfe</h3>
-            </div>
-            <p id="help-text" class="text-lg text-slate-300 leading-relaxed"></p>
-        </div>
-    </div>
-    
-    <!-- Auth Modal -->
-    <div id="modal-auth" class="fixed inset-0 z-[70] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 overflow-hidden flex flex-col modal-panel">
-            <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-navy-deep/50">
-                <h3 class="font-bold text-lg text-white flex items-center gap-2">
-                    <i class="fa-solid fa-user-astronaut text-brand-sky"></i> <span id="auth-title">Anmelden</span>
-                </h3>
-                <button onclick="closeModal('modal-auth')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-6">
-                <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-800 rounded-md font-bold shadow-sm transition-all flex items-center justify-center gap-3 mb-4">
-                    <i class="fa-brands fa-google text-red-500 text-lg"></i>
-                    <span>Weiter mit Google</span>
-                </button>
-                <div class="flex items-center my-6">
-                    <div class="flex-1 h-px bg-slate-700"></div>
-                    <span class="px-3 text-xs text-slate-500 uppercase tracking-wider font-medium">oder</span>
-                    <div class="flex-1 h-px bg-slate-700"></div>
+            <!-- Snippets Section -->
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-white text-sm">Bausteine</h4>
                 </div>
-                <div id="auth-error" class="hidden bg-red-900/30 border border-red-800 text-red-300 px-3 py-2 rounded text-sm mb-4"></div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">E-Mail</label>
-                        <input type="email" id="auth-email" class="w-full p-3 border border-slate-600 rounded-md bg-navy-deep text-white focus:border-brand-sky focus:outline-none transition-colors">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Passwort</label>
-                        <input type="password" id="auth-password" class="w-full p-3 border border-slate-600 rounded-md bg-navy-deep text-white focus:border-brand-sky focus:outline-none transition-colors">
-                    </div>
-                    <button onclick="handleAuthSubmit()" class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep rounded-md font-bold shadow-md transition-all mt-2">
-                        Starten
-                    </button>
-                </div>
-                <div class="text-center text-sm text-slate-500 mt-6">
-                    <span id="auth-switch-text">Noch kein Konto?</span>
-                    <button onclick="toggleAuthMode()" class="text-brand-sky font-bold hover:underline ml-1" id="auth-switch-btn">Registrieren</button>
+                <div id="library-snippets" class="space-y-2">
+                    <div class="text-xs text-slate-500 italic">Wähle ein Feld im Editor.</div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- General Confirm -->
-    <div id="modal-general-confirm" class="fixed inset-0 z-[60] hidden bg-navy-deep/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-light w-full max-w-sm rounded-md shadow-2xl border border-slate-700 p-6 text-center modal-panel">
-            <div class="w-16 h-16 bg-navy-deep rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
-                <i class="fa-solid fa-circle-question text-brand-sky text-3xl"></i>
-            </div>
-            <h3 id="confirm-title" class="text-xl font-bold text-white mb-2">Bestätigen</h3>
-            <p id="confirm-text" class="text-slate-400 mb-6">Bist du sicher?</p>
-            <div class="flex gap-3">
-                <button onclick="closeModal('modal-general-confirm')" class="flex-1 py-2 border border-slate-600 rounded-md text-slate-400 hover:bg-slate-800 hover:text-white">Abbrechen</button>
-                <button id="btn-confirm-action" class="flex-1 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep rounded-md font-bold">OK</button>
-            </div>
-        </div>
-    </div>
+    </aside>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-navy-light text-white px-6 py-3 rounded-md shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[110] flex items-center gap-3 border border-slate-600">
-        <i class="fa-solid fa-circle-check text-brand-sky"></i>
-        <span id="toast-msg" class="font-medium">Erfolg!</span>
-    </div>
-
+    <!-- JAVASCRIPT -->
     <script>
-        // CONFIG & HELP DATA
+        // --- CONFIG ---
         const FIELDS = [
-            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', text: "Beschreiben Sie in welcher Rolle die KI arbeiten soll." },
-            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', text: "Geben Sie die Hintergründe mit: Je klarer der Rahmen, je besser die Antwort!" },
-            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', text: "Formulieren Sie klar, was getan werden soll." },
-            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', text: "Legen sie den gewünschten Stil der Antwort fest." },
-            { id: 'format', label: 'Format & Varianten', icon: 'fa-list-check', text: "Bestimmen Sie, in welcher Form das Ergebnis ausgegeben werden soll." }
+            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein?' },
+            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', placeholder: 'Hintergrundinfos...' },
+            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', placeholder: 'Was soll getan werden?' },
+            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', placeholder: 'Wie soll es klingen?' },
+            { id: 'format', label: 'Format', icon: 'fa-list-check', placeholder: 'Ausgabeformat...' }
         ];
 
-        const HELP_SECTIONS = {
-            'role': "Hier bestimmst du, <em>wie</em> die KI denken soll. Eine Rolle hilft der KI, deine Anfrage besser einzuordnen.<br><br><strong>Beispiele:</strong><br>• \"Du bist Journalist.\"\<br>• \"Du bist Steuerberater.\"\<br>• \"Du bist Fitnesscoach.\"\<br><br>Je klarer du die Rolle beschreibst, desto hilfreicher wird die Antwort.",
-            'context': "Im Kontextfeld erklärst du kurz, worum es geht. Je klarer und genauer du den Hintergrund beschreibst, desto leichter versteht die KI deine Situation – und desto besser wird das Ergebnis.<br><br>Gib hier alles an, was wichtig ist, zum Beispiel:<br>• Für wen ist der Text gedacht?<br>• Worum geht es genau?<br>• Welche Rahmenbedingungen gibt es?<br><br>Je mehr Kontext, je weniger Halluzination!",
-            'task': "Hier sagst du klar, was die KI tun soll.<br><br><strong>Beispiele:</strong><br>• \"Schreibe einen kurzen Text.\"\<br>• \"Erstelle eine Schritt-für-Schritt-Anleitung.\"\<br>• \"Formuliere meine Nachricht höflicher.\"\<br><br>Nutze am besten direkte Verben wie \"Schreibe\", \"Erkläre\", \"Vergleiche\", \"Erstelle\".",
-            'style': "Hier legst du fest, wie die Antwort klingen soll.<br><br>Mögliche Beispiele:<br>• \"Professionell, aber locker.\"\<br>• \"Kurze Sätze.\"\<br>• \"Ohne komplizierte Begriffe.\"\<br>• \"Für Kinder verständlich.\"\<br>• \"Keine Emojis.\"\<br><br>Wenn du nichts eingibst, wählt die KI automatisch einen neutralen Stil.",
-            'format': "Im Feld Format gibst du an, <em>wie</em> das Ergebnis aussehen soll. Das hilft der KI, deinen Text direkt in die richtige Form zu bringen.<br><br>Beispiele:<br>• „Stichpunkte“<br>• „Kurzer Fließtext“<br>• „Für eine E-Mail“<br>• „Als Liste für eine Präsentation“<br>• „In ganzen Sätzen“<br><br>Je genauer du beschreibst, welches Format du brauchst, desto besser passt der Text später zu deinem Zweck.",
-            'scenarios': "Szenarien helfen dir, wiederkehrende Aufgaben schneller zu erledigen. Wenn du oft mit den gleichen Rollen und dem gleichen Kontext arbeitest, kannst du dir diese Kombination als Szenario abspeichern. Ein Szenario enthält alle Bausteine, die du immer wieder brauchst. Du musst dann später nur noch die Aufgabe anpassen.<br><br><strong>Beispiel:</strong><br>Du nutzt die KI häufig als Mail-Assistenz der Geschäftsführung. Dann kannst du dir ein Szenario anlegen, das bereits enthält:<br>• Rolle: „Du bist Assistenz der Geschäftsführung“<br>• Kontext: Eine kurze Beschreibung des Unternehmens<br>• Stil: „professionell und klar“<br>• Format: „E-Mail“<br><br>Wenn du das Szenario später öffnest, musst du nur noch die Aufgabe ergänzen.",
-            'bausteine': "Bausteine sind kleine, wiederverwendbare Elemente, die du dir für jede einzelne Kategorie anlegen kannst. Das ist praktisch, wenn du bestimmte Rollen, Kontexte oder Aufgaben immer wieder brauchst. Bausteine funktionieren wie ein persönlicher Werkzeugkasten: Du legst dir die Teile ab, die du häufig nutzt, und kannst sie später mit einem Klick auswählen. So musst du nicht jedes Mal von vorne anfangen.",
-            'historie': "In der Historie findest du alle Prompts, die du bisher in der App erstellt hast. Das ist hilfreich, wenn du etwas nachschlagen, erneut verwenden oder vergleichen möchtest. Du kannst ältere Prompts noch einmal ansehen, kopieren oder darauf basierend eine neue Version erstellen. Die Historie spart dir Zeit, weil du nicht jedes Mal komplett neu anfangen musst.",
-            'favoriten': "Wenn du bestimmte Prompts regelmäßig nutzt, kannst du sie als Favorit speichern. Das funktioniert ganz einfach:<br>1. Öffne die <strong>Historie</strong><br>2. Markiere den Prompt, den du häufiger brauchst<br>3. Speichere ihn als <strong>Favoriten</strong><br><br>Unter Favoriten findest du dann alle gespeicherten Prompts übersichtlich an einem Ort. So kannst du oft genutzte Eingaben jederzeit mit einem Klick wiederverwenden."
-        };
+        let currentMode = 'structured'; // 'structured' or 'free'
 
-        let isScenarioMode = false;
-        let isRegisterMode = false;
-        let currentSnippetFieldId = null;
-        let cachedHistory = []; // Fix for onclick bug
-
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderFields();
-            renderHelpAccordion(); 
-            loadHistory();
-            registerSW();
-            
-            // Listen for Auth Changes from db.js
-            window.addEventListener('auth-state-changed', (e) => {
-                updateHeaderUI(e.detail);
-                loadHistory(); // Reload data for new user
-            });
-
-            document.addEventListener('click', (e) => {
-                const menu = document.getElementById('header-menu');
-                const btn = document.getElementById('menu-btn');
-                if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-            });
+            renderStructuredFields();
+            // Mock loading library
+            setTimeout(() => {
+                document.getElementById('library-scenarios').innerHTML = `
+                    <div class="p-2 bg-navy-deep border border-slate-700 rounded text-sm text-slate-300 hover:border-brand-sky cursor-pointer transition-colors">Meeting Protokoll</div>
+                    <div class="p-2 bg-navy-deep border border-slate-700 rounded text-sm text-slate-300 hover:border-brand-sky cursor-pointer transition-colors">E-Mail Antwort</div>
+                `;
+            }, 500);
         });
 
-        // --- UI UPDATE ---
-        function updateHeaderUI(user) {
-            const btnAuth = document.getElementById('btn-auth');
-            const userMenu = document.getElementById('user-menu');
-            const userEmailSpan = document.getElementById('user-email');
-
-            if (user) {
-                if(btnAuth) btnAuth.classList.add('hidden');
-                if(userMenu) userMenu.classList.remove('hidden');
-                if(userEmailSpan) userEmailSpan.innerText = user.email;
-            } else {
-                if(btnAuth) btnAuth.classList.remove('hidden');
-                if(userMenu) userMenu.classList.add('hidden');
-                if(userEmailSpan) userEmailSpan.innerText = "";
-            }
-        }
-
-        // --- RENDER FUNCTIONS (CLEAN SLATE) ---
-        function renderFields() {
-            const container = document.getElementById('fields-container');
-            container.innerHTML = FIELDS.map((field) => `
-                <div class="group">
-                    <div class="flex justify-between items-end mb-2 px-1">
-                        <div class="flex items-center gap-3">
-                             <i class="fa-solid ${field.icon} text-brand-sky text-xl"></i>
-                             <label class="font-bold text-lg text-brand-sky">${field.label}</label>
-                             <button onclick="openHelp('${field.id}')" class="text-slate-500 hover:text-brand-sky transition-colors ml-1" title="Hilfe">
-                                <i class="fa-solid fa-circle-question"></i>
-                            </button>
-                        </div>
-                        <button onclick="openSnippetModal('${field.id}')" class="text-slate-500 hover:text-brand-sky text-sm font-medium transition-colors flex items-center gap-2" title="Bausteine">
-                            <i class="fa-solid fa-book"></i> Bausteine
+        // --- RENDER ---
+        function renderStructuredFields() {
+            const container = document.getElementById('editor-structured');
+            container.innerHTML = FIELDS.map(f => `
+                <div class="group relative">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fa-solid ${f.icon} text-brand-sky"></i>
+                        <label class="font-bold text-brand-sky text-sm uppercase tracking-wide">${f.label}</label>
+                    </div>
+                    <textarea id="input-${f.id}" 
+                        class="w-full h-32 bg-navy-deep border-2 border-slate-500 rounded-md p-4 text-slate-200 placeholder-slate-600 input-hard-swap text-base leading-relaxed"
+                        placeholder="${f.placeholder}"></textarea>
+                    
+                    <!-- Quick Actions (Hover) -->
+                    <div class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <button class="text-xs bg-navy-light border border-slate-600 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippets('${f.id}')">
+                            <i class="fa-solid fa-book"></i>
                         </button>
                     </div>
-
-                    <textarea 
-                        id="input-${field.id}" 
-                        class="w-full h-40 bg-navy-deep border-2 border-slate-500 rounded-md p-4 text-slate-300 placeholder-slate-600 input-hard-swap text-base leading-relaxed"
-                        placeholder="${field.text}"></textarea>
                 </div>
             `).join('');
         }
 
-        function renderHelpAccordion() {
-            const container = document.getElementById('help-accordion-container');
-            const sections = [
-                {id: 'role', label: 'Rolle', icon: 'fa-user-tie'},
-                {id: 'context', label: 'Kontext', icon: 'fa-earth-europe'},
-                {id: 'task', label: 'Aufgabe', icon: 'fa-bullseye'},
-                {id: 'style', label: 'Stil', icon: 'fa-palette'},
-                {id: 'format', label: 'Format', icon: 'fa-list-check'},
-                {id: 'bausteine', label: 'Bausteine', icon: 'fa-book'},
-                {id: 'scenarios', label: 'Szenarien', icon: 'fa-layer-group'},
-                {id: 'historie', label: 'Historie', icon: 'fa-clock-rotate-left'},
-                {id: 'favoriten', label: 'Favoriten', icon: 'fa-star'}
-            ];
-            container.innerHTML = sections.map(s => `
-                <details class="group bg-navy-light rounded-md shadow-sm border border-slate-700 overflow-hidden">
-                    <summary class="flex items-center gap-3 p-4 cursor-pointer font-bold text-slate-200">
-                        <i class="fa-solid ${s.icon} text-brand-sky w-6 text-center"></i> ${s.label}
-                        <span class="ml-auto transition-transform group-open:rotate-180 text-slate-500"><i class="fa-solid fa-chevron-down"></i></span>
-                    </summary>
-                    <div class="p-4 pt-0 text-slate-400 leading-relaxed border-t border-slate-700 mt-2">
-                        ${HELP_SECTIONS[s.id]}
-                    </div>
-                </details>
-            `).join('');
-        }
-
-        // --- AUTH UI ---
-        function openAuthModal() {
-            document.getElementById('modal-auth').classList.remove('hidden');
-            document.getElementById('auth-error').classList.add('hidden');
-        }
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            const title = document.getElementById('auth-title');
-            const switchText = document.getElementById('auth-switch-text');
-            const switchBtn = document.getElementById('auth-switch-btn');
-            if (isRegisterMode) {
-                title.innerText = "Registrieren";
-                switchText.innerText = "Bereits ein Konto?";
-                switchBtn.innerText = "Anmelden";
+        // --- LAYOUT LOGIC ---
+        function toggleSidebar(side) {
+            const el = document.getElementById(`sidebar-${side}`);
+            if (side === 'left') {
+                // Toggle width classes for left sidebar
+                el.classList.toggle('w-16');
+                el.classList.toggle('w-0'); // Mobile hide
+                el.classList.toggle('md:w-64');
+                // Simple toggle logic for demo, can be refined
+                if(el.classList.contains('w-0')) el.classList.remove('w-0');
+                else el.classList.add('w-0');
             } else {
-                title.innerText = "Anmelden";
-                switchText.innerText = "Noch kein Konto?";
-                switchBtn.innerText = "Registrieren";
+                // Right sidebar translate toggle
+                el.classList.toggle('translate-x-full');
+                el.classList.toggle('!w-0');
+                el.classList.toggle('hidden');
             }
         }
-        async function handleAuthSubmit() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            const errorBox = document.getElementById('auth-error');
-            if (!email || !pass) { errorBox.innerText = "Bitte alles ausfüllen."; errorBox.classList.remove('hidden'); return; }
-            let result;
-            if (isRegisterMode) { result = await registerUser(email, pass); } else { result = await loginUser(email, pass); }
-            if (result.error) { errorBox.innerText = result.error.message; errorBox.classList.remove('hidden'); } else { closeModal('modal-auth'); showToast(isRegisterMode ? "Registrierung erfolgreich!" : "Willkommen zurück!"); }
-        }
-        function handleLogout() { logoutUser(); showToast("Abgemeldet."); }
 
-        // --- UI LOGIC ---
-        function toggleMenu() { document.getElementById('header-menu').classList.toggle('hidden'); }
-        function switchToHelpView() { toggleMenu(); switchTab('help'); }
-        function openHelp(key) {
-            const field = FIELDS.find(f => f.id === key);
-            let title = field ? field.label : key.charAt(0).toUpperCase() + key.slice(1);
-            let text = HELP_SECTIONS[key] || "Text fehlt.";
-            document.getElementById('help-title').innerText = title;
-            document.getElementById('help-text').innerHTML = text;
-            document.getElementById('modal-help').classList.remove('hidden');
-        }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function showConfirm(title, text, btnText, btnColorClass, callback) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-text').innerText = text;
-            const btn = document.getElementById('btn-confirm-action');
-            btn.innerText = btnText;
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.onclick = () => { callback(); closeModal('modal-general-confirm'); };
-            document.getElementById('modal-general-confirm').classList.remove('hidden');
-        }
-
-        // --- SCENARIO LOGIC ---
-        function openScenarioListModal() { renderScenarioList(); document.getElementById('modal-scenario-list').classList.remove('hidden'); }
-        function startScenarioMode() {
-            closeModal('modal-scenario-list');
-            FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
-            isScenarioMode = true; updateUIForMode(); switchTab('create'); showToast("Szenario-Modus");
-        }
-        function cancelScenarioMode() {
-            showConfirm("Abbrechen?", "Eingaben gehen verloren.", "Ja, Abbrechen", "", () => {
-                isScenarioMode = false; FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = ''); updateUIForMode();
+        function switchView(viewId) {
+            // Hide all views
+            ['view-editor', 'view-history', 'view-favorites', 'view-help'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden');
             });
+            // Show target
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Update Nav State
+            // (Simplified for this demo)
         }
-        function updateUIForMode() {
-            const indicator = document.getElementById('mode-indicator');
-            const btnGenerate = document.getElementById('btn-generate');
-            const btnsScenario = document.getElementById('btns-scenario');
-            if (isScenarioMode) {
-                indicator.classList.remove('hidden'); btnGenerate.classList.add('hidden'); btnsScenario.classList.remove('hidden'); btnsScenario.classList.add('flex');
+
+        function setEditorMode(mode) {
+            currentMode = mode;
+            const btnStruct = document.getElementById('btn-mode-structured');
+            const btnFree = document.getElementById('btn-mode-free');
+            const divStruct = document.getElementById('editor-structured');
+            const divFree = document.getElementById('editor-free');
+
+            if (mode === 'structured') {
+                btnStruct.classList.add('segment-active', 'text-navy-deep');
+                btnStruct.classList.remove('text-slate-400');
+                btnFree.classList.remove('segment-active', 'text-navy-deep');
+                btnFree.classList.add('text-slate-400');
+                
+                divStruct.classList.remove('hidden');
+                divFree.classList.add('hidden');
             } else {
-                indicator.classList.add('hidden'); btnGenerate.classList.remove('hidden'); btnsScenario.classList.add('hidden'); btnsScenario.classList.remove('flex');
-            }
-        }
-        function initiateSaveScenario() {
-            if (!window.currentUser) { openAuthModal(); return; }
-            const hasContent = FIELDS.some(f => document.getElementById(`input-${f.id}`).value.trim() !== '');
-            if(!hasContent) { showToast("Felder leer!", true); return; }
-            document.getElementById('new-scenario-name').value = '';
-            document.getElementById('modal-save-scenario').classList.remove('hidden');
-        }
-        async function confirmSaveScenario() {
-            const name = document.getElementById('new-scenario-name').value.trim();
-            if(!name) { showToast("Name fehlt", true); return; }
-            const currentValues = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
-            const success = await db.saveScenario({ name, fields: currentValues });
-            if (success) { closeModal('modal-save-scenario'); isScenarioMode = false; updateUIForMode(); showToast("Gespeichert!"); }
-        }
-        async function renderScenarioList() {
-            const list = document.getElementById('scenarios-list-container');
-            list.innerHTML = '<div class="text-center text-slate-500 py-4"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-            const scenarios = await db.getScenarios();
-            if(scenarios.length === 0) { list.innerHTML = '<div class="text-slate-500 text-center py-4">Keine Szenarien.</div>'; return; }
-            list.innerHTML = scenarios.map(s => `
-                <div class="flex items-center justify-between bg-navy-deep border border-slate-700 p-3 rounded-md hover:border-brand-sky transition-colors group">
-                    <button onclick="loadScenario(${s.id})" class="flex-1 text-left font-medium text-slate-300 group-hover:text-white transition-colors">
-                        ${s.name}
-                    </button>
-                    <button onclick="deleteScenario(${s.id})" class="text-slate-600 hover:text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-        function loadScenario(id) {
-             db.getScenarios().then(scenarios => {
-                 const s = scenarios.find(x => x.id == id);
-                 if(s) {
-                    if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
-                    s.fields.forEach((val, index) => { document.getElementById(`input-${FIELDS[index].id}`).value = val; });
-                    closeModal('modal-scenario-list');
-                    showToast("Geladen");
-                 }
-             });
-        }
-        function deleteScenario(id) {
-             showConfirm("Löschen?", "Szenario unwiderruflich löschen?", "Löschen", "", async () => {
-                 await db.deleteScenario(id); renderScenarioList();
-             });
-        }
+                btnFree.classList.add('segment-active', 'text-navy-deep');
+                btnFree.classList.remove('text-slate-400');
+                btnStruct.classList.remove('segment-active', 'text-navy-deep');
+                btnStruct.classList.add('text-slate-400');
 
-        // --- SNIPPETS ---
-        function openSnippetModal(fieldId) {
-            currentSnippetFieldId = fieldId;
-            document.getElementById('snippet-modal-title').innerText = FIELDS.find(f => f.id === fieldId).label;
-            renderSnippetList();
-            document.getElementById('modal-snippets').classList.remove('hidden');
-        }
-        function saveSnippet() {
-            const name = document.getElementById('snippet-name-input').value.trim();
-            const text = document.getElementById(`input-${currentSnippetFieldId}`).value.trim();
-            if(!name || !text) { showToast("Leer!", true); return; }
-            const all = getStorage('snippets') || {};
-            if(!all[currentSnippetFieldId]) all[currentSnippetFieldId] = [];
-            all[currentSnippetFieldId].push({ id: Date.now(), name, text });
-            saveStorage('snippets', all);
-            document.getElementById('snippet-name-input').value = '';
-            renderSnippetList();
-        }
-        function loadSnippet(id) {
-            const all = getStorage('snippets') || {};
-            const item = all[currentSnippetFieldId].find(s => s.id === id);
-            if(item) {
-                document.getElementById(`input-${currentSnippetFieldId}`).value = item.text;
-                closeModal('modal-snippets');
-            }
-        }
-        function deleteSnippet(id) {
-            if(!confirm("Löschen?")) return;
-            const all = getStorage('snippets') || {};
-            all[currentSnippetFieldId] = all[currentSnippetFieldId].filter(s => s.id !== id);
-            saveStorage('snippets', all);
-            renderSnippetList();
-        }
-        function renderSnippetList() {
-            const all = getStorage('snippets') || {};
-            const list = all[currentSnippetFieldId] || [];
-            const container = document.getElementById('snippets-list');
-            if(list.length === 0) { container.innerHTML = '<div class="text-slate-500 text-center py-4">Leer.</div>'; return; }
-            container.innerHTML = list.map(s => `
-                <div class="flex items-center justify-between bg-navy-deep border border-slate-700 p-2 rounded-md hover:bg-slate-800">
-                    <button onclick="loadSnippet(${s.id})" class="flex-1 text-left">
-                        <div class="font-bold text-slate-200 text-sm">${s.name}</div>
-                        <div class="text-xs text-slate-500 truncate w-48">${s.text.substring(0,30)}...</div>
-                    </button>
-                    <button onclick="deleteSnippet(${s.id})" class="text-slate-600 hover:text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        // --- GENERATE ---
-        async function generatePrompt() {
-            let finalText = ""; let rawFields = []; let hasContent = false;
-            const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL', 'format': '🧪 VARIANTEN' };
-            FIELDS.forEach(field => {
-                const val = document.getElementById(`input-${field.id}`).value.trim();
-                rawFields.push(val);
-                if (val) { hasContent = true; finalText += `**${headerMap[field.id]}**\n${val}\n\n`; }
-            });
-            if (!hasContent) { showToast("Leer!", true); return; }
-            navigator.clipboard.writeText(finalText.trim()).then(() => showToast("Kopiert & Gespeichert!"));
-            const entry = { id: Date.now(), text: finalText.trim(), fields: rawFields };
-            await db.savePrompt(entry);
-            loadHistory();
-        }
-        function resetFields() {
-            showConfirm("Reset?", "Alle Felder leeren?", "Leeren", "", () => {
-                FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
-            });
-        }
-
-        // --- HISTORY / TABS ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === tabId) {
-                    btn.classList.add('text-brand-sky'); btn.classList.remove('text-slate-500');
-                } else {
-                    btn.classList.remove('text-brand-sky'); btn.classList.add('text-slate-500');
-                }
-            });
-            if(tabId === 'history') loadHistory();
-            if(tabId === 'favorites') loadFavorites();
-            window.scrollTo(0,0);
-        }
-
-        // --- BUGFIX: ID-BASED HANDLERS ---
-        function handleCopyPrompt(id) {
-            const item = cachedHistory.find(i => i.id == id);
-            if(item) copyText(item.text);
-        }
-        function handleRestorePrompt(id) {
-            const item = cachedHistory.find(i => i.id == id);
-            if(item && item.fields) {
-                if(isScenarioMode) { isScenarioMode = false; updateUIForMode(); }
-                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
-                switchTab('create'); showToast("Geladen");
-            }
-        }
-        function handleSaveHistoryAsScenario(id) {
-            const item = cachedHistory.find(i => i.id == id);
-            if(item && item.fields) {
-                item.fields.forEach((v, i) => document.getElementById(`input-${FIELDS[i].id}`).value = v);
-                initiateSaveScenario();
+                divFree.classList.remove('hidden');
+                divStruct.classList.add('hidden');
             }
         }
 
-        function renderCard(item) {
-            const date = new Date(item.timestamp).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-            return `
-            <div class="bg-navy-light rounded-md shadow-sm p-4 border border-slate-700 hover:border-slate-600 transition-colors">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">${date}</span>
-                    <div class="flex gap-3">
-                        <button onclick="handleSaveHistoryAsScenario(${item.id})" class="text-slate-500 hover:text-brand-sky" title="Als Szenario"><i class="fa-solid fa-layer-group"></i></button>
-                        <button onclick="toggleFavorite(${item.id})" class="${item.favorite ? 'text-brand-sky' : 'text-slate-500 hover:text-brand-sky'}"><i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
-                        <button onclick="deleteHistoryItem(${item.id})" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="bg-navy-deep p-3 rounded-md border border-slate-700 text-sm font-mono text-slate-400 h-32 overflow-y-auto relative no-scrollbar">
-                     ${item.text.replace(/\n/g, '<br>')}
-                </div>
-                <div class="flex justify-end gap-2 mt-3">
-                    <button onclick="handleRestorePrompt(${item.id})" class="px-3 py-1.5 rounded-md bg-navy-deep border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800"><i class="fa-solid fa-pen mr-1"></i> Nutzen</button>
-                    <button onclick="handleCopyPrompt(${item.id})" class="px-3 py-1.5 rounded-md bg-brand-sky text-navy-deep text-xs font-bold hover:bg-brand-hover"><i class="fa-solid fa-copy mr-1"></i> Kopieren</button>
-                </div>
-            </div>`;
+        // --- MARKDOWN TOOLBAR ---
+        function insertMarkdown(syntax) {
+            const textarea = document.getElementById('input-free');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const before = text.substring(0, start);
+            const after = text.substring(end, text.length);
+            
+            textarea.value = before + syntax + after;
+            textarea.selectionStart = textarea.selectionEnd = start + syntax.length;
+            textarea.focus();
         }
 
-        async function loadHistory() {
-            const container = document.getElementById('history-list');
-            container.innerHTML = '<div class="text-center text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-            cachedHistory = await db.getHistory(); // Cache data
-            if(cachedHistory.length === 0) container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Einträge.</div>';
-            else container.innerHTML = cachedHistory.map(item => renderCard(item)).join('');
-        }
-        async function loadFavorites() {
-            const container = document.getElementById('favorites-list');
-            cachedHistory = await db.getHistory(); // Cache data
-            const favs = cachedHistory.filter(h => h.favorite);
-            if(favs.length === 0) container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Favoriten.</div>';
-            else container.innerHTML = favs.map(item => renderCard(item)).join('');
-        }
-        async function toggleFavorite(id) {
-            const item = cachedHistory.find(h => h.id == id);
-            if (item) {
-                await db.toggleFavorite(id, item.favorite);
-                if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
-            }
-        }
-        async function deleteHistoryItem(id) {
-            showConfirm("Löschen?", "Weg damit?", "Löschen", "", async () => {
-                await db.deletePrompt(id);
-                if(!document.getElementById('view-favorites').classList.contains('hidden')) loadFavorites(); else loadHistory();
-            });
-        }
-
-        // --- IMPORT/EXPORT ---
-        function openExportModal() {
-            db.getScenarios().then(scenarios => {
-                const container = document.getElementById('export-list-container');
-                if(scenarios.length === 0) container.innerHTML = '<div class="text-slate-500 text-center py-4">Leer.</div>';
-                else container.innerHTML = scenarios.map(s => `
-                    <label class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded cursor-pointer border-b border-slate-700/50">
-                        <input type="checkbox" class="export-checkbox w-4 h-4 text-brand-sky rounded bg-navy-deep border-slate-600 focus:ring-brand-sky" value="${s.id}">
-                        <span class="text-slate-200">${s.name}</span>
-                    </label>
-                `).join('');
-                document.getElementById('modal-export-scenarios').classList.remove('hidden');
-            });
-        }
-        function executeExport() {
-            const checkboxes = document.querySelectorAll('.export-checkbox:checked');
-            if(checkboxes.length === 0) { showToast("Nichts ausgewählt", true); return; }
-            db.getScenarios().then(scenarios => {
-                const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
-                const selected = scenarios.filter(s => selectedIds.includes(s.id));
-                selected.forEach((s, i) => {
-                    setTimeout(() => {
-                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(s));
-                        const a = document.createElement('a');
-                        a.href = dataStr; a.download = `${s.name}.json`;
-                        document.body.appendChild(a); a.click(); a.remove();
-                    }, i * 200);
+        // --- CORE LOGIC: COPY & SAVE ---
+        async function handleCopyAndSave() {
+            let finalText = "";
+            
+            if (currentMode === 'structured') {
+                const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL', 'format': '🧪 VARIANTEN' };
+                FIELDS.forEach(f => {
+                    const val = document.getElementById(`input-${f.id}`).value.trim();
+                    if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
                 });
-                closeModal('modal-export-scenarios'); showToast("Exportiert");
-            });
-        }
-        function triggerImport() { document.getElementById('import-file').click(); }
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    const content = Array.isArray(data) ? data[0] : data;
-                    if(!content.fields) throw new Error("Format?");
-                    FIELDS.forEach((f, i) => { if(content.fields[i]) document.getElementById(`input-${f.id}`).value = content.fields[i]; });
-                    document.getElementById('new-scenario-name').value = file.name.replace('.json', '');
-                    document.getElementById('modal-save-scenario').classList.remove('hidden');
-                } catch (err) { showToast("Fehler!", true); }
-                event.target.value = '';
-            };
-            reader.readAsText(file);
+            } else {
+                finalText = document.getElementById('input-free').value.trim();
+            }
+
+            if (!finalText) {
+                alert("Bitte gib erst etwas ein!");
+                return;
+            }
+
+            // 1. Copy
+            try {
+                await navigator.clipboard.writeText(finalText);
+                // 2. Save (Implizit)
+                if (window.db && window.db.savePrompt) {
+                    const title = document.getElementById('project-title').value;
+                    await window.db.savePrompt({
+                        text: finalText,
+                        title: title, // New field for V5
+                        mode: currentMode,
+                        timestamp: new Date().toISOString()
+                    });
+                    console.log("Auto-Saved to History");
+                }
+                
+                // Feedback
+                const btn = document.querySelector('footer button:last-child');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>COPIED!</span>';
+                btn.classList.replace('bg-brand-sky', 'bg-green-500');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-green-500', 'bg-brand-sky');
+                }, 2000);
+
+            } catch (err) {
+                console.error('Copy failed', err);
+                alert("Fehler beim Kopieren");
+            }
         }
 
-        // --- UTILS ---
-        function getStorage(k) { return JSON.parse(localStorage.getItem('promptomizer_'+k)); }
-        function saveStorage(k, v) { localStorage.setItem('promptomizer_'+k, JSON.stringify(v)); }
-        function copyText(t) { navigator.clipboard.writeText(t).then(() => showToast("Kopiert!")); }
-        function showToast(m, err=false) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = m;
-            t.classList.remove('opacity-0', 'border-red-500', 'border-slate-600');
-            t.classList.add(err ? 'border-red-500' : 'border-slate-600');
-            setTimeout(() => t.classList.add('opacity-0'), 2500);
+        function resetCurrentView() {
+            if(confirm("Wirklich alles leeren?")) {
+                if(currentMode === 'structured') {
+                    FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
+                } else {
+                    document.getElementById('input-free').value = '';
+                }
+            }
         }
-        function registerSW() { if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.error); }
+
+        // --- MOCK DB INTEGRATION ---
+        // Placeholder for db.js functions if not present
+        window.openSnippets = (id) => {
+            console.log("Open Snippets for", id);
+            // Logic to load snippets into right sidebar
+            const container = document.getElementById('library-snippets');
+            container.innerHTML = `
+                <div class="p-2 bg-navy-deep border border-slate-700 rounded text-sm text-slate-300 hover:border-brand-sky cursor-pointer">Beispiel Snippet für ${id}</div>
+            `;
+            // Ensure right sidebar is open
+            const sb = document.getElementById('sidebar-right');
+            if(sb.classList.contains('hidden') || sb.classList.contains('!w-0')) toggleSidebar('right');
+        };
+
     </script>
+    
+    <!-- Supabase & DB Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
-</body> 
+</body>
 </html>
