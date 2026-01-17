@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V5</title>
-    <meta name="theme-color" content="#0B162A">
+    <title>Promptomizer V5 - Slate</title>
+    <meta name="theme-color" content="#020617">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,23 +17,25 @@
                 extend: {
                     colors: {
                         navy: {
-                            deep: '#0B162A',     // Editor (am dunkelsten)
-                            sidebar: '#111827',  // Sidebar (etwas heller)
-                            divider: 'rgba(255, 255, 255, 0.03)', // Border fast unsichtbar
+                            deep: '#020617',    // Slate 950 (Main Stage)
+                            sidebar: '#0f172a', // Slate 900 (Sidebar)
+                            border: '#1e293b',  // Slate 800 (Borders)
                         },
                         brand: {
-                            sky: '#0ea5e9',
-                            hover: '#38bdf8',
+                            sky: '#38bdf8',    // Sky 400 (Heller für Dark Mode)
+                            hover: '#0ea5e9',  // Sky 500
                         },
                         slate: {
                             800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
                     boxShadow: {
-                        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+                        'glow': '0 0 20px -5px rgba(56, 189, 248, 0.3)',
                     }
                 }
             }
@@ -41,236 +46,238 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #0B162A; }
-
-        /* Custom Scrollbar - dezenter */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #020617; }
+        
+        /* Premium Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; border: 1px solid #0f172a; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+        /* Transitions */
         .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-icon { transition: transform 0.3s ease; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        textarea {
-            resize: vertical;
-            outline: none;
-            background-color: rgba(255,255,255, 0.02);
-            border: 1px solid transparent;
-            color: #e2e8f0;
-            transition: all 0.2s;
+        /* Input Styles - Surface Look */
+        textarea { 
+            resize: vertical; 
+            outline: none; 
+            background-color: #0f172a; /* Slate 900 - hebt sich vom Hintergrund ab */
+            border: 1px solid #1e293b; /* Slate 800 */
+            color: #f1f5f9;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
         }
-        textarea:focus {
-            background-color: rgba(255,255,255, 0.04);
-            border-color: #0ea5e9;
-            box-shadow: 0 0 15px -3px rgba(14, 165, 233, 0.1);
+        textarea:focus { 
+            background-color: #0f172a;
+            border-color: #38bdf8; 
+            box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-
-        /* Toggle Buttons - integriert statt aufgesetzt */
+        
+        /* Toggle Button Style */
         .splitter-toggle {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 16px;
+            width: 20px;
             height: 48px;
-            background-color: transparent;
+            background-color: #0f172a; /* Match Sidebar */
+            border: 1px solid #1e293b;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 50;
-            color: #4b5563;
+            color: #64748b;
             transition: all 0.2s;
-            border-radius: 4px;
         }
-        .splitter-toggle:hover {
-            background-color: #1f2937;
-            color: #0ea5e9;
+        .splitter-toggle:hover { color: #38bdf8; border-color: #38bdf8; background-color: #1e293b; }
+        
+        .nav-item.active-nav {
+            background-color: #1e293b; /* Slate 800 */
+            border-left-color: #38bdf8;
+            color: white;
         }
     </style>
 </head>
+<body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
 
-<body class="text-slate-300 h-screen flex flex-col w-full bg-navy-deep">
-
-    <header class="h-16 flex items-center justify-center flex-shrink-0 z-40 bg-navy-sidebar w-full relative">
-        <div id="header-spacer-left" class="w-64 sidebar-transition flex-shrink-0"></div>
+    <header class="h-14 border-b border-navy-border flex items-center justify-center flex-shrink-0 z-40 bg-navy-sidebar w-full relative shadow-sm">
+        
+        <div id="header-spacer-left" class="w-64 sidebar-transition flex-shrink-0 border-r border-transparent"></div>
 
         <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0">
             <div class="w-full max-w-4xl flex items-center justify-between">
-
-                <div class="flex items-center select-none leading-none gap-3">
-                    <div class="w-8 h-8 bg-brand-sky rounded flex items-center justify-center text-navy-deep font-bold text-lg">P</div>
+                
+                <div class="flex items-center select-none leading-none gap-2">
+                    <div class="w-6 h-6 rounded bg-gradient-to-br from-brand-sky to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shadow-lg shadow-brand-sky/20">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
                     <div>
                         <span class="text-lg font-bold tracking-tight text-white">Prompt</span><span class="text-lg font-bold tracking-tight text-slate-500">omizer</span>
                     </div>
                 </div>
 
-                <div class="flex bg-black/20 p-1 rounded-lg">
-                    <button onclick="setEditorMode('structured')" id="btn-mode-structured"
-                        class="px-5 py-1.5 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-lg shadow-brand-sky/20">
+                <div class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
+                    <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
                         Strukturiert
                     </button>
-                    <button onclick="setEditorMode('free')" id="btn-mode-free"
-                        class="px-5 py-1.5 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
+                    <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-5 py-1 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
                         Frei
                     </button>
                 </div>
-
             </div>
         </div>
 
-        <div id="header-spacer-right" class="w-80 sidebar-transition flex-shrink-0"></div>
+        <div id="header-spacer-right" class="w-80 sidebar-transition flex-shrink-0 border-l border-transparent"></div>
     </header>
 
     <div class="flex-1 flex overflow-hidden relative">
 
-        <aside id="sidebar-left" class="w-64 bg-navy-sidebar flex flex-col justify-between sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
-            <div class="w-64 flex flex-col h-full pt-6">
-
-                <nav class="p-2 space-y-1 flex-1 overflow-y-auto">
-                    <div onclick="switchView('editor')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer bg-white/5 text-white shadow-subtle">
+        <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col justify-between sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
+            <div class="w-64 flex flex-col h-full">
+                <nav class="p-0 space-y-0.5 flex-1 overflow-y-auto pt-6 px-2">
+                    <div onclick="switchView('editor')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer active-nav transition-all">
                         <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
                         <span class="text-sm font-medium">Editor</span>
                     </div>
-                    <div onclick="switchView('history')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center transition-colors"></i>
+                    <div onclick="switchView('history')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-l-[3px] border-transparent transition-all">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                         <span class="text-sm font-medium">Historie</span>
                     </div>
-                    <div onclick="switchView('favorites')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-md cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all">
-                        <i class="fa-solid fa-star w-5 text-center transition-colors"></i>
+                    <div onclick="switchView('favorites')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-l-[3px] border-transparent transition-all">
+                        <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                         <span class="text-sm font-medium">Favoriten</span>
                     </div>
                 </nav>
 
-                <div class="p-4 bg-black/10">
+                <div class="p-4 border-t border-navy-border bg-black/10">
                     <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-700 to-gray-800 flex items-center justify-center text-xs font-bold ring-1 ring-white/10">
+                        <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
                             <i class="fa-solid fa-user"></i>
                         </div>
                         <div class="text-left overflow-hidden">
                             <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
-                            <div id="user-status-sub" class="text-[10px] text-slate-500 font-medium uppercase tracking-wider truncate">Login</div>
+                            <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
                         </div>
                     </button>
                 </div>
-
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col min-w-0 bg-navy-deep relative z-10">
-
-            <button onclick="toggleSidebar('left')" class="splitter-toggle left-0 hover:translate-x-1" title="Toggle Navigation">
+        <main class="flex-1 flex flex-col min-w-0 bg-navy-deep relative z-10 shadow-inner">
+            
+            <button onclick="toggleSidebar('left')" class="splitter-toggle -left-3 rounded-r-md border-l-0" title="Toggle Navigation">
                 <i id="icon-toggle-left" class="fa-solid fa-chevron-left text-xs rotate-icon"></i>
             </button>
 
             <div id="main-scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+                
                 <div id="view-editor" class="max-w-4xl mx-auto fade-in pb-20">
-                    <div id="editor-structured" class="space-y-12 pt-2"></div>
-
-                    <div id="editor-free" class="hidden h-full flex flex-col pt-2">
-                        <div class="sticky top-0 z-20 bg-black/20 p-1 rounded-lg flex gap-1 mb-2">
-                            <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-white/5 rounded text-slate-500 hover:text-slate-200"><i class="fa-solid fa-heading"></i></button>
-                            <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-white/5 rounded text-slate-500 hover:text-slate-200"><i class="fa-solid fa-bold"></i></button>
-                            <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-white/5 rounded text-slate-500 hover:text-slate-200"><i class="fa-solid fa-quote-right"></i></button>
-                            <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-white/5 rounded text-slate-500 hover:text-slate-200"><i class="fa-solid fa-list-ul"></i></button>
-                            <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-white/5 rounded text-slate-500 hover:text-slate-200"><i class="fa-solid fa-list-ol"></i></button>
+                    
+                    <div id="editor-structured" class="space-y-8 pt-4">
                         </div>
-                        <textarea id="input-free" class="w-full min-h-[60vh] rounded-lg p-6 text-lg text-slate-200 font-mono leading-relaxed placeholder-slate-700" placeholder="Schreibe deinen Prompt hier..."></textarea>
+
+                    <div id="editor-free" class="hidden h-full flex flex-col pt-4">
+                        <div class="sticky top-0 z-20 bg-navy-deep border border-navy-border border-b-0 rounded-t-md p-2 flex gap-1 shadow-md">
+                            <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-heading"></i></button>
+                            <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-bold"></i></button>
+                            <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-quote-right"></i></button>
+                            <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ul"></i></button>
+                            <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ol"></i></button>
+                        </div>
+                        <textarea id="input-free" class="w-full min-h-[60vh] bg-navy-sidebar border-2 border-navy-border rounded-b-md p-6 text-lg text-slate-200 font-mono leading-relaxed focus:border-brand-sky placeholder-slate-600" placeholder="Schreibe deinen Prompt hier..."></textarea>
                     </div>
                 </div>
 
-                <div id="view-history" class="hidden max-w-4xl mx-auto fade-in pt-2 pb-20">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-white">Historie</h2>
-                        <button onclick="loadHistory()" class="text-slate-500 hover:text-brand-sky transition-colors">
-                            <i class="fa-solid fa-rotate-right"></i>
-                        </button>
+                <div id="view-history" class="hidden max-w-4xl mx-auto fade-in pt-4">
+                    <div class="flex justify-between items-center mb-6 border-b border-navy-border pb-4">
+                        <h2 class="text-2xl font-bold text-white">Historie</h2>
+                        <button onclick="loadHistory()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i></button>
                     </div>
                     <div id="history-list" class="space-y-4"></div>
                 </div>
 
-                <div id="view-favorites" class="hidden max-w-4xl mx-auto fade-in pt-2 pb-20">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-white">Favoriten</h2>
-                    </div>
+                <div id="view-favorites" class="hidden max-w-4xl mx-auto fade-in pt-4">
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-navy-border pb-4">Favoriten</h2>
                     <div id="favorites-list" class="space-y-4"></div>
                 </div>
 
             </div>
 
-            <footer class="h-24 flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep/90 backdrop-blur-sm sticky bottom-0">
-                <div class="w-full max-w-4xl flex justify-end gap-6 items-center">
-                    <button onclick="resetCurrentView()" class="text-slate-600 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
+            <footer class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
+                <div class="w-full max-w-4xl flex justify-end gap-4">
+                    <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
                         Reset
                     </button>
-                    <button onclick="handleCopyAndSave()"
-                        class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3.5 px-10 rounded-lg shadow-xl shadow-brand-sky/10 hover:shadow-brand-sky/20 hover:-translate-y-0.5 transition-all flex items-center gap-3">
+                    <button onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
                         <i class="fa-solid fa-copy"></i>
                         <span>COPY & SAVE</span>
                     </button>
                 </div>
             </footer>
 
-            <button onclick="toggleSidebar('right')" class="splitter-toggle right-0 hover:-translate-x-1" title="Toggle Library">
+            <button onclick="toggleSidebar('right')" class="splitter-toggle -right-3 rounded-l-md border-r-0" title="Toggle Library">
                 <i id="icon-toggle-right" class="fa-solid fa-chevron-right text-xs rotate-icon"></i>
             </button>
 
         </main>
 
-        <aside id="sidebar-right" class="w-80 bg-navy-sidebar flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
+        <aside id="sidebar-right" class="w-80 bg-navy-sidebar border-l border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div class="w-80 flex flex-col h-full">
-
-                <div class="h-16 flex items-center justify-between px-6 bg-black/5">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Bibliothek</span>
-                    <button onclick="resetFields(); switchView('editor');" class="text-slate-500 hover:text-brand-sky transition-colors text-xs font-bold">
+                
+                <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
+                    <button onclick="resetFields(); switchView('editor');" class="text-[10px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
                         + Neu
                     </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-4 space-y-6">
-
-                    <div>
-                        <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-3 px-2">Gespeicherte Szenarien</h4>
-                        <div id="library-scenarios" class="space-y-1">
+                <div class="flex-1 overflow-y-auto p-0">
+                    
+                    <div class="px-4 py-3">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group"></i> Szenarien
+                        </h4>
+                        <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
                     </div>
 
-                    <div>
-                        <h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-3 px-2">Bausteine</h4>
-                        <div id="library-snippets" class="space-y-2">
+                    <div class="px-4 py-3 border-t border-navy-border">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-cube"></i> Bausteine
+                        </h4>
+                        <div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </aside>
     </div>
 
     <div id="modal-auth" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-divider w-full max-w-sm rounded-lg shadow-2xl p-6">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
             <h3 class="text-xl font-bold text-white mb-4">Login</h3>
             <button onclick="loginWithGoogle()" class="w-full py-3 bg-white text-navy-deep font-bold rounded flex justify-center gap-2 hover:bg-slate-100 transition-colors">
                 <i class="fa-brands fa-google"></i> Google Login
             </button>
-            <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="mt-4 text-slate-500 text-sm w-full hover:text-white">
-                Schließen
-            </button>
+            <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="mt-4 text-slate-500 text-sm w-full hover:text-white">Schließen</button>
         </div>
     </div>
 
     <script>
         // --- CONFIG ---
         const FIELDS = [
-            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein?' },
-            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', placeholder: 'Hintergrundinfos...' },
-            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', placeholder: 'Was soll getan werden?' },
-            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', placeholder: 'Wie soll es klingen?' },
-            { id: 'format', label: 'Format', icon: 'fa-list-check', placeholder: 'Ausgabeformat...' }
+            { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein? (z.B. Senior SEO Experte)' },
+            { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', placeholder: 'Hintergrundinfos (Zielgruppe, Kanal, Produkt...)' },
+            { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', placeholder: 'Was soll getan werden? (Schreibe 3 Headlines...)' },
+            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', placeholder: 'Wie soll es klingen? (Professionell, witzig, kurz...)' },
+            { id: 'format', label: 'Format', icon: 'fa-list-check', placeholder: 'Ausgabeformat (Tabelle, Markdown, Liste...)' }
         ];
 
         let currentMode = 'structured';
@@ -280,35 +287,33 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
-
-            if (window.db && window.db.getScenarios) {
+            
+            if(window.db && window.db.getScenarios) {
                 loadLibrary();
             } else {
                 setTimeout(loadLibrary, 1000);
             }
 
             setInterval(() => {
-                if (window.currentUser) updateUIAuth(window.currentUser);
+               if(window.currentUser) updateUIAuth(window.currentUser);
             }, 1000);
         });
 
         // --- AUTH UI UPDATE ---
         function updateUIAuth(user) {
-            const nameEl = document.getElementById('user-name-display');
-            const subEl = document.getElementById('user-status-sub');
-            if (nameEl && subEl) {
-                if (user) {
-                    nameEl.innerText = user.email.split('@')[0];
-                    subEl.innerText = 'Pro Plan';
-                    subEl.classList.remove('text-slate-500');
-                    subEl.classList.add('text-brand-sky');
-                } else {
-                    nameEl.innerText = 'Gast';
-                    subEl.innerText = 'Login';
-                    subEl.classList.remove('text-brand-sky');
-                    subEl.classList.add('text-slate-500');
-                }
-            }
+          const nameEl = document.getElementById('user-name-display');
+          const subEl = document.getElementById('user-status-sub');
+          if(nameEl && subEl) {
+              if(user) {
+                 nameEl.innerText = user.email.split('@')[0];
+                 subEl.innerText = 'Pro Plan';
+                 subEl.classList.add('text-brand-sky');
+              } else {
+                 nameEl.innerText = 'Gast';
+                 subEl.innerText = 'Klicken zum Login';
+                 subEl.classList.remove('text-brand-sky');
+              }
+          }
         }
 
         function openAuthModal() {
@@ -319,22 +324,21 @@
         function renderStructuredFields() {
             const container = document.getElementById('editor-structured');
             container.innerHTML = FIELDS.map(f => `
-                <div class="group">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid ${f.icon} text-brand-sky/80"></i>
-                            <label class="font-bold text-slate-400 text-xs uppercase tracking-widest">${f.label}</label>
-                        </div>
-                        <button class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-brand-sky"
-                                onclick="openSnippets('${f.id}')" title="Bausteine">
+                <div class="group relative">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fa-solid ${f.icon} text-brand-sky"></i>
+                        <label class="font-bold text-slate-400 text-xs uppercase tracking-widest">${f.label}</label>
+                    </div>
+                    <textarea id="input-${f.id}" 
+                        class="w-full h-32 rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed"
+                        placeholder="${f.placeholder}"
+                        onfocus="loadSnippetsForField('${f.id}')"></textarea>
+                    
+                    <div class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippets('${f.id}')">
                             <i class="fa-solid fa-book"></i>
                         </button>
                     </div>
-
-                    <textarea id="input-${f.id}"
-                        class="w-full h-32 rounded-lg p-5 text-lg leading-relaxed placeholder-slate-700"
-                        placeholder="${f.placeholder}"
-                        onfocus="loadSnippetsForField('${f.id}')"></textarea>
                 </div>
             `).join('');
         }
@@ -344,7 +348,7 @@
             const el = document.getElementById(`sidebar-${side}`);
             const icon = document.getElementById(`icon-toggle-${side}`);
             const spacer = document.getElementById(`header-spacer-${side}`);
-
+            
             if (side === 'left') {
                 if (isLeftOpen) {
                     el.classList.replace('w-64', 'w-0');
@@ -373,27 +377,27 @@
         function switchView(viewId) {
             ['view-editor', 'view-history', 'view-favorites'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
+                if(el) el.classList.add('hidden');
             });
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
-
-            const activeClasses = ['bg-white/5', 'text-white', 'shadow-subtle'];
-            const inactiveClasses = ['text-slate-500'];
-
+            
+            // Reset Nav Styles
             document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove(...activeClasses);
-                btn.classList.add(...inactiveClasses);
+                btn.classList.remove('active-nav');
+                btn.classList.remove('bg-gray-800/50', 'border-brand-sky', 'text-white');
+                btn.classList.add('text-slate-500', 'border-transparent');
             });
-
+            
+            // Set Active Style
             const index = viewId === 'editor' ? 0 : viewId === 'history' ? 1 : 2;
             const activeBtn = document.querySelectorAll('.nav-item')[index];
-            if (activeBtn) {
-                activeBtn.classList.remove(...inactiveClasses);
-                activeBtn.classList.add(...activeClasses);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-slate-500', 'border-transparent');
+                activeBtn.classList.add('active-nav');
             }
 
-            if (viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
-            if (viewId === 'favorites' && window.db) window.db.getHistory().then(renderFavoritesList);
+            if(viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
+            if(viewId === 'favorites' && window.db) window.db.getHistory().then(renderFavoritesList);
         }
 
         function setEditorMode(mode) {
@@ -403,25 +407,18 @@
             const divStruct = document.getElementById('editor-structured');
             const divFree = document.getElementById('editor-free');
 
-            const active = ['bg-brand-sky', 'text-navy-deep', 'shadow-lg', 'shadow-brand-sky/20'];
-            const inactive = ['text-slate-500', 'hover:text-slate-300'];
-
             if (mode === 'structured') {
-                btnStruct.classList.add(...active);
-                btnStruct.classList.remove(...inactive);
-
-                btnFree.classList.remove(...active);
-                btnFree.classList.add(...inactive);
-
+                btnStruct.classList.add('bg-brand-sky', 'text-navy-deep', 'shadow-glow');
+                btnStruct.classList.remove('text-slate-500', 'hover:text-slate-300');
+                btnFree.classList.remove('bg-brand-sky', 'text-navy-deep', 'shadow-glow');
+                btnFree.classList.add('text-slate-500', 'hover:text-slate-300');
                 divStruct.classList.remove('hidden');
                 divFree.classList.add('hidden');
             } else {
-                btnFree.classList.add(...active);
-                btnFree.classList.remove(...inactive);
-
-                btnStruct.classList.remove(...active);
-                btnStruct.classList.add(...inactive);
-
+                btnFree.classList.add('bg-brand-sky', 'text-navy-deep', 'shadow-glow');
+                btnFree.classList.remove('text-slate-500', 'hover:text-slate-300');
+                btnStruct.classList.remove('bg-brand-sky', 'text-navy-deep', 'shadow-glow');
+                btnStruct.classList.add('text-slate-500', 'hover:text-slate-300');
                 divFree.classList.remove('hidden');
                 divStruct.classList.add('hidden');
             }
@@ -478,11 +475,11 @@
         }
 
         function resetCurrentView() {
-            if (confirm("Wirklich alles leeren?")) resetFields();
+            if(confirm("Wirklich alles leeren?")) resetFields();
         }
 
         function resetFields() {
-            if (currentMode === 'structured') {
+            if(currentMode === 'structured') {
                 FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
             } else {
                 document.getElementById('input-free').value = '';
@@ -490,19 +487,17 @@
         }
 
         async function loadLibrary() {
-            if (!window.db) return;
+            if(!window.db) return;
             const scenarios = await window.db.getScenarios();
             const container = document.getElementById('library-scenarios');
-
-            if (scenarios.length === 0) {
+            if(scenarios.length === 0) {
                 container.innerHTML = '<div class="text-xs text-slate-600 italic text-center py-4">Keine Szenarien.</div>';
                 return;
             }
-
             container.innerHTML = scenarios.map(s => `
-                <div onclick="loadScenario(${s.id})" class="group p-3 rounded-md hover:bg-white/5 cursor-pointer transition-colors flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-brand-sky"></div>
-                    <div class="text-sm font-medium text-slate-300 group-hover:text-white truncate">${s.name}</div>
+                <div onclick="loadScenario(${s.id})" class="group flex items-center justify-between p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors">
+                    <div class="text-sm font-medium text-slate-300 group-hover:text-brand-sky truncate pr-2">${s.name}</div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                 </div>
             `).join('');
         }
@@ -510,10 +505,10 @@
         function loadScenario(id) {
             window.db.getScenarios().then(scenarios => {
                 const s = scenarios.find(x => x.id == id);
-                if (s) {
+                if(s) {
                     setEditorMode('structured');
-                    s.fields.forEach((val, index) => {
-                        if (FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                    s.fields.forEach((val, index) => { 
+                        if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
                     });
                 }
             });
@@ -522,45 +517,35 @@
         function loadSnippetsForField(fieldId) {
             const container = document.getElementById('library-snippets');
             const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
-
             container.innerHTML = `
-                <div class="text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-3 px-2">
-                    Passend für: <span class="text-brand-sky">${fieldLabel}</span>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="group p-3 rounded-md bg-navy-deep/50 border border-white/5 hover:border-brand-sky/30 cursor-pointer transition-all"
-                         onclick="insertSnippet('${fieldId}', 'Beispiel Textbaustein')">
-                        <div class="text-xs font-bold text-slate-400 mb-1">Beispiel Baustein</div>
-                        <div class="text-[10px] text-slate-600 line-clamp-2">
-                            Klick fügt einen Beispieltext ein (später echte Bausteine).
-                        </div>
-                    </div>
+                <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">Passend für: ${fieldLabel}</div>
+                <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick="insertSnippet('${fieldId}', 'Beispiel Textbaustein')">
+                    <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
+                    <div class="text-sm text-slate-300 group-hover:text-white truncate">Beispiel Baustein</div>
                 </div>
             `;
-
             const sb = document.getElementById('sidebar-right');
-            if (sb.classList.contains('w-0')) toggleSidebar('right');
+            if(sb.classList.contains('w-0')) toggleSidebar('right');
         }
 
         function insertSnippet(fieldId, text) {
             const el = document.getElementById(`input-${fieldId}`);
-            if (el) el.value = text;
+            if(el) el.value = text;
         }
 
         function renderHistoryList(history) {
             const container = document.getElementById('history-list');
-            if (!history || history.length === 0) {
+            if(!history || history.length === 0) {
                 container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Einträge.</div>';
                 return;
             }
             container.innerHTML = history.map(item => `
-                <div class="p-4 rounded-lg bg-navy-deep/40 border border-white/5 hover:border-brand-sky/30 transition-all">
+                <div class="bg-navy-sidebar rounded-md border border-navy-border p-4 hover:border-slate-500 transition-colors">
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-xs font-bold text-slate-500">${new Date(item.timestamp).toLocaleDateString()}</span>
-                        <button class="text-slate-500 hover:text-brand-sky transition-colors"><i class="fa-solid fa-copy"></i></button>
+                        <button class="text-slate-500 hover:text-brand-sky"><i class="fa-solid fa-copy"></i></button>
                     </div>
-                    <div class="text-sm font-mono text-slate-400 h-20 overflow-y-auto">
+                    <div class="text-sm font-mono text-slate-400 h-20 overflow-y-auto custom-scrollbar">
                         ${item.text.substring(0, 150)}...
                     </div>
                 </div>
@@ -570,12 +555,12 @@
         function renderFavoritesList(history) {
             const favs = history.filter(h => h.favorite);
             const container = document.getElementById('favorites-list');
-            if (favs.length === 0) {
+            if(favs.length === 0) {
                 container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Favoriten.</div>';
                 return;
             }
             container.innerHTML = favs.map(item => `
-                <div class="p-4 rounded-lg bg-navy-deep/40 border border-white/5 hover:border-brand-sky/30 transition-all">
+                <div class="bg-navy-sidebar rounded-md border border-navy-border p-4 border-l-4 border-l-brand-sky">
                     <div class="text-sm font-mono text-slate-300">
                         ${item.text.substring(0, 100)}...
                     </div>
@@ -587,7 +572,7 @@
             loadSnippetsForField(id);
         };
     </script>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
 </body>
