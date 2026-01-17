@@ -280,19 +280,26 @@
         let isLeftOpen = true;
         let isRightOpen = true;
 
-        // --- INIT ---
+        /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
-            
-            if(window.db && window.db.getScenarios) {
-                loadLibrary();
-            } else {
-                setTimeout(loadLibrary, 1000);
-            }
 
-            setInterval(() => {
-               if(window.currentUser) updateUIAuth(window.currentUser);
-            }, 1000);
+            // 1. Event Listener: Feuert sofort, wenn Supabase den Login bestätigt
+            window.addEventListener('auth-state-changed', (event) => {
+                const user = event.detail;
+                console.log("🚀 Auth Status Update:", user ? "Eingeloggt" : "Gast");
+                
+                // UI und Bibliothek sofort aktualisieren
+                updateUIAuth(user);
+                loadLibrary(); 
+            });
+
+            // 2. Fallback Start: Versucht es einmalig kurz nach Start 
+            // (Wichtig für Gast-Modus oder falls der Login extrem schnell war)
+            setTimeout(() => {
+                if(window.db && window.db.getScenarios) loadLibrary();
+                if(window.currentUser) updateUIAuth(window.currentUser);
+            }, 500);
         });
 
         // --- AUTH UI UPDATE ---
