@@ -227,7 +227,7 @@
                 
                 <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
-                    <button onclick="resetFields(); switchView('editor');" class="text-[10px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
+                    <button onclick="saveCurrentToLibrary()" class="text-[10px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
                         + Neu
                     </button>
                 </div>
@@ -236,7 +236,7 @@
                     
                     <div class="px-4 py-3">
                         <h4 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group"></i> Szenarien
+                            <i class="fa-solid fa-layer-group"></i> Prompts
                         </h4>
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
@@ -564,6 +564,36 @@
             `).join('');
         }
 
+        async function saveCurrentToLibrary() {
+            // 1. Check Login
+            if (!window.currentUser) {
+                alert("Dieses Feature benötigt einen Account. Bitte einloggen.");
+                openAuthModal();
+                return;
+            }
+
+            // 2. Name abfragen
+            const name = prompt("Name für diesen Prompt:");
+            if (!name) return;
+
+            // 3. Daten sammeln (Strukturierte Felder)
+            const fieldsData = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+
+            // 4. Speichern via DB Adapter
+            if (window.db && window.db.saveScenario) {
+                const success = await window.db.saveScenario({
+                    name: name,
+                    fields: fieldsData
+                });
+                
+                if (success) {
+                    loadLibrary(); // Liste sofort aktualisieren
+                } else {
+                    alert("Fehler beim Speichern.");
+                }
+            }
+        }
+        
         window.openSnippets = (id) => {
             loadSnippetsForField(id);
         };
