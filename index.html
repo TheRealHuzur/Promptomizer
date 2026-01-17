@@ -226,8 +226,8 @@
             <div class="w-80 flex flex-col h-full">
                 
                 <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
-                    <button onclick="saveCurrentToLibrary()" class="text-[10px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
+                    <span class="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
+                    <button onclick="saveCurrentToLibrary()" class="text-[15px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
                         + Neu
                     </button>
                 </div>
@@ -235,7 +235,7 @@
                 <div class="flex-1 overflow-y-auto p-0">
                     
                     <div class="px-4 py-3">
-                        <h4 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
+                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-layer-group"></i> Prompts
                         </h4>
                         <div id="library-scenarios" class="space-y-0.5">
@@ -244,7 +244,7 @@
                     </div>
 
                     <div class="px-4 py-3 border-t border-navy-border">
-                        <h4 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-2">
+                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-cube"></i> Bausteine
                         </h4>
                         <div id="library-snippets" class="space-y-0.5">
@@ -593,7 +593,7 @@
                 }
             }
         }
-        
+
         window.openSnippets = (id) => {
             loadSnippetsForField(id);
         };
