@@ -98,7 +98,8 @@
         
         .nav-item.active-nav {
             background-color: #1e293b; /* Slate 800 */
-            border-left-color: #38bdf8;
+            border-right-color: #0ea5e9; /* Strich jetzt RECHTS */
+            border-left-color: transparent;
             color: white;
         }
     </style>
@@ -133,33 +134,35 @@
 
     <div class="flex-1 flex overflow-hidden relative">
 
-        <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col justify-between sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
+        <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div class="w-64 flex flex-col h-full">
-                <nav class="p-0 space-y-0.5 flex-1 overflow-y-auto pt-6 px-2">
-                    <div onclick="switchView('editor')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-l-[3px] border-transparent transition-all">
-                        <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
-                        <span class="text-sm font-medium">Editor</span>
-                    </div>
-                    <div onclick="switchView('history')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-l-[3px] border-transparent transition-all">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                        <span class="text-sm font-medium">Historie</span>
-                    </div>
-                    <div onclick="switchView('favorites')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-r-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-l-[3px] border-transparent transition-all">
-                        <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                        <span class="text-sm font-medium">Favoriten</span>
-                    </div>
-                </nav>
-
-                <div class="p-4 border-t border-navy-border bg-black/10">
-                    <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
-                        <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div class="text-left overflow-hidden">
-                            <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
-                            <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
-                        </div>
+                
+                <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
+                    <span class="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
+                    <button onclick="saveCurrentToLibrary()" class="text-[15px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
+                        + Neu
                     </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-0">
+                    
+                    <div class="px-4 py-3">
+                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group"></i> Prompts
+                        </h4>
+                        <div id="library-scenarios" class="space-y-0.5">
+                            <div class="text-xs text-slate-600 italic py-2">Lade...</div>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-3 border-t border-navy-border">
+                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-cube"></i> Bausteine
+                        </h4>
+                        <div id="library-snippets" class="space-y-0.5">
+                            <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -222,35 +225,33 @@
 
         </main>
 
-        <aside id="sidebar-right" class="w-80 bg-navy-sidebar border-l border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
+        <aside id="sidebar-right" class="w-80 bg-navy-sidebar border-l border-navy-border flex flex-col justify-between sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div class="w-80 flex flex-col h-full">
-                
-                <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
-                    <span class="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
-                    <button onclick="saveCurrentToLibrary()" class="text-[15px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
-                        + Neu
+                <nav class="p-0 space-y-0.5 flex-1 overflow-y-auto pt-6 px-2">
+                    <div onclick="switchView('editor')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer active-nav transition-all border-r-[3px] border-transparent">
+                        <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
+                        <span class="text-sm font-medium">Editor</span>
+                    </div>
+                    <div onclick="switchView('history')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-r-[3px] border-transparent transition-all">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                        <span class="text-sm font-medium">Historie</span>
+                    </div>
+                    <div onclick="switchView('favorites')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-r-[3px] border-transparent transition-all">
+                        <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                        <span class="text-sm font-medium">Favoriten</span>
+                    </div>
+                </nav>
+
+                <div class="p-4 border-t border-navy-border bg-black/10">
+                    <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
+                        <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="text-left overflow-hidden">
+                            <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
+                            <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
+                        </div>
                     </button>
-                </div>
-
-                <div class="flex-1 overflow-y-auto p-0">
-                    
-                    <div class="px-4 py-3">
-                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group"></i> Prompts
-                        </h4>
-                        <div id="library-scenarios" class="space-y-0.5">
-                            <div class="text-xs text-slate-600 italic py-2">Lade...</div>
-                        </div>
-                    </div>
-
-                    <div class="px-4 py-3 border-t border-navy-border">
-                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-cube"></i> Bausteine
-                        </h4>
-                        <div id="library-snippets" class="space-y-0.5">
-                            <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </aside>
