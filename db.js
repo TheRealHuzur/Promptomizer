@@ -175,6 +175,34 @@ window.db = {
         return data || [];
     },
 
+    async updateSnippet(id, patch) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient
+            .from('snippets')
+            .update(patch)
+            .eq('id', id)
+            .eq('user_id', window.currentUser.id);
+        if (error) {
+            console.error("Snippet Update Error:", error);
+            return false;
+        }
+        return true;
+    },
+
+    async deleteSnippet(id) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient
+            .from('snippets')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', window.currentUser.id);
+        if (error) {
+            console.error("Snippet Delete Error:", error);
+            return false;
+        }
+        return true;
+    },
+
     // --- BIBLIOTHEK (Szenarien) ---
     async saveScenario(scenario) {
         if (!window.currentUser) return false; 

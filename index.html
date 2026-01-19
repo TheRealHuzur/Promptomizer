@@ -13,7 +13,7 @@
     <div id="modal-snippet" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-white">Neuer Baustein</h3>
+                <h3 id="snippet-modal-title" class="text-xl font-bold text-white">Neuer Baustein</h3>
                 <button onclick="closeSnippetModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-4">
@@ -305,6 +305,21 @@
         </div>
     </div>
 
+    <div id="snippet-item-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-40">
+        <button onclick="handleEditSnippet()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+        <button onclick="handleAskDeleteSnippet()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+    </div>
+
+    <div id="modal-snippet-delete" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Unwiderruflich löschen?</h3>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Nein</button>
+                <button onclick="confirmDeleteSnippet()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md">Ja</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- CONFIG ---
         const FIELDS = [
@@ -328,11 +343,21 @@
         let isLeftOpen = true;
         let activeFieldId = null;
         let snippetOpenState = { role: false, context: false, task: false, style: false, format: false, free: false };
+        let snippetMenuOpen = false;
+        let snippetMenuSnippetId = null;
+        let snippetMenuCategoryId = null;
+        let snippetCacheById = {};
+        let editingSnippetId = null;
+        let pendingDeleteSnippetId = null;
+        let pendingDeleteCategoryId = null;
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
             renderSnippetsAccordion();
+            document.addEventListener('click', () => {
+                if (snippetMenuOpen) closeSnippetItemMenu();
+            });
 
             // 1. Event Listener: Feuert sofort, wenn Supabase den Login bestätigt
             window.addEventListener('auth-state-changed', (event) => {
@@ -388,8 +413,8 @@
                         onfocus="setActiveField('${f.id}')"></textarea>
                     
                     <div class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippets('${f.id}')">
-                            <i class="fa-solid fa-book"></i>
+                        <button class="text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippetModalFromField('${f.id}')">
+                            <i class="fa-solid fa-floppy-disk"></i>
                         </button>
                     </div>
                 </div>
@@ -539,7 +564,7 @@
                 return;
             }
             container.innerHTML = scenarios.map(s => `
-                <div onclick="loadScenario(${s.id})" class="group flex items-center justify-between p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors">
+                <div onclick="loadScenario(${s.id})" class="group flex items-center justify-between p-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors">
                     <div class="text-sm font-medium text-slate-300 group-hover:text-brand-sky truncate pr-2">${s.name}</div>
                     <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                 </div>
@@ -592,8 +617,7 @@
             const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
             container.innerHTML = `
                 <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">Passend für: ${fieldLabel}</div>
-                <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick="insertSnippet('${fieldId}', 'Beispiel Textbaustein')">
-                    <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
+                <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippet('${fieldId}', 'Beispiel Textbaustein')">
                     <div class="text-sm text-slate-300 group-hover:text-white truncate">Beispiel Baustein</div>
                 </div>
             `;
@@ -667,8 +691,7 @@
             container.innerHTML = `
                 <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">${headerLabel}</div>
                 ${snippets.map(snippet => `
-                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick='insertSnippetText(${JSON.stringify(snippet.content)}, ${JSON.stringify(fieldId)})'>
-                        <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
+                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick='insertSnippetText(${JSON.stringify(snippet.content)}, ${JSON.stringify(fieldId)})'>
                         <div class="text-sm text-slate-300 group-hover:text-white truncate">${snippet.name}</div>
                     </div>
                 `).join('')}
@@ -684,7 +707,7 @@
             if (!container) return;
 
             container.innerHTML = SNIPPET_CATEGORIES.map(cat => `
-                <div class="border-b border-white/5">
+                <div>
                     <button class="w-full flex items-center justify-between p-2 text-left hover:bg-slate-800/50 rounded" onclick="toggleSnippetSection('${cat.id}')">
                         <span class="text-sm font-bold text-slate-300">${cat.label}</span>
                         <i id="snip-icon-${cat.id}" class="fa-solid fa-chevron-down text-xs transition-transform ${snippetOpenState[cat.id] ? 'rotate-180' : ''}"></i>
@@ -740,21 +763,126 @@
                 return;
             }
 
-            body.innerHTML = snippets.map(snippet => {
-                const encoded = encodeURIComponent(snippet.content || '');
-                return `
-                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
-                        <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
-                        <div class="text-sm text-slate-300 group-hover:text-white truncate">${snippet.name}</div>
-                    </div>
-                `;
-            }).join('');
+            body.innerHTML = `
+                <div class="space-y-0.5">
+                    ${snippets.map(snippet => {
+                        snippetCacheById[snippet.id] = snippet;
+                        const encoded = encodeURIComponent(snippet.content || '');
+                        return `
+                            <div id="snippet-item-${snippet.id}" class="group py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight">${snippet.name}</div>
+                                    <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none" onclick="openSnippetItemMenu(event, '${cat.id}', ${snippet.id})">
+                                        <i class="fa-solid fa-ellipsis"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
             body.dataset.loaded = 'true';
         }
 
         function insertSnippetEncoded(encoded, targetFieldId) {
             const text = decodeURIComponent(encoded || '');
             insertSnippetText(text, targetFieldId);
+        }
+
+        function openSnippetItemMenu(ev, categoryId, snippetId) {
+            ev.stopPropagation();
+            const menu = document.getElementById('snippet-item-menu');
+            if (!menu) return;
+
+            snippetMenuSnippetId = snippetId;
+            snippetMenuCategoryId = categoryId;
+
+            menu.classList.remove('hidden');
+            const r = ev.currentTarget.getBoundingClientRect();
+            menu.style.top = (r.bottom + 6) + 'px';
+            menu.style.left = (r.right - menu.offsetWidth) + 'px';
+            if (menu.offsetWidth === 0) {
+                menu.classList.remove('hidden');
+                menu.style.left = (r.right - menu.offsetWidth) + 'px';
+            }
+            snippetMenuOpen = true;
+            menu.onclick = (e) => e.stopPropagation();
+        }
+
+        function closeSnippetItemMenu() {
+            const menu = document.getElementById('snippet-item-menu');
+            if (menu) menu.classList.add('hidden');
+            snippetMenuOpen = false;
+            snippetMenuSnippetId = null;
+            snippetMenuCategoryId = null;
+        }
+
+        function handleEditSnippet() {
+            const snippet = snippetCacheById[snippetMenuSnippetId];
+            const categoryId = snippetMenuCategoryId;
+            closeSnippetItemMenu();
+            if (!snippet) return;
+            openSnippetModalForEdit(categoryId, snippet);
+        }
+
+        function handleAskDeleteSnippet() {
+            const categoryId = snippetMenuCategoryId;
+            const snippetId = snippetMenuSnippetId;
+            closeSnippetItemMenu();
+            openDeleteSnippetModal(categoryId, snippetId);
+        }
+
+        function openSnippetModalForEdit(categoryId, snippet) {
+            openSnippetModal({
+                id: snippet.id,
+                name: snippet.name,
+                categoryId: categoryId,
+                content: snippet.content
+            });
+        }
+
+        function openSnippetModalFromField(fieldId) {
+            const ta = document.getElementById(`input-${fieldId}`);
+            const text = ta ? ta.value : '';
+            openSnippetModal({
+                id: null,
+                name: '',
+                categoryId: fieldId,
+                content: text
+            });
+        }
+
+        function openDeleteSnippetModal(categoryId, snippetId) {
+            pendingDeleteCategoryId = categoryId;
+            pendingDeleteSnippetId = snippetId;
+            const modal = document.getElementById('modal-snippet-delete');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeDeleteSnippetModal() {
+            const modal = document.getElementById('modal-snippet-delete');
+            if (modal) modal.classList.add('hidden');
+            pendingDeleteCategoryId = null;
+            pendingDeleteSnippetId = null;
+        }
+
+        async function confirmDeleteSnippet() {
+            if (!pendingDeleteSnippetId || !window.db || !window.db.deleteSnippet) {
+                closeDeleteSnippetModal();
+                return;
+            }
+            const ok = await window.db.deleteSnippet(pendingDeleteSnippetId);
+            if (ok) {
+                const el = document.getElementById(`snippet-item-${pendingDeleteSnippetId}`);
+                if (el) el.remove();
+                if (snippetCacheById && snippetCacheById[pendingDeleteSnippetId]) {
+                    delete snippetCacheById[pendingDeleteSnippetId];
+                }
+            }
+            closeDeleteSnippetModal();
+            if (ok && pendingDeleteCategoryId) {
+                await loadSnippetSection(pendingDeleteCategoryId);
+            }
         }
 
         function insertSnippetText(text, targetFieldId = null) {
@@ -849,20 +977,24 @@
             `).join('');
         }
 
-        function openSnippetModal(prefillCategory = null) {
+        function openSnippetModal(prefill = {}) {
             if (!window.currentUser) {
                 alert("Bitte einloggen...");
                 openAuthModal();
                 return;
             }
             const modal = document.getElementById('modal-snippet');
+            const titleEl = document.getElementById('snippet-modal-title');
             const nameEl = document.getElementById('snippet-name');
             const categoryEl = document.getElementById('snippet-category');
             const contentEl = document.getElementById('snippet-content');
 
-            if (nameEl) nameEl.value = '';
-            if (contentEl) contentEl.value = '';
-            if (categoryEl) categoryEl.value = prefillCategory || 'context';
+            editingSnippetId = prefill.id || null;
+            if (titleEl) titleEl.innerText = editingSnippetId ? 'Baustein bearbeiten' : 'Neuer Baustein';
+
+            if (nameEl) nameEl.value = prefill.name || '';
+            if (categoryEl) categoryEl.value = prefill.categoryId || 'context';
+            if (contentEl) contentEl.value = prefill.content || '';
 
             if (modal) modal.classList.remove('hidden');
             if (nameEl) nameEl.focus();
@@ -871,6 +1003,7 @@
         function closeSnippetModal() {
             const modal = document.getElementById('modal-snippet');
             if (modal) modal.classList.add('hidden');
+            editingSnippetId = null;
         }
 
         async function saveSnippetFromModal() {
@@ -894,16 +1027,20 @@
                 field_id = 'free';
             }
 
-            if (window.db && window.db.saveSnippet) {
-                const success = await window.db.saveSnippet({ name, content, mode, field_id });
-                if (success) {
-                    closeSnippetModal();
-                    snippetOpenState[category] = true;
-                    renderSnippetsAccordion();
-                    await loadSnippetSection(category);
-                } else {
-                    alert("Fehler beim Speichern.");
-                }
+            let success = false;
+            if (editingSnippetId && window.db && window.db.updateSnippet) {
+                success = await window.db.updateSnippet(editingSnippetId, { name, content, mode, field_id });
+            } else if (window.db && window.db.saveSnippet) {
+                success = await window.db.saveSnippet({ name, content, mode, field_id });
+            }
+
+            if (success) {
+                closeSnippetModal();
+                snippetOpenState[category] = true;
+                renderSnippetsAccordion();
+                await loadSnippetSection(category);
+            } else {
+                alert("Fehler beim Speichern.");
             }
         }
 
