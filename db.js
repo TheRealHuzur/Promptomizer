@@ -130,6 +130,51 @@ window.db = {
         }
     },
 
+    // --- SNIPPETS (Bausteine) ---
+    async saveSnippet(snippet) {
+        if (!window.currentUser) return false;
+
+        const { error } = await supabaseClient
+            .from('snippets')
+            .insert({
+                user_id: window.currentUser.id,
+                name: snippet.name,
+                content: snippet.content,
+                mode: snippet.mode,
+                field_id: snippet.field_id,
+                created_at: new Date().toISOString()
+            });
+
+        if (error) {
+            console.error("Snippet Save Error:", error);
+            return false;
+        }
+        return true;
+    },
+
+    async getSnippets(params) {
+        if (!window.currentUser) return [];
+
+        let query = supabaseClient
+            .from('snippets')
+            .select('*')
+            .eq('user_id', window.currentUser.id);
+
+        if (params.mode === 'structured') {
+            query = query.in('mode', ['structured', 'both']).eq('field_id', params.fieldId);
+        }
+        if (params.mode === 'free') {
+            query = query.in('mode', ['free', 'both']).or('field_id.is.null,field_id.eq.free');
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+        if (error) {
+            console.error("Snippets Fetch Error:", error);
+            return [];
+        }
+        return data || [];
+    },
+
     // --- BIBLIOTHEK (Szenarien) ---
     async saveScenario(scenario) {
         if (!window.currentUser) return false; 
