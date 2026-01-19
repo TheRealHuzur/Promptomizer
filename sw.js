@@ -1,4 +1,4 @@
-const CACHE_NAME = 'promptomizer-v3.2-cache';
+const CACHE_NAME = 'promptomizer-v3.3-cache';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

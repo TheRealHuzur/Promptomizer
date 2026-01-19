@@ -604,29 +604,36 @@
         }
 
         function insertSnippetText(text, targetFieldId = null) {
-            let textarea = null;
-            if (currentMode === 'structured') {
-                const fid = targetFieldId || activeFieldId;
-                if (!fid) {
-                    alert("Bitte zuerst ein Feld im Editor auswählen.");
-                    return;
-                }
-                textarea = document.getElementById(`input-${fid}`);
-                activeFieldId = fid;
-            } else {
-                textarea = document.getElementById('input-free');
-            }
-            if (!textarea) {
-                alert("Kein Eingabefeld gefunden.");
+            if (currentMode === 'free') {
+                const ta = document.getElementById('input-free');
+                if (!ta) { alert('Freies Textfeld nicht gefunden.'); return; }
+                ta.focus();
+                const start = (ta.selectionStart ?? ta.value.length);
+                const end = (ta.selectionEnd ?? ta.value.length);
+                ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+                const pos = start + text.length;
+                ta.setSelectionRange(pos, pos);
                 return;
             }
-            textarea.focus();
-            const start = textarea.selectionStart ?? textarea.value.length;
-            const end = textarea.selectionEnd ?? textarea.value.length;
-            const value = textarea.value;
-            textarea.value = value.substring(0, start) + text + value.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + text.length;
-            textarea.focus();
+
+            let target = targetFieldId;
+
+            if (target === 'free') {
+                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
+            }
+
+            if (!target) {
+                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
+            }
+
+            const ta = document.getElementById(`input-${target}`);
+            if (!ta) { alert('Zielfeld nicht gefunden: ' + target); return; }
+            ta.focus();
+            const start = (ta.selectionStart ?? ta.value.length);
+            const end = (ta.selectionEnd ?? ta.value.length);
+            ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+            const pos = start + text.length;
+            ta.setSelectionRange(pos, pos);
         }
 
         async function loadSnippetsForField(fieldId) {
@@ -750,32 +757,37 @@
             insertSnippetText(text, targetFieldId);
         }
 
-        function insertSnippetText(text, targetFieldId) {
-            let textarea = null;
-            if (targetFieldId === 'free') {
-                if (currentMode !== 'free') setEditorMode('free');
-                activeFieldId = 'free';
-                textarea = document.getElementById('input-free');
-            } else {
-                if (!targetFieldId) {
-                    alert("Bitte zuerst ein Feld im Editor auswählen.");
-                    return;
-                }
-                if (currentMode !== 'structured') setEditorMode('structured');
-                textarea = document.getElementById(`input-${targetFieldId}`);
-                activeFieldId = targetFieldId;
-            }
-            if (!textarea) {
-                alert("Kein Eingabefeld gefunden.");
+        function insertSnippetText(text, targetFieldId = null) {
+            if (currentMode === 'free') {
+                const ta = document.getElementById('input-free');
+                if (!ta) { alert('Freies Textfeld nicht gefunden.'); return; }
+                ta.focus();
+                const start = (ta.selectionStart ?? ta.value.length);
+                const end = (ta.selectionEnd ?? ta.value.length);
+                ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+                const pos = start + text.length;
+                ta.setSelectionRange(pos, pos);
                 return;
             }
-            textarea.focus();
-            const start = textarea.selectionStart ?? textarea.value.length;
-            const end = textarea.selectionEnd ?? textarea.value.length;
-            const value = textarea.value;
-            textarea.value = value.substring(0, start) + text + value.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + text.length;
-            textarea.focus();
+
+            let target = targetFieldId;
+
+            if (target === 'free') {
+                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
+            }
+
+            if (!target) {
+                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
+            }
+
+            const ta = document.getElementById(`input-${target}`);
+            if (!ta) { alert('Zielfeld nicht gefunden: ' + target); return; }
+            ta.focus();
+            const start = (ta.selectionStart ?? ta.value.length);
+            const end = (ta.selectionEnd ?? ta.value.length);
+            ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+            const pos = start + text.length;
+            ta.setSelectionRange(pos, pos);
         }
 
         async function openSnippetCategory(id) {
