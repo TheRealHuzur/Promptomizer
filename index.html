@@ -10,6 +10,40 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <div id="modal-snippet" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Neuer Baustein</h3>
+                <button onclick="closeSnippetModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
+                    <input id="snippet-name" type="text" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none" placeholder="z.B. Kontext-Short" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kategorie</label>
+                    <select id="snippet-category" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none">
+                        <option value="role">Rolle & Funktion</option>
+                        <option value="context">Kontext</option>
+                        <option value="task">Aufgabe</option>
+                        <option value="style">Stil & Tonalität</option>
+                        <option value="format">Format</option>
+                        <option value="free">Freie Bausteine</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baustein-Text</label>
+                    <textarea id="snippet-content" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none min-h-[120px]" placeholder="Text für den Baustein..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="closeSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
+                <button onclick="saveSnippetFromModal()" class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">Speichern</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -155,8 +189,13 @@
                     </div>
 
                     <div class="px-4 py-3 border-t border-navy-border">
-                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-cube"></i> Bausteine
+                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2 justify-between">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-cube"></i> Bausteine
+                            </span>
+                            <button onclick="openSnippetModal()" class="text-[12px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
+                                + Neu
+                            </button>
                         </h4>
                         <div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
@@ -222,7 +261,7 @@
                             <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ul"></i></button>
                             <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ol"></i></button>
                         </div>
-                        <textarea id="input-free" class="w-full min-h-[60vh] bg-navy-sidebar border-2 border-navy-border rounded-b-md p-6 text-lg text-slate-200 font-mono leading-relaxed focus:border-brand-sky placeholder-slate-600" placeholder="Schreibe deinen Prompt hier..."></textarea>
+                        <textarea id="input-free" class="w-full min-h-[60vh] bg-navy-sidebar border-2 border-navy-border rounded-b-md p-6 text-lg text-slate-200 font-mono leading-relaxed focus:border-brand-sky placeholder-slate-600" placeholder="Schreibe deinen Prompt hier..." onfocus="setActiveField('free')"></textarea>
                     </div>
                 </div>
 
@@ -276,12 +315,24 @@
             { id: 'format', label: 'Format', icon: 'fa-list-check', placeholder: 'Ausgabeformat (Tabelle, Markdown, Liste...)' }
         ];
 
+        const SNIPPET_CATEGORIES = [
+            { id: 'role', label: 'Rolle & Funktion', mode: 'structured' },
+            { id: 'context', label: 'Kontext', mode: 'structured' },
+            { id: 'task', label: 'Aufgabe', mode: 'structured' },
+            { id: 'style', label: 'Stil & Tonalität', mode: 'structured' },
+            { id: 'format', label: 'Format', mode: 'structured' },
+            { id: 'free', label: 'Freie Bausteine', mode: 'free' }
+        ];
+
         let currentMode = 'structured';
         let isLeftOpen = true;
+        let activeFieldId = null;
+        let snippetOpenState = { role: false, context: false, task: false, style: false, format: false, free: false };
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
+            renderSnippetsAccordion();
 
             // 1. Event Listener: Feuert sofort, wenn Supabase den Login bestätigt
             window.addEventListener('auth-state-changed', (event) => {
@@ -334,7 +385,7 @@
                     <textarea id="input-${f.id}" 
                         class="w-full h-32 rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed"
                         placeholder="${f.placeholder}"
-                        onfocus="loadSnippetsForField('${f.id}')"></textarea>
+                        onfocus="setActiveField('${f.id}')"></textarea>
                     
                     <div class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button class="text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippets('${f.id}')">
@@ -498,16 +549,45 @@
         function loadScenario(id) {
             window.db.getScenarios().then(scenarios => {
                 const s = scenarios.find(x => x.id == id);
-                if(s) {
+                if (!s) return;
+
+                if (Array.isArray(s.fields)) {
                     setEditorMode('structured');
                     s.fields.forEach((val, index) => { 
-                        if(FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                        if (FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
                     });
+                    return;
+                }
+
+                if (!s.fields || typeof s.fields !== 'object') return;
+
+                if (s.fields.mode === 'free') {
+                    setEditorMode('free');
+                    document.getElementById('input-free').value = s.fields.text || '';
+                    setActiveField('free');
+                    return;
+                }
+
+                if (s.fields.mode === 'structured') {
+                    setEditorMode('structured');
+                    if (Array.isArray(s.fields.fields)) {
+                        s.fields.fields.forEach((val, index) => { 
+                            if (FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
+                        });
+                        return;
+                    }
+                    if (s.fields.fields && typeof s.fields.fields === 'object') {
+                        FIELDS.forEach(f => {
+                            if (s.fields.fields[f.id] !== undefined) {
+                                document.getElementById(`input-${f.id}`).value = s.fields.fields[f.id];
+                            }
+                        });
+                    }
                 }
             });
         }
 
-        function loadSnippetsForField(fieldId) {
+        function loadSnippetsForFieldDemo(fieldId) {
             const container = document.getElementById('library-snippets');
             const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
             container.innerHTML = `
@@ -520,8 +600,200 @@
         }
 
         function insertSnippet(fieldId, text) {
-            const el = document.getElementById(`input-${fieldId}`);
-            if(el) el.value = text;
+            insertSnippetText(text, fieldId);
+        }
+
+        function insertSnippetText(text, targetFieldId = null) {
+            let textarea = null;
+            if (currentMode === 'structured') {
+                const fid = targetFieldId || activeFieldId;
+                if (!fid) {
+                    alert("Bitte zuerst ein Feld im Editor auswählen.");
+                    return;
+                }
+                textarea = document.getElementById(`input-${fid}`);
+                activeFieldId = fid;
+            } else {
+                textarea = document.getElementById('input-free');
+            }
+            if (!textarea) {
+                alert("Kein Eingabefeld gefunden.");
+                return;
+            }
+            textarea.focus();
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            const value = textarea.value;
+            textarea.value = value.substring(0, start) + text + value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + text.length;
+            textarea.focus();
+        }
+
+        async function loadSnippetsForField(fieldId) {
+            const container = document.getElementById('library-snippets');
+            activeFieldId = fieldId;
+
+            if (!isLeftOpen) toggleSidebar('left');
+
+            if (currentMode === 'structured' && (!fieldId || fieldId === 'free')) {
+                container.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>';
+                return;
+            }
+
+            if (!window.db || !window.db.getSnippets) {
+                container.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>';
+                return;
+            }
+
+            const snippets = await window.db.getSnippets({ mode: currentMode, fieldId: activeFieldId });
+            const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
+            const headerLabel = currentMode === 'free' ? 'Bausteine (Frei)' : `Passend für: ${fieldLabel}`;
+
+            if (!snippets || snippets.length === 0) {
+                container.innerHTML = `
+                    <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">${headerLabel}</div>
+                    <div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">${headerLabel}</div>
+                ${snippets.map(snippet => `
+                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick='insertSnippetText(${JSON.stringify(snippet.content)}, ${JSON.stringify(fieldId)})'>
+                        <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
+                        <div class="text-sm text-slate-300 group-hover:text-white truncate">${snippet.name}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function setActiveField(fieldId) {
+            activeFieldId = fieldId;
+        }
+
+        function renderSnippetsAccordion() {
+            const container = document.getElementById('library-snippets');
+            if (!container) return;
+
+            container.innerHTML = SNIPPET_CATEGORIES.map(cat => `
+                <div class="border-b border-white/5">
+                    <button class="w-full flex items-center justify-between p-2 text-left hover:bg-slate-800/50 rounded" onclick="toggleSnippetSection('${cat.id}')">
+                        <span class="text-sm font-bold text-slate-300">${cat.label}</span>
+                        <i id="snip-icon-${cat.id}" class="fa-solid fa-chevron-down text-xs transition-transform ${snippetOpenState[cat.id] ? 'rotate-180' : ''}"></i>
+                    </button>
+                    <div id="snip-body-${cat.id}" class="${snippetOpenState[cat.id] ? '' : 'hidden'} px-2 pb-2" data-loaded="false">
+                        <div class="text-xs text-slate-600 italic py-2">Noch nicht geladen.</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function toggleSnippetSection(catId) {
+            const body = document.getElementById(`snip-body-${catId}`);
+            const icon = document.getElementById(`snip-icon-${catId}`);
+            if (!body) return;
+
+            snippetOpenState[catId] = !snippetOpenState[catId];
+            if (snippetOpenState[catId]) {
+                body.classList.remove('hidden');
+                if (icon) icon.classList.add('rotate-180');
+                if (body.dataset.loaded !== 'true') {
+                    await loadSnippetSection(catId);
+                }
+            } else {
+                body.classList.add('hidden');
+                if (icon) icon.classList.remove('rotate-180');
+            }
+        }
+
+        async function loadSnippetSection(catId) {
+            const body = document.getElementById(`snip-body-${catId}`);
+            if (!body) return;
+
+            body.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Lade...</div>';
+
+            if (!window.currentUser) {
+                body.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Bitte einloggen, um Bausteine zu sehen.</div>';
+                body.dataset.loaded = 'false';
+                return;
+            }
+
+            const cat = SNIPPET_CATEGORIES.find(c => c.id === catId);
+            if (!cat || !window.db || !window.db.getSnippets) {
+                body.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>';
+                body.dataset.loaded = 'true';
+                return;
+            }
+
+            const snippets = await window.db.getSnippets({ mode: cat.mode, fieldId: cat.id });
+            if (!snippets || snippets.length === 0) {
+                body.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>';
+                body.dataset.loaded = 'true';
+                return;
+            }
+
+            body.innerHTML = snippets.map(snippet => {
+                const encoded = encodeURIComponent(snippet.content || '');
+                return `
+                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer border-b border-white/5 transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
+                        <i class="fa-solid fa-plus text-xs text-slate-500 mr-2 group-hover:text-brand-sky"></i>
+                        <div class="text-sm text-slate-300 group-hover:text-white truncate">${snippet.name}</div>
+                    </div>
+                `;
+            }).join('');
+            body.dataset.loaded = 'true';
+        }
+
+        function insertSnippetEncoded(encoded, targetFieldId) {
+            const text = decodeURIComponent(encoded || '');
+            insertSnippetText(text, targetFieldId);
+        }
+
+        function insertSnippetText(text, targetFieldId) {
+            let textarea = null;
+            if (targetFieldId === 'free') {
+                if (currentMode !== 'free') setEditorMode('free');
+                activeFieldId = 'free';
+                textarea = document.getElementById('input-free');
+            } else {
+                if (!targetFieldId) {
+                    alert("Bitte zuerst ein Feld im Editor auswählen.");
+                    return;
+                }
+                if (currentMode !== 'structured') setEditorMode('structured');
+                textarea = document.getElementById(`input-${targetFieldId}`);
+                activeFieldId = targetFieldId;
+            }
+            if (!textarea) {
+                alert("Kein Eingabefeld gefunden.");
+                return;
+            }
+            textarea.focus();
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            const value = textarea.value;
+            textarea.value = value.substring(0, start) + text + value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + text.length;
+            textarea.focus();
+        }
+
+        async function openSnippetCategory(id) {
+            if (!isLeftOpen) toggleSidebar('left');
+            activeFieldId = id;
+            snippetOpenState[id] = true;
+            renderSnippetsAccordion();
+            await loadSnippetSection(id);
+            const header = document.getElementById(`snip-body-${id}`)?.previousElementSibling;
+            if (header && header.scrollIntoView) header.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function loadSnippetsForField(fieldId) {
+            await openSnippetCategory(fieldId);
+        }
+
+        function loadSnippetsForFieldDemo(fieldId) {
+            openSnippetCategory(fieldId);
         }
 
         function renderHistoryList(history) {
@@ -565,6 +837,64 @@
             `).join('');
         }
 
+        function openSnippetModal(prefillCategory = null) {
+            if (!window.currentUser) {
+                alert("Bitte einloggen...");
+                openAuthModal();
+                return;
+            }
+            const modal = document.getElementById('modal-snippet');
+            const nameEl = document.getElementById('snippet-name');
+            const categoryEl = document.getElementById('snippet-category');
+            const contentEl = document.getElementById('snippet-content');
+
+            if (nameEl) nameEl.value = '';
+            if (contentEl) contentEl.value = '';
+            if (categoryEl) categoryEl.value = prefillCategory || 'context';
+
+            if (modal) modal.classList.remove('hidden');
+            if (nameEl) nameEl.focus();
+        }
+
+        function closeSnippetModal() {
+            const modal = document.getElementById('modal-snippet');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function saveSnippetFromModal() {
+            const nameEl = document.getElementById('snippet-name');
+            const categoryEl = document.getElementById('snippet-category');
+            const contentEl = document.getElementById('snippet-content');
+
+            const name = nameEl?.value.trim();
+            const content = contentEl?.value.trim();
+            const category = categoryEl?.value;
+
+            if (!name || !content) {
+                alert("Name und Text sind Pflicht.");
+                return;
+            }
+
+            let mode = 'structured';
+            let field_id = category;
+            if (category === 'free') {
+                mode = 'free';
+                field_id = 'free';
+            }
+
+            if (window.db && window.db.saveSnippet) {
+                const success = await window.db.saveSnippet({ name, content, mode, field_id });
+                if (success) {
+                    closeSnippetModal();
+                    snippetOpenState[category] = true;
+                    renderSnippetsAccordion();
+                    await loadSnippetSection(category);
+                } else {
+                    alert("Fehler beim Speichern.");
+                }
+            }
+        }
+
         async function saveCurrentToLibrary() {
             // 1. Check Login
             if (!window.currentUser) {
@@ -577,26 +907,43 @@
             const name = prompt("Name für diesen Prompt:");
             if (!name) return;
 
-            // 3. Daten sammeln (Strukturierte Felder)
-            const fieldsData = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+            if (currentMode === 'structured') {
+                const fieldsData = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+                if (window.db && window.db.saveScenario) {
+                    const success = await window.db.saveScenario({
+                        name: name,
+                        fields: fieldsData
+                    });
+                    
+                    if (success) {
+                        loadLibrary();
+                    } else {
+                        alert("Fehler beim Speichern.");
+                    }
+                }
+            } else {
+                const text = document.getElementById('input-free').value.trim();
+                if (!text) {
+                    alert("Bitte Text eingeben.");
+                    return;
+                }
+                if (window.db && window.db.saveScenario) {
+                    const success = await window.db.saveScenario({
+                        name: name,
+                        fields: { mode: 'free', text: text }
+                    });
 
-            // 4. Speichern via DB Adapter
-            if (window.db && window.db.saveScenario) {
-                const success = await window.db.saveScenario({
-                    name: name,
-                    fields: fieldsData
-                });
-                
-                if (success) {
-                    loadLibrary(); // Liste sofort aktualisieren
-                } else {
-                    alert("Fehler beim Speichern.");
+                    if (success) {
+                        loadLibrary();
+                    } else {
+                        alert("Fehler beim Speichern.");
+                    }
                 }
             }
         }
 
         window.openSnippets = (id) => {
-            loadSnippetsForField(id);
+            openSnippetCategory(id);
         };
     </script>
     
