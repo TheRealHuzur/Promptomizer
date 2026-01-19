@@ -61,7 +61,7 @@ window.db = {
         if (window.currentUser) {
             // ☁️ CLOUD SAVE
             const { error } = await supabaseClient
-                .from('prompts')
+                .from('prompt_history')
                 .insert({
                     user_id: window.currentUser.id,
                     text: entry.text,
@@ -85,7 +85,7 @@ window.db = {
         if (window.currentUser) {
             // ☁️ CLOUD FETCH
             const { data, error } = await supabaseClient
-                .from('prompts')
+                .from('prompt_history')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(50);
@@ -109,7 +109,7 @@ window.db = {
 
     async deletePrompt(id) {
         if (window.currentUser) {
-            await supabaseClient.from('prompts').delete().eq('id', id);
+            await supabaseClient.from('prompt_history').delete().eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             history = history.filter(h => h.id != id); // Loose equality für Session IDs
@@ -119,7 +119,7 @@ window.db = {
 
     async toggleFavorite(id, currentStatus) {
         if (window.currentUser) {
-            await supabaseClient.from('prompts').update({ favorite: !currentStatus }).eq('id', id);
+            await supabaseClient.from('prompt_history').update({ favorite: !currentStatus }).eq('id', id);
         } else {
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             const idx = history.findIndex(h => h.id == id);
