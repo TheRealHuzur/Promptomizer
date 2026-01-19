@@ -96,10 +96,10 @@
         }
         .splitter-toggle:hover { color: #38bdf8; border-color: #38bdf8; background-color: #1e293b; }
         
+        .nav-item .nav-indicator { opacity: 0; }
+        .nav-item.active-nav .nav-indicator { opacity: 1; }
         .nav-item.active-nav {
             background-color: #1e293b; /* Slate 800 */
-            border-right-color: #0ea5e9; /* Strich jetzt RECHTS */
-            border-left-color: transparent;
             color: white;
         }
     </style>
@@ -129,7 +129,6 @@
             </div>
         </div>
 
-        <div id="header-spacer-right" class="w-80 sidebar-transition flex-shrink-0 border-l border-transparent"></div>
     </header>
 
     <div class="flex-1 flex overflow-hidden relative">
@@ -162,6 +161,41 @@
                         <div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
                         </div>
+                    </div>
+
+                    <div class="px-2 py-4 border-t border-navy-border">
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
+                        <div class="space-y-0.5">
+                            <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
+                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                                <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
+                                <span class="text-sm font-medium">Editor</span>
+                            </div>
+                            <div onclick="switchView('history')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                                <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                                <span class="text-sm font-medium">Historie</span>
+                            </div>
+                            <div onclick="switchView('favorites')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                                <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                                <span class="text-sm font-medium">Favoriten</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="p-4 border-t border-navy-border bg-black/10">
+                        <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
+                            <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="text-left overflow-hidden">
+                                <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
+                                <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -219,42 +253,7 @@
                 </div>
             </footer>
 
-            <button onclick="toggleSidebar('right')" class="splitter-toggle -right-3 rounded-l-md border-r-0" title="Toggle Library">
-                <i id="icon-toggle-right" class="fa-solid fa-chevron-right text-xs rotate-icon"></i>
-            </button>
-
         </main>
-
-        <aside id="sidebar-right" class="w-80 bg-navy-sidebar border-l border-navy-border flex flex-col justify-between sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
-            <div class="w-80 flex flex-col h-full">
-                <nav class="p-0 space-y-0.5 flex-1 overflow-y-auto pt-6 px-2">
-                    <div onclick="switchView('editor')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer active-nav transition-all border-r-[3px] border-transparent">
-                        <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
-                        <span class="text-sm font-medium">Editor</span>
-                    </div>
-                    <div onclick="switchView('history')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-r-[3px] border-transparent transition-all">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                        <span class="text-sm font-medium">Historie</span>
-                    </div>
-                    <div onclick="switchView('favorites')" class="nav-item group flex items-center gap-3 px-3 py-2.5 rounded-l-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border-r-[3px] border-transparent transition-all">
-                        <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                        <span class="text-sm font-medium">Favoriten</span>
-                    </div>
-                </nav>
-
-                <div class="p-4 border-t border-navy-border bg-black/10">
-                    <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
-                        <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div class="text-left overflow-hidden">
-                            <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
-                            <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </aside>
     </div>
 
     <div id="modal-auth" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -279,7 +278,6 @@
 
         let currentMode = 'structured';
         let isLeftOpen = true;
-        let isRightOpen = true;
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -353,6 +351,8 @@
             const icon = document.getElementById(`icon-toggle-${side}`);
             const spacer = document.getElementById(`header-spacer-${side}`);
             
+            if (side === 'right') return;
+
             if (side === 'left') {
                 if (isLeftOpen) {
                     el.classList.replace('w-64', 'w-0');
@@ -364,17 +364,6 @@
                     icon.classList.remove('rotate-180');
                 }
                 isLeftOpen = !isLeftOpen;
-            } else {
-                if (isRightOpen) {
-                    el.classList.replace('w-80', 'w-0');
-                    spacer.classList.replace('w-80', 'w-0');
-                    icon.classList.add('rotate-180');
-                } else {
-                    el.classList.replace('w-0', 'w-80');
-                    spacer.classList.replace('w-0', 'w-80');
-                    icon.classList.remove('rotate-180');
-                }
-                isRightOpen = !isRightOpen;
             }
         }
 
@@ -528,8 +517,6 @@
                     <div class="text-sm text-slate-300 group-hover:text-white truncate">Beispiel Baustein</div>
                 </div>
             `;
-            const sb = document.getElementById('sidebar-right');
-            if(sb.classList.contains('w-0')) toggleSidebar('right');
         }
 
         function insertSnippet(fieldId, text) {
