@@ -412,9 +412,9 @@
                         placeholder="${f.placeholder}"
                         onfocus="setActiveField('${f.id}')"></textarea>
                     
-                    <div class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-400 hover:text-white" onclick="openSnippetModalFromField('${f.id}')">
-                            <i class="fa-solid fa-floppy-disk"></i>
+                    <div class="absolute top-0 right-0">
+                        <button class="group p-1.5 bg-transparent rounded-md border border-transparent hover:bg-slate-800/60 hover:border-brand-sky hover:shadow-glow transform active:scale-95 transition-all" onclick="openSnippetModalFromField('${f.id}')" title="Als Baustein speichern">
+                            <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                         </button>
                     </div>
                 </div>
@@ -712,7 +712,7 @@
                         <span class="text-sm font-bold text-slate-300">${cat.label}</span>
                         <i id="snip-icon-${cat.id}" class="fa-solid fa-chevron-down text-xs transition-transform ${snippetOpenState[cat.id] ? 'rotate-180' : ''}"></i>
                     </button>
-                    <div id="snip-body-${cat.id}" class="${snippetOpenState[cat.id] ? '' : 'hidden'} px-2 pb-2" data-loaded="false">
+                    <div id="snip-body-${cat.id}" class="${snippetOpenState[cat.id] ? '' : 'hidden'} pl-2 pr-0 pb-2" data-loaded="false">
                         <div class="text-xs text-slate-600 italic py-2">Noch nicht geladen.</div>
                     </div>
                 </div>
@@ -769,10 +769,10 @@
                         snippetCacheById[snippet.id] = snippet;
                         const encoded = encodeURIComponent(snippet.content || '');
                         return `
-                            <div id="snippet-item-${snippet.id}" class="group py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
-                                <div class="flex items-center justify-between">
-                                    <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight">${snippet.name}</div>
-                                    <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none" onclick="openSnippetItemMenu(event, '${cat.id}', ${snippet.id})">
+                            <div id="snippet-item-${snippet.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(snippet.name || '')}>${snippet.name}</div>
+                                    <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openSnippetItemMenu(event, '${cat.id}', ${snippet.id})">
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
                                 </div>
