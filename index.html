@@ -543,6 +543,12 @@
             `).join('');
         }
 
+        async function loadHistory() {
+            if (!window.db) return;
+            const history = await window.db.getHistory();
+            renderHistoryList(history);
+        }
+
         function renderFavoritesList(history) {
             const favs = history.filter(h => h.favorite);
             const container = document.getElementById('favorites-list');
