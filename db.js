@@ -274,6 +274,7 @@ window.db = {
             .from('prompt_categories')
             .insert({ user_id: window.currentUser.id, name });
         if (error) {
+            if (error.code === '23505') return true;
             console.error("Prompt Category Create Error:", error);
             return false;
         }
@@ -282,21 +283,28 @@ window.db = {
 
     async updateScenario(id, patch) {
         if (!window.currentUser) return false;
+        const uid = window.currentUser.id;
+
         const { error } = await supabaseClient
             .from('library')
             .update(patch)
             .eq('id', id)
-            .eq('user_id', window.currentUser.id);
-        if (error && error.code !== '42P01') {
+            .eq('user_id', uid);
+
+        if (!error) return true;
+
+        if (error.code !== '42P01') {
             console.error("Scenario Update Error:", error);
             return false;
         }
+
         const { error: err2 } = await supabaseClient
             .from('scenarios')
             .update(patch)
             .eq('id', id)
-            .eq('user_id', window.currentUser.id);
-        if (err2 && err2.code !== '42P01') {
+            .eq('user_id', uid);
+
+        if (err2) {
             console.error("Scenario Update Error (fallback):", err2);
             return false;
         }
