@@ -661,6 +661,103 @@
             });
         }
 
+        function isFreePrompt(s) {
+            if (!s || !s.fields) return false;
+            if (typeof s.fields === 'object' && s.fields.mode === 'free') return true;
+            if (typeof s.fields === 'object' && typeof s.fields.text === 'string') return true;
+            return false;
+        }
+
+        function extractStructuredFields(s) {
+            const out = { role:'', context:'', task:'', style:'', format:'' };
+
+            if (Array.isArray(s.fields)) {
+                s.fields.forEach((val, idx) => {
+                    if (FIELDS[idx]) out[FIELDS[idx].id] = val ?? '';
+                });
+                return out;
+            }
+
+            if (!s.fields || typeof s.fields !== 'object') return out;
+
+            if (s.fields.mode === 'structured') {
+                if (Array.isArray(s.fields.fields)) {
+                    s.fields.fields.forEach((val, idx) => {
+                        if (FIELDS[idx]) out[FIELDS[idx].id] = val ?? '';
+                    });
+                    return out;
+                }
+                if (s.fields.fields && typeof s.fields.fields === 'object') {
+                    FIELDS.forEach(f => {
+                        if (s.fields.fields[f.id] !== undefined) out[f.id] = s.fields.fields[f.id] ?? '';
+                    });
+                    return out;
+                }
+            }
+
+            return out;
+        }
+
+        function applyStructuredToEditor(s) {
+            const data = extractStructuredFields(s);
+            FIELDS.forEach(f => {
+                const el = document.getElementById(`input-${f.id}`);
+                if (el) el.value = data[f.id] ?? '';
+            });
+        }
+
+        function structuredPromptToText(s) {
+            const headerMap = { role:'ðŸŽ­ ROLLE', context:'ðŸŒ KONTEXT', task:'ðŸŽ¯ AUFGABE', style:'ðŸŽ¨ STIL', format:'ðŸ§ª VARIANTEN' };
+            const data = extractStructuredFields(s);
+            let finalText = '';
+            FIELDS.forEach(f => {
+                const val = (data[f.id] ?? '').toString().trim();
+                if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
+            });
+            return finalText.trim();
+        }
+
+        async function handlePromptClick(id) {
+            let scenarios = [];
+            if (Array.isArray(promptLibraryCache) && promptLibraryCache.length) {
+                scenarios = promptLibraryCache;
+            } else {
+                scenarios = await window.db.getScenarios();
+                promptLibraryCache = scenarios;
+            }
+
+            const s = scenarios.find(x => x.id == id);
+            if (!s) return;
+
+            const freePrompt = isFreePrompt(s);
+
+            if (currentMode === 'structured') {
+                if (!freePrompt) {
+                    applyStructuredToEditor(s);
+                    return;
+                }
+                setEditorMode('free');
+                const ta = document.getElementById('input-free');
+                if (ta) {
+                    ta.value = s.fields.text || '';
+                    setActiveField('free');
+                }
+                return;
+            }
+
+            const ta = document.getElementById('input-free');
+            if (!ta) return;
+
+            if (freePrompt) {
+                ta.value = s.fields.text || '';
+                setActiveField('free');
+                return;
+            }
+
+            ta.value = structuredPromptToText(s);
+            setActiveField('free');
+        }
+
         function loadSnippetsForFieldDemo(fieldId) {
             const container = document.getElementById('library-snippets');
             const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
@@ -857,7 +954,7 @@
             body.innerHTML = `
                 <div class="space-y-0.5">
                     ${filtered.map(s => `
-                        <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="loadScenario(${s.id})">
+                        <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${s.id})">
                             <div class="flex items-center justify-between w-full">
                                 <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(s.name || '')}>${s.name}</div>
                                 <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${s.id})">
