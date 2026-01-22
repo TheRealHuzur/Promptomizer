@@ -10,39 +10,6 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <div id="modal-snippet" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 id="snippet-modal-title" class="text-xl font-bold text-white">Neuer Baustein</h3>
-                <button onclick="closeSnippetModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
-                    <input id="snippet-name" type="text" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none" placeholder="z.B. Kontext-Short" />
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kategorie</label>
-                    <select id="snippet-category" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none">
-                        <option value="role">Rolle & Funktion</option>
-                        <option value="context">Kontext</option>
-                        <option value="task">Aufgabe</option>
-                        <option value="style">Stil & Tonalität</option>
-                        <option value="format">Format</option>
-                        <option value="free">Freie Bausteine</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baustein-Text</label>
-                    <textarea id="snippet-content" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none min-h-[120px]" placeholder="Text für den Baustein..."></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end gap-3 mt-6">
-                <button onclick="closeSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
-                <button onclick="saveSnippetFromModal()" class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">Speichern</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         tailwind.config = {
@@ -169,59 +136,65 @@
 
         <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div class="w-64 flex flex-col h-full">
-                
-                <div class="h-10 flex items-center justify-between px-4 border-b border-navy-border bg-black/10">
-                    <span class="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Bibliothek</span>
-                    <button onclick="saveCurrentToLibrary()" class="text-[15px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
-                        + Neu
-                    </button>
+                <div class="px-2 py-4 border-b border-navy-border">
+                    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
+                    <div class="space-y-0.5">
+                        <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
+                            <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                            <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
+                            <span class="text-sm font-medium">Editor</span>
+                        </div>
+                        <div onclick="switchView('history')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                            <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                            <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                            <span class="text-sm font-medium">Historie</span>
+                        </div>
+                        <div onclick="switchView('favorites')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                            <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
+                            <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                            <span class="text-sm font-medium">Favoriten</span>
+                        </div>
+                    </div>
                 </div>
-
+                
                 <div class="flex-1 overflow-y-auto p-0">
                     
-                    <div class="px-4 py-3">
-                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group"></i> Prompts
-                        </h4>
+                    <div class="sticky top-0 z-20 bg-navy-sidebar border-b border-navy-border">
+                        <button onclick="togglePromptsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
+                            <span class="flex items-center gap-2 text-base font-bold text-slate-400">
+                                <i class="fa-solid fa-layer-group"></i> Prompts
+                            </span>
+                            <i id="prompts-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
+                        </button>
+                    </div>
+                    <div id="prompts-body" class="px-4 py-3">
+                        <button onclick="saveCurrentToLibrary()" class="w-full flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky font-bold">+</span>
+                            <span class="text-brand-sky font-bold">Neu</span>
+                        </button>
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
                     </div>
 
-                    <div class="px-4 py-3 border-t border-navy-border">
-                        <h4 class="text-base font-bold text-slate-400 mb-2 flex items-center gap-2 justify-between">
-                            <span class="flex items-center gap-2">
+                    <div class="border-t border-navy-border">
+                        <button onclick="toggleSnippetsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
+                            <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-cube"></i> Bausteine
                             </span>
-                            <button onclick="openSnippetModal()" class="text-[12px] bg-slate-800 hover:bg-brand-sky hover:text-navy-deep text-slate-300 px-2 py-0.5 rounded transition-colors border border-slate-700">
-                                + Neu
+                            <i id="snippets-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
+                        </button>
+                        <div id="snippets-body" class="px-4 py-3">
+                            <button onclick="openSnippetModal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                                <span class="text-brand-sky font-bold">+</span>
+                                <span class="text-brand-sky font-bold">Neu</span>
                             </button>
-                        </h4>
-                        <div id="library-snippets" class="space-y-0.5">
+                            <div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="px-2 py-4 border-t border-navy-border">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
-                        <div class="space-y-0.5">
-                            <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
-                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                                <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
-                                <span class="text-sm font-medium">Editor</span>
-                            </div>
-                            <div onclick="switchView('history')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                                <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                                <span class="text-sm font-medium">Historie</span>
-                            </div>
-                            <div onclick="switchView('favorites')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-                                <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                                <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                                <span class="text-sm font-medium">Favoriten</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="mt-auto">
@@ -295,6 +268,39 @@
         </main>
     </div>
 
+    <div id="modal-snippet" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="snippet-modal-title" class="text-xl font-bold text-white">Neuer Baustein</h3>
+                <button onclick="closeSnippetModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
+                    <input id="snippet-name" type="text" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none" placeholder="z.B. Kontext-Short" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kategorie</label>
+                    <select id="snippet-category" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none">
+                        <option value="role">Rolle & Funktion</option>
+                        <option value="context">Kontext</option>
+                        <option value="task">Aufgabe</option>
+                        <option value="style">Stil & Tonalität</option>
+                        <option value="format">Format</option>
+                        <option value="free">Freie Bausteine</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baustein-Text</label>
+                    <textarea id="snippet-content" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none min-h-[120px]" placeholder="Text für den Baustein..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="closeSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
+                <button onclick="saveSnippetFromModal()" class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">Speichern</button>
+            </div>
+        </div>
+    </div>
     <div id="modal-auth" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
             <h3 class="text-xl font-bold text-white mb-4">Login</h3>
@@ -341,6 +347,8 @@
 
         let currentMode = 'structured';
         let isLeftOpen = true;
+        let isPromptsOpen = true;
+        let isSnippetsOpen = true;
         let activeFieldId = null;
         let snippetOpenState = { role: false, context: false, task: false, style: false, format: false, free: false };
         let snippetMenuOpen = false;
@@ -441,6 +449,22 @@
                 }
                 isLeftOpen = !isLeftOpen;
             }
+        }
+
+        function togglePromptsSection() {
+            isPromptsOpen = !isPromptsOpen;
+            const body = document.getElementById('prompts-body');
+            const icon = document.getElementById('prompts-toggle-icon');
+            if (body) body.classList.toggle('hidden', !isPromptsOpen);
+            if (icon) icon.classList.toggle('rotate-180', isPromptsOpen);
+        }
+
+        function toggleSnippetsSection() {
+            isSnippetsOpen = !isSnippetsOpen;
+            const body = document.getElementById('snippets-body');
+            const icon = document.getElementById('snippets-toggle-icon');
+            if (body) body.classList.toggle('hidden', !isSnippetsOpen);
+            if (icon) icon.classList.toggle('rotate-180', isSnippetsOpen);
         }
 
         function switchView(viewId) {
