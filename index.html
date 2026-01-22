@@ -136,7 +136,7 @@
 
         <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div class="w-64 flex flex-col h-full">
-                <div class="px-2 py-4 border-b border-navy-border">
+                <div class="px-2 py-4">
                     <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
                     <div class="space-y-0.5">
                         <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
@@ -159,7 +159,7 @@
                 
                 <div class="flex-1 overflow-y-auto p-0">
                     
-                    <div class="sticky top-0 z-20 bg-navy-sidebar border-b border-navy-border">
+                    <div class="sticky top-0 z-20 bg-navy-sidebar">
                         <button onclick="togglePromptsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
                             <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-layer-group"></i> Prompts
@@ -167,27 +167,25 @@
                             <i id="prompts-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
                         </button>
                     </div>
-                    <div id="prompts-body" class="px-4 py-3">
-                        <button onclick="saveCurrentToLibrary()" class="w-full flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                            <span class="text-brand-sky font-bold">+</span>
-                            <span class="text-brand-sky font-bold">Neu</span>
+                    <div id="prompts-body" class="px-4 pt-1 pb-2">
+                        <button onclick="saveCurrentToLibrary()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky text-sm font-medium">Prompt speichern</span>
                         </button>
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
                     </div>
 
-                    <div class="border-t border-navy-border">
+                    <div>
                         <button onclick="toggleSnippetsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
                             <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-cube"></i> Bausteine
                             </span>
                             <i id="snippets-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
                         </button>
-                        <div id="snippets-body" class="px-4 py-3">
-                            <button onclick="openSnippetModal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                                <span class="text-brand-sky font-bold">+</span>
-                                <span class="text-brand-sky font-bold">Neu</span>
+                        <div id="snippets-body" class="px-4 pt-1 pb-2">
+                            <button onclick="openSnippetModal()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                                <span class="text-brand-sky text-sm font-medium">Neuer Baustein</span>
                             </button>
                             <div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
@@ -260,7 +258,7 @@
                     </button>
                     <button onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
                         <i class="fa-solid fa-copy"></i>
-                        <span>COPY & SAVE</span>
+                        <span>Kopieren</span>
                     </button>
                 </div>
             </footer>
