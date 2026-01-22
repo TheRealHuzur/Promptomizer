@@ -171,6 +171,9 @@
                         <button onclick="saveCurrentToLibrary()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
                             <span class="text-brand-sky text-sm font-medium">Prompt speichern</span>
                         </button>
+                        <button onclick="openPromptCategoryModal()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
+                        </button>
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
@@ -316,7 +319,21 @@
 
     <div id="prompt-item-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
         <button onclick="handleEditPrompt()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
-        <button onclick="handlePromptCategoryPlaceholder()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorie</button>
+        <div id="prompt-menu-category" class="relative group">
+            <button class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60" onmouseenter="openPromptCategorySubmenu()" onclick="return false;">
+                <span>Kategorie</span>
+                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+            </button>
+            <div id="prompt-category-submenu" class="absolute top-0 left-full ml-2 w-64 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden">
+                <button class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky" onclick="handlePromptCategoryCreateFromMenu(event)">
+                    Kategorie anlegen
+                </button>
+                <div class="h-px bg-navy-border"></div>
+                <div id="prompt-category-submenu-list" class="py-1">
+                    <div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>
+                </div>
+            </div>
+        </div>
         <button onclick="handleAskDeletePrompt()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
 
@@ -346,6 +363,23 @@
             <p class="text-sm text-slate-400">Modal folgt im nÃ¤chsten Schritt.</p>
             <div class="flex justify-end mt-6">
                 <button onclick="closePromptEditModal()" class="px-4 py-2 text-slate-400 hover:text-white">SchlieÃŸen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-prompt-category" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Kategorie anlegen</h3>
+                <button onclick="closePromptCategoryModal()" class="text-slate-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <label class="block text-sm text-slate-300 mb-1">Name der Kategorie</label>
+            <input id="prompt-category-name" type="text" class="w-full bg-slate-900/40 border border-navy-border rounded-md p-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-sky" placeholder="z. B. Verwaltung, Workshop, ..." />
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="closePromptCategoryModal()" class="px-4 py-2 rounded-md border border-navy-border text-slate-200 hover:bg-slate-800/50">Abbrechen</button>
+                <button onclick="savePromptCategoryFromModal()" class="px-4 py-2 rounded-md bg-brand-sky text-white hover:bg-brand-hover shadow-glow">Speichern</button>
             </div>
         </div>
     </div>
@@ -977,6 +1011,10 @@
             promptMenuCategoryKey = catKey;
 
             menu.classList.remove('hidden');
+            const sub = document.getElementById('prompt-category-submenu');
+            if (sub) sub.classList.add('hidden');
+            const list = document.getElementById('prompt-category-submenu-list');
+            if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
             const r = ev.currentTarget.getBoundingClientRect();
             menu.style.top = (r.bottom + 6) + 'px';
             menu.style.left = (r.right - menu.offsetWidth) + 'px';
@@ -991,6 +1029,10 @@
         function closePromptItemMenu() {
             const menu = document.getElementById('prompt-item-menu');
             if (menu) menu.classList.add('hidden');
+            const sub = document.getElementById('prompt-category-submenu');
+            if (sub) sub.classList.add('hidden');
+            const list = document.getElementById('prompt-category-submenu-list');
+            if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
             promptMenuOpen = false;
             promptMenuPromptId = null;
             promptMenuCategoryKey = null;
@@ -1061,6 +1103,124 @@
         function closePromptEditModal() {
             const modal = document.getElementById('modal-prompt-edit');
             if (modal) modal.classList.add('hidden');
+        }
+
+        function openPromptCategoryModal(prefill = '') {
+            if (!window.currentUser) {
+                alert('Bitte einloggen.');
+                openAuthModal();
+                return;
+            }
+            const modal = document.getElementById('modal-prompt-category');
+            const inp = document.getElementById('prompt-category-name');
+            if (inp) inp.value = prefill || '';
+            if (modal) modal.classList.remove('hidden');
+            setTimeout(() => { if (inp) inp.focus(); }, 50);
+        }
+
+        function closePromptCategoryModal() {
+            const modal = document.getElementById('modal-prompt-category');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function savePromptCategoryFromModal() {
+            const inp = document.getElementById('prompt-category-name');
+            const name = (inp?.value || '').trim();
+            if (!name) {
+                alert('Bitte einen Namen eingeben.');
+                return;
+            }
+            const ok = await window.db.createPromptCategory(name);
+            if (!ok) {
+                alert('Fehler beim Speichern.');
+                return;
+            }
+
+            promptCategoriesCache = await window.db.getPromptCategories();
+            renderPromptsAccordion();
+            if (promptMenuOpen) {
+                await openPromptCategorySubmenu();
+            }
+
+            closePromptCategoryModal();
+        }
+
+        async function openPromptCategorySubmenu() {
+            const menu = document.getElementById('prompt-category-submenu');
+            const list = document.getElementById('prompt-category-submenu-list');
+            if (!menu || !list) return;
+
+            menu.classList.remove('hidden');
+
+            const fromTable = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
+            const names1 = (fromTable || []).map(x => (typeof x === 'string' ? x : x.name)).filter(Boolean);
+            const names2 = Array.isArray(promptLibraryCache)
+                ? [...new Set(promptLibraryCache.map(p => (p.category || '').trim()).filter(Boolean))]
+                : [];
+
+            const all = [...new Set([...names1, ...names2])].sort((a, b) => a.localeCompare(b, 'de'));
+
+            if (!all.length) {
+                list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Keine Kategorien.</div>';
+                return;
+            }
+
+            list.innerHTML = all.map(n => `
+                <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
+                        title=${JSON.stringify(n)}
+                        onclick='selectPromptCategory(event, ${JSON.stringify(n)})'>
+                    ${escapeHtml(n)}
+                </button>
+            `).join('');
+        }
+
+        function handlePromptCategoryCreateFromMenu(ev) {
+            ev.stopPropagation();
+            closePromptItemMenu();
+            openPromptCategoryModal();
+        }
+
+        async function selectPromptCategory(ev, categoryName) {
+            ev.stopPropagation();
+
+            const id = promptMenuPromptId;
+            const oldKey = promptMenuCategoryKey;
+            if (!id) return;
+
+            if (!window.db || !window.db.updateScenario) {
+                console.error('window.db.updateScenario fehlt');
+                return;
+            }
+
+            const ok = await window.db.updateScenario(id, { category: categoryName });
+            if (!ok) {
+                alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
+                return;
+            }
+
+            if (Array.isArray(promptLibraryCache)) {
+                const p = promptLibraryCache.find(x => x.id == id);
+                if (p) p.category = categoryName;
+            }
+
+            closePromptItemMenu();
+            renderPromptsAccordion();
+
+            const key = categoryKeyFromName(categoryName);
+            if (oldKey) promptOpenState[oldKey] = true;
+            promptOpenState[key] = true;
+            renderPromptsAccordion();
+            if (oldKey) await loadPromptCategory(oldKey);
+            await loadPromptCategory(key);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function renderSnippetsAccordion() {
