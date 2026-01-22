@@ -212,7 +212,8 @@ window.db = {
             .insert({
                 user_id: window.currentUser.id,
                 name: scenario.name,
-                fields: scenario.fields
+                fields: scenario.fields,
+                category: scenario.category ?? null
             });
         
         if (error) {
@@ -221,7 +222,8 @@ window.db = {
                  const { error: err2 } = await supabaseClient.from('scenarios').insert({
                     user_id: window.currentUser.id,
                     name: scenario.name,
-                    fields: scenario.fields
+                    fields: scenario.fields,
+                    category: scenario.category ?? null
                 });
                 if(err2) { console.error(err2); return false; }
                 return true;
@@ -251,12 +253,78 @@ window.db = {
         }
         return data;
     },
+
+    async getPromptCategories() {
+        if (!window.currentUser) return [];
+        const { data, error } = await supabaseClient
+            .from('prompt_categories')
+            .select('name')
+            .eq('user_id', window.currentUser.id)
+            .order('created_at', { ascending: true });
+        if (error) {
+            console.error("Prompt Categories Fetch Error:", error);
+            return [];
+        }
+        return data || [];
+    },
+
+    async createPromptCategory(name) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient
+            .from('prompt_categories')
+            .insert({ user_id: window.currentUser.id, name });
+        if (error) {
+            console.error("Prompt Category Create Error:", error);
+            return false;
+        }
+        return true;
+    },
+
+    async updateScenario(id, patch) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient
+            .from('library')
+            .update(patch)
+            .eq('id', id)
+            .eq('user_id', window.currentUser.id);
+        if (error && error.code !== '42P01') {
+            console.error("Scenario Update Error:", error);
+            return false;
+        }
+        const { error: err2 } = await supabaseClient
+            .from('scenarios')
+            .update(patch)
+            .eq('id', id)
+            .eq('user_id', window.currentUser.id);
+        if (err2 && err2.code !== '42P01') {
+            console.error("Scenario Update Error (fallback):", err2);
+            return false;
+        }
+        return true;
+    },
     
     async deleteScenario(id) {
-        if(window.currentUser) {
-            // Try both tables to be safe
-            await supabaseClient.from('library').delete().eq('id', id);
-            await supabaseClient.from('scenarios').delete().eq('id', id);
+        try {
+            if (!window.currentUser) return false;
+            const uid = window.currentUser.id;
+
+            await supabaseClient
+                .from('library')
+                .delete()
+                .eq('id', id)
+                .eq('user_id', uid);
+
+            // Fallback Tabelle (falls vorhanden/benutzt)
+            await supabaseClient
+                .from('scenarios')
+                .delete()
+                .eq('id', id)
+                .eq('user_id', uid);
+
+            return true;
+        } catch (e) {
+            console.error('deleteScenario error', e);
+            return false;
         }
     }
 };
