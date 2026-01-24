@@ -5,10 +5,47 @@ const SUPABASE_URL = 'https://nrrsroaubbpmjyexhuhi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycnNyb2F1YmJwbWp5ZXhodWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MzU2ODcsImV4cCI6MjA4MzExMTY4N30.UcUIVDHiV6o5thTyeO8r5cylhPpNGl6Tpc3J0qsSxoM';
 
 // Initialisierung
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient;
+let authSubscription = null;
 
 // Globaler User State
 window.currentUser = null;
+
+function getRememberPref() {
+    return localStorage.getItem('promptomizer_remember') !== 'false';
+}
+
+function initSupabaseClient() {
+    const remember = getRememberPref();
+    const storage = remember ? window.localStorage : window.sessionStorage;
+
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            storage,
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+        }
+    });
+
+    if (authSubscription && authSubscription.unsubscribe) authSubscription.unsubscribe();
+
+    const { data } = supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log("ðŸ” Auth Status:", event, session?.user?.email);
+        window.currentUser = session?.user || null;
+        const authEvent = new CustomEvent('auth-state-changed', { detail: window.currentUser });
+        window.dispatchEvent(authEvent);
+    });
+
+    authSubscription = data?.subscription || null;
+}
+
+window.setRememberPref = (remember) => {
+    localStorage.setItem('promptomizer_remember', remember ? 'true' : 'false');
+    initSupabaseClient();
+};
+
+initSupabaseClient();
 
 console.log("🚀 Supabase Client V4 initialisiert");
 
@@ -16,22 +53,17 @@ console.log("🚀 Supabase Client V4 initialisiert");
 // AUTHENTIFIZIERUNG & LISTENER
 // ---------------------------------------------------------
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log("🔐 Auth Status:", event, session?.user?.email);
-    window.currentUser = session?.user || null;
-    
-    // Custom Event feuern, damit index.html das UI updaten kann
-    const authEvent = new CustomEvent('auth-state-changed', { detail: window.currentUser });
-    window.dispatchEvent(authEvent);
-});
-
 // Google Login
 async function loginWithGoogle() {
-    const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin }
-    });
-    if (error) throw error;
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: window.location.origin }
+        });
+        if (error) throw error;
+    } catch (err) {
+        console.error('Google Login Fehler:', err);
+    }
 }
 
 // Email Auth
@@ -336,3 +368,4 @@ window.db = {
         }
     }
 };
+
