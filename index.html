@@ -267,10 +267,10 @@
                             <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                             <span class="text-sm font-medium">Historie</span>
                         </div>
-                        <div onclick="switchView('favorites')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                        <div onclick="toggleSettingsMenu(event)" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                            <i class="fa-solid fa-star w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                            <span class="text-sm font-medium">Favoriten</span>
+                            <i class="fa-solid fa-gear w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                            <span class="text-sm font-medium">Einstellungen & Hilfe</span>
                         </div>
                     </div>
                 </div>
@@ -365,9 +365,13 @@
                     <div id="history-list" class="space-y-4"></div>
                 </div>
 
-                <div id="view-favorites" class="hidden max-w-4xl mx-auto fade-in pt-4">
-                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-navy-border pb-4">Favoriten</h2>
-                    <div id="favorites-list" class="space-y-4"></div>
+                <div id="view-settings" class="hidden max-w-4xl mx-auto fade-in pt-4">
+                    <div class="flex justify-between items-center mb-6 border-b border-navy-border pb-4">
+                        <h2 id="settings-title" class="text-2xl font-bold text-white">Kategorien verwalten</h2>
+                    </div>
+                    <div id="settings-content" class="space-y-4">
+                        <div class="text-center text-slate-500 py-10">Inhalte folgen.</div>
+                    </div>
                 </div>
 
             </div>
@@ -491,6 +495,12 @@
         <button onclick="handleAskDeletePrompt()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
 
+    <div id="settings-nav-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-56">
+        <button onclick="openSettingsPage('categories')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorien verwalten</button>
+        <button onclick="openSettingsPage('help')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Hilfe</button>
+        <button onclick="openSettingsPage('import')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Import & Export</button>
+    </div>
+
     <div id="modal-snippet-delete" class="ui-backdrop z-[120] hidden">
         <div class="ui-modal ui-modal-sm">
             <h3 class="ui-modal-title mb-4">Unwiderruflich löschen?</h3>
@@ -552,11 +562,23 @@
                    class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
                    placeholder="z.B. Workshop Auftakt" />
 
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-4 block">Kategorie (optional)</label>
-            <select id="save-prompt-category"
-                    class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none">
-                <option value="">Ohne Kategorie</option>
-            </select>
+            <div id="save-prompt-category-field" class="mt-4 relative">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Kategorie (optional)</label>
+                <button type="button" id="save-prompt-category-trigger"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none flex items-center justify-between"
+                        onclick="openSavePromptCategoryMenu(event)">
+                    <span id="save-prompt-category-value" class="truncate">Ohne Kategorie</span>
+                    <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                </button>
+                <div id="save-prompt-category-menu" class="absolute left-0 right-0 mt-2 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden z-20">
+                    <button class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky"
+                            onclick="handleSavePromptCategoryCreate(event)">
+                        Kategorie anlegen
+                    </button>
+                    <div class="h-px bg-navy-border"></div>
+                    <div id="save-prompt-category-list" class="py-1"></div>
+                </div>
+            </div>
 
             <div id="save-prompt-error" class="hidden text-sm text-red-400 mt-3"></div>
 
@@ -621,14 +643,27 @@
         let promptMenuCategoryKey = null;
         let pendingDeletePromptId = null;
         let pendingDeletePromptCategoryKey = null;
+        let savePromptSelectedCategory = '';
+        let savePromptCategoryMenuOpen = false;
+        let settingsMenuOpen = false;
+        let settingsCurrentPage = 'categories';
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
             renderSnippetsAccordion();
-            document.addEventListener('click', () => {
+            document.addEventListener('click', (ev) => {
                 if (snippetMenuOpen) closeSnippetItemMenu();
                 if (promptMenuOpen) closePromptItemMenu();
+                if (savePromptCategoryMenuOpen) {
+                    const field = document.getElementById('save-prompt-category-field');
+                    if (!field || !field.contains(ev.target)) closeSavePromptCategoryMenu();
+                }
+                if (settingsMenuOpen) closeSettingsMenu();
+            });
+            document.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Escape' && savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+                if (ev.key === 'Escape' && settingsMenuOpen) closeSettingsMenu();
             });
 
             // 1. Event Listener: Feuert sofort, wenn Supabase den Login bestätigt
@@ -778,8 +813,65 @@
             if (icon) icon.classList.toggle('rotate-180', isSnippetsOpen);
         }
 
+        function toggleSettingsMenu(ev) {
+            if (ev) ev.stopPropagation();
+            const menu = document.getElementById('settings-nav-menu');
+            const target = ev?.currentTarget;
+            if (!menu || !target) return;
+
+            if (settingsMenuOpen) {
+                closeSettingsMenu();
+                return;
+            }
+
+            if (snippetMenuOpen) closeSnippetItemMenu();
+            if (promptMenuOpen) closePromptItemMenu();
+            if (savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+
+            menu.classList.remove('hidden');
+            const rect = target.getBoundingClientRect();
+            const menuWidth = menu.offsetWidth || 220;
+            const menuHeight = menu.offsetHeight || 120;
+            const maxLeft = Math.max(8, window.innerWidth - menuWidth - 8);
+            const maxTop = Math.max(8, window.innerHeight - menuHeight - 8);
+            const left = Math.min(rect.right + 10, maxLeft);
+            const top = Math.min(rect.top, maxTop);
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            settingsMenuOpen = true;
+            menu.onclick = (e) => e.stopPropagation();
+        }
+
+        function closeSettingsMenu() {
+            const menu = document.getElementById('settings-nav-menu');
+            if (menu) menu.classList.add('hidden');
+            settingsMenuOpen = false;
+        }
+
+        function renderSettingsPage() {
+            const titleEl = document.getElementById('settings-title');
+            const contentEl = document.getElementById('settings-content');
+            const map = {
+                categories: 'Kategorien verwalten',
+                help: 'Hilfe',
+                import: 'Import & Export'
+            };
+            const title = map[settingsCurrentPage] || 'Einstellungen & Hilfe';
+            if (titleEl) titleEl.textContent = title;
+            if (contentEl) {
+                contentEl.innerHTML = '<div class="text-center text-slate-500 py-10">Inhalte folgen.</div>';
+            }
+        }
+
+        function openSettingsPage(pageKey) {
+            settingsCurrentPage = pageKey || 'categories';
+            renderSettingsPage();
+            closeSettingsMenu();
+            switchView('settings');
+        }
+
         function switchView(viewId) {
-            ['view-editor', 'view-history', 'view-favorites'].forEach(id => {
+            ['view-editor', 'view-history', 'view-settings'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.classList.add('hidden');
             });
@@ -801,7 +893,6 @@
             }
 
             if(viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
-            if(viewId === 'favorites' && window.db) window.db.getHistory().then(renderFavoritesList);
         }
 
         function setEditorMode(mode) {
@@ -908,6 +999,24 @@
             promptLibraryCache = await window.db.getScenarios();
             promptCategoriesCache = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
             renderPromptsAccordion();
+        }
+
+        async function refreshPromptLibraryAndCategories() {
+            if (!window.db) return;
+            promptLibraryCache = await window.db.getScenarios();
+            promptCategoriesCache = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
+            renderPromptsAccordion();
+
+            if (promptMenuOpen) {
+                const sub = document.getElementById('prompt-category-submenu');
+                if (sub && !sub.classList.contains('hidden')) {
+                    await openPromptCategorySubmenu();
+                }
+            }
+
+            if (isSavePromptModalOpen()) {
+                await refreshSavePromptCategoryMenu();
+            }
         }
 
         function loadScenario(id) {
@@ -1391,13 +1500,10 @@
                 alert('Fehler beim Speichern.');
                 return;
             }
-
-            promptCategoriesCache = await window.db.getPromptCategories();
-            renderPromptsAccordion();
-            if (promptMenuOpen) {
-                await openPromptCategorySubmenu();
+            await refreshPromptLibraryAndCategories();
+            if (isSavePromptModalOpen()) {
+                setSavePromptCategory(name);
             }
-
             closePromptCategoryModal();
         }
 
@@ -1408,26 +1514,40 @@
 
             menu.classList.remove('hidden');
 
-            const fromTable = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
-            const names1 = (fromTable || []).map(x => (typeof x === 'string' ? x : x.name)).filter(Boolean);
+            const names1 = (promptCategoriesCache || [])
+                .map(x => (typeof x === 'string' ? x : x.name))
+                .filter(Boolean)
+                .map(s => s.trim())
+                .filter(Boolean);
             const names2 = Array.isArray(promptLibraryCache)
                 ? [...new Set(promptLibraryCache.map(p => (p.category || '').trim()).filter(Boolean))]
                 : [];
 
             const all = [...new Set([...names1, ...names2])].sort((a, b) => a.localeCompare(b, 'de'));
 
+            const items = [];
+            items.push(`
+                <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
+                        onclick="selectPromptCategory(event, '')">
+                    Ohne Kategorie
+                </button>
+            `);
+
             if (!all.length) {
-                list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Keine Kategorien.</div>';
+                items.push('<div class="px-3 py-2 text-xs text-slate-500 italic">Keine Kategorien.</div>');
+                list.innerHTML = items.join('');
                 return;
             }
 
-            list.innerHTML = all.map(n => `
+            items.push(all.map(n => `
                 <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
                         title=${JSON.stringify(n)}
                         onclick='selectPromptCategory(event, ${JSON.stringify(n)})'>
                     ${escapeHtml(n)}
                 </button>
-            `).join('');
+            `).join(''));
+
+            list.innerHTML = items.join('');
         }
 
         function handlePromptCategoryCreateFromMenu(ev) {
@@ -1448,26 +1568,35 @@
                 return;
             }
 
-            const ok = await window.db.updateScenario(id, { category: categoryName });
-            if (!ok) {
+            const normalized = (categoryName || '').trim();
+            const catVal = normalized ? normalized : null;
+            const newKey = categoryKeyFromName(catVal || '');
+
+            try {
+                const ok = await window.db.updateScenario(id, { category: catVal });
+                if (!ok) {
+                    console.error('Kategorie konnte nicht gespeichert werden.');
+                    alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
+                    return;
+                }
+            } catch (err) {
+                console.error('Kategorie Update Fehler:', err);
                 alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
                 return;
             }
 
             if (Array.isArray(promptLibraryCache)) {
                 const p = promptLibraryCache.find(x => x.id == id);
-                if (p) p.category = categoryName;
+                if (p) p.category = catVal;
             }
 
-            closePromptItemMenu();
-            renderPromptsAccordion();
-
-            const key = categoryKeyFromName(categoryName);
             if (oldKey) promptOpenState[oldKey] = true;
-            promptOpenState[key] = true;
-            renderPromptsAccordion();
+            promptOpenState[newKey] = true;
+
+            closePromptItemMenu();
+            await refreshPromptLibraryAndCategories();
             if (oldKey) await loadPromptCategory(oldKey);
-            await loadPromptCategory(key);
+            await loadPromptCategory(newKey);
         }
 
         function escapeHtml(value) {
@@ -1824,6 +1953,92 @@
             }
         }
 
+        function isSavePromptModalOpen() {
+            const modal = document.getElementById('modal-save-prompt');
+            return !!(modal && !modal.classList.contains('hidden'));
+        }
+
+        function setSavePromptCategory(value) {
+            savePromptSelectedCategory = (value || '').trim();
+            const label = savePromptSelectedCategory || 'Ohne Kategorie';
+            const el = document.getElementById('save-prompt-category-value');
+            if (el) el.textContent = label;
+            closeSavePromptCategoryMenu();
+        }
+
+        function renderSavePromptCategoryMenu(categories) {
+            const list = document.getElementById('save-prompt-category-list');
+            if (!list) return;
+            const items = [];
+            items.push(`
+                <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
+                        onclick="setSavePromptCategory('')">
+                    Ohne Kategorie
+                </button>
+            `);
+            (categories || []).forEach(n => {
+                items.push(`
+                    <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
+                            title=${JSON.stringify(n)}
+                            onclick='setSavePromptCategory(${JSON.stringify(n)})'>
+                        ${escapeHtml(n)}
+                    </button>
+                `);
+            });
+            list.innerHTML = items.join('');
+        }
+
+        function openSavePromptCategoryMenu(ev) {
+            if (ev) ev.stopPropagation();
+            const menu = document.getElementById('save-prompt-category-menu');
+            const trigger = document.getElementById('save-prompt-category-trigger');
+            if (!menu || !trigger) return;
+            menu.classList.remove('hidden');
+            savePromptCategoryMenuOpen = true;
+            menu.onclick = (e) => e.stopPropagation();
+            requestAnimationFrame(() => {
+                const rect = trigger.getBoundingClientRect();
+                const menuHeight = menu.offsetHeight;
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
+                    menu.style.top = 'auto';
+                    menu.style.bottom = 'calc(100% + 6px)';
+                } else {
+                    menu.style.bottom = 'auto';
+                    menu.style.top = 'calc(100% + 6px)';
+                }
+            });
+        }
+
+        function closeSavePromptCategoryMenu() {
+            const menu = document.getElementById('save-prompt-category-menu');
+            if (menu) menu.classList.add('hidden');
+            savePromptCategoryMenuOpen = false;
+        }
+
+        async function refreshSavePromptCategoryMenu() {
+            try {
+                const rows = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
+                const names = (rows || [])
+                    .map(r => (typeof r === 'string' ? r : r.name))
+                    .filter(Boolean)
+                    .map(s => s.trim())
+                    .filter(Boolean);
+                const unique = [...new Set(names)].sort((a, b) => a.localeCompare(b, 'de'));
+                renderSavePromptCategoryMenu(unique);
+            } catch (e) {
+                console.error('Kategorie Dropdown Laden Fehler', e);
+                renderSavePromptCategoryMenu([]);
+            }
+        }
+
+        function handleSavePromptCategoryCreate(ev) {
+            if (ev) ev.stopPropagation();
+            closeSavePromptCategoryMenu();
+            openPromptCategoryModal();
+        }
+
         async function openSavePromptModal() {
             const modal = document.getElementById('modal-save-prompt');
             const inp = document.getElementById('save-prompt-name');
@@ -1833,28 +2048,8 @@
                 err.innerText = '';
             }
             if (inp) inp.value = '';
-            const sel = document.getElementById('save-prompt-category');
-            if (sel) {
-                sel.innerHTML = '<option value="">Ohne Kategorie</option>';
-                try {
-                    const rows = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
-                    const names = (rows || [])
-                        .map(r => (typeof r === 'string' ? r : r.name))
-                        .filter(Boolean)
-                        .map(s => s.trim())
-                        .filter(Boolean);
-                    const unique = [...new Set(names)].sort((a, b) => a.localeCompare(b, 'de'));
-                    unique.forEach(n => {
-                        const opt = document.createElement('option');
-                        opt.value = n;
-                        opt.textContent = n;
-                        sel.appendChild(opt);
-                    });
-                    sel.value = '';
-                } catch (e) {
-                    console.error('Kategorie Dropdown Laden Fehler', e);
-                }
-            }
+            setSavePromptCategory('');
+            await refreshSavePromptCategoryMenu();
             if (modal) modal.classList.remove('hidden');
             setTimeout(() => inp && inp.focus(), 50);
         }
@@ -1862,6 +2057,7 @@
         function closeSavePromptModal() {
             const modal = document.getElementById('modal-save-prompt');
             if (modal) modal.classList.add('hidden');
+            closeSavePromptCategoryMenu();
         }
 
         async function confirmSavePromptModal() {
@@ -1892,8 +2088,7 @@
                 return;
             }
 
-            const category = (document.getElementById('save-prompt-category')?.value || '').trim();
-            const catVal = category ? category : null;
+            const catVal = (savePromptSelectedCategory || '').trim() || null;
 
             if (currentMode === 'structured') {
                 const fieldsData = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
