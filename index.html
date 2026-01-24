@@ -103,6 +103,124 @@
             background-color: #1e293b; /* Slate 800 */
             color: white;
         }
+
+        :root{
+          --navy-deep:#020617;
+          --navy-sidebar:#0f172a;
+          --navy-border:#1e293b;
+          --brand-sky:#0ea5e9;
+          --brand-hover:#38bdf8;
+          --text:#e2e8f0;
+          --muted:#94a3b8;
+        }
+
+        .ui-backdrop{
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,.80);
+          backdrop-filter:blur(6px);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          padding:16px;
+        }
+
+        .ui-modal{
+          background:var(--navy-sidebar);
+          border:1px solid var(--navy-border);
+          border-radius:12px;
+          box-shadow:0 25px 50px -12px rgba(0,0,0,.45);
+          padding:24px;
+          width:100%;
+        }
+        .ui-modal-sm{ max-width:24rem; }
+        .ui-modal-lg{ max-width:32rem; }
+
+        .ui-modal-header{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          margin-bottom:16px;
+        }
+        .ui-modal-title{
+          font-size:1.25rem;
+          font-weight:700;
+          color:#fff;
+        }
+
+        .ui-icon-btn{
+          color:#64748b;
+          transition:color .15s ease, background .15s ease, transform .15s ease;
+          border-radius:8px;
+          padding:6px;
+        }
+        .ui-icon-btn:hover{ color:#fff; background:rgba(30,41,59,.40); }
+        .ui-icon-btn:active{ transform:scale(.98); }
+
+        .ui-label{
+          font-size:.75rem;
+          font-weight:700;
+          color:#94a3b8;
+          text-transform:uppercase;
+          letter-spacing:.12em;
+        }
+
+        .ui-input, .ui-select, .ui-textarea{
+          width:100%;
+          margin-top:8px;
+          border-radius:10px;
+          padding:12px;
+          background:var(--navy-deep);
+          border:1px solid var(--navy-border);
+          color:var(--text);
+          outline:none;
+          transition:border-color .15s ease, box-shadow .15s ease;
+        }
+        .ui-textarea{ min-height:120px; resize:vertical; }
+        .ui-input:focus, .ui-select:focus, .ui-textarea:focus{
+          border-color:var(--brand-sky);
+          box-shadow:0 0 0 1px var(--brand-sky);
+        }
+
+        .ui-actions{
+          display:flex;
+          justify-content:flex-end;
+          gap:12px;
+          margin-top:24px;
+        }
+
+        .ui-btn{
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          padding:10px 16px;
+          border-radius:10px;
+          font-size:.875rem;
+          font-weight:700;
+          transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+          user-select:none;
+        }
+        .ui-btn:active{ transform:scale(.98); }
+
+        .ui-btn-ghost{
+          color:var(--muted);
+          background:transparent;
+        }
+        .ui-btn-ghost:hover{ color:#fff; }
+
+        .ui-btn-primary{
+          background:var(--brand-sky);
+          color:var(--navy-deep);
+          box-shadow:0 0 20px -5px rgba(56,189,248,.30);
+        }
+        .ui-btn-primary:hover{ background:var(--brand-hover); }
+
+        .ui-btn-danger{
+          background:#ef4444;
+          color:#fff;
+        }
+        .ui-btn-danger:hover{ background:#dc2626; }
     </style>
 </head>
 <body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
@@ -269,20 +387,20 @@
         </main>
     </div>
 
-    <div id="modal-snippet" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 id="snippet-modal-title" class="text-xl font-bold text-white">Neuer Baustein</h3>
-                <button onclick="closeSnippetModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modal-snippet" class="ui-backdrop z-[110] hidden">
+        <div class="ui-modal ui-modal-lg">
+            <div class="ui-modal-header">
+                <h3 id="snippet-modal-title" class="ui-modal-title">Neuer Baustein</h3>
+                <button onclick="closeSnippetModal()" class="ui-icon-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
-                    <input id="snippet-name" type="text" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none" placeholder="z.B. Kontext-Short" />
+                    <label class="ui-label">Name</label>
+                    <input id="snippet-name" type="text" class="ui-input" placeholder="z.B. Kontext-Short" />
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kategorie</label>
-                    <select id="snippet-category" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none">
+                    <label class="ui-label">Kategorie</label>
+                    <select id="snippet-category" class="ui-select">
                         <option value="role">Rolle & Funktion</option>
                         <option value="context">Kontext</option>
                         <option value="task">Aufgabe</option>
@@ -292,23 +410,23 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baustein-Text</label>
-                    <textarea id="snippet-content" class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none min-h-[120px]" placeholder="Text für den Baustein..."></textarea>
+                    <label class="ui-label">Baustein-Text</label>
+                    <textarea id="snippet-content" class="ui-textarea" placeholder="Text für den Baustein..."></textarea>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 mt-6">
-                <button onclick="closeSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
-                <button onclick="saveSnippetFromModal()" class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">Speichern</button>
+            <div class="ui-actions">
+                <button onclick="closeSnippetModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
+                <button onclick="saveSnippetFromModal()" class="ui-btn ui-btn-primary">Speichern</button>
             </div>
         </div>
     </div>
-    <div id="modal-auth" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
-            <h3 class="text-xl font-bold text-white mb-4">Login</h3>
-            <button onclick="loginWithGoogle()" class="w-full py-3 bg-white text-navy-deep font-bold rounded flex justify-center gap-2 hover:bg-slate-100 transition-colors">
+    <div id="modal-auth" class="ui-backdrop z-[100] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <h3 class="ui-modal-title mb-4">Login</h3>
+            <button onclick="loginWithGoogle()" class="ui-btn w-full py-3 bg-white text-navy-deep font-bold rounded flex justify-center gap-2 hover:bg-slate-100 transition-colors">
                 <i class="fa-brands fa-google"></i> Google Login
             </button>
-            <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="mt-4 text-slate-500 text-sm w-full hover:text-white">Schließen</button>
+            <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="ui-btn ui-btn-ghost mt-4 w-full">Schließen</button>
         </div>
     </div>
 
@@ -337,49 +455,49 @@
         <button onclick="handleAskDeletePrompt()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
 
-    <div id="modal-snippet-delete" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
-            <h3 class="text-xl font-bold text-white mb-4">Unwiderruflich löschen?</h3>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeDeleteSnippetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Nein</button>
-                <button onclick="confirmDeleteSnippet()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md">Ja</button>
+    <div id="modal-snippet-delete" class="ui-backdrop z-[120] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <h3 class="ui-modal-title mb-4">Unwiderruflich löschen?</h3>
+            <div class="ui-actions">
+                <button onclick="closeDeleteSnippetModal()" class="ui-btn ui-btn-ghost">Nein</button>
+                <button onclick="confirmDeleteSnippet()" class="ui-btn ui-btn-danger">Ja</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-prompt-delete" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
-            <h3 class="text-xl font-bold text-white mb-4">Endgültig löschen?</h3>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeDeletePromptModal()" class="px-4 py-2 text-slate-400 hover:text-white">Nein</button>
-                <button onclick="confirmDeletePrompt()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md">Ja</button>
+    <div id="modal-prompt-delete" class="ui-backdrop z-[120] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <h3 class="ui-modal-title mb-4">Endgültig löschen?</h3>
+            <div class="ui-actions">
+                <button onclick="closeDeletePromptModal()" class="ui-btn ui-btn-ghost">Nein</button>
+                <button onclick="confirmDeletePrompt()" class="ui-btn ui-btn-danger">Ja</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-prompt-edit" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
-            <h3 class="text-xl font-bold text-white mb-2">Prompt bearbeiten</h3>
+    <div id="modal-prompt-edit" class="ui-backdrop z-[120] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <h3 class="ui-modal-title mb-2">Prompt bearbeiten</h3>
             <p class="text-sm text-slate-400">Modal folgt im nÃ¤chsten Schritt.</p>
-            <div class="flex justify-end mt-6">
-                <button onclick="closePromptEditModal()" class="px-4 py-2 text-slate-400 hover:text-white">SchlieÃŸen</button>
+            <div class="ui-actions">
+                <button onclick="closePromptEditModal()" class="ui-btn ui-btn-ghost">SchlieÃŸen</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-prompt-category" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-white">Kategorie anlegen</h3>
-                <button onclick="closePromptCategoryModal()" class="text-slate-500 hover:text-white">
+    <div id="modal-prompt-category" class="ui-backdrop z-[120] hidden">
+        <div class="ui-modal ui-modal-lg">
+            <div class="ui-modal-header">
+                <h3 class="ui-modal-title">Kategorie anlegen</h3>
+                <button onclick="closePromptCategoryModal()" class="ui-icon-btn">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <label class="block text-sm text-slate-300 mb-1">Name der Kategorie</label>
-            <input id="prompt-category-name" type="text" class="w-full bg-slate-900/40 border border-navy-border rounded-md p-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-sky" placeholder="z. B. Verwaltung, Workshop, ..." />
-            <div class="mt-6 flex justify-end gap-2">
-                <button onclick="closePromptCategoryModal()" class="px-4 py-2 rounded-md border border-navy-border text-slate-200 hover:bg-slate-800/50">Abbrechen</button>
-                <button onclick="savePromptCategoryFromModal()" class="px-4 py-2 rounded-md bg-brand-sky text-white hover:bg-brand-hover shadow-glow">Speichern</button>
+            <label class="ui-label">Name der Kategorie</label>
+            <input id="prompt-category-name" type="text" class="ui-input" placeholder="z. B. Verwaltung, Workshop, ..." />
+            <div class="ui-actions">
+                <button onclick="closePromptCategoryModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
+                <button onclick="savePromptCategoryFromModal()" class="ui-btn ui-btn-primary">Speichern</button>
             </div>
         </div>
     </div>
