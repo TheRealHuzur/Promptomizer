@@ -531,7 +531,7 @@
         </div>
     </div>
 
-    <div id="modal-prompt-category" class="ui-backdrop z-[120] hidden">
+    <div id="modal-prompt-category" class="ui-backdrop z-[140] hidden">
         <div class="ui-modal ui-modal-lg">
             <div class="ui-modal-header">
                 <h3 class="ui-modal-title">Kategorie anlegen</h3>
@@ -1479,7 +1479,10 @@
             const modal = document.getElementById('modal-prompt-category');
             const inp = document.getElementById('prompt-category-name');
             if (inp) inp.value = prefill || '';
-            if (modal) modal.classList.remove('hidden');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.zIndex = '140';
+            }
             setTimeout(() => { if (inp) inp.focus(); }, 50);
         }
 
@@ -1556,8 +1559,11 @@
             openPromptCategoryModal();
         }
 
-        async function selectPromptCategory(ev, categoryName) {
-            ev.stopPropagation();
+                async function selectPromptCategory(ev, categoryName) {
+            try {
+                const e = ev || window.event;
+                if (e && e.stopPropagation) e.stopPropagation();
+            } catch (_) {}
 
             const id = promptMenuPromptId;
             const oldKey = promptMenuCategoryKey;
@@ -1573,29 +1579,33 @@
             const newKey = categoryKeyFromName(catVal || '');
 
             try {
+                console.log('move prompt', id, 'to category', catVal);
                 const ok = await window.db.updateScenario(id, { category: catVal });
                 if (!ok) {
                     console.error('Kategorie konnte nicht gespeichert werden.');
-                    alert('Kategorie konnte nicht gespeichert werden. Bitte Console prÃ¼fen.');
+                    alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
                     return;
                 }
             } catch (err) {
                 console.error('Kategorie Update Fehler:', err);
-                alert('Kategorie konnte nicht gespeichert werden. Bitte Console prÃ¼fen.');
+                alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
                 return;
-            }
-
-            if (Array.isArray(promptLibraryCache)) {
-                const p = promptLibraryCache.find(x => x.id == id);
-                if (p) p.category = catVal;
             }
 
             if (oldKey) promptOpenState[oldKey] = true;
             promptOpenState[newKey] = true;
 
+            promptLibraryCache = await window.db.getScenarios();
+            renderPromptsAccordion();
+
+            const oldBody = oldKey ? document.getElementById(`prompt-body-${oldKey}`) : null;
+            const newBody = document.getElementById(`prompt-body-${newKey}`);
+            if (oldBody) oldBody.dataset.loaded = 'false';
+            if (newBody) newBody.dataset.loaded = 'false';
+
             closePromptItemMenu();
-            await refreshPromptLibraryAndCategories();
-            if (oldKey) await loadPromptCategory(oldKey);
+
+            if (oldKey && oldKey !== newKey) await loadPromptCategory(oldKey);
             await loadPromptCategory(newKey);
         }
 
@@ -2136,3 +2146,4 @@
     <script src="db.js"></script>
 </body>
 </html>
+

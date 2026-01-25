@@ -240,7 +240,7 @@ window.db = {
         if (!window.currentUser) return false; 
 
         const { error } = await supabaseClient
-            .from('library') // Achte darauf, dass deine Tabelle in Supabase 'library' oder 'scenarios' heißt. Im V3 Code war es 'scenarios' oder 'library'. Ich nutze hier 'library' basierend auf deinem letzten Input.
+            .from('library')
             .insert({
                 user_id: window.currentUser.id,
                 name: scenario.name,
@@ -249,17 +249,6 @@ window.db = {
             });
         
         if (error) {
-            // Fallback falls Tabelle 'scenarios' heißt
-            if(error.code === '42P01') { // Undefined table
-                 const { error: err2 } = await supabaseClient.from('scenarios').insert({
-                    user_id: window.currentUser.id,
-                    name: scenario.name,
-                    fields: scenario.fields,
-                    category: scenario.category ?? null
-                });
-                if(err2) { console.error(err2); return false; }
-                return true;
-            }
             console.error("Library Save Error:", error);
             return false;
         }
@@ -268,20 +257,17 @@ window.db = {
 
     async getScenarios() {
         if (!window.currentUser) return [];
+        const uid = window.currentUser.id;
 
-        // Versuch 'library', Fallback auf 'scenarios'
-        let { data, error } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('library')
             .select('*')
+            .eq('user_id', uid)
             .order('created_at', { ascending: false });
         
         if (error) {
-             const { data: data2, error: error2 } = await supabaseClient
-            .from('scenarios')
-            .select('*')
-            .order('created_at', { ascending: false });
-            if(error2) return [];
-            return data2;
+            console.error("Library Fetch Error:", error);
+            return [];
         }
         return data;
     },
@@ -290,9 +276,9 @@ window.db = {
         if (!window.currentUser) return [];
         const { data, error } = await supabaseClient
             .from('prompt_categories')
-            .select('name')
+            .select('*')
             .eq('user_id', window.currentUser.id)
-            .order('created_at', { ascending: true });
+            .order('name', { ascending: true });
         if (error) {
             console.error("Prompt Categories Fetch Error:", error);
             return [];
@@ -306,7 +292,6 @@ window.db = {
             .from('prompt_categories')
             .insert({ user_id: window.currentUser.id, name });
         if (error) {
-            if (error.code === '23505') return true;
             console.error("Prompt Category Create Error:", error);
             return false;
         }
@@ -317,29 +302,23 @@ window.db = {
         if (!window.currentUser) return false;
         const uid = window.currentUser.id;
 
-        const { error } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('library')
             .update(patch)
             .eq('id', id)
-            .eq('user_id', uid);
+            .eq('user_id', uid)
+            .select('id');
 
-        if (!error) return true;
-
-        if (error.code !== '42P01') {
+        if (error) {
             console.error("Scenario Update Error:", error);
             return false;
         }
 
-        const { error: err2 } = await supabaseClient
-            .from('scenarios')
-            .update(patch)
-            .eq('id', id)
-            .eq('user_id', uid);
-
-        if (err2) {
-            console.error("Scenario Update Error (fallback):", err2);
+        if (!data || data.length === 0) {
+            console.error("Scenario Update: 0 rows updated", { id, uid, patch });
             return false;
         }
+
         return true;
     },
     
@@ -348,18 +327,16 @@ window.db = {
             if (!window.currentUser) return false;
             const uid = window.currentUser.id;
 
-            await supabaseClient
+            const { error } = await supabaseClient
                 .from('library')
                 .delete()
                 .eq('id', id)
                 .eq('user_id', uid);
 
-            // Fallback Tabelle (falls vorhanden/benutzt)
-            await supabaseClient
-                .from('scenarios')
-                .delete()
-                .eq('id', id)
-                .eq('user_id', uid);
+            if (error) {
+                console.error('deleteScenario error', error);
+                return false;
+            }
 
             return true;
         } catch (e) {
@@ -368,4 +345,5 @@ window.db = {
         }
     }
 };
+
 
