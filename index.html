@@ -54,6 +54,11 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; border: 1px solid #0f172a; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        textarea::-webkit-scrollbar { width: 10px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; border: 1px solid #0f172a; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #475569; }
+
 
         /* Transitions */
         .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -659,6 +664,7 @@
         let isPromptsOpen = true;
         let isSnippetsOpen = true;
         let activeFieldId = null;
+        let fieldFullscreenState = {};
         let snippetOpenState = { role: false, context: false, task: false, style: false, format: false, free: false };
         let snippetMenuOpen = false;
         let snippetMenuSnippetId = null;
@@ -811,9 +817,11 @@
                         class="w-full h-32 rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed"
                         placeholder="${f.placeholder}"
                         onfocus="setActiveField('${f.id}')"></textarea>
-                    
-                    <div class="absolute top-0 right-0">
-                        <button class="group p-1.5 bg-transparent rounded-md border border-transparent hover:bg-slate-800/60 hover:border-brand-sky hover:shadow-glow transform active:scale-95 transition-all" onclick="openSnippetModalFromField('${f.id}')" title="Als Baustein speichern">
+                    <div class="absolute top-0 right-0 flex items-center gap-1">
+                        <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); toggleFieldFullscreen('${f.id}')" title="Feld vergrößern">
+                            <i id="field-fullscreen-icon-${f.id}" class="fa-solid fa-up-right-and-down-left-from-center text-brand-sky group-hover:text-brand-hover transition-colors"></i>
+                        </button>
+                        <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); openSnippetModalFromField('${f.id}')" title="Als Baustein speichern">
                             <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                         </button>
                     </div>
@@ -821,6 +829,27 @@
             `).join('');
         }
 
+        function toggleFieldFullscreen(fieldId) {
+            const ta = document.getElementById(`input-${fieldId}`);
+            const icon = document.getElementById(`field-fullscreen-icon-${fieldId}`);
+            if (!ta || !icon) return;
+
+            const isExpanded = !!fieldFullscreenState[fieldId];
+            if (!isExpanded) {
+                const baseHeight = ta.offsetHeight;
+                ta.dataset.baseHeightPx = baseHeight;
+                ta.style.height = (baseHeight * 3) + 'px';
+                fieldFullscreenState[fieldId] = true;
+                icon.classList.remove('fa-up-right-and-down-left-from-center');
+                icon.classList.add('fa-down-left-and-up-right-to-center');
+            } else {
+                const baseHeight = parseFloat(ta.dataset.baseHeightPx || '0');
+                ta.style.height = baseHeight ? (baseHeight + 'px') : '';
+                fieldFullscreenState[fieldId] = false;
+                icon.classList.remove('fa-down-left-and-up-right-to-center');
+                icon.classList.add('fa-up-right-and-down-left-from-center');
+            }
+        }
         // --- LAYOUT LOGIC ---
         function toggleSidebar(side) {
             const el = document.getElementById(`sidebar-${side}`);
@@ -2488,6 +2517,8 @@
     <script src="db.js"></script>
 </body>
 </html>
+
+
 
 
 
