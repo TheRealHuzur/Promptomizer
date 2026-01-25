@@ -286,13 +286,7 @@
                         </button>
                     </div>
                     <div id="prompts-body" class="px-4 pt-1 pb-2">
-                        <button onclick="saveCurrentToLibrary()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                            <span class="text-brand-sky text-sm font-medium">Prompt speichern</span>
-                        </button>
-                        <button onclick="openPromptCategoryModal()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                            <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
-                        </button>
-                        <div id="library-scenarios" class="space-y-0.5">
+<div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
                     </div>
@@ -305,10 +299,7 @@
                             <i id="snippets-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
                         </button>
                         <div id="snippets-body" class="px-4 pt-1 pb-2">
-                            <button onclick="openSnippetModal()" class="w-full flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                                <span class="text-brand-sky text-sm font-medium">Neuer Baustein</span>
-                            </button>
-                            <div id="library-snippets" class="space-y-0.5">
+<div id="library-snippets" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
                             </div>
                         </div>
@@ -368,6 +359,9 @@
                 <div id="view-settings" class="hidden max-w-4xl mx-auto fade-in pt-4">
                     <div class="flex justify-between items-center mb-6 border-b border-navy-border pb-4">
                         <h2 id="settings-title" class="text-2xl font-bold text-white">Kategorien verwalten</h2>
+                        <button onclick="openPromptCategoryModal()" class="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
+                        </button>
                     </div>
                     <div id="settings-content" class="space-y-4">
                         <div class="text-center text-slate-500 py-10">Inhalte folgen.</div>
@@ -377,14 +371,22 @@
             </div>
 
             <footer class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
-                <div class="w-full max-w-4xl flex justify-end gap-4">
-                    <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
-                        Reset
-                    </button>
-                    <button onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
-                        <i class="fa-solid fa-copy"></i>
-                        <span>Kopieren</span>
-                    </button>
+                <div class="w-full max-w-4xl flex items-center gap-4">
+                    <div id="footer-save-wrap">
+                        <button onclick="saveCurrentToLibrary()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Prompt speichern</span>
+                        </button>
+                    </div>
+                    <div class="ml-auto flex items-center gap-4">
+                        <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
+                            Reset
+                        </button>
+                        <button id="btn-copy" onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Kopieren</span>
+                        </button>
+                    </div>
                 </div>
             </footer>
 
@@ -1215,7 +1217,9 @@
             if(activeBtn) {
                 activeBtn.classList.remove('text-slate-500', 'border-transparent');
                 activeBtn.classList.add('active-nav');
-            }
+            }
+            const saveWrap = document.getElementById('footer-save-wrap');
+            if (saveWrap) saveWrap.classList.toggle('hidden', viewId !== 'editor');
 
             if(viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
         }
@@ -1281,7 +1285,7 @@
                         timestamp: new Date().toISOString()
                     });
                 }
-                const btn = document.querySelector('footer button:last-child');
+                const btn = document.getElementById('btn-copy');
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>COPIED!</span>';
                 btn.classList.replace('bg-brand-sky', 'bg-green-500');
@@ -2484,6 +2488,10 @@
     <script src="db.js"></script>
 </body>
 </html>
+
+
+
+
 
 
 
