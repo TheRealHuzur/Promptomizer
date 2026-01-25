@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="de" class="dark antialiased">
 <head>
     <meta charset="UTF-8">
@@ -497,7 +497,7 @@
 
     <div id="manage-category-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
         <button onclick="handleManageCategoryRename()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Umbenennen</button>
-        <button onclick="handleManageCategoryDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+        <button onclick="handleManageCategoryDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">LÃ¶schen</button>
     </div>
     <div id="settings-nav-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-56">
         <button onclick="openSettingsPage('categories')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorien verwalten</button>
@@ -571,11 +571,11 @@
 
     <div id="modal-category-delete" class="ui-backdrop z-[120] hidden">
         <div class="ui-modal ui-modal-sm">
-            <h3 class="ui-modal-title mb-3">Kategorie löschen</h3>
-            <p class="text-sm text-slate-400 mb-4">Die Prompts in dieser Kategorie werden nicht gelöscht. Sie erscheinen anschließend unter „Ohne Kategorie“.</p>
+            <h3 class="ui-modal-title mb-3">Kategorie lÃ¶schen</h3>
+            <p class="text-sm text-slate-400 mb-4">Die Prompts in dieser Kategorie werden nicht gelÃ¶scht. Sie erscheinen anschlieÃŸend unter â€žOhne Kategorieâ€œ.</p>
             <div class="ui-actions">
                 <button onclick="closeDeleteCategoryModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
-                <button onclick="confirmDeleteCategory()" class="ui-btn ui-btn-danger">Löschen</button>
+                <button onclick="confirmDeleteCategory()" class="ui-btn ui-btn-danger">LÃ¶schen</button>
             </div>
         </div>
     </div>
@@ -972,7 +972,7 @@
                 const promptList = filtered.length ? `
                     <div class="space-y-0.5">
                         ${filtered.map(p => `
-                            <div id="manage-prompt-${p.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${p.id})">
+                            <div id="manage-prompt-${p.id}" class="group w-full py-1 px-1 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${p.id})">
                                 <div class="flex items-center justify-between w-full">
                                     <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(p.name || '')}>${p.name}</div>
                                     <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${p.id})">
@@ -982,10 +982,10 @@
                             </div>
                         `).join('')}
                     </div>
-                ` : '<div class="text-xs text-slate-600 italic py-2">Keine Prompts.</div>';
+                ` : '<div class="text-xs text-slate-600 italic py-2 pl-1">Keine Prompts.</div>';
 
                 const menuButton = cat.isPseudo ? '' : `
-                    <button type="button" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="event.stopPropagation(); event.preventDefault(); openManageCategoryMenu(event, '${cat.id}', ${JSON.stringify(cat.name)})">
+                    <button type="button" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick='return openManageCategoryMenu(event, ${JSON.stringify(cat.id)}, ${JSON.stringify(cat.name)})'>
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
                 `;
@@ -1001,7 +1001,7 @@
                                 <i id="manage-cat-icon-${key}" class="fa-solid fa-chevron-down text-xs transition-transform ${manageCategoryOpenState[key] ? 'rotate-180' : ''}"></i>
                             </div>
                         </div>
-                        <div id="manage-cat-body-${key}" class="${manageCategoryOpenState[key] ? '' : 'hidden'} pl-2 pr-0 pb-2">
+                        <div id="manage-cat-body-${key}" class="${manageCategoryOpenState[key] ? '' : 'hidden'} pl-8 pr-0 pb-2">
                             ${promptList}
                         </div>
                     </div>
@@ -1018,15 +1018,15 @@
             body.classList.toggle('hidden', !manageCategoryOpenState[key]);
             if (icon) icon.classList.toggle('rotate-180', manageCategoryOpenState[key]);
         }
-
-                function openManageCategoryMenu(ev, categoryId, categoryName) {
+        function openManageCategoryMenu(ev, categoryId, categoryName) {
             const e = ev || window.event;
             if (e) {
                 if (e.stopPropagation) e.stopPropagation();
                 if (e.preventDefault) e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
             }
             const menu = document.getElementById('manage-category-menu');
-            if (!menu) return;
+            if (!menu) return false;
 
             if (snippetMenuOpen) closeSnippetItemMenu();
             if (promptMenuOpen) closePromptItemMenu();
@@ -1037,17 +1037,37 @@
             manageCategoryMenuName = categoryName || '';
 
             menu.classList.remove('hidden');
-            const r = e && e.currentTarget ? e.currentTarget.getBoundingClientRect() : null;
-            if (r) {
-                menu.style.top = (r.bottom + 6) + 'px';
-                menu.style.left = (r.right - menu.offsetWidth) + 'px';
-                if (menu.offsetWidth === 0) {
-                    menu.classList.remove('hidden');
-                    menu.style.left = (r.right - menu.offsetWidth) + 'px';
+            const target = e && e.currentTarget ? e.currentTarget : null;
+            const positionMenu = (attempt = 0) => {
+                if (!target) return;
+                const rect = target.getBoundingClientRect();
+                const menuWidth = menu.offsetWidth;
+                const menuHeight = menu.offsetHeight;
+                if ((!menuWidth || !menuHeight) && attempt < 2) {
+                    requestAnimationFrame(() => positionMenu(attempt + 1));
+                    return;
                 }
-            }
+                if (!menuWidth || !menuHeight) return;
+
+                let left = rect.right - menuWidth;
+                let top = rect.bottom + 6;
+
+                if (rect.bottom + menuHeight + 8 > window.innerHeight && rect.top - menuHeight - 6 >= 8) {
+                    top = rect.top - menuHeight - 6;
+                }
+
+                const maxLeft = window.innerWidth - menuWidth - 8;
+                const maxTop = window.innerHeight - menuHeight - 8;
+                left = Math.min(Math.max(8, left), Math.max(8, maxLeft));
+                top = Math.min(Math.max(8, top), Math.max(8, maxTop));
+
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+            };
+            requestAnimationFrame(() => positionMenu());
             manageCategoryMenuOpen = true;
             menu.onclick = (evt) => evt.stopPropagation();
+            return false;
         }
 
         function closeManageCategoryMenu() {
@@ -1127,7 +1147,7 @@
 
             const ok = await window.db.renamePromptCategory(id, oldName, newName);
             if (!ok) {
-                alert('Kategorie konnte nicht umbenannt werden. Bitte Console prÃ¼fen.');
+                alert('Kategorie konnte nicht umbenannt werden. Bitte Konsole prÃ¼fen.');
                 return;
             }
 
@@ -1166,7 +1186,7 @@
 
             const ok = await window.db.deletePromptCategory(id, name);
             if (!ok) {
-                alert('Kategorie konnte nicht gelÃ¶scht werden. Bitte Console prÃ¼fen.');
+                alert('Kategorie konnte nicht gelÃ¶scht werden. Bitte Konsole prÃ¼fen.');
                 return;
             }
 
@@ -1650,7 +1670,7 @@
             });
 
             if (!filtered.length) {
-                body.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Keine Prompts.</div>';
+                body.innerHTML = '<div class="text-xs text-slate-600 italic py-2 pl-1">Keine Prompts.</div>';
                 body.dataset.loaded = 'true';
                 return;
             }
@@ -1888,12 +1908,12 @@
                 const ok = await window.db.updateScenario(id, { category: catVal });
                 if (!ok) {
                     console.error('Kategorie konnte nicht gespeichert werden.');
-                    alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
+                    alert('Kategorie konnte nicht gespeichert werden. Bitte Konsole prÃ¼fen.');
                     return;
                 }
             } catch (err) {
                 console.error('Kategorie Update Fehler:', err);
-                alert('Kategorie konnte nicht gespeichert werden. Bitte Console prüfen.');
+                alert('Kategorie konnte nicht gespeichert werden. Bitte Konsole prÃ¼fen.');
                 return;
             }
 
@@ -2464,6 +2484,16 @@
     <script src="db.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 
