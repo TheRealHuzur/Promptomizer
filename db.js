@@ -276,7 +276,7 @@ window.db = {
         if (!window.currentUser) return [];
         const { data, error } = await supabaseClient
             .from('prompt_categories')
-            .select('*')
+            .select('id, name, created_at')
             .eq('user_id', window.currentUser.id)
             .order('name', { ascending: true });
         if (error) {
@@ -295,6 +295,86 @@ window.db = {
             console.error("Prompt Category Create Error:", error);
             return false;
         }
+        return true;
+    },
+
+    async renamePromptCategory(categoryId, oldName, newName) {
+        if (!window.currentUser) return false;
+        const uid = window.currentUser.id;
+
+        const { data, error } = await supabaseClient
+            .from('prompt_categories')
+            .update({ name: newName })
+            .eq('id', categoryId)
+            .eq('user_id', uid)
+            .select('id');
+
+        if (error) {
+            console.error('Prompt Category Rename Error:', error);
+            return false;
+        }
+
+        if (!data || data.length === 0) {
+            console.error('Prompt Category Rename: 0 rows updated', { categoryId, uid, oldName, newName });
+            return false;
+        }
+
+        const { data: rows, error: err2 } = await supabaseClient
+            .from('library')
+            .update({ category: newName })
+            .eq('user_id', uid)
+            .eq('category', oldName)
+            .select('id');
+
+        if (err2) {
+            console.error('Prompt Category Rename Library Error:', err2);
+            return false;
+        }
+
+        if (!rows || rows.length === 0) {
+            console.error('Prompt Category Rename: 0 prompts updated', { categoryId, uid, oldName, newName });
+        }
+
+        return true;
+    },
+
+    async deletePromptCategory(categoryId, categoryName) {
+        if (!window.currentUser) return false;
+        const uid = window.currentUser.id;
+
+        const { data, error } = await supabaseClient
+            .from('prompt_categories')
+            .delete()
+            .eq('id', categoryId)
+            .eq('user_id', uid)
+            .select('id');
+
+        if (error) {
+            console.error('Prompt Category Delete Error:', error);
+            return false;
+        }
+
+        if (!data || data.length === 0) {
+            console.error('Prompt Category Delete: 0 rows deleted', { categoryId, uid, categoryName });
+            return false;
+        }
+
+        const { data: rows, error: err2 } = await supabaseClient
+            .from('library')
+            .update({ category: null })
+            .eq('user_id', uid)
+            .eq('category', categoryName)
+            .select('id');
+
+        if (err2) {
+            console.error('Prompt Category Delete Library Error:', err2);
+            return false;
+        }
+
+        if (!rows || rows.length === 0) {
+            console.error('Prompt Category Delete: 0 prompts updated', { categoryId, uid, categoryName });
+        }
+
         return true;
     },
 
