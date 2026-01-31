@@ -364,9 +364,7 @@
                 <div id="view-settings" class="hidden max-w-4xl mx-auto fade-in pt-4">
                     <div class="flex justify-between items-center mb-6 border-b border-navy-border pb-4">
                         <h2 id="settings-title" class="text-2xl font-bold text-white">Kategorien verwalten</h2>
-                        <button onclick="openPromptCategoryModal()" class="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
-                            <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
-                        </button>
+                        <div id="settings-header-action"></div>
                     </div>
                     <div id="settings-content" class="space-y-4">
                         <div class="text-center text-slate-500 py-10">Inhalte folgen.</div>
@@ -506,10 +504,23 @@
         <button onclick="handleManageCategoryRename()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Umbenennen</button>
         <button onclick="handleManageCategoryDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
+    <div id="manage-snippet-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
+        <button onclick="handleManageSnippetEdit()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+        <button id="manage-snippet-target-trigger" class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60" onmouseenter="openManageSnippetTargetSubmenu()" onclick="return false;">
+            <span>Baustein</span>
+            <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+        </button>
+        <button onclick="handleManageSnippetDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+    </div>
+    <div id="manage-snippet-target-submenu" class="fixed z-[121] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-64">
+        <div id="manage-snippet-target-submenu-list" class="py-1">
+            <div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>
+        </div>
+    </div>
     <div id="settings-nav-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-56">
         <button onclick="openSettingsPage('categories')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorien verwalten</button>
+        <button onclick="openSettingsPage('snippets')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bausteine verwalten</button>
         <button onclick="openSettingsPage('help')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Hilfe</button>
-        <button onclick="openSettingsPage('import')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Import & Export</button>
     </div>
 
     <div id="modal-snippet-delete" class="ui-backdrop z-[120] hidden">
@@ -697,6 +708,13 @@
         let pendingDeleteManageCategoryName = '';
         let manageCategoriesCache = [];
         let managePromptsCache = [];
+        let manageSnippetsOpenState = {};
+        let manageSnippetsCacheByCat = {};
+        let manageSnippetCacheById = {};
+        let manageSnippetMenuOpen = false;
+        let manageSnippetMenuSnippetId = null;
+        let manageSnippetMenuCategoryId = null;
+        let editingSnippetOriginalCategoryId = null;
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -705,6 +723,7 @@
             document.addEventListener('click', (ev) => {
                 if (snippetMenuOpen) closeSnippetItemMenu();
                 if (promptMenuOpen) closePromptItemMenu();
+                if (manageSnippetMenuOpen) closeManageSnippetMenu();
                 if (savePromptCategoryMenuOpen) {
                     const field = document.getElementById('save-prompt-category-field');
                     if (!field || !field.contains(ev.target)) closeSavePromptCategoryMenu();
@@ -714,6 +733,7 @@
             });
             document.addEventListener('keydown', (ev) => {
                 if (ev.key === 'Escape' && savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+                if (ev.key === 'Escape' && manageSnippetMenuOpen) closeManageSnippetMenu();
                 if (ev.key === 'Escape' && manageCategoryMenuOpen) closeManageCategoryMenu();
                 if (ev.key === 'Escape' && settingsMenuOpen) closeSettingsMenu();
             });
@@ -901,7 +921,9 @@
 
             if (snippetMenuOpen) closeSnippetItemMenu();
             if (promptMenuOpen) closePromptItemMenu();
+            if (manageSnippetMenuOpen) closeManageSnippetMenu();
             if (savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+            if (manageCategoryMenuOpen) closeManageCategoryMenu();
 
             menu.classList.remove('hidden');
             const rect = target.getBoundingClientRect();
@@ -926,17 +948,35 @@
         function renderSettingsPage() {
             const titleEl = document.getElementById('settings-title');
             const contentEl = document.getElementById('settings-content');
+            const actionEl = document.getElementById('settings-header-action');
             const map = {
                 categories: 'Kategorien verwalten',
+                snippets: 'Bausteine verwalten',
                 help: 'Hilfe',
                 import: 'Import & Export'
             };
             const title = map[settingsCurrentPage] || 'Einstellungen & Hilfe';
             if (titleEl) titleEl.textContent = title;
+            if (actionEl) {
+                if (settingsCurrentPage === 'categories') {
+                    actionEl.innerHTML = `
+                        <button onclick="openPromptCategoryModal()" class="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
+                        </button>
+                    `;
+                } else {
+                    actionEl.innerHTML = '';
+                }
+            }
             if (contentEl) {
                 if (settingsCurrentPage === 'categories') {
                     contentEl.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Lade...</div>';
                     loadManageCategoriesPage();
+                    return;
+                }
+                if (settingsCurrentPage === 'snippets') {
+                    contentEl.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Lade...</div>';
+                    loadManageSnippetsPage();
                     return;
                 }
                 contentEl.innerHTML = '<div class="text-center text-slate-500 py-10">Inhalte folgen.</div>';
@@ -1049,6 +1089,265 @@
             body.classList.toggle('hidden', !manageCategoryOpenState[key]);
             if (icon) icon.classList.toggle('rotate-180', manageCategoryOpenState[key]);
         }
+
+        async function loadManageSnippetsPage() {
+            const contentEl = document.getElementById('settings-content');
+            if (!contentEl) return;
+
+            if (!window.currentUser) {
+                contentEl.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Bitte einloggen, um Bausteine zu verwalten.</div>';
+                return;
+            }
+
+            if (!window.db || !window.db.getSnippets) {
+                contentEl.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Datenbank nicht verfügbar.</div>';
+                return;
+            }
+
+            manageSnippetsCacheByCat = {};
+            manageSnippetCacheById = {};
+
+            for (const cat of SNIPPET_CATEGORIES) {
+                if (manageSnippetsOpenState[cat.id] === undefined) manageSnippetsOpenState[cat.id] = false;
+                const rows = await window.db.getSnippets({ mode: cat.mode, fieldId: cat.id });
+                const list = Array.isArray(rows) ? rows : [];
+                manageSnippetsCacheByCat[cat.id] = list;
+                list.forEach(s => { manageSnippetCacheById[s.id] = s; });
+            }
+
+            renderManageSnippetsAccordion();
+        }
+
+        function renderManageSnippetsAccordion() {
+            const container = document.getElementById('settings-content');
+            if (!container) return;
+
+            container.innerHTML = SNIPPET_CATEGORIES.map(cat => {
+                if (manageSnippetsOpenState[cat.id] === undefined) manageSnippetsOpenState[cat.id] = false;
+                const snippets = manageSnippetsCacheByCat[cat.id] || [];
+                const snippetList = snippets.length ? `
+                    <div class="space-y-0.5">
+                        ${snippets.map(snippet => {
+                            manageSnippetCacheById[snippet.id] = snippet;
+                            return `
+                                <div id="manage-snippet-${snippet.id}" class="group w-full py-1 px-1 rounded hover:bg-slate-800/50 transition-colors">
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(snippet.name || '')}>${snippet.name}</div>
+                                        <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openManageSnippetMenu(event, '${cat.id}', ${snippet.id})">
+                                            <i class="fa-solid fa-ellipsis"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                ` : '<div class="text-xs text-slate-600 italic py-2 pl-1">Keine Bausteine.</div>';
+
+                return `                    <div>
+                        <div class="group w-full flex items-center justify-between p-2 text-left hover:bg-slate-800/50 rounded cursor-pointer" role="button" tabindex="0" onclick="toggleManageSnippetCategory('${cat.id}')">
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <i class="fa-regular fa-folder text-sm text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                                <span class="truncate text-sm font-bold text-slate-300">${cat.label}</span>
+                            </div>
+                            <i id="manage-snippet-icon-${cat.id}" class="fa-solid fa-chevron-down text-xs transition-transform ${manageSnippetsOpenState[cat.id] ? 'rotate-180' : ''}"></i>
+                        </div>
+                        <div id="manage-snippet-body-${cat.id}" class="${manageSnippetsOpenState[cat.id] ? '' : 'hidden'} pl-8 pr-0 pb-2">
+                            ${snippetList}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleManageSnippetCategory(catId) {
+            const body = document.getElementById(`manage-snippet-body-${catId}`);
+            const icon = document.getElementById(`manage-snippet-icon-${catId}`);
+            if (!body) return;
+
+            manageSnippetsOpenState[catId] = !manageSnippetsOpenState[catId];
+            body.classList.toggle('hidden', !manageSnippetsOpenState[catId]);
+            if (icon) icon.classList.toggle('rotate-180', manageSnippetsOpenState[catId]);
+        }
+
+        async function refreshManageSnippetCategory(catId) {
+            const cat = SNIPPET_CATEGORIES.find(c => c.id === catId);
+            if (!cat || !window.db || !window.db.getSnippets) return;
+            const rows = await window.db.getSnippets({ mode: cat.mode, fieldId: cat.id });
+            const list = Array.isArray(rows) ? rows : [];
+            manageSnippetsCacheByCat[cat.id] = list;
+            list.forEach(s => { manageSnippetCacheById[s.id] = s; });
+        }
+
+        function openManageSnippetMenu(ev, catId, snippetId) {
+            const e = ev || window.event;
+            if (e) {
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            }
+            const menu = document.getElementById('manage-snippet-menu');
+            if (!menu) return false;
+
+            if (snippetMenuOpen) closeSnippetItemMenu();
+            if (promptMenuOpen) closePromptItemMenu();
+            if (manageCategoryMenuOpen) closeManageCategoryMenu();
+            if (settingsMenuOpen) closeSettingsMenu();
+            if (manageSnippetMenuOpen) closeManageSnippetMenu();
+
+            manageSnippetMenuSnippetId = snippetId;
+            manageSnippetMenuCategoryId = catId;
+
+            const submenu = document.getElementById('manage-snippet-target-submenu');
+            if (submenu) submenu.classList.add('hidden');
+            const list = document.getElementById('manage-snippet-target-submenu-list');
+            if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
+
+            menu.classList.remove('hidden');
+            const target = e && e.currentTarget ? e.currentTarget : null;
+            const positionMenu = (attempt = 0) => {
+                if (!target) return;
+                const rect = target.getBoundingClientRect();
+                const menuWidth = menu.offsetWidth;
+                const menuHeight = menu.offsetHeight;
+                if ((!menuWidth || !menuHeight) && attempt < 2) {
+                    requestAnimationFrame(() => positionMenu(attempt + 1));
+                    return;
+                }
+                if (!menuWidth || !menuHeight) return;
+
+                let left = rect.right - menuWidth;
+                let top = rect.bottom + 6;
+
+                if (rect.bottom + menuHeight + 8 > window.innerHeight && rect.top - menuHeight - 6 >= 8) {
+                    top = rect.top - menuHeight - 6;
+                }
+
+                const maxLeft = window.innerWidth - menuWidth - 8;
+                const maxTop = window.innerHeight - menuHeight - 8;
+                left = Math.min(Math.max(8, left), Math.max(8, maxLeft));
+                top = Math.min(Math.max(8, top), Math.max(8, maxTop));
+
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+            };
+            requestAnimationFrame(() => positionMenu());
+            manageSnippetMenuOpen = true;
+            menu.onclick = (evt) => evt.stopPropagation();
+            return false;
+        }
+
+        function closeManageSnippetMenu() {
+            const menu = document.getElementById('manage-snippet-menu');
+            const submenu = document.getElementById('manage-snippet-target-submenu');
+            if (menu) menu.classList.add('hidden');
+            if (submenu) submenu.classList.add('hidden');
+            manageSnippetMenuOpen = false;
+            manageSnippetMenuSnippetId = null;
+            manageSnippetMenuCategoryId = null;
+        }
+
+        function openManageSnippetTargetSubmenu() {
+            const menu = document.getElementById('manage-snippet-target-submenu');
+            const list = document.getElementById('manage-snippet-target-submenu-list');
+            const trigger = document.getElementById('manage-snippet-target-trigger');
+            if (!menu || !list || !trigger) return;
+
+            const items = SNIPPET_CATEGORIES.map(cat => `
+                <button class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800/60 truncate"
+                        title=${JSON.stringify(cat.label)}
+                        onclick="selectManageSnippetTarget(event, '${cat.id}')">
+                    ${escapeHtml(cat.label)}
+                </button>
+            `);
+            list.innerHTML = items.join('');
+
+            menu.classList.remove('hidden');
+            menu.onclick = (evt) => evt.stopPropagation();
+
+            requestAnimationFrame(() => {
+                const rect = trigger.getBoundingClientRect();
+                const menuWidth = menu.offsetWidth;
+                const menuHeight = menu.offsetHeight;
+
+                let left = rect.right + 8;
+                let top = rect.top;
+
+                if (rect.top + menuHeight + 8 > window.innerHeight && rect.bottom - menuHeight >= 8) {
+                    top = rect.bottom - menuHeight;
+                }
+
+                const maxLeft = window.innerWidth - menuWidth - 8;
+                const maxTop = window.innerHeight - menuHeight - 8;
+                left = Math.min(Math.max(8, left), Math.max(8, maxLeft));
+                top = Math.min(Math.max(8, top), Math.max(8, maxTop));
+
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+            });
+        }
+
+        function handleManageSnippetEdit() {
+            const id = manageSnippetMenuSnippetId;
+            const categoryId = manageSnippetMenuCategoryId;
+            const snippet = manageSnippetCacheById[id];
+            closeManageSnippetMenu();
+            if (!snippet) return;
+            openSnippetModalForEdit(categoryId, snippet);
+        }
+
+        function handleManageSnippetDelete() {
+            const categoryId = manageSnippetMenuCategoryId;
+            const snippetId = manageSnippetMenuSnippetId;
+            closeManageSnippetMenu();
+            openDeleteSnippetModal(categoryId, snippetId);
+        }
+
+        async function selectManageSnippetTarget(ev, targetCatId) {
+            try {
+                const e = ev || window.event;
+                if (e && e.stopPropagation) e.stopPropagation();
+            } catch (_) {}
+
+            const snippetId = manageSnippetMenuSnippetId;
+            const oldCatId = manageSnippetMenuCategoryId;
+            if (!snippetId) return;
+
+            if (!window.db || !window.db.updateSnippet) {
+                console.error('window.db.updateSnippet fehlt');
+                return;
+            }
+
+            const patch = targetCatId === 'free'
+                ? { mode: 'free', field_id: 'free' }
+                : { mode: 'structured', field_id: targetCatId };
+
+            try {
+                const ok = await window.db.updateSnippet(snippetId, patch);
+                if (!ok) {
+                    alert('Baustein konnte nicht verschoben werden.');
+                    return;
+                }
+            } catch (err) {
+                console.error('Baustein Update Fehler:', err);
+                alert('Baustein konnte nicht verschoben werden. Bitte Konsole prüfen.');
+                return;
+            }
+
+            await refreshManageSnippetCategory(oldCatId);
+            if (oldCatId !== targetCatId) await refreshManageSnippetCategory(targetCatId);
+
+            renderManageSnippetsAccordion();
+            closeManageSnippetMenu();
+
+            if (oldCatId) {
+                const oldBody = document.getElementById(`snip-body-${oldCatId}`);
+                if (oldBody) oldBody.dataset.loaded = 'false';
+                if (snippetOpenState[oldCatId]) await loadSnippetSection(oldCatId);
+            }
+            const newBody = document.getElementById(`snip-body-${targetCatId}`);
+            if (newBody) newBody.dataset.loaded = 'false';
+            if (snippetOpenState[targetCatId]) await loadSnippetSection(targetCatId);
+        }
         function openManageCategoryMenu(ev, categoryId, categoryName) {
             const e = ev || window.event;
             if (e) {
@@ -1061,6 +1360,7 @@
 
             if (snippetMenuOpen) closeSnippetItemMenu();
             if (promptMenuOpen) closePromptItemMenu();
+            if (manageSnippetMenuOpen) closeManageSnippetMenu();
             if (savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
             if (settingsMenuOpen) closeSettingsMenu();
 
@@ -2173,6 +2473,9 @@
             if (ok && pendingDeleteCategoryId) {
                 await loadSnippetSection(pendingDeleteCategoryId);
             }
+            if (ok && settingsCurrentPage === 'snippets') {
+                await loadManageSnippetsPage();
+            }
         }
 
         function insertSnippetText(text, targetFieldId = null) {
@@ -2280,6 +2583,7 @@
             const contentEl = document.getElementById('snippet-content');
 
             editingSnippetId = prefill.id || null;
+            editingSnippetOriginalCategoryId = editingSnippetId ? (prefill.categoryId || null) : null;
             if (titleEl) titleEl.innerText = editingSnippetId ? 'Baustein bearbeiten' : 'Neuer Baustein';
 
             if (nameEl) nameEl.value = prefill.name || '';
@@ -2294,6 +2598,7 @@
             const modal = document.getElementById('modal-snippet');
             if (modal) modal.classList.add('hidden');
             editingSnippetId = null;
+            editingSnippetOriginalCategoryId = null;
         }
 
         async function saveSnippetFromModal() {
@@ -2326,9 +2631,21 @@
 
             if (success) {
                 closeSnippetModal();
+                const oldCategory = editingSnippetOriginalCategoryId;
+                editingSnippetOriginalCategoryId = null;
                 snippetOpenState[category] = true;
                 renderSnippetsAccordion();
+                if (oldCategory && oldCategory !== category) {
+                    const oldBody = document.getElementById(`snip-body-${oldCategory}`);
+                    if (oldBody) oldBody.dataset.loaded = 'false';
+                    if (snippetOpenState[oldCategory]) {
+                        await loadSnippetSection(oldCategory);
+                    }
+                }
                 await loadSnippetSection(category);
+                if (settingsCurrentPage === 'snippets') {
+                    await loadManageSnippetsPage();
+                }
             } else {
                 alert("Fehler beim Speichern.");
             }
