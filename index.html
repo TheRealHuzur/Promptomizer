@@ -226,6 +226,27 @@
           color:#fff;
         }
         .ui-btn-danger:hover{ background:#dc2626; }
+
+        #input-free-editor {
+          font-family: 'Inter', sans-serif;
+          white-space: pre-wrap;
+          outline: none;
+        }
+        #input-free-editor:empty:before {
+          content: attr(data-placeholder);
+          color: #64748b;
+        }
+        #input-free-editor h1 { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        #input-free-editor h2 { font-size: 1.25rem; font-weight: 700; color: #fff; }
+        #input-free-editor h3 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+        #input-free-editor blockquote {
+          border-left: 2px solid #334155;
+          padding-left: 12px;
+          color: #cbd5f5;
+          font-style: italic;
+          margin: 6px 0;
+        }
+        #input-free-editor ul, #input-free-editor ol { margin-left: 1.25rem; }
     </style>
 </head>
 <body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
@@ -344,17 +365,20 @@
                     <div id="editor-free" class="hidden h-full flex flex-col pt-4">
                         <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
                             <div class="flex gap-1">
-                                <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-heading"></i></button>
-                                <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-bold"></i></button>
-                                <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-quote-right"></i></button>
-                                <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ul"></i></button>
-                                <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ol"></i></button>
+                                <button id="btn-free-h1" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h1')">H1</button>
+                                <button id="btn-free-h2" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h2')">H2</button>
+                                <button id="btn-free-h3" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h3')">H3</button>
+                                <button id="btn-free-bold" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('bold')"><i class="fa-solid fa-bold"></i></button>
+                                <button id="btn-free-quote" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('quote')"><i class="fa-solid fa-quote-right"></i></button>
+                                <button id="btn-free-ul" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('ul')"><i class="fa-solid fa-list-ul"></i></button>
+                                <button id="btn-free-ol" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('ol')"><i class="fa-solid fa-list-ol"></i></button>
                             </div>
                             <button type="button" class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
                                 <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                             </button>
                         </div>
-                        <textarea id="input-free" class="w-full min-h-[60vh] rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed font-sans" placeholder="Schreibe deinen Prompt hier..." onfocus="setActiveField('free')"></textarea>
+                        <textarea id="input-free" class="hidden"></textarea>
+                        <div id="input-free-editor" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full min-h-[60vh] bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
                     </div>
                 </div>
 
@@ -720,11 +744,13 @@
         let manageSnippetMenuSnippetId = null;
         let manageSnippetMenuCategoryId = null;
         let editingSnippetOriginalCategoryId = null;
+        let freeFormatActive = 'none';
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
             renderSnippetsAccordion();
+            initFreeEditor();
             document.addEventListener('click', (ev) => {
                 if (snippetMenuOpen) closeSnippetItemMenu();
                 if (promptMenuOpen) closePromptItemMenu();
@@ -1579,7 +1605,256 @@
                 btnStruct.classList.add('text-slate-500', 'hover:text-slate-300');
                 divFree.classList.remove('hidden');
                 divStruct.classList.add('hidden');
+                freeSetMarkdown(freeGetMarkdown());
             }
+        }
+
+        function getFreeEditorEl() {
+            return document.getElementById('input-free-editor');
+        }
+
+        function freeGetMarkdown() {
+            const ta = document.getElementById('input-free');
+            return ta ? ta.value : '';
+        }
+
+        function freeSetMarkdown(md) {
+            const ta = document.getElementById('input-free');
+            const editor = getFreeEditorEl();
+            const value = md || '';
+            if (ta) ta.value = value;
+            if (editor) editor.innerHTML = freeMarkdownToHtml(value);
+            freeFormatActive = 'none';
+            setFreeActiveButton('none');
+        }
+
+        function initFreeEditor() {
+            const editor = getFreeEditorEl();
+            if (!editor) return;
+            editor.addEventListener('input', () => freeSyncHtmlToMarkdown());
+            editor.addEventListener('keydown', (ev) => handleFreeEditorKeydown(ev));
+            editor.addEventListener('blur', () => freeSyncHtmlToMarkdown());
+            freeSetMarkdown(freeGetMarkdown());
+        }
+
+        function setFreeActiveButton(format) {
+            const btns = {
+                h1: document.getElementById('btn-free-h1'),
+                h2: document.getElementById('btn-free-h2'),
+                h3: document.getElementById('btn-free-h3'),
+                bold: document.getElementById('btn-free-bold'),
+                quote: document.getElementById('btn-free-quote'),
+                ul: document.getElementById('btn-free-ul'),
+                ol: document.getElementById('btn-free-ol')
+            };
+
+            Object.keys(btns).forEach(key => {
+                const btn = btns[key];
+                if (!btn) return;
+                btn.classList.remove('bg-slate-800', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+            });
+
+            if (format && format !== 'none' && btns[format]) {
+                const btn = btns[format];
+                btn.classList.add('bg-slate-800', 'text-white');
+                btn.classList.remove('text-slate-400');
+            }
+        }
+
+        function getClosestTag(node, tags) {
+            let cur = node;
+            while (cur) {
+                if (cur.nodeType === 1 && tags.includes(cur.tagName)) return cur;
+                cur = cur.parentNode;
+            }
+            return null;
+        }
+
+        function clearFreeFormattingContext() {
+            const sel = window.getSelection();
+            const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+            const inUl = getClosestTag(anchor, ['UL']);
+            const inOl = getClosestTag(anchor, ['OL']);
+            const inBlock = getClosestTag(anchor, ['BLOCKQUOTE']);
+
+            if (inUl) document.execCommand('insertUnorderedList');
+            if (inOl) document.execCommand('insertOrderedList');
+            if (inBlock) document.execCommand('formatBlock', false, 'P');
+            document.execCommand('formatBlock', false, 'P');
+            document.execCommand('removeFormat');
+        }
+
+        function toggleFreeFormat(format) {
+            const editor = getFreeEditorEl();
+            if (!editor) return;
+            editor.focus();
+
+            if (freeFormatActive === format) {
+                clearFreeFormattingContext();
+                freeFormatActive = 'none';
+                setFreeActiveButton('none');
+                freeSyncHtmlToMarkdown();
+                return;
+            }
+
+            clearFreeFormattingContext();
+
+            if (format === 'h1') document.execCommand('formatBlock', false, 'H1');
+            if (format === 'h2') document.execCommand('formatBlock', false, 'H2');
+            if (format === 'h3') document.execCommand('formatBlock', false, 'H3');
+            if (format === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+            if (format === 'ul') document.execCommand('insertUnorderedList');
+            if (format === 'ol') document.execCommand('insertOrderedList');
+            if (format === 'bold') document.execCommand('bold');
+
+            freeFormatActive = format;
+            setFreeActiveButton(format);
+            freeSyncHtmlToMarkdown();
+        }
+
+        function handleFreeEditorKeydown(ev) {
+            if (ev.key !== 'Enter') return;
+            const sel = window.getSelection();
+            const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+            const li = getClosestTag(anchor, ['LI']);
+            if (!li) return;
+            const list = getClosestTag(li, ['UL', 'OL']);
+            if (!list) return;
+            if (li.textContent.trim() === '') {
+                ev.preventDefault();
+                if (list.tagName === 'UL') document.execCommand('insertUnorderedList');
+                if (list.tagName === 'OL') document.execCommand('insertOrderedList');
+                document.execCommand('formatBlock', false, 'P');
+                freeFormatActive = 'none';
+                setFreeActiveButton('none');
+                freeSyncHtmlToMarkdown();
+            }
+        }
+
+        function freeSyncHtmlToMarkdown() {
+            const editor = getFreeEditorEl();
+            const ta = document.getElementById('input-free');
+            if (!editor || !ta) return;
+            const md = freeHtmlToMarkdown(editor);
+            ta.value = md.trim();
+        }
+
+        function freeHtmlToMarkdown(root) {
+            const blockTags = ['H1','H2','H3','P','DIV','BLOCKQUOTE','UL','OL'];
+
+            const inlineToMd = (node) => {
+                if (node.nodeType === 3) return node.nodeValue;
+                if (node.nodeType !== 1) return '';
+                const tag = node.tagName;
+                if (tag === 'BR') return '\n';
+                const inner = Array.from(node.childNodes).map(inlineToMd).join('');
+                if (tag === 'STRONG' || tag === 'B') return `**${inner}**`;
+                return inner;
+            };
+
+            const blockToMd = (node) => {
+                if (node.nodeType === 3) {
+                    const text = node.nodeValue || '';
+                    return text.trim() ? text + '\n\n' : '';
+                }
+                if (node.nodeType !== 1) return '';
+                const tag = node.tagName;
+                if (tag === 'H1') return `# ${inlineToMd(node).trim()}\n\n`;
+                if (tag === 'H2') return `## ${inlineToMd(node).trim()}\n\n`;
+                if (tag === 'H3') return `### ${inlineToMd(node).trim()}\n\n`;
+                if (tag === 'BLOCKQUOTE') {
+                    const text = inlineToMd(node).trim();
+                    const lines = text ? text.split('\n') : [''];
+                    return lines.map(l => `> ${l}`.trimEnd()).join('\n') + '\n\n';
+                }
+                if (tag === 'UL') {
+                    const items = Array.from(node.children).filter(c => c.tagName === 'LI');
+                    const rows = items.map(li => `- ${inlineToMd(li).trim()}`);
+                    return rows.join('\n') + '\n\n';
+                }
+                if (tag === 'OL') {
+                    const items = Array.from(node.children).filter(c => c.tagName === 'LI');
+                    const rows = items.map((li, idx) => `${idx + 1}. ${inlineToMd(li).trim()}`);
+                    return rows.join('\n') + '\n\n';
+                }
+                if (tag === 'P' || tag === 'DIV') {
+                    const text = inlineToMd(node).trim();
+                    if (!text) return '';
+                    return text + '\n\n';
+                }
+                if (blockTags.includes(tag)) return inlineToMd(node).trim() + '\n\n';
+                return inlineToMd(node).trim();
+            };
+
+            let out = '';
+            root.childNodes.forEach(node => {
+                out += blockToMd(node);
+            });
+            return out.trimEnd();
+        }
+
+        function freeMarkdownToHtml(md) {
+            const lines = (md || '').replace(/\r\n/g, '\n').split('\n');
+            const blocks = [];
+            let i = 0;
+
+            const parseInline = (text) => {
+                const safe = escapeHtml(text);
+                return safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            };
+
+            while (i < lines.length) {
+                const line = lines[i];
+                if (!line.trim()) {
+                    i += 1;
+                    continue;
+                }
+                if (/^#{1,3}\s+/.test(line)) {
+                    const level = line.match(/^#{1,3}/)[0].length;
+                    const content = line.replace(/^#{1,3}\s+/, '');
+                    blocks.push(`<h${level}>${parseInline(content)}</h${level}>`);
+                    i += 1;
+                    continue;
+                }
+                if (/^>\s?/.test(line)) {
+                    const buf = [];
+                    while (i < lines.length && /^>\s?/.test(lines[i])) {
+                        buf.push(lines[i].replace(/^>\s?/, ''));
+                        i += 1;
+                    }
+                    const content = parseInline(buf.join('\n')).replace(/\n/g, '<br>');
+                    blocks.push(`<blockquote>${content}</blockquote>`);
+                    continue;
+                }
+                if (/^-\s+/.test(line)) {
+                    const items = [];
+                    while (i < lines.length && /^-\s+/.test(lines[i])) {
+                        items.push(lines[i].replace(/^-+\s+/, ''));
+                        i += 1;
+                    }
+                    blocks.push(`<ul>${items.map(it => `<li>${parseInline(it)}</li>`).join('')}</ul>`);
+                    continue;
+                }
+                if (/^\d+\.\s+/.test(line)) {
+                    const items = [];
+                    while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+                        items.push(lines[i].replace(/^\d+\.\s+/, ''));
+                        i += 1;
+                    }
+                    blocks.push(`<ol>${items.map(it => `<li>${parseInline(it)}</li>`).join('')}</ol>`);
+                    continue;
+                }
+                const para = [];
+                while (i < lines.length && lines[i].trim() && !/^#{1,3}\s+/.test(lines[i]) && !/^>\s?/.test(lines[i]) && !/^-\s+/.test(lines[i]) && !/^\d+\.\s+/.test(lines[i])) {
+                    para.push(lines[i]);
+                    i += 1;
+                }
+                const content = parseInline(para.join('\n')).replace(/\n/g, '<br>');
+                blocks.push(`<p>${content}</p>`);
+            }
+
+            return blocks.join('');
         }
 
         function insertMarkdown(syntax) {
@@ -1601,7 +1876,8 @@
                     if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
                 });
             } else {
-                finalText = document.getElementById('input-free').value.trim();
+                freeSyncHtmlToMarkdown();
+                finalText = freeGetMarkdown().trim();
             }
 
             if (!finalText) {
@@ -1653,7 +1929,7 @@
             if(currentMode === 'structured') {
                 FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
             } else {
-                document.getElementById('input-free').value = '';
+                freeSetMarkdown('');
             }
         }
 
@@ -1699,7 +1975,7 @@
 
                 if (s.fields.mode === 'free') {
                     setEditorMode('free');
-                    document.getElementById('input-free').value = s.fields.text || '';
+                    freeSetMarkdown(s.fields.text || '');
                     setActiveField('free');
                     return;
                 }
@@ -1799,24 +2075,18 @@
                     return;
                 }
                 setEditorMode('free');
-                const ta = document.getElementById('input-free');
-                if (ta) {
-                    ta.value = s.fields.text || '';
-                    setActiveField('free');
-                }
-                return;
-            }
-
-            const ta = document.getElementById('input-free');
-            if (!ta) return;
-
-            if (freePrompt) {
-                ta.value = s.fields.text || '';
+                freeSetMarkdown(s.fields.text || '');
                 setActiveField('free');
                 return;
             }
 
-            ta.value = structuredPromptToText(s);
+            if (freePrompt) {
+                freeSetMarkdown(s.fields.text || '');
+                setActiveField('free');
+                return;
+            }
+
+            freeSetMarkdown(structuredPromptToText(s));
             setActiveField('free');
         }
 
@@ -1837,14 +2107,11 @@
 
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
-                const ta = document.getElementById('input-free');
-                if (!ta) { alert('Freies Textfeld nicht gefunden.'); return; }
-                ta.focus();
-                const start = (ta.selectionStart ?? ta.value.length);
-                const end = (ta.selectionEnd ?? ta.value.length);
-                ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
-                const pos = start + text.length;
-                ta.setSelectionRange(pos, pos);
+                const editor = getFreeEditorEl();
+                if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
+                editor.focus();
+                document.execCommand('insertText', false, text);
+                freeSyncHtmlToMarkdown();
                 return;
             }
 
@@ -2448,8 +2715,8 @@
         }
 
         function openFreeSnippetSaveModal() {
-            const ta = document.getElementById('input-free');
-            const text = ta ? ta.value : '';
+            freeSyncHtmlToMarkdown();
+            const text = freeGetMarkdown();
             openSnippetModal({
                 id: null,
                 name: '',
@@ -2496,14 +2763,11 @@
 
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
-                const ta = document.getElementById('input-free');
-                if (!ta) { alert('Freies Textfeld nicht gefunden.'); return; }
-                ta.focus();
-                const start = (ta.selectionStart ?? ta.value.length);
-                const end = (ta.selectionEnd ?? ta.value.length);
-                ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
-                const pos = start + text.length;
-                ta.setSelectionRange(pos, pos);
+                const editor = getFreeEditorEl();
+                if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
+                editor.focus();
+                document.execCommand('insertText', false, text);
+                freeSyncHtmlToMarkdown();
                 return;
             }
 
@@ -2820,7 +3084,8 @@
                     }
                 }
             } else {
-                const text = document.getElementById('input-free').value.trim();
+                freeSyncHtmlToMarkdown();
+                const text = freeGetMarkdown().trim();
                 if (!text) {
                     alert("Bitte Text eingeben.");
                     return;
