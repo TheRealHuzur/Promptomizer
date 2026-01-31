@@ -342,14 +342,19 @@
                         </div>
 
                     <div id="editor-free" class="hidden h-full flex flex-col pt-4">
-                        <div class="sticky top-0 z-20 bg-navy-deep border border-navy-border border-b-0 rounded-t-md p-2 flex gap-1 shadow-md">
-                            <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-heading"></i></button>
-                            <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-bold"></i></button>
-                            <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-quote-right"></i></button>
-                            <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ul"></i></button>
-                            <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ol"></i></button>
+                        <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
+                            <div class="flex gap-1">
+                                <button onclick="insertMarkdown('# ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-heading"></i></button>
+                                <button onclick="insertMarkdown('**text**')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-bold"></i></button>
+                                <button onclick="insertMarkdown('> ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-quote-right"></i></button>
+                                <button onclick="insertMarkdown('- ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ul"></i></button>
+                                <button onclick="insertMarkdown('1. ')" class="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><i class="fa-solid fa-list-ol"></i></button>
+                            </div>
+                            <button type="button" class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
+                                <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
+                            </button>
                         </div>
-                        <textarea id="input-free" class="w-full min-h-[60vh] bg-navy-sidebar border-2 border-navy-border rounded-b-md p-6 text-lg text-slate-200 font-mono leading-relaxed focus:border-brand-sky placeholder-slate-600" placeholder="Schreibe deinen Prompt hier..." onfocus="setActiveField('free')"></textarea>
+                        <textarea id="input-free" class="w-full min-h-[60vh] rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed font-sans" placeholder="Schreibe deinen Prompt hier..." onfocus="setActiveField('free')"></textarea>
                     </div>
                 </div>
 
@@ -2438,6 +2443,17 @@
                 id: null,
                 name: '',
                 categoryId: fieldId,
+                content: text
+            });
+        }
+
+        function openFreeSnippetSaveModal() {
+            const ta = document.getElementById('input-free');
+            const text = ta ? ta.value : '';
+            openSnippetModal({
+                id: null,
+                name: '',
+                categoryId: 'free',
                 content: text
             });
         }
