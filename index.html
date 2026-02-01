@@ -227,26 +227,28 @@
         }
         .ui-btn-danger:hover{ background:#dc2626; }
 
-        #input-free-editor {
+        #input-free {
           font-family: 'Inter', sans-serif;
           white-space: pre-wrap;
           outline: none;
         }
-        #input-free-editor:empty:before {
+        #input-free:empty:before {
           content: attr(data-placeholder);
           color: #64748b;
         }
-        #input-free-editor h1 { font-size: 1.5rem; font-weight: 700; color: #fff; }
-        #input-free-editor h2 { font-size: 1.25rem; font-weight: 700; color: #fff; }
-        #input-free-editor h3 { font-size: 1.1rem; font-weight: 700; color: #fff; }
-        #input-free-editor blockquote {
-          border-left: 2px solid #334155;
-          padding-left: 12px;
-          color: #cbd5f5;
+        #input-free h1 { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        #input-free h2 { font-size: 1.25rem; font-weight: 700; color: #fff; }
+        #input-free h3 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+        #input-free ul { list-style: disc; padding-left: 1.5rem; }
+        #input-free ol { list-style: decimal; padding-left: 1.5rem; }
+        #input-free li { margin: 0.15rem 0; }
+        #input-free blockquote {
           font-style: italic;
+          border-left: 3px solid rgba(148, 163, 184, 0.5);
+          padding-left: 0.75rem;
+          color: #cbd5f5;
           margin: 6px 0;
         }
-        #input-free-editor ul, #input-free-editor ol { margin-left: 1.25rem; }
     </style>
 </head>
 <body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
@@ -365,20 +367,19 @@
                     <div id="editor-free" class="hidden h-full flex flex-col pt-4">
                         <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
                             <div class="flex gap-1">
-                                <button id="btn-free-h1" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h1')">H1</button>
-                                <button id="btn-free-h2" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h2')">H2</button>
-                                <button id="btn-free-h3" type="button" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onclick="toggleFreeFormat('h3')">H3</button>
-                                <button id="btn-free-bold" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('bold')"><i class="fa-solid fa-bold"></i></button>
-                                <button id="btn-free-quote" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('quote')"><i class="fa-solid fa-quote-right"></i></button>
-                                <button id="btn-free-ul" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('ul')"><i class="fa-solid fa-list-ul"></i></button>
-                                <button id="btn-free-ol" type="button" class="free-format-btn p-2 rounded" onclick="toggleFreeFormat('ol')"><i class="fa-solid fa-list-ol"></i></button>
+                                <button id="btn-free-h1" type="button" data-format="h1" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h1')">H1</button>
+                                <button id="btn-free-h2" type="button" data-format="h2" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h2')">H2</button>
+                                <button id="btn-free-h3" type="button" data-format="h3" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h3')">H3</button>
+                                <button id="btn-free-bold" type="button" data-format="bold" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('bold')"><i class="fa-solid fa-bold"></i></button>
+                                <button id="btn-free-quote" type="button" data-format="quote" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('quote')"><i class="fa-solid fa-quote-right"></i></button>
+                                <button id="btn-free-ul" type="button" data-format="ul" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('ul')"><i class="fa-solid fa-list-ul"></i></button>
+                                <button id="btn-free-ol" type="button" data-format="ol" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('ol')"><i class="fa-solid fa-list-ol"></i></button>
                             </div>
                             <button type="button" class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
                                 <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                             </button>
                         </div>
-                        <textarea id="input-free" class="hidden"></textarea>
-                        <div id="input-free-editor" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full min-h-[60vh] bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
+                        <div id="input-free" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full min-h-[60vh] bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
                     </div>
                 </div>
 
@@ -744,7 +745,8 @@
         let manageSnippetMenuSnippetId = null;
         let manageSnippetMenuCategoryId = null;
         let editingSnippetOriginalCategoryId = null;
-        let freeFormatActive = 'none';
+        let freeActiveFormat = null;
+        let freeMarkdownCache = '';
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1610,22 +1612,35 @@
         }
 
         function getFreeEditorEl() {
-            return document.getElementById('input-free-editor');
+            return document.getElementById('input-free');
+        }
+
+        function getFreeMarkdownFromEditor() {
+            const editor = getFreeEditorEl();
+            if (!editor) return '';
+            return freeHtmlToMarkdown(editor).trim();
+        }
+
+        function setFreeEditorFromMarkdown(md) {
+            const editor = getFreeEditorEl();
+            if (!editor) return;
+            const value = md || '';
+            const html = freeMarkdownToHtml(value);
+            editor.innerHTML = html || '<div><br></div>';
+            freeMarkdownCache = value;
+            freeActiveFormat = null;
+            updateFreeToolbarUI();
         }
 
         function freeGetMarkdown() {
-            const ta = document.getElementById('input-free');
-            return ta ? ta.value : '';
+            const editor = getFreeEditorEl();
+            if (editor) return getFreeMarkdownFromEditor();
+            return freeMarkdownCache || '';
         }
 
         function freeSetMarkdown(md) {
-            const ta = document.getElementById('input-free');
-            const editor = getFreeEditorEl();
-            const value = md || '';
-            if (ta) ta.value = value;
-            if (editor) editor.innerHTML = freeMarkdownToHtml(value);
-            freeFormatActive = 'none';
-            setFreeActiveButton('none');
+            freeMarkdownCache = md || '';
+            setFreeEditorFromMarkdown(freeMarkdownCache);
         }
 
         function initFreeEditor() {
@@ -1634,32 +1649,19 @@
             editor.addEventListener('input', () => freeSyncHtmlToMarkdown());
             editor.addEventListener('keydown', (ev) => handleFreeEditorKeydown(ev));
             editor.addEventListener('blur', () => freeSyncHtmlToMarkdown());
-            freeSetMarkdown(freeGetMarkdown());
+            setFreeEditorFromMarkdown(freeGetMarkdown());
         }
 
-        function setFreeActiveButton(format) {
-            const btns = {
-                h1: document.getElementById('btn-free-h1'),
-                h2: document.getElementById('btn-free-h2'),
-                h3: document.getElementById('btn-free-h3'),
-                bold: document.getElementById('btn-free-bold'),
-                quote: document.getElementById('btn-free-quote'),
-                ul: document.getElementById('btn-free-ul'),
-                ol: document.getElementById('btn-free-ol')
-            };
-
-            Object.keys(btns).forEach(key => {
-                const btn = btns[key];
-                if (!btn) return;
+        function updateFreeToolbarUI() {
+            const buttons = document.querySelectorAll('.free-format-btn');
+            buttons.forEach(btn => {
                 btn.classList.remove('bg-slate-800', 'text-white');
                 btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+                if (btn.dataset.format === freeActiveFormat) {
+                    btn.classList.add('bg-slate-800', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                }
             });
-
-            if (format && format !== 'none' && btns[format]) {
-                const btn = btns[format];
-                btn.classList.add('bg-slate-800', 'text-white');
-                btn.classList.remove('text-slate-400');
-            }
         }
 
         function getClosestTag(node, tags) {
@@ -1671,46 +1673,47 @@
             return null;
         }
 
-        function clearFreeFormattingContext() {
-            const sel = window.getSelection();
-            const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
-            const inUl = getClosestTag(anchor, ['UL']);
-            const inOl = getClosestTag(anchor, ['OL']);
-            const inBlock = getClosestTag(anchor, ['BLOCKQUOTE']);
-
-            if (inUl) document.execCommand('insertUnorderedList');
-            if (inOl) document.execCommand('insertOrderedList');
-            if (inBlock) document.execCommand('formatBlock', false, 'P');
-            document.execCommand('formatBlock', false, 'P');
-            document.execCommand('removeFormat');
-        }
-
         function toggleFreeFormat(format) {
             const editor = getFreeEditorEl();
             if (!editor) return;
-            editor.focus();
+            focusEditorPreserveSelection(editor);
 
-            if (freeFormatActive === format) {
-                clearFreeFormattingContext();
-                freeFormatActive = 'none';
-                setFreeActiveButton('none');
-                freeSyncHtmlToMarkdown();
+            if (freeActiveFormat === format) {
+                deactivateFormat(format);
+                freeActiveFormat = null;
+                updateFreeToolbarUI();
                 return;
             }
 
-            clearFreeFormattingContext();
+            deactivateFormat(freeActiveFormat);
+            activateFormat(format);
+            freeActiveFormat = format;
+            updateFreeToolbarUI();
+        }
 
+        function deactivateFormat(format) {
+            if (!format) return;
+            if (format === 'bold') document.execCommand('bold');
+            if (format === 'h1' || format === 'h2' || format === 'h3' || format === 'quote') {
+                document.execCommand('formatBlock', false, 'P');
+            }
+            if (format === 'ul') document.execCommand('insertUnorderedList');
+            if (format === 'ol') document.execCommand('insertOrderedList');
+        }
+
+        function activateFormat(format) {
+            if (format === 'bold') document.execCommand('bold');
             if (format === 'h1') document.execCommand('formatBlock', false, 'H1');
             if (format === 'h2') document.execCommand('formatBlock', false, 'H2');
             if (format === 'h3') document.execCommand('formatBlock', false, 'H3');
             if (format === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
             if (format === 'ul') document.execCommand('insertUnorderedList');
             if (format === 'ol') document.execCommand('insertOrderedList');
-            if (format === 'bold') document.execCommand('bold');
+        }
 
-            freeFormatActive = format;
-            setFreeActiveButton(format);
-            freeSyncHtmlToMarkdown();
+        function focusEditorPreserveSelection(editor) {
+            if (!editor) return;
+            editor.focus();
         }
 
         function handleFreeEditorKeydown(ev) {
@@ -1723,21 +1726,44 @@
             if (!list) return;
             if (li.textContent.trim() === '') {
                 ev.preventDefault();
-                if (list.tagName === 'UL') document.execCommand('insertUnorderedList');
-                if (list.tagName === 'OL') document.execCommand('insertOrderedList');
-                document.execCommand('formatBlock', false, 'P');
-                freeFormatActive = 'none';
-                setFreeActiveButton('none');
+                const listParent = list.parentNode;
+                if (!listParent) return;
+                const listNext = list.nextSibling;
+                li.remove();
+                if (!list.querySelector('li')) {
+                    list.remove();
+                }
+                const block = document.createElement('div');
+                block.appendChild(document.createElement('br'));
+                if (listNext) {
+                    listParent.insertBefore(block, listNext);
+                } else {
+                    listParent.appendChild(block);
+                }
+                placeCaretAtStart(block);
+                if (freeActiveFormat === 'ul' || freeActiveFormat === 'ol') {
+                    freeActiveFormat = null;
+                    updateFreeToolbarUI();
+                }
                 freeSyncHtmlToMarkdown();
             }
         }
 
         function freeSyncHtmlToMarkdown() {
-            const editor = getFreeEditorEl();
-            const ta = document.getElementById('input-free');
-            if (!editor || !ta) return;
-            const md = freeHtmlToMarkdown(editor);
-            ta.value = md.trim();
+            freeMarkdownCache = getFreeMarkdownFromEditor();
+            return freeMarkdownCache;
+        }
+
+        function placeCaretAtStart(el) {
+            if (!el) return;
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(true);
+            const sel = window.getSelection();
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         }
 
         function freeHtmlToMarkdown(root) {
@@ -1857,16 +1883,6 @@
             return blocks.join('');
         }
 
-        function insertMarkdown(syntax) {
-            const textarea = document.getElementById('input-free');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + syntax + text.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + syntax.length;
-            textarea.focus();
-        }
-
         async function handleCopyAndSave() {
             let finalText = "";
             if (currentMode === 'structured') {
@@ -1876,8 +1892,7 @@
                     if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
                 });
             } else {
-                freeSyncHtmlToMarkdown();
-                finalText = freeGetMarkdown().trim();
+                finalText = getFreeMarkdownFromEditor().trim();
             }
 
             if (!finalText) {
@@ -1929,7 +1944,11 @@
             if(currentMode === 'structured') {
                 FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
             } else {
-                freeSetMarkdown('');
+                const editor = getFreeEditorEl();
+                if (editor) editor.innerHTML = '<div><br></div>';
+                freeMarkdownCache = '';
+                freeActiveFormat = null;
+                updateFreeToolbarUI();
             }
         }
 
@@ -1975,7 +1994,7 @@
 
                 if (s.fields.mode === 'free') {
                     setEditorMode('free');
-                    freeSetMarkdown(s.fields.text || '');
+                    setFreeEditorFromMarkdown(s.fields.text || '');
                     setActiveField('free');
                     return;
                 }
@@ -3084,8 +3103,7 @@
                     }
                 }
             } else {
-                freeSyncHtmlToMarkdown();
-                const text = freeGetMarkdown().trim();
+                const text = getFreeMarkdownFromEditor().trim();
                 if (!text) {
                     alert("Bitte Text eingeben.");
                     return;
