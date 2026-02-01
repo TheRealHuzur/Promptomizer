@@ -117,7 +117,38 @@
           --brand-hover:#38bdf8;
           --text:#e2e8f0;
           --muted:#94a3b8;
+          --sidebar-w:16rem;
+          --sidebar-w-collapsed:4rem;
+          --sidebar-current-w:var(--sidebar-w);
         }
+        body.sidebar-collapsed{
+          --sidebar-current-w:var(--sidebar-w-collapsed);
+        }
+        #sidebar-left{
+          position:fixed;
+          top:0;
+          left:0;
+          bottom:0;
+          width:var(--sidebar-current-w);
+        }
+        #header-spacer-left{
+          width:var(--sidebar-current-w);
+        }
+        #app-body{
+          margin-left:var(--sidebar-current-w);
+          transition:margin-left .3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar-inner{
+          padding-top:0;
+          height:auto;
+        }
+        body.sidebar-collapsed #sidebar-topbar{ justify-content:center; }
+        body.sidebar-collapsed #sidebar-left .nav-label{ display:none; }
+        body.sidebar-collapsed #sidebar-left .sidebar-nav-title{ display:none; }
+        body.sidebar-collapsed #sidebar-library{ display:none; }
+        body.sidebar-collapsed #sidebar-left .nav-item{ justify-content:center; gap:0; }
+        body.sidebar-collapsed #sidebar-left .nav-item i{ margin:0; }
+        body.sidebar-collapsed #sidebar-left .sidebar-user-text{ display:none; }
 
         .ui-backdrop{
           position:fixed;
@@ -256,57 +287,68 @@
 </head>
 <body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
 
-    <header class="h-14 border-b border-navy-border flex items-center justify-center flex-shrink-0 z-40 bg-navy-sidebar w-full relative shadow-sm">
-        
-        <div id="header-spacer-left" class="w-64 sidebar-transition flex-shrink-0 border-r border-transparent"></div>
+    <header id="app-header" class="h-14 flex-shrink-0 w-full relative z-40 shadow-sm pointer-events-none">
+        <!-- Hintergrund + Bottom-Border nur für den Main-Bereich (rechts neben der Sidebar) -->
+        <div id="header-bg" class="absolute inset-y-0 right-0 bg-navy-sidebar border-b border-navy-border"
+             style="left: var(--sidebar-current-w);"></div>
 
-        <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0">
-            <div class="w-full max-w-4xl flex items-center justify-between">
-                
-                <div class="flex items-center select-none leading-none">
-                    <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-                    <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-                </div>
+        <!-- Inhalt -->
+        <div class="relative z-10 w-full h-full flex items-center justify-center">
+            <!-- Spacer bleibt, damit Logo/Controls weiterhin korrekt zentriert sind; klickt sich durch (pointer-events-none) -->
+            <div id="header-spacer-left" class="sidebar-transition flex-shrink-0 border-r border-transparent pointer-events-none"></div>
 
-                <div class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
-                    <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
-                        Strukturiert
-                    </button>
-                    <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-5 py-1 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
-                        Frei
-                    </button>
+            <!-- Interaktiver Bereich (Buttons etc.) wieder klickbar -->
+            <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0 pointer-events-auto">
+                <div class="w-full max-w-4xl flex items-center justify-between">
+                    <div class="flex items-center select-none leading-none">
+                        <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
+                        <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
+                    </div>
+
+                    <div class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
+                        <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
+                            Strukturiert
+                        </button>
+                        <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-5 py-1 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
+                            Frei
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-
     </header>
 
-    <div class="flex-1 flex overflow-hidden relative">
+    <div id="app-body" class="flex-1 flex overflow-hidden relative">
 
         <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
-            <div class="w-64 flex flex-col h-full">
+            <div id="sidebar-topbar" class="h-14 flex items-center justify-end px-3 border-r border-transparent">
+                <button id="btn-sidebar-collapse" class="ui-icon-btn w-9 h-9 flex items-center justify-center leading-none" onclick="toggleSidebar('left')" title="Sidebar umschalten">
+                    <i class="fa-solid fa-table-columns leading-none relative top-px"></i>
+                </button>
+            </div>
+            <div id="sidebar-inner" class="flex flex-col flex-1">
                 <div class="px-2 py-4">
-                    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
+                    <div class="sidebar-nav-title text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
                     <div class="space-y-0.5">
                         <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
                             <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
-                            <span class="text-sm font-medium">Editor</span>
+                            <span class="nav-label text-sm font-medium">Editor</span>
                         </div>
                         <div onclick="switchView('history')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
                             <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                            <span class="text-sm font-medium">Historie</span>
+                            <span class="nav-label text-sm font-medium">Historie</span>
                         </div>
                         <div onclick="toggleSettingsMenu(event)" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
                             <i class="fa-solid fa-gear w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                            <span class="text-sm font-medium">Einstellungen & Hilfe</span>
+                            <span class="nav-label text-sm font-medium">Einstellungen & Hilfe</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex-1 overflow-y-auto p-0">
+                <div id="sidebar-library" class="flex-1 overflow-y-auto p-0">
                     
                     <div class="sticky top-0 z-20 bg-navy-sidebar">
                         <button onclick="togglePromptsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
@@ -339,12 +381,12 @@
                 </div>
 
                 <div class="mt-auto">
-                    <div class="p-4 border-t border-navy-border bg-black/10">
-                        <button onclick="openAuthModal()" class="w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
+                    <div class="h-20 px-4 border-t border-navy-border bg-black/10 flex items-center">
+                        <button onclick="openAuthModal()" class="user-button w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
                             <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
                                 <i class="fa-solid fa-user"></i>
                             </div>
-                            <div class="text-left overflow-hidden">
+                            <div class="sidebar-user-text text-left overflow-hidden">
                                 <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
                                 <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
                             </div>
@@ -356,7 +398,7 @@
 
         <main class="flex-1 flex flex-col min-w-0 bg-navy-deep relative z-10 shadow-inner">
             
-            <button onclick="toggleSidebar('left')" class="splitter-toggle -left-3 rounded-r-md border-l-0" title="Toggle Navigation">
+            <button onclick="toggleSidebar('left')" class="splitter-toggle -left-3 rounded-r-md border-l-0 hidden" title="Toggle Navigation">
                 <i id="icon-toggle-left" class="fa-solid fa-chevron-left text-xs rotate-icon"></i>
             </button>
 
@@ -751,12 +793,17 @@
         let freeActiveFormat = null;
         let freeMarkdownCache = '';
         let freeLastSelectionRange = null;
+        let lastSidebarRefreshTs = 0;
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderStructuredFields();
             renderSnippetsAccordion();
             initFreeEditor();
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') safeRefreshSidebar();
+            });
+            window.addEventListener('focus', safeRefreshSidebar);
             document.addEventListener('click', (ev) => {
                 if (snippetMenuOpen) closeSnippetItemMenu();
                 if (promptMenuOpen) closePromptItemMenu();
@@ -909,21 +956,13 @@
         }
         // --- LAYOUT LOGIC ---
         function toggleSidebar(side) {
-            const el = document.getElementById(`sidebar-${side}`);
-            const icon = document.getElementById(`icon-toggle-${side}`);
-            const spacer = document.getElementById(`header-spacer-${side}`);
-            
             if (side === 'right') return;
 
             if (side === 'left') {
                 if (isLeftOpen) {
-                    el.classList.replace('w-64', 'w-0');
-                    spacer.classList.replace('w-64', 'w-0');
-                    icon.classList.add('rotate-180');
+                    document.body.classList.add('sidebar-collapsed');
                 } else {
-                    el.classList.replace('w-0', 'w-64');
-                    spacer.classList.replace('w-0', 'w-64');
-                    icon.classList.remove('rotate-180');
+                    document.body.classList.remove('sidebar-collapsed');
                 }
                 isLeftOpen = !isLeftOpen;
             }
@@ -1658,7 +1697,6 @@
             editor.addEventListener('mouseup', updateSelection);
             editor.addEventListener('select', updateSelection);
             editor.addEventListener('input', updateSelection);
-            editor.addEventListener('blur', updateSelection);
             document.addEventListener('selectionchange', () => {
                 if (document.activeElement === editor) updateFreeSelection();
             });
@@ -1793,6 +1831,21 @@
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
+        }
+
+        function getFreeInsertionRange(editor) {
+            if (freeLastSelectionRange && editor.contains(freeLastSelectionRange.startContainer)) {
+                return freeLastSelectionRange.cloneRange();
+            }
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount) {
+                const r = sel.getRangeAt(0);
+                if (editor.contains(r.startContainer)) return r.cloneRange();
+            }
+            const r = document.createRange();
+            r.selectNodeContents(editor);
+            r.collapse(false);
+            return r;
         }
 
         function insertTextAtCursor(el, text, fallbackRange) {
@@ -2053,6 +2106,13 @@
             }
         }
 
+        function safeRefreshSidebar() {
+            const now = Date.now();
+            if (now - lastSidebarRefreshTs < 1000) return;
+            lastSidebarRefreshTs = now;
+            if (window.db && window.db.getScenarios) loadLibrary();
+        }
+
         async function loadLibrary() {
             if(!window.db) return;
             promptLibraryCache = await window.db.getScenarios();
@@ -2229,9 +2289,8 @@
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
                 if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
-                const active = document.activeElement;
-                const target = (active === editor) ? editor : editor;
-                insertTextAtCursor(target, text, freeLastSelectionRange);
+                const range = getFreeInsertionRange(editor);
+                insertTextAtCursor(editor, text, range);
                 freeSyncHtmlToMarkdown();
                 return;
             }
@@ -2353,6 +2412,15 @@
                     </div>
                 </div>
             `).join('');
+            (async () => {
+                for (const cat of meta) {
+                    if (!promptOpenState[cat.key]) continue;
+                    const body = document.getElementById(`prompt-body-${cat.key}`);
+                    if (body && body.dataset.loaded !== 'true') {
+                        await loadPromptCategory(cat.key);
+                    }
+                }
+            })();
         }
 
         async function togglePromptCategory(catKey) {
