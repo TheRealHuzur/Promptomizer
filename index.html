@@ -1618,7 +1618,7 @@
         function getFreeMarkdownFromEditor() {
             const editor = getFreeEditorEl();
             if (!editor) return '';
-            return freeHtmlToMarkdown(editor).trim();
+            return freeHtmlToMarkdown(editor);
         }
 
         function setFreeEditorFromMarkdown(md) {
@@ -1718,6 +1718,13 @@
 
         function handleFreeEditorKeydown(ev) {
             if (ev.key !== 'Enter') return;
+            if (freeActiveFormat === 'h1' || freeActiveFormat === 'h2' || freeActiveFormat === 'h3') {
+                requestAnimationFrame(() => {
+                    freeActiveFormat = null;
+                    updateFreeToolbarUI();
+                    freeSyncHtmlToMarkdown();
+                });
+            }
             const sel = window.getSelection();
             const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
             const li = getClosestTag(anchor, ['LI']);
@@ -1779,6 +1786,26 @@
                 return inner;
             };
 
+            const isEmptyBlock = (node) => {
+                if (!node || node.nodeType !== 1) return false;
+                if (node.tagName !== 'DIV' && node.tagName !== 'P') return false;
+                if (!node.childNodes || node.childNodes.length === 0) return true;
+                return Array.from(node.childNodes).every(child => {
+                    if (child.nodeType === 3) return !child.nodeValue.trim();
+                    if (child.nodeType === 1) return child.tagName === 'BR';
+                    return true;
+                });
+            };
+
+            const hasBlockChild = (node) => {
+                if (!node || node.nodeType !== 1) return false;
+                return Array.from(node.childNodes).some(child => {
+                    if (child.nodeType !== 1) return false;
+                    if (blockTags.includes(child.tagName)) return true;
+                    return hasBlockChild(child);
+                });
+            };
+
             const blockToMd = (node) => {
                 if (node.nodeType === 3) {
                     const text = node.nodeValue || '';
@@ -1786,11 +1813,12 @@
                 }
                 if (node.nodeType !== 1) return '';
                 const tag = node.tagName;
+                if ((tag === 'DIV' || tag === 'P') && isEmptyBlock(node)) return '\n\n';
                 if (tag === 'H1') return `# ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'H2') return `## ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'H3') return `### ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'BLOCKQUOTE') {
-                    const text = inlineToMd(node).trim();
+                    const text = inlineToMd(node).trimEnd();
                     const lines = text ? text.split('\n') : [''];
                     return lines.map(l => `> ${l}`.trimEnd()).join('\n') + '\n\n';
                 }
@@ -1805,8 +1833,11 @@
                     return rows.join('\n') + '\n\n';
                 }
                 if (tag === 'P' || tag === 'DIV') {
-                    const text = inlineToMd(node).trim();
-                    if (!text) return '';
+                    if (hasBlockChild(node)) {
+                        return Array.from(node.childNodes).map(blockToMd).join('');
+                    }
+                    const text = inlineToMd(node).trimEnd();
+                    if (!text.trim()) return '';
                     return text + '\n\n';
                 }
                 if (blockTags.includes(tag)) return inlineToMd(node).trim() + '\n\n';
@@ -1817,7 +1848,7 @@
             root.childNodes.forEach(node => {
                 out += blockToMd(node);
             });
-            return out.trimEnd();
+            return out;
         }
 
         function freeMarkdownToHtml(md) {
@@ -1833,6 +1864,7 @@
             while (i < lines.length) {
                 const line = lines[i];
                 if (!line.trim()) {
+                    blocks.push('<div><br></div>');
                     i += 1;
                     continue;
                 }
@@ -1892,10 +1924,15 @@
                     if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
                 });
             } else {
-                finalText = getFreeMarkdownFromEditor().trim();
+                const raw = getFreeMarkdownFromEditor().replace(/\r\n/g, '\n');
+                if (!raw.trim()) {
+                    alert("Bitte gib erst etwas ein!");
+                    return;
+                }
+                finalText = raw;
             }
 
-            if (!finalText) {
+            if (!finalText || !finalText.trim()) {
                 alert("Bitte gib erst etwas ein!");
                 return;
             }
@@ -3103,8 +3140,8 @@
                     }
                 }
             } else {
-                const text = getFreeMarkdownFromEditor().trim();
-                if (!text) {
+                const raw = getFreeMarkdownFromEditor().replace(/\r\n/g, '\n');
+                if (!raw.trim()) {
                     alert("Bitte Text eingeben.");
                     return;
                 }
@@ -3112,7 +3149,7 @@
                     const success = await window.db.saveScenario({
                         name: name,
                         category: catVal,
-                        fields: { mode: 'free', text: text }
+                        fields: { mode: 'free', text: raw }
                     });
 
                     if (success) {
