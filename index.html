@@ -488,7 +488,6 @@
                         <option value="role">Rolle & Funktion</option>
                         <option value="context">Kontext</option>
                         <option value="task">Aufgabe</option>
-                        <option value="style">Stil & Tonalität</option>
                         <option value="format">Format</option>
                         <option value="free">Freie Bausteine</option>
                     </select>
@@ -732,15 +731,14 @@
             { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein? (z.B. Senior SEO Experte)' },
             { id: 'context', label: 'Kontext', icon: 'fa-earth-europe', placeholder: 'Hintergrundinfos (Zielgruppe, Kanal, Produkt...)' },
             { id: 'task', label: 'Aufgabe', icon: 'fa-bullseye', placeholder: 'Was soll getan werden? (Schreibe 3 Headlines...)' },
-            { id: 'style', label: 'Stil & Tonalität', icon: 'fa-palette', placeholder: 'Wie soll es klingen? (Professionell, witzig, kurz...)' },
             { id: 'format', label: 'Format', icon: 'fa-list-check', placeholder: 'Ausgabeformat (Tabelle, Markdown, Liste...)' }
         ];
+        const STRUCTURED_STORAGE_ORDER = ['role', 'context', 'task', 'style', 'format'];
 
         const SNIPPET_CATEGORIES = [
             { id: 'role', label: 'Rolle & Funktion', mode: 'structured' },
             { id: 'context', label: 'Kontext', mode: 'structured' },
             { id: 'task', label: 'Aufgabe', mode: 'structured' },
-            { id: 'style', label: 'Stil & Tonalität', mode: 'structured' },
             { id: 'format', label: 'Format', mode: 'structured' },
             { id: 'free', label: 'Freie Bausteine', mode: 'free' }
         ];
@@ -751,7 +749,7 @@
         let isSnippetsOpen = true;
         let activeFieldId = null;
         let fieldFullscreenState = {};
-        let snippetOpenState = { role: false, context: false, task: false, style: false, format: false, free: false };
+        let snippetOpenState = { role: false, context: false, task: false, format: false, free: false };
         let snippetMenuOpen = false;
         let snippetMenuSnippetId = null;
         let snippetMenuCategoryId = null;
@@ -2035,7 +2033,7 @@
         async function handleCopyAndSave() {
             let finalText = "";
             if (currentMode === 'structured') {
-                const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'style': '🎨 STIL', 'format': '🧪 VARIANTEN' };
+                const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'format': '🧪 VARIANTEN' };
                 FIELDS.forEach(f => {
                     const val = document.getElementById(`input-${f.id}`).value.trim();
                     if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
@@ -2145,9 +2143,7 @@
 
                 if (Array.isArray(s.fields)) {
                     setEditorMode('structured');
-                    s.fields.forEach((val, index) => { 
-                        if (FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
-                    });
+                    applyStructuredToEditor(s);
                     return;
                 }
 
@@ -2162,19 +2158,7 @@
 
                 if (s.fields.mode === 'structured') {
                     setEditorMode('structured');
-                    if (Array.isArray(s.fields.fields)) {
-                        s.fields.fields.forEach((val, index) => { 
-                            if (FIELDS[index]) document.getElementById(`input-${FIELDS[index].id}`).value = val;
-                        });
-                        return;
-                    }
-                    if (s.fields.fields && typeof s.fields.fields === 'object') {
-                        FIELDS.forEach(f => {
-                            if (s.fields.fields[f.id] !== undefined) {
-                                document.getElementById(`input-${f.id}`).value = s.fields.fields[f.id];
-                            }
-                        });
-                    }
+                    applyStructuredToEditor(s);
                 }
             });
         }
@@ -2187,11 +2171,14 @@
         }
 
         function extractStructuredFields(s) {
-            const out = { role:'', context:'', task:'', style:'', format:'' };
+            const out = { role:'', context:'', task:'', format:'' };
 
             if (Array.isArray(s.fields)) {
                 s.fields.forEach((val, idx) => {
-                    if (FIELDS[idx]) out[FIELDS[idx].id] = val ?? '';
+                    const key = STRUCTURED_STORAGE_ORDER[idx];
+                    if (key && Object.prototype.hasOwnProperty.call(out, key)) {
+                        out[key] = val ?? '';
+                    }
                 });
                 return out;
             }
@@ -2201,13 +2188,16 @@
             if (s.fields.mode === 'structured') {
                 if (Array.isArray(s.fields.fields)) {
                     s.fields.fields.forEach((val, idx) => {
-                        if (FIELDS[idx]) out[FIELDS[idx].id] = val ?? '';
+                        const key = STRUCTURED_STORAGE_ORDER[idx];
+                        if (key && Object.prototype.hasOwnProperty.call(out, key)) {
+                            out[key] = val ?? '';
+                        }
                     });
                     return out;
                 }
                 if (s.fields.fields && typeof s.fields.fields === 'object') {
-                    FIELDS.forEach(f => {
-                        if (s.fields.fields[f.id] !== undefined) out[f.id] = s.fields.fields[f.id] ?? '';
+                    Object.keys(out).forEach(key => {
+                        if (s.fields.fields[key] !== undefined) out[key] = s.fields.fields[key] ?? '';
                     });
                     return out;
                 }
@@ -2225,7 +2215,7 @@
         }
 
         function structuredPromptToText(s) {
-            const headerMap = { role:'ðŸŽ­ ROLLE', context:'ðŸŒ KONTEXT', task:'ðŸŽ¯ AUFGABE', style:'ðŸŽ¨ STIL', format:'ðŸ§ª VARIANTEN' };
+            const headerMap = { role:'ðŸŽ­ ROLLE', context:'ðŸŒ KONTEXT', task:'ðŸŽ¯ AUFGABE', format:'ðŸ§ª VARIANTEN' };
             const data = extractStructuredFields(s);
             let finalText = '';
             FIELDS.forEach(f => {
@@ -3228,7 +3218,13 @@
             const catVal = (savePromptSelectedCategory || '').trim() || null;
 
             if (currentMode === 'structured') {
-                const fieldsData = FIELDS.map(f => document.getElementById(`input-${f.id}`).value);
+                const fieldsData = [
+                    document.getElementById('input-role')?.value || '',
+                    document.getElementById('input-context')?.value || '',
+                    document.getElementById('input-task')?.value || '',
+                    '',
+                    document.getElementById('input-format')?.value || ''
+                ];
                 if (window.db && window.db.saveScenario) {
                     const success = await window.db.saveScenario({
                         name: name,
