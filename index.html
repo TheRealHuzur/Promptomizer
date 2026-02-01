@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer V5 - Slate</title>
+    <title>Promptomizer Beta</title>
     <meta name="theme-color" content="#020617">
     
     <link rel="manifest" href="manifest.json">
@@ -231,6 +231,9 @@
           font-family: 'Inter', sans-serif;
           white-space: pre-wrap;
           outline: none;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
         }
         #input-free:empty:before {
           content: attr(data-placeholder);
@@ -359,12 +362,12 @@
 
             <div id="main-scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
                 
-                <div id="view-editor" class="max-w-4xl mx-auto fade-in pb-20">
+                <div id="view-editor" class="max-w-4xl mx-auto fade-in pb-20 h-full flex flex-col min-h-0">
                     
                     <div id="editor-structured" class="space-y-8 pt-4">
                         </div>
 
-                    <div id="editor-free" class="hidden h-full flex flex-col pt-4">
+                    <div id="editor-free" class="hidden flex-1 min-h-0 flex flex-col pt-4">
                         <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
                             <div class="flex gap-1">
                                 <button id="btn-free-h1" type="button" data-format="h1" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h1')">H1</button>
@@ -379,7 +382,7 @@
                                 <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                             </button>
                         </div>
-                        <div id="input-free" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full min-h-[60vh] bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
+                        <div id="input-free" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full flex-1 min-h-0 overflow-y-auto bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
                     </div>
                 </div>
 
@@ -747,6 +750,7 @@
         let editingSnippetOriginalCategoryId = null;
         let freeActiveFormat = null;
         let freeMarkdownCache = '';
+        let freeLastSelectionRange = null;
 
         /// --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1649,7 +1653,25 @@
             editor.addEventListener('input', () => freeSyncHtmlToMarkdown());
             editor.addEventListener('keydown', (ev) => handleFreeEditorKeydown(ev));
             editor.addEventListener('blur', () => freeSyncHtmlToMarkdown());
+            const updateSelection = () => updateFreeSelection();
+            editor.addEventListener('keyup', updateSelection);
+            editor.addEventListener('mouseup', updateSelection);
+            editor.addEventListener('select', updateSelection);
+            editor.addEventListener('input', updateSelection);
+            editor.addEventListener('blur', updateSelection);
+            document.addEventListener('selectionchange', () => {
+                if (document.activeElement === editor) updateFreeSelection();
+            });
             setFreeEditorFromMarkdown(freeGetMarkdown());
+        }
+
+        function updateFreeSelection() {
+            const editor = getFreeEditorEl();
+            const sel = window.getSelection();
+            if (!editor || !sel || !sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            if (!editor.contains(range.startContainer)) return;
+            freeLastSelectionRange = range.cloneRange();
         }
 
         function updateFreeToolbarUI() {
@@ -1770,6 +1792,48 @@
             if (sel) {
                 sel.removeAllRanges();
                 sel.addRange(range);
+            }
+        }
+
+        function insertTextAtCursor(el, text, fallbackRange) {
+            if (!el || !text) return;
+            if (el.isContentEditable) {
+                let rangeToUse = null;
+                if (fallbackRange && el.contains(fallbackRange.startContainer)) {
+                    rangeToUse = fallbackRange.cloneRange();
+                }
+                const sel = window.getSelection();
+                if (!rangeToUse && sel && sel.rangeCount) {
+                    const current = sel.getRangeAt(0);
+                    if (el.contains(current.startContainer)) rangeToUse = current.cloneRange();
+                }
+                el.focus();
+                const focusedSel = window.getSelection();
+                if (rangeToUse && focusedSel) {
+                    focusedSel.removeAllRanges();
+                    focusedSel.addRange(rangeToUse);
+                }
+                if (!rangeToUse && focusedSel && focusedSel.rangeCount) {
+                    const current = focusedSel.getRangeAt(0);
+                    if (el.contains(current.startContainer)) rangeToUse = current;
+                }
+                if (!rangeToUse) {
+                    el.appendChild(document.createTextNode(text));
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    return;
+                }
+                rangeToUse.deleteContents();
+                const node = document.createTextNode(text);
+                rangeToUse.insertNode(node);
+                rangeToUse.setStartAfter(node);
+                rangeToUse.setEndAfter(node);
+                if (focusedSel) {
+                    focusedSel.removeAllRanges();
+                    focusedSel.addRange(rangeToUse);
+                }
+                freeLastSelectionRange = rangeToUse.cloneRange();
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
             }
         }
 
@@ -2165,8 +2229,9 @@
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
                 if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
-                editor.focus();
-                document.execCommand('insertText', false, text);
+                const active = document.activeElement;
+                const target = (active === editor) ? editor : editor;
+                insertTextAtCursor(target, text, freeLastSelectionRange);
                 freeSyncHtmlToMarkdown();
                 return;
             }
@@ -2815,36 +2880,6 @@
             if (ok && settingsCurrentPage === 'snippets') {
                 await loadManageSnippetsPage();
             }
-        }
-
-        function insertSnippetText(text, targetFieldId = null) {
-            if (currentMode === 'free') {
-                const editor = getFreeEditorEl();
-                if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
-                editor.focus();
-                document.execCommand('insertText', false, text);
-                freeSyncHtmlToMarkdown();
-                return;
-            }
-
-            let target = targetFieldId;
-
-            if (target === 'free') {
-                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
-            }
-
-            if (!target) {
-                target = (activeFieldId && activeFieldId !== 'free') ? activeFieldId : 'context';
-            }
-
-            const ta = document.getElementById(`input-${target}`);
-            if (!ta) { alert('Zielfeld nicht gefunden: ' + target); return; }
-            ta.focus();
-            const start = (ta.selectionStart ?? ta.value.length);
-            const end = (ta.selectionEnd ?? ta.value.length);
-            ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
-            const pos = start + text.length;
-            ta.setSelectionRange(pos, pos);
         }
 
         async function openSnippetCategory(id) {
