@@ -756,7 +756,10 @@
         let snippetOpenState = { role: false, context: false, task: false, format: false, free: false };
         let snippetMenuOpen = false;
         let snippetMenuSnippetId = null;
-        let snippetMenuCategoryId = null;
+let snippetMenuCategoryId = null;
+let snippetMenuTriggerEl = null;
+let promptMenuTriggerEl = null;
+let sidebarMenuRaf = null;
         let snippetCacheById = {};
         let editingSnippetId = null;
         let pendingDeleteSnippetId = null;
@@ -797,8 +800,12 @@
         let freeLastSelectionRange = null;
         let lastSidebarRefreshTs = 0;
 
-        /// --- INIT ---
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarScroll = document.getElementById('sidebar-library');
+    if (sidebarScroll) {
+        sidebarScroll.addEventListener('scroll', scheduleSidebarMenuReposition, { passive: true });
+    }
+    window.addEventListener('resize', scheduleSidebarMenuReposition);
             renderStructuredFields();
             renderSnippetsAccordion();
             initFreeEditor();
@@ -2480,28 +2487,88 @@
             body.dataset.loaded = 'true';
         }
 
-        function openPromptItemMenu(ev, catKey, promptId) {
+function scheduleSidebarMenuReposition() {
+    if (sidebarMenuRaf) return;
+    sidebarMenuRaf = requestAnimationFrame(() => {
+        sidebarMenuRaf = null;
+        if (snippetMenuOpen) repositionSnippetItemMenu();
+        if (promptMenuOpen) repositionPromptItemMenu();
+    });
+}
+
+function positionMenuNextToTrigger(menu, triggerEl) {
+    if (!menu || !triggerEl) return;
+
+    const rect = triggerEl.getBoundingClientRect();
+
+    // Wenn Trigger komplett außerhalb des Viewports: Menü schließen
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return false;
+
+    const menuWidth = menu.offsetWidth || 180;
+    const menuHeight = menu.offsetHeight || 140;
+
+    // Standard: rechts neben dem Eintrag öffnen
+    let left = rect.right + 8;
+    let top = rect.top;
+
+    // Wenn rechts kein Platz: links öffnen
+    if (left + menuWidth + 8 > window.innerWidth) {
+        left = rect.left - menuWidth - 8;
+    }
+
+    // Wenn unten kein Platz: nach oben schieben
+    if (top + menuHeight + 8 > window.innerHeight) {
+        top = Math.max(8, rect.bottom - menuHeight);
+    }
+
+    // Clamp
+    const maxLeft = Math.max(8, window.innerWidth - menuWidth - 8);
+    const maxTop = Math.max(8, window.innerHeight - menuHeight - 8);
+    left = Math.min(Math.max(8, left), maxLeft);
+    top = Math.min(Math.max(8, top), maxTop);
+
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    return true;
+}
+
+function repositionSnippetItemMenu() {
+    const menu = document.getElementById('snippet-item-menu');
+    if (!menu || !snippetMenuTriggerEl) return;
+    const ok = positionMenuNextToTrigger(menu, snippetMenuTriggerEl);
+    if (ok === false) closeSnippetItemMenu();
+}
+
+function repositionPromptItemMenu() {
+    const menu = document.getElementById('prompt-item-menu');
+    if (!menu || !promptMenuTriggerEl) return;
+    const ok = positionMenuNextToTrigger(menu, promptMenuTriggerEl);
+    if (ok === false) closePromptItemMenu();
+}
+
+function openPromptItemMenu(ev, catKey, promptId) {
             ev.stopPropagation();
             const menu = document.getElementById('prompt-item-menu');
             if (!menu) return;
 
             promptMenuPromptId = promptId;
             promptMenuCategoryKey = catKey;
+            promptMenuTriggerEl = ev.currentTarget;
 
             menu.classList.remove('hidden');
+
             const sub = document.getElementById('prompt-category-submenu');
             if (sub) sub.classList.add('hidden');
             const list = document.getElementById('prompt-category-submenu-list');
             if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
-            const r = ev.currentTarget.getBoundingClientRect();
-            menu.style.top = (r.bottom + 6) + 'px';
-            menu.style.left = (r.right - menu.offsetWidth) + 'px';
-            if (menu.offsetWidth === 0) {
-                menu.classList.remove('hidden');
-                menu.style.left = (r.right - menu.offsetWidth) + 'px';
-            }
+
             promptMenuOpen = true;
             menu.onclick = (e) => e.stopPropagation();
+
+            requestAnimationFrame(() => {
+                repositionPromptItemMenu();
+                scheduleSidebarMenuReposition();
+            });
         }
 
         function closePromptItemMenu() {
@@ -2511,7 +2578,8 @@
             if (sub) sub.classList.add('hidden');
             const list = document.getElementById('prompt-category-submenu-list');
             if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
-            promptMenuOpen = false;
+    promptMenuOpen = false;
+    promptMenuTriggerEl = null;
             promptMenuPromptId = null;
             promptMenuCategoryKey = null;
         }
@@ -2841,23 +2909,23 @@
 
             snippetMenuSnippetId = snippetId;
             snippetMenuCategoryId = categoryId;
+            snippetMenuTriggerEl = ev.currentTarget;
 
             menu.classList.remove('hidden');
-            const r = ev.currentTarget.getBoundingClientRect();
-            menu.style.top = (r.bottom + 6) + 'px';
-            menu.style.left = (r.right - menu.offsetWidth) + 'px';
-            if (menu.offsetWidth === 0) {
-                menu.classList.remove('hidden');
-                menu.style.left = (r.right - menu.offsetWidth) + 'px';
-            }
             snippetMenuOpen = true;
             menu.onclick = (e) => e.stopPropagation();
+
+            requestAnimationFrame(() => {
+                repositionSnippetItemMenu();
+                scheduleSidebarMenuReposition();
+            });
         }
 
         function closeSnippetItemMenu() {
             const menu = document.getElementById('snippet-item-menu');
             if (menu) menu.classList.add('hidden');
-            snippetMenuOpen = false;
+    snippetMenuOpen = false;
+    snippetMenuTriggerEl = null;
             snippetMenuSnippetId = null;
             snippetMenuCategoryId = null;
         }
