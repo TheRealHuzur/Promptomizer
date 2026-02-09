@@ -433,9 +433,8 @@
                 </div>
 
                 <div id="view-history" class="hidden max-w-4xl mx-auto fade-in pt-4">
-                    <div class="flex justify-between items-center mb-6 border-b border-navy-border pb-4">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4">
                         <h2 class="text-2xl font-bold text-white">Historie</h2>
-                        <button onclick="loadHistory()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i></button>
                     </div>
                     <div id="history-list" class="space-y-4"></div>
                 </div>
@@ -799,6 +798,8 @@ let sidebarMenuRaf = null;
         let freeMarkdownCache = '';
         let freeLastSelectionRange = null;
         let lastSidebarRefreshTs = 0;
+        let historyCacheById = {};
+        let historyFullscreenState = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebarScroll = document.getElementById('sidebar-library');
@@ -3030,23 +3031,160 @@ function openPromptItemMenu(ev, catKey, promptId) {
             openSnippetCategory(fieldId);
         }
 
+        function historyGetTimestamp(item) {
+            return item?.timestamp || item?.created_at || item?.createdAt || item?.created || null;
+        }
+
+        function historyGetMode(item) {
+            if (!item) return null;
+            if (item.mode) return item.mode;
+            const f = item.fields;
+            if (f && typeof f === 'object' && f.mode) return f.mode;
+            return null;
+        }
+
+        function historyInferModeFromText(text) {
+            const t = (text || '').toUpperCase();
+            const hasRole = t.includes('ROLLE');
+            const hasContext = t.includes('KONTEXT');
+            const hasTask = t.includes('AUFGABE');
+            if (hasRole && hasContext && hasTask) return 'structured';
+            return 'free';
+        }
+
+        function historyParseStructuredFromText(text) {
+            const out = { role: '', context: '', task: '', format: '' };
+            const buckets = { role: [], context: [], task: [], format: [] };
+
+            const lines = (text || '').replace(/\r\n/g, '\n').split('\n');
+            let cur = null;
+
+            const detect = (line) => {
+                const norm = String(line || '').replace(/\*/g, '').trim().toUpperCase();
+                if (!norm) return null;
+                if (norm.includes('ROLLE')) return 'role';
+                if (norm.includes('KONTEXT')) return 'context';
+                if (norm.includes('AUFGABE')) return 'task';
+                if (norm.includes('VARIANTEN') || norm.includes('FORMAT')) return 'format';
+                return null;
+            };
+
+            for (const line of lines) {
+                const key = detect(line);
+                if (key) {
+                    cur = key;
+                    continue;
+                }
+                if (cur) buckets[cur].push(line);
+            }
+
+            for (const k of Object.keys(out)) {
+                out[k] = buckets[k].join('\n').trim();
+            }
+            return out;
+        }
+
+        function handleHistoryLoad(historyId) {
+            const id = String(historyId);
+            const item = historyCacheById[id];
+            if (!item) return;
+
+            const text = (item.text ?? '').toString();
+            let mode = historyGetMode(item);
+            if (!mode) mode = historyInferModeFromText(text);
+
+            // in den Editor wechseln
+            switchView('editor');
+
+            if (mode === 'free') {
+                setEditorMode('free');
+                freeSetMarkdown(text);
+                setActiveField('free');
+                return;
+            }
+
+            // structured
+            setEditorMode('structured');
+            const fields = historyParseStructuredFromText(text);
+            FIELDS.forEach(f => {
+                const el = document.getElementById(`input-${f.id}`);
+                if (el) el.value = fields[f.id] ?? '';
+            });
+            setActiveField('context');
+        }
+
+        function toggleHistoryItemFullscreen(historyId) {
+            const id = String(historyId);
+            const box = document.getElementById(`history-text-${id}`);
+            const icon = document.getElementById(`history-fullscreen-icon-${id}`);
+            if (!box || !icon) return;
+
+            const isExpanded = !!historyFullscreenState[id];
+
+            if (!isExpanded) {
+                // base inline style merken (meist leer) und dann "3x" vergrößern
+                box.dataset.baseInlineMaxHeight = box.style.maxHeight || '';
+                const base = box.offsetHeight || 96;
+                box.style.maxHeight = (base * 3) + 'px';
+
+                historyFullscreenState[id] = true;
+                icon.classList.remove('fa-up-right-and-down-left-from-center');
+                icon.classList.add('fa-down-left-and-up-right-to-center');
+            } else {
+                // zurücksetzen auf Tailwind-Klasse
+                box.style.maxHeight = box.dataset.baseInlineMaxHeight || '';
+                historyFullscreenState[id] = false;
+                icon.classList.remove('fa-down-left-and-up-right-to-center');
+                icon.classList.add('fa-up-right-and-down-left-from-center');
+            }
+        }
+
         function renderHistoryList(history) {
             const container = document.getElementById('history-list');
-            if(!history || history.length === 0) {
+            if (!container) return;
+
+            historyCacheById = {};
+
+            if (!history || history.length === 0) {
                 container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Einträge.</div>';
                 return;
             }
-            container.innerHTML = history.map(item => `
-                <div class="bg-navy-sidebar rounded-md border border-navy-border p-4 hover:border-slate-500 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-xs font-bold text-slate-500">${new Date(item.timestamp).toLocaleDateString()}</span>
-                        <button class="text-slate-500 hover:text-brand-sky"><i class="fa-solid fa-copy"></i></button>
+
+            container.innerHTML = history.map((item, idx) => {
+                const id = String(item.id ?? idx);
+                historyCacheById[id] = item;
+
+                const ts = historyGetTimestamp(item);
+                const dateStr = ts ? new Date(ts).toLocaleString('de-DE') : '';
+
+                const text = escapeHtml((item.text ?? '').toString());
+
+                return `
+                    <div class="bg-navy-sidebar rounded-md border border-navy-border p-4 hover:border-slate-500 transition-colors">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold text-slate-500">${dateStr}</span>
+                            <div class="flex items-center gap-1">
+                                <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors"
+                                        onclick="toggleHistoryItemFullscreen('${id}')"
+                                        title="Box vergrößern">
+                                    <i id="history-fullscreen-icon-${id}"
+                                       class="fa-solid fa-up-right-and-down-left-from-center text-brand-sky group-hover:text-brand-hover transition-colors"></i>
+                                </button>
+                                <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors"
+                                        onclick="handleHistoryLoad('${id}')"
+                                        title="Prompt laden">
+                                    <i class="fa-solid fa-copy text-brand-sky group-hover:text-brand-hover transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="history-text-${id}"
+                             class="text-sm font-mono text-slate-400 max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-2 overscroll-contain">
+                            ${text}
+                        </div>
                     </div>
-                    <div class="text-sm font-mono text-slate-400 h-20 overflow-y-auto custom-scrollbar">
-                        ${item.text.substring(0, 150)}...
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function loadHistory() {
