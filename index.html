@@ -1065,6 +1065,205 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadManageSnippetsPage();
                     return;
                 }
+                if (settingsCurrentPage === 'help') {
+                    contentEl.innerHTML = `
+                        <section class="help-doc space-y-6 text-slate-300 leading-relaxed">
+
+                          <h2 class="text-2xl font-bold text-white">Hilfe: Promptomizer Beta</h2>
+                          <p>
+                            Der Promptomizer hilft dir, Prompts sauber aufzubauen, wiederzuverwenden und zu organisieren.
+                            Du arbeitest in drei Hauptbereichen: <strong>Editor</strong>, <strong>Historie</strong> und <strong>Einstellungen &amp; Hilfe</strong>.
+                          </p>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">Schnellstart (in 60 Sekunden)</h2>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>Öffne den <strong>Editor</strong>.</li>
+                            <li>Wähle oben den Modus: <strong>Strukturiert</strong> (empfohlen) oder <strong>Frei</strong>.</li>
+                            <li>Fülle die Felder aus (z. B. Rolle, Kontext, Aufgabe, Format).</li>
+                            <li>Klicke auf <strong>Kopieren</strong>, um den fertigen Prompt in die Zwischenablage zu kopieren.</li>
+                            <li>Optional: Klicke auf <strong>Prompt speichern</strong>, um ihn mit Namen (und Kategorie) abzulegen.</li>
+                          </ol>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">1) Modus wählen: „Strukturiert“ oder „Frei“</h2>
+
+                          <h3 class="text-lg font-semibold text-white">Strukturiert (empfohlen)</h3>
+                          <p>
+                            Du baust deinen Prompt Feld für Feld auf. Das ist ideal für Einsteiger, weil nichts Wichtiges vergessen wird.
+                          </p>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>Rolle &amp; Funktion</strong>: Wer soll die KI sein und was ist ihre Aufgabe? (z. B. „Du bist …“)</li>
+                            <li><strong>Kontext</strong>: Worum geht es, welche Rahmenbedingungen sind wichtig?</li>
+                            <li><strong>Aufgabe</strong>: Was soll die KI konkret tun?</li>
+                            <li><strong>Format</strong>: Wie soll die Ausgabe aussehen? (z. B. Liste, Tabelle, Schritte, Länge)</li>
+                          </ul>
+
+                          <h3 class="text-lg font-semibold text-white">Frei</h3>
+                          <p>
+                            Du schreibst den Prompt als Fließtext. Das ist praktisch, wenn du schon weißt, was du tust,
+                            oder wenn du sehr eigene Strukturen nutzen willst.
+                          </p>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">2) Editor: Prompt erstellen</h2>
+                          <p>
+                            Im <strong>Editor</strong> schreibst du deinen Prompt. Unten findest du wichtige Aktionen:
+                          </p>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>Kopieren</strong>: Kopiert den aktuellen Prompt in die Zwischenablage (zum Einfügen in ChatGPT &amp; Co.).</li>
+                            <li>
+                              <strong>Reset</strong>: Setzt den aktuellen Inhalt im Editor zurück.
+                              Du wirst vorher gefragt („Wirklich alles leeren?“).
+                            </li>
+                            <li><strong>Prompt speichern</strong>: Speichert den Prompt in deiner Bibliothek (siehe nächster Abschnitt).</li>
+                          </ul>
+
+                          <h3 class="text-lg font-semibold text-white">Tipp</h3>
+                          <p>
+                            Arbeite im strukturierten Modus am besten von oben nach unten:
+                            Rolle → Kontext → Aufgabe → Format. Das sorgt für klare, stabile Ergebnisse.
+                          </p>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">3) Prompts (Bibliothek): speichern &amp; wiederfinden</h2>
+                          <p>
+                            Im Bereich <strong>Prompts</strong> verwaltest du deine gespeicherten Prompts.
+                          </p>
+
+                          <h3 class="text-lg font-semibold text-white">Prompt speichern</h3>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>Klicke auf <strong>Prompt speichern</strong>.</li>
+                            <li>Gib einen <strong>Namen</strong> ein (damit du ihn später schnell erkennst).</li>
+                            <li>Optional: Wähle eine <strong>Kategorie</strong> (oder „Ohne Kategorie“).</li>
+                            <li>Optional: Klicke auf <strong>Kategorie anlegen</strong>, wenn du eine neue Kategorie brauchst.</li>
+                            <li>Klicke auf <strong>Speichern</strong>.</li>
+                          </ol>
+
+                          <h3 class="text-lg font-semibold text-white">Gespeicherte Prompts verwalten</h3>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>Löschen</strong>: Entfernt einen Prompt (mit Sicherheitsabfrage).</li>
+                            <li><strong>Bearbeiten</strong>: Wenn verfügbar, kannst du Prompt-Daten anpassen.</li>
+                          </ul>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">4) Historie: Verlauf deiner Prompts</h2>
+                          <p>
+                            In der <strong>Historie</strong> findest du deine zuletzt erstellten bzw. genutzten Prompts.
+                            Das ist praktisch, wenn du etwas schnell wieder brauchst.
+                          </p>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>Löschen</strong>: Entfernt einen Eintrag (mit Sicherheitsabfrage).</li>
+                            <li><strong>Bearbeiten</strong>: Wenn verfügbar, kannst du Einträge anpassen.</li>
+                          </ul>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">5) Bausteine: Textbausteine zum schnellen Einfügen</h2>
+                          <p>
+                            <strong>Bausteine</strong> sind wiederverwendbare Textstücke (z. B. Standard-Rollen, typische Formatvorgaben).
+                            Sie lassen sich per Klick in den Editor einfügen.
+                          </p>
+
+                          <h3 class="text-lg font-semibold text-white">So nutzt du Bausteine</h3>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>Wähle zuerst ein Feld im Editor aus (z. B. „Kontext“).</li>
+                            <li>Öffne den Bereich <strong>Bausteine</strong>.</li>
+                            <li>Klicke auf einen Baustein, um ihn in das aktuell aktive Feld einzufügen.</li>
+                          </ol>
+
+                          <h3 class="text-lg font-semibold text-white">Neuen Baustein anlegen</h3>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>Klicke auf <strong>Neuer Baustein</strong>.</li>
+                            <li>Vergib einen <strong>Namen</strong> (z. B. „Tabellen-Format kurz“).</li>
+                            <li>Wähle die passende <strong>Kategorie</strong> (Rolle &amp; Funktion / Kontext / Aufgabe / Format / Freie Bausteine).</li>
+                            <li>Füge den <strong>Baustein-Text</strong> ein.</li>
+                            <li>Klicke auf <strong>Speichern</strong>.</li>
+                          </ol>
+
+                          <h3 class="text-lg font-semibold text-white">Bausteine verwalten</h3>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>Bearbeiten</strong>: Text oder Name ändern.</li>
+                            <li><strong>Löschen</strong>: Entfernen (mit Sicherheitsabfrage).</li>
+                          </ul>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">6) Kategorien verwalten</h2>
+                          <p>
+                            Kategorien helfen dir, gespeicherte Prompts zu sortieren.
+                          </p>
+
+                          <h3 class="text-lg font-semibold text-white">Kategorie anlegen</h3>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>Öffne <strong>Einstellungen &amp; Hilfe</strong> → <strong>Kategorien verwalten</strong>.</li>
+                            <li>Klicke auf <strong>Kategorie anlegen</strong>.</li>
+                            <li>Name eingeben → <strong>Speichern</strong>.</li>
+                          </ol>
+
+                          <h3 class="text-lg font-semibold text-white">Kategorie umbenennen</h3>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>In <strong>Kategorien verwalten</strong> auf <strong>Umbenennen</strong> klicken.</li>
+                            <li>Neuen Namen eingeben → <strong>Speichern</strong>.</li>
+                          </ol>
+
+                          <h3 class="text-lg font-semibold text-white">Kategorie löschen</h3>
+                          <p>
+                            Wenn du eine Kategorie löschst, werden die Prompts darin <strong>nicht</strong> gelöscht.
+                            Sie erscheinen danach unter <strong>„Ohne Kategorie“</strong>.
+                          </p>
+                          <ol class="list-decimal pl-6 space-y-2">
+                            <li>In <strong>Kategorien verwalten</strong> auf <strong>Löschen</strong> klicken.</li>
+                            <li>Sicherheitsabfrage bestätigen.</li>
+                          </ol>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">7) Login</h2>
+                          <p>
+                            Du kannst den Promptomizer als <strong>Gast</strong> testen. Für dauerhaftes Speichern ist ein Login sinnvoll.
+                          </p>
+                          <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>E-Mail &amp; Passwort</strong>: Einloggen über das Login-Formular.</li>
+                            <li><strong>Angemeldet bleiben</strong>: Wenn aktiviert, bleibst du eingeloggt.</li>
+                            <li><strong>Google Login</strong>: Alternativ per Google anmelden.</li>
+                          </ul>
+
+                          <hr class="border-navy-border" />
+
+                          <h2 class="text-xl font-bold text-white">FAQ</h2>
+
+                          <details class="border border-navy-border rounded-md p-4 bg-slate-900/30">
+                            <summary class="cursor-pointer text-slate-200"><strong>Warum passiert bei „Reset“ nichts?</strong></summary>
+                            <p class="mt-2">
+                              Beim Reset kommt eine Sicherheitsabfrage („Wirklich alles leeren?“).
+                              Du musst dort bestätigen, sonst bleibt der Inhalt erhalten.
+                            </p>
+                          </details>
+
+                          <details class="border border-navy-border rounded-md p-4 bg-slate-900/30">
+                            <summary class="cursor-pointer text-slate-200"><strong>Wo sind meine Prompts nach dem Löschen einer Kategorie?</strong></summary>
+                            <p class="mt-2">
+                              Deine Prompts werden nicht gelöscht. Sie werden automatisch nach <strong>„Ohne Kategorie“</strong> verschoben.
+                            </p>
+                          </details>
+
+                          <details class="border border-navy-border rounded-md p-4 bg-slate-900/30">
+                            <summary class="cursor-pointer text-slate-200"><strong>Wie nutze ich Bausteine richtig?</strong></summary>
+                            <p class="mt-2">
+                              Wähle zuerst ein Feld im Editor aus. Erst dann lassen sich Bausteine gezielt in dieses Feld einfügen.
+                            </p>
+                          </details>
+
+                        </section>
+                    `;
+                    return;
+                }
                 contentEl.innerHTML = '<div class="text-center text-slate-500 py-10">Inhalte folgen.</div>';
             }
         }
