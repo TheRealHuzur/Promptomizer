@@ -1,11 +1,12 @@
 ﻿<!DOCTYPE html>
 <html lang="de" class="dark antialiased">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Promptomizer Beta</title>
     <meta name="theme-color" content="#020617">
-    
+
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
@@ -24,7 +25,7 @@
                         },
                         brand: {
                             sky: '#0ea5e9',    // DEIN ORIGINAL (Sky 500)
-                             hover: '#38bdf8',  // Heller beim Drüberfahren (Hover Effekt umgedreht)
+                            hover: '#38bdf8',  // Heller beim Drüberfahren (Hover Effekt umgedreht)
                         },
                         slate: {
                             800: '#1e293b',
@@ -47,42 +48,95 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #020617; }
-        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #020617;
+        }
+
         /* Premium Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; border: 1px solid #0f172a; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        textarea::-webkit-scrollbar { width: 10px; }
-        textarea::-webkit-scrollbar-track { background: transparent; }
-        textarea::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; border: 1px solid #0f172a; }
-        textarea::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+            border: 1px solid #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        textarea::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+            border: 1px solid #0f172a;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
 
 
         /* Transitions */
-        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .rotate-icon { transition: transform 0.3s ease; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-transition {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* Input Styles - Surface Look */
-        textarea { 
-            resize: vertical; 
-            outline: none; 
-            background-color: #0f172a; /* Slate 900 - hebt sich vom Hintergrund ab */
-            border: 1px solid #1e293b; /* Slate 800 */
+        textarea {
+            resize: vertical;
+            outline: none;
+            background-color: #0f172a;
+            /* Slate 900 - hebt sich vom Hintergrund ab */
+            border: 1px solid #1e293b;
+            /* Slate 800 */
             color: #f1f5f9;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-        textarea:focus { 
+
+        textarea:focus {
             background-color: #0f172a;
-            border-color: #38bdf8; 
+            border-color: #38bdf8;
             box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Toggle Button Style */
         .splitter-toggle {
             position: absolute;
@@ -90,7 +144,8 @@
             transform: translateY(-50%);
             width: 20px;
             height: 48px;
-            background-color: #0f172a; /* Match Sidebar */
+            background-color: #0f172a;
+            /* Match Sidebar */
             border: 1px solid #1e293b;
             display: flex;
             align-items: center;
@@ -100,206 +155,330 @@
             color: #64748b;
             transition: all 0.2s;
         }
-        .splitter-toggle:hover { color: #38bdf8; border-color: #38bdf8; background-color: #1e293b; }
-        
-        .nav-item .nav-indicator { opacity: 0; }
-        .nav-item.active-nav .nav-indicator { opacity: 1; }
+
+        .splitter-toggle:hover {
+            color: #38bdf8;
+            border-color: #38bdf8;
+            background-color: #1e293b;
+        }
+
+        .nav-item .nav-indicator {
+            opacity: 0;
+        }
+
+        .nav-item.active-nav .nav-indicator {
+            opacity: 1;
+        }
+
         .nav-item.active-nav {
-            background-color: #1e293b; /* Slate 800 */
+            background-color: #1e293b;
+            /* Slate 800 */
             color: white;
         }
 
-        :root{
-          --navy-deep:#020617;
-          --navy-sidebar:#0f172a;
-          --navy-border:#1e293b;
-          --brand-sky:#0ea5e9;
-          --brand-hover:#38bdf8;
-          --text:#e2e8f0;
-          --muted:#94a3b8;
-          --sidebar-w:16rem;
-          --sidebar-w-collapsed:4rem;
-          --sidebar-current-w:var(--sidebar-w);
-        }
-        body.sidebar-collapsed{
-          --sidebar-current-w:var(--sidebar-w-collapsed);
-        }
-        #sidebar-left{
-          position:fixed;
-          top:0;
-          left:0;
-          bottom:0;
-          width:var(--sidebar-current-w);
-        }
-        #header-spacer-left{
-          width:var(--sidebar-current-w);
-        }
-        #app-body{
-          margin-left:var(--sidebar-current-w);
-          transition:margin-left .3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #sidebar-inner{
-          padding-top:0;
-          height:auto;
-          min-height:0;
-        }
-        #sidebar-library{
-          min-height:0;
-        }
-        body.sidebar-collapsed #sidebar-topbar{ justify-content:center; }
-        body.sidebar-collapsed #sidebar-left .nav-label{ display:none; }
-        body.sidebar-collapsed #sidebar-left .sidebar-nav-title{ display:none; }
-        body.sidebar-collapsed #sidebar-library{ display:none; }
-        body.sidebar-collapsed #sidebar-left .nav-item{ justify-content:center; gap:0; }
-        body.sidebar-collapsed #sidebar-left .nav-item i{ margin:0; }
-        body.sidebar-collapsed #sidebar-left .sidebar-user-text{ display:none; }
-
-        .ui-backdrop{
-          position:fixed;
-          inset:0;
-          background:rgba(0,0,0,.80);
-          backdrop-filter:blur(6px);
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          padding:16px;
+        :root {
+            --navy-deep: #020617;
+            --navy-sidebar: #0f172a;
+            --navy-border: #1e293b;
+            --brand-sky: #0ea5e9;
+            --brand-hover: #38bdf8;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --sidebar-w: 16rem;
+            --sidebar-w-collapsed: 4rem;
+            --sidebar-current-w: var(--sidebar-w);
         }
 
-        .ui-modal{
-          background:var(--navy-sidebar);
-          border:1px solid var(--navy-border);
-          border-radius:12px;
-          box-shadow:0 25px 50px -12px rgba(0,0,0,.45);
-          padding:24px;
-          width:100%;
-        }
-        .ui-modal-sm{ max-width:24rem; }
-        .ui-modal-lg{ max-width:32rem; }
-
-        .ui-modal-header{
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          margin-bottom:16px;
-        }
-        .ui-modal-title{
-          font-size:1.25rem;
-          font-weight:700;
-          color:#fff;
+        body.sidebar-collapsed {
+            --sidebar-current-w: var(--sidebar-w-collapsed);
         }
 
-        .ui-icon-btn{
-          color:#64748b;
-          transition:color .15s ease, background .15s ease, transform .15s ease;
-          border-radius:8px;
-          padding:6px;
-        }
-        .ui-icon-btn:hover{ color:#fff; background:rgba(30,41,59,.40); }
-        .ui-icon-btn:active{ transform:scale(.98); }
-
-        .ui-label{
-          font-size:.75rem;
-          font-weight:700;
-          color:#94a3b8;
-          text-transform:uppercase;
-          letter-spacing:.12em;
+        #sidebar-left {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-current-w);
         }
 
-        .ui-input, .ui-select, .ui-textarea{
-          width:100%;
-          margin-top:8px;
-          border-radius:10px;
-          padding:12px;
-          background:var(--navy-deep);
-          border:1px solid var(--navy-border);
-          color:var(--text);
-          outline:none;
-          transition:border-color .15s ease, box-shadow .15s ease;
-        }
-        .ui-textarea{ min-height:120px; resize:vertical; }
-        .ui-input:focus, .ui-select:focus, .ui-textarea:focus{
-          border-color:var(--brand-sky);
-          box-shadow:0 0 0 1px var(--brand-sky);
+        #header-spacer-left {
+            width: var(--sidebar-current-w);
         }
 
-        .ui-actions{
-          display:flex;
-          justify-content:flex-end;
-          gap:12px;
-          margin-top:24px;
+        #app-body {
+            margin-left: var(--sidebar-current-w);
+            transition: margin-left .3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .ui-btn{
-          display:inline-flex;
-          align-items:center;
-          justify-content:center;
-          gap:8px;
-          padding:10px 16px;
-          border-radius:10px;
-          font-size:.875rem;
-          font-weight:700;
-          transition:background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
-          user-select:none;
+        #sidebar-inner {
+            padding-top: 0;
+            height: auto;
+            min-height: 0;
         }
-        .ui-btn:active{ transform:scale(.98); }
 
-        .ui-btn-ghost{
-          color:var(--muted);
-          background:transparent;
+        #sidebar-library {
+            min-height: 0;
         }
-        .ui-btn-ghost:hover{ color:#fff; }
 
-        .ui-btn-primary{
-          background:var(--brand-sky);
-          color:var(--navy-deep);
-          box-shadow:0 0 20px -5px rgba(56,189,248,.30);
+        body.sidebar-collapsed #sidebar-topbar {
+            justify-content: center;
         }
-        .ui-btn-primary:hover{ background:var(--brand-hover); }
 
-        .ui-btn-danger{
-          background:#ef4444;
-          color:#fff;
+        body.sidebar-collapsed #sidebar-left .nav-label {
+            display: none;
         }
-        .ui-btn-danger:hover{ background:#dc2626; }
+
+        body.sidebar-collapsed #sidebar-left .sidebar-nav-title {
+            display: none;
+        }
+
+        body.sidebar-collapsed #sidebar-library {
+            display: none;
+        }
+
+        body.sidebar-collapsed #sidebar-left .nav-item {
+            justify-content: center;
+            gap: 0;
+        }
+
+        body.sidebar-collapsed #sidebar-left .nav-item i {
+            margin: 0;
+        }
+
+        body.sidebar-collapsed #sidebar-left .sidebar-user-text {
+            display: none;
+        }
+
+        .ui-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .80);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .ui-modal {
+            background: var(--navy-sidebar);
+            border: 1px solid var(--navy-border);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .45);
+            padding: 24px;
+            width: 100%;
+        }
+
+        .ui-modal-sm {
+            max-width: 24rem;
+        }
+
+        .ui-modal-lg {
+            max-width: 32rem;
+        }
+
+        .ui-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .ui-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .ui-icon-btn {
+            color: #64748b;
+            transition: color .15s ease, background .15s ease, transform .15s ease;
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        .ui-icon-btn:hover {
+            color: #fff;
+            background: rgba(30, 41, 59, .40);
+        }
+
+        .ui-icon-btn:active {
+            transform: scale(.98);
+        }
+
+        .ui-label {
+            font-size: .75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+        }
+
+        .ui-input,
+        .ui-select,
+        .ui-textarea {
+            width: 100%;
+            margin-top: 8px;
+            border-radius: 10px;
+            padding: 12px;
+            background: var(--navy-deep);
+            border: 1px solid var(--navy-border);
+            color: var(--text);
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .ui-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .ui-input:focus,
+        .ui-select:focus,
+        .ui-textarea:focus {
+            border-color: var(--brand-sky);
+            box-shadow: 0 0 0 1px var(--brand-sky);
+        }
+
+        .ui-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .ui-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: .875rem;
+            font-weight: 700;
+            transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+            user-select: none;
+        }
+
+        .ui-btn:active {
+            transform: scale(.98);
+        }
+
+        .ui-btn-ghost {
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .ui-btn-ghost:hover {
+            color: #fff;
+        }
+
+        .ui-btn-primary {
+            background: var(--brand-sky);
+            color: var(--navy-deep);
+            box-shadow: 0 0 20px -5px rgba(56, 189, 248, .30);
+        }
+
+        .ui-btn-primary:hover {
+            background: var(--brand-hover);
+        }
+
+        .ui-btn-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .ui-btn-danger:hover {
+            background: #dc2626;
+        }
 
         #input-free {
-          font-family: 'Inter', sans-serif;
-          white-space: pre-wrap;
-          outline: none;
-          overflow-y: auto;
-          overscroll-behavior: contain;
-          -webkit-overflow-scrolling: touch;
+            font-family: 'Inter', sans-serif;
+            white-space: pre-wrap;
+            outline: none;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
+
         #input-free:empty:before {
-          content: attr(data-placeholder);
-          color: #64748b;
+            content: attr(data-placeholder);
+            color: #64748b;
         }
-        #input-free h1 { font-size: 1.5rem; font-weight: 700; color: #fff; }
-        #input-free h2 { font-size: 1.25rem; font-weight: 700; color: #fff; }
-        #input-free h3 { font-size: 1.1rem; font-weight: 700; color: #fff; }
-        #input-free ul { list-style: disc; padding-left: 1.5rem; }
-        #input-free ol { list-style: decimal; padding-left: 1.5rem; }
-        #input-free li { margin: 0.15rem 0; }
+
+        #input-free h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        #input-free h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        #input-free h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        #input-free ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+        }
+
+        #input-free ol {
+            list-style: decimal;
+            padding-left: 1.5rem;
+        }
+
+        #input-free li {
+            margin: 0.15rem 0;
+        }
+
+        #input-free code,
+        #input-free pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            background-color: rgba(30, 41, 59, 0.5);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: #38bdf8;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #input-free pre {
+            display: block;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
         #input-free blockquote {
-          font-style: italic;
-          border-left: 3px solid rgba(148, 163, 184, 0.5);
-          padding-left: 0.75rem;
-          color: #cbd5f5;
-          margin: 6px 0;
+            font-style: italic;
+            border-left: 3px solid rgba(148, 163, 184, 0.5);
+            padding-left: 0.75rem;
+            color: #cbd5f5;
+            margin: 6px 0;
         }
     </style>
 </head>
+
 <body class="text-slate-400 h-screen flex flex-col w-full bg-navy-deep">
 
     <header id="app-header" class="h-14 flex-shrink-0 w-full relative z-40 shadow-sm pointer-events-none">
         <!-- Hintergrund + Bottom-Border nur für den Main-Bereich (rechts neben der Sidebar) -->
         <div id="header-bg" class="absolute inset-y-0 right-0 bg-navy-sidebar border-b border-navy-border"
-             style="left: var(--sidebar-current-w);"></div>
+            style="left: var(--sidebar-current-w);"></div>
 
         <!-- Inhalt -->
         <div class="relative z-10 w-full h-full flex items-center justify-center">
             <!-- Spacer bleibt, damit Logo/Controls weiterhin korrekt zentriert sind; klickt sich durch (pointer-events-none) -->
-            <div id="header-spacer-left" class="sidebar-transition flex-shrink-0 border-r border-transparent pointer-events-none"></div>
+            <div id="header-spacer-left"
+                class="sidebar-transition flex-shrink-0 border-r border-transparent pointer-events-none"></div>
 
             <!-- Interaktiver Bereich (Buttons etc.) wieder klickbar -->
             <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0 pointer-events-auto">
@@ -310,10 +489,12 @@
                     </div>
 
                     <div class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
-                        <button onclick="setEditorMode('structured')" id="btn-mode-structured" class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
+                        <button onclick="setEditorMode('structured')" id="btn-mode-structured"
+                            class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
                             Strukturiert
                         </button>
-                        <button onclick="setEditorMode('free')" id="btn-mode-free" class="px-5 py-1 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
+                        <button onclick="setEditorMode('free')" id="btn-mode-free"
+                            class="px-5 py-1 rounded text-xs font-bold text-slate-500 hover:text-slate-300 transition-all">
                             Frei
                         </button>
                     </div>
@@ -324,60 +505,74 @@
 
     <div id="app-body" class="flex-1 flex overflow-hidden relative">
 
-        <aside id="sidebar-left" class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
+        <aside id="sidebar-left"
+            class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div id="sidebar-topbar" class="h-14 flex items-center justify-end px-3 border-r border-transparent">
-                <button id="btn-sidebar-collapse" class="ui-icon-btn w-9 h-9 flex items-center justify-center leading-none" onclick="toggleSidebar('left')" title="Sidebar umschalten">
+                <button id="btn-sidebar-collapse"
+                    class="ui-icon-btn w-9 h-9 flex items-center justify-center leading-none"
+                    onclick="toggleSidebar('left')" title="Sidebar umschalten">
                     <i class="fa-solid fa-table-columns leading-none relative top-px"></i>
                 </button>
             </div>
             <div id="sidebar-inner" class="flex flex-col flex-1 min-h-0">
                 <div class="px-2 py-4">
-                    <div class="sidebar-nav-title text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">Navigation</div>
+                    <div
+                        class="sidebar-nav-title text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">
+                        Navigation</div>
                     <div class="space-y-0.5">
-                        <div onclick="switchView('editor')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
+                        <div onclick="switchView('editor')"
+                            class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
                             <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
                             <span class="nav-label text-sm font-medium">Editor</span>
                         </div>
-                        <div onclick="switchView('history')" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                        <div onclick="switchView('history')"
+                            class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                            <i class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                            <i
+                                class="fa-solid fa-clock-rotate-left w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                             <span class="nav-label text-sm font-medium">Historie</span>
                         </div>
-                        <div onclick="toggleSettingsMenu(event)" class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                        <div onclick="toggleSettingsMenu(event)"
+                            class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                            <i class="fa-solid fa-gear w-5 text-center group-hover:text-brand-sky transition-colors"></i>
+                            <i
+                                class="fa-solid fa-gear w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                             <span class="nav-label text-sm font-medium">Einstellungen & Hilfe</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="sidebar-library" class="flex-1 min-h-0 overflow-y-auto p-0">
-                    
+
                     <div class="bg-navy-sidebar">
-                        <button onclick="togglePromptsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
+                        <button onclick="togglePromptsSection()"
+                            class="w-full flex items-center justify-between px-4 py-3 text-left">
                             <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-layer-group"></i> Prompts
                             </span>
-                            <i id="prompts-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
+                            <i id="prompts-toggle-icon"
+                                class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
                         </button>
                     </div>
                     <div id="prompts-body" class="px-4 pt-1 pb-2">
-<div id="library-scenarios" class="space-y-0.5">
+                        <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
                     </div>
 
                     <div>
-                        <button onclick="toggleSnippetsSection()" class="w-full flex items-center justify-between px-4 py-3 text-left">
+                        <button onclick="toggleSnippetsSection()"
+                            class="w-full flex items-center justify-between px-4 py-3 text-left">
                             <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-cube"></i> Bausteine
                             </span>
-                            <i id="snippets-toggle-icon" class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
+                            <i id="snippets-toggle-icon"
+                                class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
                         </button>
                         <div id="snippets-body" class="px-4 pt-1 pb-2">
-<div id="library-snippets" class="space-y-0.5">
-                            <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
+                            <div id="library-snippets" class="space-y-0.5">
+                                <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
                             </div>
                         </div>
                     </div>
@@ -386,13 +581,17 @@
 
                 <div class="mt-auto flex-shrink-0">
                     <div class="h-20 px-4 border-t border-navy-border bg-black/10 flex items-center">
-                        <button onclick="openAuthModal()" class="user-button w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
-                            <div class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
+                        <button onclick="openAuthModal()"
+                            class="user-button w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
+                            <div
+                                class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
                                 <i class="fa-solid fa-user"></i>
                             </div>
                             <div class="sidebar-user-text text-left overflow-hidden">
                                 <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
-                                <div id="user-status-sub" class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login</div>
+                                <div id="user-status-sub"
+                                    class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login
+                                </div>
                             </div>
                         </button>
                     </div>
@@ -401,34 +600,58 @@
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0 bg-navy-deep relative z-10 shadow-inner">
-            
-            <button onclick="toggleSidebar('left')" class="splitter-toggle -left-3 rounded-r-md border-l-0 hidden" title="Toggle Navigation">
+
+            <button onclick="toggleSidebar('left')" class="splitter-toggle -left-3 rounded-r-md border-l-0 hidden"
+                title="Toggle Navigation">
                 <i id="icon-toggle-left" class="fa-solid fa-chevron-left text-xs rotate-icon"></i>
             </button>
 
             <div id="main-scroll-area" class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
-                
+
                 <div id="view-editor" class="max-w-4xl mx-auto fade-in pb-20 h-full flex flex-col min-h-0">
-                    
+
                     <div id="editor-structured" class="space-y-8 pt-4">
-                        </div>
+                    </div>
 
                     <div id="editor-free" class="hidden flex-1 min-h-0 flex flex-col pt-4">
                         <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
                             <div class="flex gap-1">
-                                <button id="btn-free-h1" type="button" data-format="h1" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h1')">H1</button>
-                                <button id="btn-free-h2" type="button" data-format="h2" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h2')">H2</button>
-                                <button id="btn-free-h3" type="button" data-format="h3" class="free-format-btn px-2 py-1 rounded text-xs font-bold" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h3')">H3</button>
-                                <button id="btn-free-bold" type="button" data-format="bold" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('bold')"><i class="fa-solid fa-bold"></i></button>
-                                <button id="btn-free-quote" type="button" data-format="quote" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('quote')"><i class="fa-solid fa-quote-right"></i></button>
-                                <button id="btn-free-ul" type="button" data-format="ul" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('ul')"><i class="fa-solid fa-list-ul"></i></button>
-                                <button id="btn-free-ol" type="button" data-format="ol" class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()" onclick="toggleFreeFormat('ol')"><i class="fa-solid fa-list-ol"></i></button>
+                                <button id="btn-free-h1" type="button" data-format="h1"
+                                    class="free-format-btn px-2 py-1 rounded text-xs font-bold"
+                                    onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h1')">H1</button>
+                                <button id="btn-free-h2" type="button" data-format="h2"
+                                    class="free-format-btn px-2 py-1 rounded text-xs font-bold"
+                                    onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h2')">H2</button>
+                                <button id="btn-free-h3" type="button" data-format="h3"
+                                    class="free-format-btn px-2 py-1 rounded text-xs font-bold"
+                                    onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h3')">H3</button>
+                                <button id="btn-free-bold" type="button" data-format="bold"
+                                    class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()"
+                                    onclick="toggleFreeFormat('bold')"><i class="fa-solid fa-bold"></i></button>
+                                <button id="btn-free-quote" type="button" data-format="quote"
+                                    class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()"
+                                    onclick="toggleFreeFormat('quote')"><i class="fa-solid fa-quote-right"></i></button>
+                                <button id="btn-free-ul" type="button" data-format="ul"
+                                    class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()"
+                                    onclick="toggleFreeFormat('ul')"><i class="fa-solid fa-list-ul"></i></button>
+                                <button id="btn-free-ol" type="button" data-format="ol"
+                                    class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()"
+                                    onclick="toggleFreeFormat('ol')"><i class="fa-solid fa-list-ol"></i></button>
+                                <button id="btn-free-code" type="button" data-format="code"
+                                    class="free-format-btn p-2 rounded" onmousedown="event.preventDefault()"
+                                    onclick="toggleFreeFormat('code')" title="Code/Monospaced"><i
+                                        class="fa-solid fa-code"></i></button>
                             </div>
-                            <button type="button" class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
-                                <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
+                            <button type="button"
+                                class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors"
+                                onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
+                                <i
+                                    class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                             </button>
                         </div>
-                        <div id="input-free" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..." class="w-full flex-1 min-h-0 overflow-y-auto bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans" onfocus="setActiveField('free')"></div>
+                        <div id="input-free" contenteditable="true" data-placeholder="Schreibe deinen Prompt hier..."
+                            class="w-full flex-1 min-h-0 overflow-y-auto bg-navy-sidebar border border-navy-border rounded-md p-6 text-slate-200 text-base leading-relaxed font-sans"
+                            onfocus="setActiveField('free')"></div>
                     </div>
                 </div>
 
@@ -451,19 +674,23 @@
 
             </div>
 
-            <footer class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
+            <footer
+                class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
                 <div class="w-full max-w-4xl flex items-center gap-4">
                     <div id="footer-save-wrap">
-                        <button onclick="saveCurrentToLibrary()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                        <button onclick="saveCurrentToLibrary()"
+                            class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
                             <i class="fa-solid fa-floppy-disk"></i>
                             <span>Prompt speichern</span>
                         </button>
                     </div>
                     <div class="ml-auto flex items-center gap-4">
-                        <button onclick="resetCurrentView()" class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
+                        <button onclick="resetCurrentView()"
+                            class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
                             Reset
                         </button>
-                        <button id="btn-copy" onclick="handleCopyAndSave()" class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                        <button id="btn-copy" onclick="handleCopyAndSave()"
+                            class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
                             <i class="fa-solid fa-copy"></i>
                             <span>Kopieren</span>
                         </button>
@@ -497,7 +724,8 @@
                 </div>
                 <div>
                     <label class="ui-label">Baustein-Text</label>
-                    <textarea id="snippet-content" class="ui-textarea" placeholder="Text für den Baustein..."></textarea>
+                    <textarea id="snippet-content" class="ui-textarea"
+                        placeholder="Text für den Baustein..."></textarea>
                 </div>
             </div>
             <div class="ui-actions">
@@ -506,7 +734,8 @@
             </div>
         </div>
     </div>
-    <div id="modal-auth" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="modal-auth"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold text-white">Login</h3>
@@ -519,15 +748,15 @@
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">E-Mail</label>
                     <input id="auth-email" type="email"
-                           class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                           placeholder="name@mail.de" />
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="name@mail.de" />
                 </div>
 
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort</label>
                     <input id="auth-password" type="password"
-                           class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                           placeholder="••••••••" />
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="••••••••" />
                 </div>
 
                 <label class="flex items-center gap-2 text-sm text-slate-300 select-none">
@@ -538,34 +767,44 @@
                 <div id="auth-error" class="hidden text-sm text-red-400"></div>
 
                 <button onclick="handleEmailLogin()"
-                        class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
+                    class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
                     Einloggen
                 </button>
 
                 <div class="h-px bg-navy-border"></div>
 
                 <button onclick="loginWithGoogle()"
-                        class="w-full py-3 bg-white text-navy-deep font-bold rounded-md flex justify-center gap-2 hover:bg-slate-100 transition-colors">
+                    class="w-full py-3 bg-white text-navy-deep font-bold rounded-md flex justify-center gap-2 hover:bg-slate-100 transition-colors">
                     <i class="fa-brands fa-google"></i> Google Login
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="snippet-item-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-40">
-        <button onclick="handleEditSnippet()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
-        <button onclick="handleAskDeleteSnippet()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+    <div id="snippet-item-menu"
+        class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-40">
+        <button onclick="handleEditSnippet()"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+        <button onclick="handleAskDeleteSnippet()"
+            class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
 
-    <div id="prompt-item-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
-        <button onclick="handleEditPrompt()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+    <div id="prompt-item-menu"
+        class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
+        <button onclick="handleEditPrompt()"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
         <div id="prompt-menu-category" class="relative group">
-            <button class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60" onmouseenter="openPromptCategorySubmenu()" onclick="return false;">
+            <button
+                class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
+                onmouseenter="openPromptCategorySubmenu()" onclick="return false;">
                 <span>Kategorie</span>
                 <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
             </button>
-            <div id="prompt-category-submenu" class="absolute top-0 left-full ml-2 w-64 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden">
-                <button class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky" onclick="handlePromptCategoryCreateFromMenu(event)">
+            <div id="prompt-category-submenu"
+                class="absolute top-0 left-full ml-2 w-64 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden">
+                <button
+                    class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky"
+                    onclick="handlePromptCategoryCreateFromMenu(event)">
                     Kategorie anlegen
                 </button>
                 <div class="h-px bg-navy-border"></div>
@@ -574,30 +813,45 @@
                 </div>
             </div>
         </div>
-        <button onclick="handleAskDeletePrompt()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+        <button onclick="handleAskDeletePrompt()"
+            class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
 
-    <div id="manage-category-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
-        <button onclick="handleManageCategoryRename()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Umbenennen</button>
-        <button onclick="handleManageCategoryDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+    <div id="manage-category-menu"
+        class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
+        <button onclick="handleManageCategoryRename()"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Umbenennen</button>
+        <button onclick="handleManageCategoryDelete()"
+            class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
-    <div id="manage-snippet-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
-        <button onclick="handleManageSnippetEdit()" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
-        <button id="manage-snippet-target-trigger" class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60" onmouseenter="openManageSnippetTargetSubmenu()" onclick="return false;">
+    <div id="manage-snippet-menu"
+        class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
+        <button onclick="handleManageSnippetEdit()"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+        <button id="manage-snippet-target-trigger"
+            class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
+            onmouseenter="openManageSnippetTargetSubmenu()" onclick="return false;">
             <span>Baustein</span>
             <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
         </button>
-        <button onclick="handleManageSnippetDelete()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
+        <button onclick="handleManageSnippetDelete()"
+            class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800/60">Löschen</button>
     </div>
-    <div id="manage-snippet-target-submenu" class="fixed z-[121] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-64">
+    <div id="manage-snippet-target-submenu"
+        class="fixed z-[121] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-64">
         <div id="manage-snippet-target-submenu-list" class="py-1">
             <div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>
         </div>
     </div>
-    <div id="settings-nav-menu" class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-56">
-        <button onclick="openSettingsPage('categories')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorien verwalten</button>
-        <button onclick="openSettingsPage('snippets')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bausteine verwalten</button>
-        <button onclick="openSettingsPage('help')" class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Hilfe</button>
+    <div id="settings-nav-menu"
+        class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden w-56">
+        <button onclick="openSettingsPage('categories')"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Kategorien
+            verwalten</button>
+        <button onclick="openSettingsPage('snippets')"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bausteine verwalten</button>
+        <button onclick="openSettingsPage('help')"
+            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Hilfe</button>
     </div>
 
     <div id="modal-snippet-delete" class="ui-backdrop z-[120] hidden">
@@ -639,7 +893,8 @@
                 </button>
             </div>
             <label class="ui-label">Name der Kategorie</label>
-            <input id="prompt-category-name" type="text" class="ui-input" placeholder="z. B. Verwaltung, Workshop, ..." />
+            <input id="prompt-category-name" type="text" class="ui-input"
+                placeholder="z. B. Verwaltung, Workshop, ..." />
             <div class="ui-actions">
                 <button onclick="closePromptCategoryModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
                 <button onclick="savePromptCategoryFromModal()" class="ui-btn ui-btn-primary">Speichern</button>
@@ -656,7 +911,8 @@
                 </button>
             </div>
             <label class="ui-label">Neuer Name</label>
-            <input id="rename-category-name" type="text" class="ui-input" placeholder="z. B. Marketing, Workshop, ..." />
+            <input id="rename-category-name" type="text" class="ui-input"
+                placeholder="z. B. Marketing, Workshop, ..." />
             <div class="ui-actions">
                 <button onclick="closeRenameCategoryModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
                 <button onclick="confirmRenameCategory()" class="ui-btn ui-btn-primary">Speichern</button>
@@ -667,14 +923,16 @@
     <div id="modal-category-delete" class="ui-backdrop z-[120] hidden">
         <div class="ui-modal ui-modal-sm">
             <h3 class="ui-modal-title mb-3">Kategorie löschen</h3>
-            <p class="text-sm text-slate-400 mb-4">Die Prompts in dieser Kategorie werden nicht gelöscht. Sie erscheinen anschließend unter „Ohne Kategorie“.</p>
+            <p class="text-sm text-slate-400 mb-4">Die Prompts in dieser Kategorie werden nicht gelöscht. Sie erscheinen
+                anschließend unter „Ohne Kategorie“.</p>
             <div class="ui-actions">
                 <button onclick="closeDeleteCategoryModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
                 <button onclick="confirmDeleteCategory()" class="ui-btn ui-btn-danger">Löschen</button>
             </div>
         </div>
     </div>
-    <div id="modal-save-prompt" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="modal-save-prompt"
+        class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-lg rounded-lg shadow-2xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold text-white">Prompt speichern</h3>
@@ -685,20 +943,23 @@
 
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
             <input id="save-prompt-name" type="text"
-                   class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                   placeholder="z.B. Workshop Auftakt" />
+                class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                placeholder="z.B. Workshop Auftakt" />
 
             <div id="save-prompt-category-field" class="mt-4 relative">
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Kategorie (optional)</label>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Kategorie
+                    (optional)</label>
                 <button type="button" id="save-prompt-category-trigger"
-                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none flex items-center justify-between"
-                        onclick="openSavePromptCategoryMenu(event)">
+                    class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none flex items-center justify-between"
+                    onclick="openSavePromptCategoryMenu(event)">
                     <span id="save-prompt-category-value" class="truncate">Ohne Kategorie</span>
                     <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                 </button>
-                <div id="save-prompt-category-menu" class="absolute left-0 right-0 mt-2 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden z-20">
-                    <button class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky"
-                            onclick="handleSavePromptCategoryCreate(event)">
+                <div id="save-prompt-category-menu"
+                    class="absolute left-0 right-0 mt-2 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden z-20">
+                    <button
+                        class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky"
+                        onclick="handleSavePromptCategoryCreate(event)">
                         Kategorie anlegen
                     </button>
                     <div class="h-px bg-navy-border"></div>
@@ -709,21 +970,25 @@
             <div id="save-prompt-error" class="hidden text-sm text-red-400 mt-3"></div>
 
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="closeSavePromptModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
-                <button onclick="confirmSavePromptModal()" class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">
+                <button onclick="closeSavePromptModal()"
+                    class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
+                <button onclick="confirmSavePromptModal()"
+                    class="px-5 py-2 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md">
                     Speichern
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="modal-reset" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="modal-reset"
+        class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
             <h3 class="text-xl font-bold text-white mb-3">Wirklich alles leeren?</h3>
             <p class="text-sm text-slate-400 mb-6">Der aktuelle Inhalt im Editor wird zurückgesetzt.</p>
             <div class="flex justify-end gap-3">
                 <button onclick="closeResetModal()" class="px-4 py-2 text-slate-400 hover:text-white">Abbrechen</button>
-                <button onclick="confirmReset()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md">Reset</button>
+                <button onclick="confirmReset()"
+                    class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md">Reset</button>
             </div>
         </div>
     </div>
@@ -755,10 +1020,10 @@
         let snippetOpenState = { role: false, context: false, task: false, format: false, free: false };
         let snippetMenuOpen = false;
         let snippetMenuSnippetId = null;
-let snippetMenuCategoryId = null;
-let snippetMenuTriggerEl = null;
-let promptMenuTriggerEl = null;
-let sidebarMenuRaf = null;
+        let snippetMenuCategoryId = null;
+        let snippetMenuTriggerEl = null;
+        let promptMenuTriggerEl = null;
+        let sidebarMenuRaf = null;
         let snippetCacheById = {};
         let editingSnippetId = null;
         let pendingDeleteSnippetId = null;
@@ -801,12 +1066,12 @@ let sidebarMenuRaf = null;
         let historyCacheById = {};
         let historyFullscreenState = {};
 
-document.addEventListener('DOMContentLoaded', () => {
-    const sidebarScroll = document.getElementById('sidebar-library');
-    if (sidebarScroll) {
-        sidebarScroll.addEventListener('scroll', scheduleSidebarMenuReposition, { passive: true });
-    }
-    window.addEventListener('resize', scheduleSidebarMenuReposition);
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarScroll = document.getElementById('sidebar-library');
+            if (sidebarScroll) {
+                sidebarScroll.addEventListener('scroll', scheduleSidebarMenuReposition, { passive: true });
+            }
+            window.addEventListener('resize', scheduleSidebarMenuReposition);
             renderStructuredFields();
             renderSnippetsAccordion();
             initFreeEditor();
@@ -836,35 +1101,35 @@ document.addEventListener('DOMContentLoaded', () => {
             window.addEventListener('auth-state-changed', (event) => {
                 const user = event.detail;
                 console.log("🚀 Auth Status Update:", user ? "Eingeloggt" : "Gast");
-                
+
                 // UI und Bibliothek sofort aktualisieren
                 updateUIAuth(user);
-                loadLibrary(); 
+                loadLibrary();
             });
 
             // 2. Fallback Start: Versucht es einmalig kurz nach Start 
             // (Wichtig für Gast-Modus oder falls der Login extrem schnell war)
             setTimeout(() => {
-                if(window.db && window.db.getScenarios) loadLibrary();
-                if(window.currentUser) updateUIAuth(window.currentUser);
+                if (window.db && window.db.getScenarios) loadLibrary();
+                if (window.currentUser) updateUIAuth(window.currentUser);
             }, 500);
         });
 
         // --- AUTH UI UPDATE ---
         function updateUIAuth(user) {
-          const nameEl = document.getElementById('user-name-display');
-          const subEl = document.getElementById('user-status-sub');
-          if(nameEl && subEl) {
-              if(user) {
-                 nameEl.innerText = user.email.split('@')[0];
-                 subEl.innerText = 'Pro Plan';
-                 subEl.classList.add('text-brand-sky');
-              } else {
-                 nameEl.innerText = 'Gast';
-                 subEl.innerText = 'Klicken zum Login';
-                 subEl.classList.remove('text-brand-sky');
-              }
-          }
+            const nameEl = document.getElementById('user-name-display');
+            const subEl = document.getElementById('user-status-sub');
+            if (nameEl && subEl) {
+                if (user) {
+                    nameEl.innerText = user.email.split('@')[0];
+                    subEl.innerText = 'Pro Plan';
+                    subEl.classList.add('text-brand-sky');
+                } else {
+                    nameEl.innerText = 'Gast';
+                    subEl.innerText = 'Klicken zum Login';
+                    subEl.classList.remove('text-brand-sky');
+                }
+            }
         }
 
         function closeAuthModal() {
@@ -1413,8 +1678,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const snippetList = snippets.length ? `
                     <div class="space-y-0.5">
                         ${snippets.map(snippet => {
-                            manageSnippetCacheById[snippet.id] = snippet;
-                            return `
+                    manageSnippetCacheById[snippet.id] = snippet;
+                    return `
                                 <div id="manage-snippet-${snippet.id}" class="group w-full py-1 px-1 rounded hover:bg-slate-800/50 transition-colors">
                                     <div class="flex items-center justify-between w-full">
                                         <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(snippet.name || '')}>${snippet.name}</div>
@@ -1424,7 +1689,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 ` : '<div class="text-xs text-slate-600 italic py-2 pl-1">Keine Bausteine.</div>';
 
@@ -1591,7 +1856,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const e = ev || window.event;
                 if (e && e.stopPropagation) e.stopPropagation();
-            } catch (_) {}
+            } catch (_) { }
 
             const snippetId = manageSnippetMenuSnippetId;
             const oldCatId = manageSnippetMenuCategoryId;
@@ -1814,31 +2079,38 @@ document.addEventListener('DOMContentLoaded', () => {
         function switchView(viewId) {
             ['view-editor', 'view-history', 'view-settings'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.classList.add('hidden');
+                if (el) el.classList.add('hidden');
             });
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            
+
             // Reset Nav Styles
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('active-nav');
                 btn.classList.remove('bg-gray-800/50', 'border-brand-sky', 'text-white');
                 btn.classList.add('text-slate-500', 'border-transparent');
             });
-            
+
             // Set Active Style
             const index = viewId === 'editor' ? 0 : viewId === 'history' ? 1 : 2;
             const activeBtn = document.querySelectorAll('.nav-item')[index];
-            if(activeBtn) {
+            if (activeBtn) {
                 activeBtn.classList.remove('text-slate-500', 'border-transparent');
                 activeBtn.classList.add('active-nav');
-            }
+            }
+
             const saveWrap = document.getElementById('footer-save-wrap');
             if (saveWrap) saveWrap.classList.toggle('hidden', viewId !== 'editor');
 
-            if(viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
+            if (viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
         }
 
         function setEditorMode(mode) {
+            // If not in editor view, switch to it
+            const editorView = document.getElementById('view-editor');
+            if (editorView && editorView.classList.contains('hidden')) {
+                switchView('editor');
+            }
+
             currentMode = mode;
             const btnStruct = document.getElementById('btn-mode-structured');
             const btnFree = document.getElementById('btn-mode-free');
@@ -1901,6 +2173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editor.addEventListener('input', () => freeSyncHtmlToMarkdown());
             editor.addEventListener('keydown', (ev) => handleFreeEditorKeydown(ev));
             editor.addEventListener('blur', () => freeSyncHtmlToMarkdown());
+            editor.addEventListener('paste', (ev) => handleFreePaste(ev));
             const updateSelection = () => updateFreeSelection();
             editor.addEventListener('keyup', updateSelection);
             editor.addEventListener('mouseup', updateSelection);
@@ -1912,6 +2185,16 @@ document.addEventListener('DOMContentLoaded', () => {
             setFreeEditorFromMarkdown(freeGetMarkdown());
         }
 
+        function handleFreePaste(ev) {
+            ev.preventDefault();
+            const text = (ev.clipboardData || window.clipboardData).getData('text/plain');
+            const editor = getFreeEditorEl();
+            if (!editor) return;
+
+            // Inserts plain text at cursor
+            insertTextAtCursor(editor, text, freeLastSelectionRange);
+        }
+
         function updateFreeSelection() {
             const editor = getFreeEditorEl();
             const sel = window.getSelection();
@@ -1919,6 +2202,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const range = sel.getRangeAt(0);
             if (!editor.contains(range.startContainer)) return;
             freeLastSelectionRange = range.cloneRange();
+            updateFreeActiveFormatFromSelection();
+        }
+
+        function updateFreeActiveFormatFromSelection() {
+            const editor = getFreeEditorEl();
+            const sel = window.getSelection();
+            if (!editor || !sel || !sel.rangeCount) return;
+
+            let node = sel.anchorNode;
+            if (node.nodeType === 3) node = node.parentNode;
+
+            let format = null;
+            if (getClosestTag(node, ['H1'])) format = 'h1';
+            else if (getClosestTag(node, ['H2'])) format = 'h2';
+            else if (getClosestTag(node, ['H3'])) format = 'h3';
+            else if (getClosestTag(node, ['BLOCKQUOTE'])) format = 'quote';
+            else if (getClosestTag(node, ['UL'])) format = 'ul';
+            else if (getClosestTag(node, ['OL'])) format = 'ol';
+            else if (getClosestTag(node, ['CODE', 'PRE'])) format = 'code';
+
+            freeActiveFormat = format;
+            updateFreeToolbarUI();
+
+            // Special check for Bold
+            const btnBold = document.getElementById('btn-free-bold');
+            if (btnBold) {
+                const isBold = document.queryCommandState('bold');
+                btnBold.classList.toggle('bg-slate-800', isBold);
+                btnBold.classList.toggle('text-white', isBold);
+                btnBold.classList.toggle('text-slate-400', !isBold);
+            }
         }
 
         function updateFreeToolbarUI() {
@@ -1963,7 +2277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function deactivateFormat(format) {
             if (!format) return;
             if (format === 'bold') document.execCommand('bold');
-            if (format === 'h1' || format === 'h2' || format === 'h3' || format === 'quote') {
+            if (format === 'h1' || format === 'h2' || format === 'h3' || format === 'quote' || format === 'code') {
                 document.execCommand('formatBlock', false, 'P');
             }
             if (format === 'ul') document.execCommand('insertUnorderedList');
@@ -1978,6 +2292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (format === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
             if (format === 'ul') document.execCommand('insertUnorderedList');
             if (format === 'ol') document.execCommand('insertOrderedList');
+            if (format === 'code') document.execCommand('formatBlock', false, 'PRE');
         }
 
         function focusEditorPreserveSelection(editor) {
@@ -1987,6 +2302,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function handleFreeEditorKeydown(ev) {
             if (ev.key !== 'Enter') return;
+
+            const sel = window.getSelection();
+            const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+
+            // PRE handling: Enter should just insert a newline
+            const pre = getClosestTag(anchor, ['PRE']);
+            if (pre) {
+                ev.preventDefault();
+                // We use insertHTML or insertText to cross-browser insert a newline
+                document.execCommand('insertHTML', false, '\n');
+                return;
+            }
+
             if (freeActiveFormat === 'h1' || freeActiveFormat === 'h2' || freeActiveFormat === 'h3') {
                 requestAnimationFrame(() => {
                     freeActiveFormat = null;
@@ -1994,8 +2322,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     freeSyncHtmlToMarkdown();
                 });
             }
-            const sel = window.getSelection();
-            const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+
             const li = getClosestTag(anchor, ['LI']);
             if (!li) return;
             const list = getClosestTag(li, ['UL', 'OL']);
@@ -2100,7 +2427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function freeHtmlToMarkdown(root) {
-            const blockTags = ['H1','H2','H3','P','DIV','BLOCKQUOTE','UL','OL'];
+            const blockTags = ['H1', 'H2', 'H3', 'P', 'DIV', 'BLOCKQUOTE', 'UL', 'OL'];
 
             const inlineToMd = (node) => {
                 if (node.nodeType === 3) return node.nodeValue;
@@ -2109,6 +2436,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tag === 'BR') return '\n';
                 const inner = Array.from(node.childNodes).map(inlineToMd).join('');
                 if (tag === 'STRONG' || tag === 'B') return `**${inner}**`;
+                if (tag === 'CODE') return `\`${inner}\``;
                 return inner;
             };
 
@@ -2143,6 +2471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tag === 'H1') return `# ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'H2') return `## ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'H3') return `### ${inlineToMd(node).trim()}\n\n`;
+                if (tag === 'PRE' || tag === 'CODE') return `\`\`\`\n${inlineToMd(node).trim()}\n\`\`\`\n\n`;
                 if (tag === 'BLOCKQUOTE') {
                     const text = inlineToMd(node).trimEnd();
                     const lines = text ? text.split('\n') : [''];
@@ -2174,7 +2503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             root.childNodes.forEach(node => {
                 out += blockToMd(node);
             });
-            return out;
+            return out.trim();
         }
 
         function freeMarkdownToHtml(md) {
@@ -2184,14 +2513,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const parseInline = (text) => {
                 const safe = escapeHtml(text);
-                return safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                return safe
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/`(.+?)`/g, '<code>$1</code>');
             };
 
             while (i < lines.length) {
                 const line = lines[i];
                 if (!line.trim()) {
-                    blocks.push('<div><br></div>');
-                    i += 1;
+                    // Skip single empty lines that act as paragraph separators
+                    // But if there are consecutive ones, we might want to keep a spacer
+                    let emptyCount = 0;
+                    while (i < lines.length && !lines[i].trim()) {
+                        emptyCount++;
+                        i++;
+                    }
+                    if (emptyCount > 1) {
+                        for (let k = 0; k < emptyCount - 1; k++) {
+                            blocks.push('<div><br></div>');
+                        }
+                    }
                     continue;
                 }
                 if (/^#{1,3}\s+/.test(line)) {
@@ -2199,6 +2540,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const content = line.replace(/^#{1,3}\s+/, '');
                     blocks.push(`<h${level}>${parseInline(content)}</h${level}>`);
                     i += 1;
+                    continue;
+                }
+                if (/^```/.test(line)) {
+                    const buf = [];
+                    i += 1; // skip fence
+                    while (i < lines.length && !/^```/.test(lines[i])) {
+                        buf.push(lines[i]);
+                        i += 1;
+                    }
+                    i += 1; // skip closing fence
+                    blocks.push(`<pre>${escapeHtml(buf.join('\n'))}</pre>`);
                     continue;
                 }
                 if (/^>\s?/.test(line)) {
@@ -2238,6 +2590,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 blocks.push(`<p>${content}</p>`);
             }
 
+            // JOIN WITHOUT EXTRA DIVS FOR EMPTY LINES (unless multiple)
             return blocks.join('');
         }
 
@@ -2304,7 +2657,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function resetFields() {
-            if(currentMode === 'structured') {
+            if (currentMode === 'structured') {
                 FIELDS.forEach(f => document.getElementById(`input-${f.id}`).value = '');
             } else {
                 const editor = getFreeEditorEl();
@@ -2323,7 +2676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function loadLibrary() {
-            if(!window.db) return;
+            if (!window.db) return;
             promptLibraryCache = await window.db.getScenarios();
             promptCategoriesCache = window.db.getPromptCategories ? await window.db.getPromptCategories() : [];
             renderPromptsAccordion();
@@ -2382,7 +2735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function extractStructuredFields(s) {
-            const out = { role:'', context:'', task:'', format:'' };
+            const out = { role: '', context: '', task: '', format: '' };
 
             if (Array.isArray(s.fields)) {
                 s.fields.forEach((val, idx) => {
@@ -2426,7 +2779,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function structuredPromptToText(s) {
-            const headerMap = { role:'ðŸŽ­ ROLLE', context:'ðŸŒ KONTEXT', task:'ðŸŽ¯ AUFGABE', format:'ðŸ§ª VARIANTEN' };
+            const headerMap = { role: 'ðŸŽ­ ROLLE', context: 'ðŸŒ KONTEXT', task: 'ðŸŽ¯ AUFGABE', format: 'ðŸ§ª VARIANTEN' };
             const data = extractStructuredFields(s);
             let finalText = '';
             FIELDS.forEach(f => {
@@ -2687,66 +3040,66 @@ document.addEventListener('DOMContentLoaded', () => {
             body.dataset.loaded = 'true';
         }
 
-function scheduleSidebarMenuReposition() {
-    if (sidebarMenuRaf) return;
-    sidebarMenuRaf = requestAnimationFrame(() => {
-        sidebarMenuRaf = null;
-        if (snippetMenuOpen) repositionSnippetItemMenu();
-        if (promptMenuOpen) repositionPromptItemMenu();
-    });
-}
+        function scheduleSidebarMenuReposition() {
+            if (sidebarMenuRaf) return;
+            sidebarMenuRaf = requestAnimationFrame(() => {
+                sidebarMenuRaf = null;
+                if (snippetMenuOpen) repositionSnippetItemMenu();
+                if (promptMenuOpen) repositionPromptItemMenu();
+            });
+        }
 
-function positionMenuNextToTrigger(menu, triggerEl) {
-    if (!menu || !triggerEl) return;
+        function positionMenuNextToTrigger(menu, triggerEl) {
+            if (!menu || !triggerEl) return;
 
-    const rect = triggerEl.getBoundingClientRect();
+            const rect = triggerEl.getBoundingClientRect();
 
-    // Wenn Trigger komplett außerhalb des Viewports: Menü schließen
-    if (rect.bottom < 0 || rect.top > window.innerHeight) return false;
+            // Wenn Trigger komplett außerhalb des Viewports: Menü schließen
+            if (rect.bottom < 0 || rect.top > window.innerHeight) return false;
 
-    const menuWidth = menu.offsetWidth || 180;
-    const menuHeight = menu.offsetHeight || 140;
+            const menuWidth = menu.offsetWidth || 180;
+            const menuHeight = menu.offsetHeight || 140;
 
-    // Standard: rechts neben dem Eintrag öffnen
-    let left = rect.right + 8;
-    let top = rect.top;
+            // Standard: rechts neben dem Eintrag öffnen
+            let left = rect.right + 8;
+            let top = rect.top;
 
-    // Wenn rechts kein Platz: links öffnen
-    if (left + menuWidth + 8 > window.innerWidth) {
-        left = rect.left - menuWidth - 8;
-    }
+            // Wenn rechts kein Platz: links öffnen
+            if (left + menuWidth + 8 > window.innerWidth) {
+                left = rect.left - menuWidth - 8;
+            }
 
-    // Wenn unten kein Platz: nach oben schieben
-    if (top + menuHeight + 8 > window.innerHeight) {
-        top = Math.max(8, rect.bottom - menuHeight);
-    }
+            // Wenn unten kein Platz: nach oben schieben
+            if (top + menuHeight + 8 > window.innerHeight) {
+                top = Math.max(8, rect.bottom - menuHeight);
+            }
 
-    // Clamp
-    const maxLeft = Math.max(8, window.innerWidth - menuWidth - 8);
-    const maxTop = Math.max(8, window.innerHeight - menuHeight - 8);
-    left = Math.min(Math.max(8, left), maxLeft);
-    top = Math.min(Math.max(8, top), maxTop);
+            // Clamp
+            const maxLeft = Math.max(8, window.innerWidth - menuWidth - 8);
+            const maxTop = Math.max(8, window.innerHeight - menuHeight - 8);
+            left = Math.min(Math.max(8, left), maxLeft);
+            top = Math.min(Math.max(8, top), maxTop);
 
-    menu.style.left = left + 'px';
-    menu.style.top = top + 'px';
-    return true;
-}
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            return true;
+        }
 
-function repositionSnippetItemMenu() {
-    const menu = document.getElementById('snippet-item-menu');
-    if (!menu || !snippetMenuTriggerEl) return;
-    const ok = positionMenuNextToTrigger(menu, snippetMenuTriggerEl);
-    if (ok === false) closeSnippetItemMenu();
-}
+        function repositionSnippetItemMenu() {
+            const menu = document.getElementById('snippet-item-menu');
+            if (!menu || !snippetMenuTriggerEl) return;
+            const ok = positionMenuNextToTrigger(menu, snippetMenuTriggerEl);
+            if (ok === false) closeSnippetItemMenu();
+        }
 
-function repositionPromptItemMenu() {
-    const menu = document.getElementById('prompt-item-menu');
-    if (!menu || !promptMenuTriggerEl) return;
-    const ok = positionMenuNextToTrigger(menu, promptMenuTriggerEl);
-    if (ok === false) closePromptItemMenu();
-}
+        function repositionPromptItemMenu() {
+            const menu = document.getElementById('prompt-item-menu');
+            if (!menu || !promptMenuTriggerEl) return;
+            const ok = positionMenuNextToTrigger(menu, promptMenuTriggerEl);
+            if (ok === false) closePromptItemMenu();
+        }
 
-function openPromptItemMenu(ev, catKey, promptId) {
+        function openPromptItemMenu(ev, catKey, promptId) {
             ev.stopPropagation();
             const menu = document.getElementById('prompt-item-menu');
             if (!menu) return;
@@ -2778,8 +3131,8 @@ function openPromptItemMenu(ev, catKey, promptId) {
             if (sub) sub.classList.add('hidden');
             const list = document.getElementById('prompt-category-submenu-list');
             if (list) list.innerHTML = '<div class="px-3 py-2 text-xs text-slate-500 italic">Lade…</div>';
-    promptMenuOpen = false;
-    promptMenuTriggerEl = null;
+            promptMenuOpen = false;
+            promptMenuTriggerEl = null;
             promptMenuPromptId = null;
             promptMenuCategoryKey = null;
         }
@@ -2940,11 +3293,11 @@ function openPromptItemMenu(ev, catKey, promptId) {
             openPromptCategoryModal();
         }
 
-                        async function selectPromptCategory(ev, categoryName) {
+        async function selectPromptCategory(ev, categoryName) {
             try {
                 const e = ev || window.event;
                 if (e && e.stopPropagation) e.stopPropagation();
-            } catch (_) {}
+            } catch (_) { }
 
             const id = promptMenuPromptId;
             const oldKey = promptMenuCategoryKey;
@@ -3079,9 +3432,9 @@ function openPromptItemMenu(ev, catKey, promptId) {
             body.innerHTML = `
                 <div class="space-y-0.5">
                     ${snippets.map(snippet => {
-                        snippetCacheById[snippet.id] = snippet;
-                        const encoded = encodeURIComponent(snippet.content || '');
-                        return `
+                snippetCacheById[snippet.id] = snippet;
+                const encoded = encodeURIComponent(snippet.content || '');
+                return `
                             <div id="snippet-item-${snippet.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
                                 <div class="flex items-center justify-between w-full">
                                     <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title=${JSON.stringify(snippet.name || '')}>${snippet.name}</div>
@@ -3091,7 +3444,7 @@ function openPromptItemMenu(ev, catKey, promptId) {
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             `;
             body.dataset.loaded = 'true';
@@ -3124,8 +3477,8 @@ function openPromptItemMenu(ev, catKey, promptId) {
         function closeSnippetItemMenu() {
             const menu = document.getElementById('snippet-item-menu');
             if (menu) menu.classList.add('hidden');
-    snippetMenuOpen = false;
-    snippetMenuTriggerEl = null;
+            snippetMenuOpen = false;
+            snippetMenuTriggerEl = null;
             snippetMenuSnippetId = null;
             snippetMenuCategoryId = null;
         }
@@ -3395,7 +3748,7 @@ function openPromptItemMenu(ev, catKey, promptId) {
         function renderFavoritesList(history) {
             const favs = history.filter(h => h.favorite);
             const container = document.getElementById('favorites-list');
-            if(favs.length === 0) {
+            if (favs.length === 0) {
                 container.innerHTML = '<div class="text-center text-slate-500 py-10">Keine Favoriten.</div>';
                 return;
             }
@@ -3673,38 +4026,9 @@ function openPromptItemMenu(ev, catKey, promptId) {
             openSnippetCategory(id);
         };
     </script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="db.js"></script>
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
