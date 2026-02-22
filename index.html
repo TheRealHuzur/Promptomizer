@@ -581,7 +581,7 @@
 
                 <div class="mt-auto flex-shrink-0">
                     <div class="h-20 px-4 border-t border-navy-border bg-black/10 flex items-center">
-                        <button onclick="openAuthModal()"
+                        <button onclick="switchView('konto')"
                             class="user-button w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
                             <div
                                 class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
@@ -669,6 +669,131 @@
                     </div>
                     <div id="settings-content" class="space-y-4">
                         <div class="text-center text-slate-500 py-10">Inhalte folgen.</div>
+                    </div>
+                </div>
+
+                <!-- KONTO VIEW -->
+                <div id="view-konto" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="mb-8 border-b border-navy-border pb-4">
+                        <h2 class="text-2xl font-bold text-white">Konto</h2>
+                    </div>
+
+                    <div class="space-y-12">
+                        <!-- Profil -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div
+                                        class="w-12 h-12 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xl font-bold">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div id="konto-user-name" class="text-lg font-bold text-white">Gast</div>
+                                        <div id="konto-user-email" class="text-sm text-slate-400">Nicht eingeloggt</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 italic">Weitere Einstellungen folgen.</p>
+                            </div>
+                        </section>
+
+                        <!-- Plan & Abonnement -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Plan &
+                                Abonnement</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <div class="text-lg font-bold text-white" id="konto-plan-name">Free Plan</div>
+                                        <div class="text-sm text-slate-400">Aktueller Status</div>
+                                    </div>
+                                    <div
+                                        class="px-3 py-1 bg-brand-sky/10 border border-brand-sky/20 rounded text-brand-sky text-xs font-bold uppercase tracking-wider">
+                                        Aktiv</div>
+                                </div>
+                                <p class="text-xs text-slate-500 italic">Abo-Verwaltung folgt in Kürze.</p>
+                            </div>
+                        </section>
+
+                        <!-- Rechtliches -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Rechtliches</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg overflow-hidden">
+                                <button onclick="switchView('impressum')"
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 border-b border-navy-border transition-colors group">
+                                    <span
+                                        class="text-slate-300 group-hover:text-white transition-colors">Impressum</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="switchView('datenschutz')"
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 border-b border-navy-border transition-colors group">
+                                    <span
+                                        class="text-slate-300 group-hover:text-white transition-colors">Datenschutzerklärung</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="switchView('agb')"
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors group">
+                                    <span class="text-slate-300 group-hover:text-white transition-colors">AGB &
+                                        Widerrufsbelehrung</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Konto löschen -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Gefahrenzone
+                            </h3>
+                            <div class="bg-navy-sidebar border border-red-500/20 rounded-lg p-6">
+                                <button disabled
+                                    class="px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-md font-bold text-sm opacity-50 cursor-not-allowed">
+                                    Konto löschen — demnächst verfügbar
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- RECHTSEITEN VIEWS -->
+                <div id="view-impressum" class="hidden h-full flex flex-col pt-4">
+                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                        <button onclick="switchView('konto')"
+                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
+                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
+                        <div id="content-impressum" class="prose prose-slate max-w-none">
+                            <!-- Inhalt wird nachgereicht -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-datenschutz" class="hidden h-full flex flex-col pt-4">
+                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                        <button onclick="switchView('konto')"
+                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
+                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
+                        <div id="content-datenschutz" class="prose prose-slate max-w-none">
+                            <!-- Inhalt wird nachgereicht -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-agb" class="hidden h-full flex flex-col pt-4">
+                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                        <button onclick="switchView('konto')"
+                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
+                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
+                        <div id="content-agb" class="prose prose-slate max-w-none">
+                            <!-- Inhalt wird nachgereicht -->
+                        </div>
                     </div>
                 </div>
 
@@ -2076,8 +2201,86 @@
             await loadManageCategoriesPage();
         }
 
+        async function updateKontoView() {
+            const nameEl = document.getElementById('konto-user-name');
+            const emailEl = document.getElementById('konto-user-email');
+            const planEl = document.getElementById('konto-plan-name');
+
+            if (window.currentUser) {
+                nameEl.innerText = window.currentUser.email.split('@')[0];
+                emailEl.innerText = window.currentUser.email;
+                planEl.innerText = 'Pro Plan';
+            } else {
+                nameEl.innerText = 'Gast';
+                emailEl.innerText = 'Nicht eingeloggt';
+                planEl.innerText = 'Free Plan';
+            }
+
+            // Load legal texts if not already loaded
+            if (!document.getElementById('content-impressum').innerHTML.trim()) {
+                await loadLegalContent();
+            }
+        }
+
+        async function loadLegalContent(specificKey = null) {
+            const legalFiles = {
+                impressum: 'Impressum.md',
+                datenschutz: 'Datenschutzerklaerung.md',
+                agb: 'AGB.md'
+            };
+
+            const keysToLoad = specificKey ? [specificKey] : Object.keys(legalFiles);
+
+            for (const key of keysToLoad) {
+                const filename = legalFiles[key];
+                const container = document.getElementById(`content-${key}`);
+                if (!container || (container.innerHTML.trim() && !container.innerText.includes('Fehler'))) continue;
+
+                try {
+                    const response = await fetch(filename);
+                    if (response.ok) {
+                        const markdown = await response.text();
+                        container.innerHTML = simpleMarkdownToHtml(markdown);
+                    } else {
+                        console.error(`Status ${response.status} beim Laden von ${filename}`);
+                        container.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+                            <strong>Fehler beim Laden:</strong> ${filename} wurde nicht gefunden (Status: ${response.status}).<br>
+                            Erscheint diese Meldung auf dem Live-Server? Prüfen Sie, ob die Datei im Ordner vorhanden ist.
+                        </div>`;
+                    }
+                } catch (e) {
+                    console.error(`Netzwerkfehler beim Laden von ${filename}:`, e);
+                    container.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+                            <strong>Netzwerkfehler:</strong> Die Datei ${filename} konnte nicht geladen werden.<br>
+                            Falls Sie die Datei direkt im Browser öffnen (ohne Server), erlaubt der Browser keinen Zugriff auf lokale Dateien (CORS). Nutzen Sie bitte "Live Server".
+                        </div>`;
+                }
+            }
+        }
+
+        function simpleMarkdownToHtml(md) {
+            if (!md) return '';
+            return md
+                .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6">$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold mt-8 mb-4">$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>')
+                .replace(/^\* (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
+                .replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
+                .replace(/^\d\. (.*$)/gm, '<li class="ml-4 list-decimal">$1</li>')
+                .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gm, '<em>$1</em>')
+                .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-slate-200 pl-4 italic my-4">$1</blockquote>')
+                .replace(/\n\n/g, '</p><p class="mb-4">')
+                .replace(/\n/g, '<br>');
+        }
+
         function switchView(viewId) {
-            ['view-editor', 'view-history', 'view-settings'].forEach(id => {
+            const legalViews = ['impressum', 'datenschutz', 'agb'];
+            if (legalViews.includes(viewId)) {
+                loadLegalContent(viewId);
+            }
+
+            ['view-editor', 'view-history', 'view-settings', 'view-konto', 'view-impressum', 'view-datenschutz', 'view-agb'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -2091,12 +2294,15 @@
             });
 
             // Set Active Style
-            const index = viewId === 'editor' ? 0 : viewId === 'history' ? 1 : 2;
-            const activeBtn = document.querySelectorAll('.nav-item')[index];
-            if (activeBtn) {
-                activeBtn.classList.remove('text-slate-500', 'border-transparent');
-                activeBtn.classList.add('active-nav');
+            const indexTable = { editor: 0, history: 1, settings: 2 };
+            const index = indexTable[viewId] !== undefined ? indexTable[viewId] : -1;
+            const navItems = document.querySelectorAll('.nav-item');
+            if (index !== -1 && navItems[index]) {
+                navItems[index].classList.remove('text-slate-500', 'border-transparent');
+                navItems[index].classList.add('active-nav');
             }
+
+            if (viewId === 'konto') updateKontoView();
 
             const saveWrap = document.getElementById('footer-save-wrap');
             if (saveWrap) saveWrap.classList.toggle('hidden', viewId !== 'editor');
