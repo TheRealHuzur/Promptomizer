@@ -12,9 +12,9 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" data-cookieconsent="ignore"></script>
 
-    <script>
+    <script data-cookieconsent="ignore">
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -46,8 +46,10 @@
         }
     </script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        data-cookieconsent="ignore">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+        data-cookieconsent="ignore">
 
     <style>
         body {
@@ -465,6 +467,10 @@
             padding-left: 0.75rem;
             color: #cbd5f5;
             margin: 6px 0;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -1503,7 +1509,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cookieconsent="ignore">
         // --- CONFIG ---
         const FIELDS = [
             { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein? (z.B. Senior SEO Experte)' },
@@ -4605,8 +4611,8 @@
         };
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" data-cookieconsent="ignore"></script>
+    <script src="db.js" data-cookieconsent="ignore"></script>
 </body>
 
 </html>
