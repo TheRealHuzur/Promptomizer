@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e"
+        data-blockingmode="auto" type="text/javascript"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Promptomizer Beta</title>
     <meta name="theme-color" content="#020617">
@@ -10,9 +12,9 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" data-cookieconsent="ignore"></script>
 
-    <script>
+    <script data-cookieconsent="ignore">
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -44,8 +46,10 @@
         }
     </script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        data-cookieconsent="ignore">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+        data-cookieconsent="ignore">
 
     <style>
         body {
@@ -464,6 +468,10 @@
             color: #cbd5f5;
             margin: 6px 0;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -732,9 +740,15 @@
                                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                                 </button>
                                 <button onclick="switchView('agb')"
-                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors group">
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 border-b border-navy-border transition-colors group">
                                     <span class="text-slate-300 group-hover:text-white transition-colors">AGB &
                                         Widerrufsbelehrung</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="switchView('cookies')"
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors group">
+                                    <span
+                                        class="text-slate-300 group-hover:text-white transition-colors">Cookie-Einstellungen</span>
                                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                                 </button>
                             </div>
@@ -755,202 +769,422 @@
                 </div>
 
                 <!-- RECHTSEITEN VIEWS -->
-                <div id="view-impressum" class="hidden h-full flex flex-col pt-4">
-                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                <div id="view-impressum" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4 gap-4">
                         <button onclick="switchView('konto')"
-                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
-                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-colors"
+                            title="Zurück">
+                            <i class="fa-solid fa-arrow-left"></i>
                         </button>
+                        <h2 class="text-2xl font-bold text-white">Impressum</h2>
                     </div>
-                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
-                        <div id="content-impressum" class="prose prose-slate max-w-none">
-                            <h1 class="text-3xl font-bold mb-6">Impressum</h1>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Anbieter</h2>
-                            <p class="mb-4">Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg</p>
-                            <p class="mb-4">Vertreten durch: Patrick Roßkothen</p>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Kontakt</h2>
-                            <p class="mb-4">Telefon: 0177 / 35 22 745<br>E-Mail: info@promptomizer.de</p>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Berufsbezeichnung</h2>
-                            <p class="mb-4">Freiberufler</p>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Haftungsausschluss</h2>
-                            <p class="mb-4">Wir sind für die Inhalte unserer Internetseiten nach den Maßgaben der
-                                allgemeinen Gesetze verantwortlich. Alle Inhalte werden mit der gebotenen Sorgfalt und
-                                nach bestem Wissen erstellt. Soweit wir auf unseren Internetseiten mittels Hyperlink auf
-                                Internetseiten Dritter verweisen, können wir keine Gewähr für die fortwährende
-                                Aktualität, Richtigkeit und Vollständigkeit der verlinkten Inhalte übernehmen, da diese
-                                Inhalte außerhalb unseres Verantwortungsbereichs liegen und wir auf die zukünftige
-                                Gestaltung keinen Einfluss haben. Sollten aus Ihrer Sicht Inhalte gegen geltendes Recht
-                                verstoßen oder unangemessen sein, teilen Sie uns dies bitte mit.</p>
-                            <p class="mb-4">Die rechtlichen Hinweise auf dieser Seite sowie alle Fragen und
+
+                    <div class="space-y-6 text-slate-300 leading-relaxed">
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Anbieter</h3>
+                            <p>Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg</p>
+                            <p>Vertreten durch: Patrick Roßkothen</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Kontakt</h3>
+                            <p>Telefon: 0177 / 35 22 745<br>E-Mail: info@promptomizer.de</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Berufsbezeichnung</h3>
+                            <p>Freiberufler</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Haftungsausschluss</h3>
+                            <p>Wir sind für die Inhalte unserer Internetseiten nach den Maßgaben der allgemeinen Gesetze
+                                verantwortlich. Alle Inhalte werden mit der gebotenen Sorgfalt und nach bestem Wissen
+                                erstellt. Soweit wir auf unseren Internetseiten mittels Hyperlink auf Internetseiten
+                                Dritter verweisen, können wir keine Gewähr für die fortwährende Aktualität, Richtigkeit
+                                und Vollständigkeit der verlinkten Inhalte übernehmen, da diese Inhalte außerhalb
+                                unseres Verantwortungsbereichs liegen und wir auf die zukünftige Gestaltung keinen
+                                Einfluss haben. Sollten aus Ihrer Sicht Inhalte gegen geltendes Recht verstoßen oder
+                                unangemessen sein, teilen Sie uns dies bitte mit.</p>
+                            <p class="mt-4">Die rechtlichen Hinweise auf dieser Seite sowie alle Fragen und
                                 Streitigkeiten im Zusammenhang mit der Gestaltung dieser Internetseite unterliegen dem
                                 Recht der Bundesrepublik Deutschland.</p>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Urheberrechtshinweis</h2>
-                            <p class="mb-4">Die auf unserer Internetseite vorhandenen Texte, Bilder, Fotos, Videos oder
-                                Grafiken unterliegen in der Regel dem Schutz des Urheberrechts. Jede unberechtigte
-                                Verwendung (insbesondere die Vervielfältigung, Bearbeitung oder Verbreitung) dieser
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Urheberrechtshinweis</h3>
+                            <p>Die auf unserer Internetseite vorhandenen Texte, Bilder, Fotos, Videos oder Grafiken
+                                unterliegen in der Regel dem Schutz des Urheberrechts. Jede unberechtigte Verwendung
+                                (insbesondere die Vervielfältigung, Bearbeitung oder Verbreitung) dieser
                                 urheberrechtlich geschützten Inhalte ist daher untersagt. Wenn Sie beabsichtigen, diese
                                 Inhalte oder Teile davon zu verwenden, kontaktieren Sie uns bitte im Voraus unter den
                                 oben stehenden Angaben.</p>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">Widerspruch gegen Werbe-E-Mails</h2>
-                            <p class="mb-4">Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten
-                                Kontaktdaten zur Übersendung von nicht ausdrücklich angeforderter Werbung und
-                                Informationsmaterialien wird hiermit widersprochen. Die Betreiber der Seiten behalten
-                                sich ausdrücklich rechtliche Schritte im Falle der unverlangten Zusendung von
-                                Werbeinformationen, etwa durch Spam-E-Mails, vor.</p>
-                        </div>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Widerspruch gegen Werbe-E-Mails</h3>
+                            <p>Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten Kontaktdaten zur
+                                Übersendung von nicht ausdrücklich angeforderter Werbung und Informationsmaterialien
+                                wird hiermit widersprochen. Die Betreiber der Seiten behalten sich ausdrücklich
+                                rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen, etwa
+                                durch Spam-E-Mails, vor.</p>
+                        </section>
                     </div>
                 </div>
 
-                <div id="view-datenschutz" class="hidden h-full flex flex-col pt-4">
-                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                <div id="view-datenschutz" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4 gap-4">
                         <button onclick="switchView('konto')"
-                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
-                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-colors"
+                            title="Zurück">
+                            <i class="fa-solid fa-arrow-left"></i>
                         </button>
+                        <h2 class="text-2xl font-bold text-white">Datenschutzerklärung</h2>
                     </div>
-                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
-                        <div id="content-datenschutz" class="prose prose-slate max-w-none">
-                            <h1 class="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
-                            <h2 class="text-2xl font-bold mt-8 mb-4">1. Datenschutz auf einen Blick</h2>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Allgemeine Hinweise</h3>
-                            <p class="mb-4">Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit
-                                Ihren personenbezogenen Daten passiert, wenn Sie Promptomizer.de nutzen.
-                                Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden
-                                können.</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Datenerfassung auf dieser Website</h3>
-                            <p class="mb-4"><strong>Wer ist verantwortlich?</strong><br>Die Datenverarbeitung erfolgt
-                                durch den Websitebetreiber. Kontaktdaten siehe Impressum.</p>
-                            <p class="mb-4"><strong>Welche Daten erfassen wir?</strong><br>
-                            <ul class="ml-8 list-disc mb-4">
+
+                    <div class="space-y-6 text-slate-300 leading-relaxed overflow-y-auto pr-2">
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">1. Datenschutz auf einen Blick</h3>
+                            <h4 class="text-lg font-semibold text-white mb-2">Allgemeine Hinweise</h4>
+                            <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren
+                                personenbezogenen Daten passiert, wenn Sie Promptomizer.de nutzen. Personenbezogene
+                                Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Datenerfassung auf dieser Website
+                            </h4>
+                            <p><strong>Wer ist verantwortlich?</strong><br>Die Datenverarbeitung erfolgt durch den
+                                Websitebetreiber. Kontaktdaten siehe Impressum.</p>
+
+                            <p class="mt-4"><strong>Welche Daten erfassen wir?</strong></p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
                                 <li>Daten, die Sie bei der Registrierung und Nutzung aktiv eingeben (E-Mail-Adresse,
                                     gespeicherte Prompts)</li>
                                 <li>Technische Daten, die beim Besuch automatisch erfasst werden (IP-Adresse, Browser,
                                     Betriebssystem)</li>
                             </ul>
-                            </p>
-                            <p class="mb-4"><strong>Wofür nutzen wir Ihre Daten?</strong><br>Zur Bereitstellung und
+
+                            <p class="mt-4"><strong>Wofür nutzen wir Ihre Daten?</strong><br>Zur Bereitstellung und
                                 Verbesserung des Dienstes, zur Abwicklung von Abonnements sowie zur Kommunikation mit
                                 Ihnen.</p>
-                            <p class="mb-4"><strong>Welche Rechte haben Sie?</strong><br>Auskunft, Berichtigung,
+
+                            <p class="mt-4"><strong>Welche Rechte haben Sie?</strong><br>Auskunft, Berichtigung,
                                 Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit, Widerspruch. Details
                                 siehe Abschnitt 3.</p>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">2. Hosting</h2>
-                            <h3 class="text-xl font-bold mt-6 mb-3">IONOS</h3>
-                            <p class="mb-4">Wir nutzen IONOS für die Domain und DNS-Verwaltung von Promptomizer.de.
-                                Anbieter ist die IONOS SE, Elgendorfer Str. 57, 56410 Montabaur. Details:
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">2. Hosting</h3>
+                            <h4 class="text-lg font-semibold text-white mb-2">IONOS</h4>
+                            <p>Wir nutzen IONOS für die Domain und DNS-Verwaltung von Promptomizer.de. Anbieter ist die
+                                IONOS SE, Elgendorfer Str. 57, 56410 Montabaur. Details:
                                 https://www.ionos.de/terms-gtc/terms-privacy</p>
-                            <p class="mb-4">Die Nutzung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+                            <p class="mt-2">Die Nutzung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
                                 (berechtigtes Interesse an zuverlässigem Betrieb). Ein Auftragsverarbeitungsvertrag
                                 (AVV) wurde geschlossen.</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Vercel</h3>
-                            <p class="mb-4">Das Frontend von Promptomizer.de wird über Vercel bereitgestellt. Anbieter
-                                ist die Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA.</p>
-                            <p class="mb-4">Beim Aufruf der Website erfasst Vercel technische Zugriffsdaten (IP-Adresse,
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Vercel</h4>
+                            <p>Das Frontend von Promptomizer.de wird über Vercel bereitgestellt. Anbieter ist die Vercel
+                                Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA.</p>
+                            <p class="mt-2">Beim Aufruf der Website erfasst Vercel technische Zugriffsdaten (IP-Adresse,
                                 Browsertyp, aufgerufene Seiten, Zeitstempel). Diese Daten werden zur Auslieferung der
                                 Anwendung und zur Fehlerbehebung verwendet.</p>
-                            <p class="mb-4">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.
-                                Vercel verfügt über eine Zertifizierung nach dem EU-US Data Privacy Framework. Ein AVV
-                                wurde abgeschlossen. Weitere Informationen: https://vercel.com/legal/privacy-policy</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Supabase</h3>
-                            <p class="mb-4">Nutzerdaten (Konten, gespeicherte Prompts, Authentifizierung) werden bei
-                                Supabase gespeichert. Anbieter ist die Supabase Inc., 970 Trestle Glen Rd, Oakland, CA
-                                94610, USA.</p>
-                            <p class="mb-4">Supabase verarbeitet folgende Daten: E-Mail-Adresse und Passwort-Hash bei
-                                Registrierung, Authentifizierungs-Tokens (Session-Management), Gespeicherte Prompts und
-                                Kategorien, Plan-Status (Free/Pro) und Nutzungsmetadaten.</p>
-                            <p class="mb-4">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO
+                            <p class="mt-2 text-sm">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f
+                                DSGVO. Vercel verfügt über eine Zertifizierung nach dem EU-US Data Privacy Framework.
+                                Ein AVV wurde abgeschlossen. Weitere Informationen:
+                                https://vercel.com/legal/privacy-policy</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Supabase</h4>
+                            <p>Nutzerdaten (Konten, gespeicherte Prompts, Authentifizierung) werden bei Supabase
+                                gespeichert. Anbieter ist die Supabase Inc., 970 Trestle Glen Rd, Oakland, CA 94610,
+                                USA.</p>
+
+                            <div class="my-4 p-4 border border-brand-sky/20 bg-brand-sky/5 rounded-md text-sm italic">
+                                🔒 Die Daten werden in der Region eu-central-1 (Frankfurt) verarbeitet.
+                            </div>
+
+                            <p>Supabase verarbeitet folgende Daten:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li>E-Mail-Adresse und Passwort-Hash bei Registrierung</li>
+                                <li>Authentifizierungs-Tokens (Session-Management)</li>
+                                <li>Gespeicherte Prompts und Kategorien</li>
+                                <li>Plan-Status (Free/Pro) und Nutzungsmetadaten</li>
+                            </ul>
+                            <p class="mt-2">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO
                                 (Vertragserfüllung) und Art. 6 Abs. 1 lit. f DSGVO. Ein AVV wurde abgeschlossen. Weitere
                                 Informationen: https://supabase.com/privacy</p>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">3. Allgemeine Hinweise und Pflichtinformationen
-                            </h2>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Verantwortliche Stelle</h3>
-                            <p class="mb-4">Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg<br>E-Mail:
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">3. Allgemeine Hinweise und
+                                Pflichtinformationen</h3>
+                            <h4 class="text-lg font-semibold text-white mb-2">Verantwortliche Stelle</h4>
+                            <p>Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg<br>E-Mail:
                                 info@promptomizer.de<br>Telefon: 0177 / 35 22 745</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Speicherdauer</h3>
-                            <p class="mb-4">Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist oder solange es
-                                für die Vertragserfüllung erforderlich ist. Nach Löschung Ihres Kontos werden
-                                personenbezogene Daten innerhalb von 30 Tagen gelöscht, sofern keine gesetzlichen
-                                Aufbewahrungspflichten entgegenstehen (z. B. Rechnungsdaten: 10 Jahre gem. § 147 AO).
-                            </p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Rechtsgrundlagen</h3>
-                            <p class="mb-4">Wir verarbeiten Ihre Daten auf folgenden Rechtsgrundlagen: Art. 6 Abs. 1
-                                lit. a DSGVO (Einwilligung), Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung), Art. 6 Abs.
-                                1 lit. c DSGVO (Rechtliche Verpflichtung), Art. 6 Abs. 1 lit. f DSGVO (Berechtigtes
-                                Interesse).</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Ihre Rechte</h3>
-                            <p class="mb-4">Sie haben nach der DSGVO Rechte auf Auskunft, Berichtigung, Löschung,
-                                Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Zur Ausübung
-                                dieser Rechte wenden Sie sich an: info@promptomizer.de. Sie haben außerdem ein
-                                Beschwerderecht bei der zuständigen Aufsichtsbehörde (LDI NRW).</p>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">4. Datenerfassung auf Promptomizer.de</h2>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Cookies</h3>
-                            <p class="mb-4">Promptomizer.de verwendet Cookies. Technisch notwendige Cookies werden auf
-                                Grundlage von Art. 6 Abs. 1 lit. f DSGVO gesetzt. Alle weiteren Cookies werden nur nach
-                                Ihrer ausdrücklichen Einwilligung gesetzt.</p>
-                            <h3 class="text-xl font-bold mt-6 mb-3">Registrierung und Nutzerkonto</h3>
-                            <p class="mb-4">Zur Nutzung ist eine Registrierung erforderlich. Dabei erheben wir:
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Speicherdauer</h4>
+                            <p>Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist oder solange es für die
+                                Vertragserfüllung erforderlich ist. Nach Löschung Ihres Kontos werden personenbezogene
+                                Daten innerhalb von 30 Tagen gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten
+                                entgegenstehen (z. B. Rechnungsdaten: 10 Jahre gem. § 147 AO).</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Rechtsgrundlagen</h4>
+                            <p>Wir verarbeiten Ihre Daten auf folgenden Rechtsgrundlagen:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li><strong>Art. 6 Abs. 1 lit. a DSGVO</strong> – Einwilligung (z. B. Cookie-Consent)
+                                </li>
+                                <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> – Vertragserfüllung (Konto, Abo)</li>
+                                <li><strong>Art. 6 Abs. 1 lit. c DSGVO</strong> – Rechtliche Verpflichtung
+                                    (Rechnungsaufbewahrung)</li>
+                                <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> – Berechtigtes Interesse (Betrieb und
+                                    Sicherheit der Plattform)</li>
+                            </ul>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Ihre Rechte</h4>
+                            <p>Sie haben jederzeit das Recht auf:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li><strong>Auskunft</strong> über Ihre gespeicherten Daten (Art. 15 DSGVO)</li>
+                                <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16 DSGVO)</li>
+                                <li><strong>Löschung</strong> Ihrer Daten (Art. 17 DSGVO)</li>
+                                <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18 DSGVO)</li>
+                                <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO)</li>
+                                <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21 DSGVO)</li>
+                            </ul>
+                            <p class="mt-4 text-sm italic">Zur Ausübung dieser Rechte wenden Sie sich an:
+                                info@promptomizer.de</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Sie haben außerdem das Recht, sich bei der
+                                zuständigen Datenschutzaufsichtsbehörde zu beschweren. In Nordrhein-Westfalen ist dies
+                                die Landesbeauftragte für Datenschutz und Informationsfreiheit NRW.</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">SSL-/TLS-Verschlüsselung</h4>
+                            <p>Promptomizer.de nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung. Eine
+                                verschlüsselte Verbindung erkennen Sie am „https://“ in der Adresszeile sowie am
+                                Schloss-Symbol Ihres Browsers.</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Widerruf Ihrer Einwilligung</h4>
+                            <p>Viele Datenverarbeitungsvorgänge sind nur mit Ihrer Einwilligung möglich. Diese können
+                                Sie jederzeit widerrufen (z. B. per E-Mail an info@promptomizer.de). Die Rechtmäßigkeit
+                                der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">4. Datenerfassung auf Promptomizer.de</h3>
+                            <h4 class="text-lg font-semibold text-white mb-2">Cookies</h4>
+                            <p>Promptomizer.de verwendet Cookies. Technisch notwendige Cookies (z. B. für die Anmeldung
+                                und Session-Verwaltung) werden auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO gesetzt und
+                                erfordern keine Einwilligung. Alle weiteren Cookies werden nur nach Ihrer ausdrücklichen
+                                Einwilligung über unser Cookie-Consent-Tool gesetzt.</p>
+                            <p class="mt-2 text-sm italic">Sie können Ihre Cookie-Einstellungen jederzeit über den Link
+                                „Cookie-Einstellungen“ in der App anpassen.</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Registrierung und Nutzerkonto</h4>
+                            <p>Zur Nutzung von Promptomizer.de ist eine Registrierung erforderlich. Dabei erheben wir
                                 E-Mail-Adresse, Passwort (verschlüsselt), Zeitpunkt der Registrierung und Plan-Status.
-                                Die Verarbeitung erfolgt gemäß Art. 6 Abs. 1 lit. b DSGVO.</p>
+                                Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO zur
+                                Vertragserfüllung.</p>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">5. Analyse-Tools</h2>
-                            <p class="mb-4">Aktuell setzt Promptomizer.de keine Analyse-Tools ein.</p>
-                            <p class="mt-8 text-xs text-slate-400 italic">Quelle: Angepasst auf Grundlage von
-                                e-recht24.de | Stand: Februar 2026</p>
-                        </div>
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Gespeicherte Prompts und Inhalte</h4>
+                            <p>Prompts, Kategorien und Bausteine, die Sie in der App erstellen und speichern, werden in
+                                unserer Datenbank (Supabase) gespeichert. Diese Inhalte gehören Ihnen. Wir verwenden sie
+                                ausschließlich zur Erbringung des Dienstes und nicht für eigene Zwecke.</p>
+                            <p class="mt-2 text-sm italic text-slate-400 text-sm">Sie können Ihre Inhalte jederzeit
+                                löschen oder die Löschung Ihres gesamten Kontos über info@promptomizer.de beantragen.
+                            </p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Zahlungsabwicklung (Stripe)</h4>
+                            <p>Für die Abwicklung von Abonnements nutzen wir Stripe. Stripe verarbeitet Zahlungsdaten
+                                (Kreditkarte, SEPA-Lastschrift) und erstellt Rechnungen in unserem Auftrag. Wir
+                                speichern keine Zahlungsdaten selbst. Die Verarbeitung erfolgt auf Grundlage von Art. 6
+                                Abs. 1 lit. b DSGVO.</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Kontaktaufnahme per E-Mail</h4>
+                            <p>Wenn Sie uns per E-Mail kontaktieren, werden Ihre Angaben (Name, E-Mail-Adresse,
+                                Nachrichteninhalt) zur Bearbeitung Ihrer Anfrage gespeichert. Die Verarbeitung erfolgt
+                                auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. b DSGVO.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">5. Analyse-Tools</h3>
+                            <p>Aktuell setzt Promptomizer.de keine Analyse-Tools ein. Sollte dies in Zukunft geändert
+                                werden, wird diese Datenschutzerklärung entsprechend aktualisiert.</p>
+                        </section>
+
+                        <p class="mt-8 text-xs text-slate-500 italic text-right">Quelle: Angepasst auf Grundlage von
+                            e-recht24.de | Stand: Februar 2026</p>
                     </div>
                 </div>
 
-                <div id="view-agb" class="hidden h-full flex flex-col pt-4">
-                    <div class="max-w-4xl mx-auto w-full px-4 mb-6">
+                <div id="view-agb" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4 gap-4">
                         <button onclick="switchView('konto')"
-                            class="text-brand-sky hover:text-brand-hover flex items-center gap-2 font-medium transition-colors">
-                            <i class="fa-solid fa-arrow-left"></i> Zurück zum Konto
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-colors"
+                            title="Zurück">
+                            <i class="fa-solid fa-arrow-left"></i>
                         </button>
+                        <h2 class="text-2xl font-bold text-white">Allgemeine Geschäftsbedingungen</h2>
                     </div>
-                    <div class="flex-1 overflow-y-auto bg-white rounded-t-3xl p-8 md:p-12 text-slate-800 shadow-2xl">
-                        <div id="content-agb" class="prose prose-slate max-w-none">
-                            <h1 class="text-3xl font-bold mb-6">Allgemeine Geschäftsbedingungen</h1>
-                            <p class="mb-6 italic">Stand: Februar 2026</p>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">1. Anbieter und Geltungsbereich</h2>
-                            <p class="mb-4">Anbieter und Vertragspartner ist: Patrick Roßkothen, Mercatorstr. 108, 47051
-                                Duisburg, E-Mail: info@promptomizer.de. Diese AGB gelten für alle Verträge über die
-                                Nutzung der Plattform Promptomizer.de.</p>
+                    <div class="space-y-6 text-slate-300 leading-relaxed overflow-y-auto pr-2">
+                        <section>
+                            <p class="italic text-sm">Stand: Februar 2026</p>
+                            <div class="mt-4 p-4 border border-brand-sky/20 bg-brand-sky/5 rounded-md text-sm italic">
+                                ⚠️ <strong>Hinweis:</strong> Dieser Entwurf dient als Arbeitsgrundlage. Eine rechtliche
+                                Prüfung wird empfohlen.
+                            </div>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">2. Leistungsgegenstand</h2>
-                            <p class="mb-4">Promptomizer.de ist eine webbasierte Plattform zur Erstellung und Verwaltung
-                                von KI-Prompts. Wir bieten einen Free-Plan (kostenfrei, begrenzter Speicher) und einen
-                                Pro-Plan (kostenpflichtig, unbegrenzte Speicherung).</p>
+                        <hr class="border-navy-border" />
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">3. Vertragsschluss</h2>
-                            <p class="mb-4">Der Vertrag kommt mit der Bestätigung der Registrierung durch den Anbieter
-                                zustande. Für den Pro-Plan kommt der kostenpflichtige Vertrag mit Abschluss des
-                                Bestellvorgangs zustande.</p>
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">1. Anbieter und Geltungsbereich</h3>
+                            <p>Anbieter und Vertragspartner ist:</p>
+                            <p class="mt-2">Patrick Roßkothen, Freiberufler<br>Mercatorstr. 108, 47051
+                                Duisburg<br>E-Mail: info@promptomizer.de<br>Telefon: 0177 / 35 22 745</p>
+                            <p class="mt-4">Diese AGB gelten für alle Verträge über die Nutzung der
+                                Software-as-a-Service-Plattform Promptomizer.de, die über die Website oder
+                                Fernkommunikationsmittel geschlossen werden.</p>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">4. Preise und Zahlung</h2>
-                            <p class="mb-4">Alle Preise inkl. MwSt. Die Zahlung des Pro-Plans erfolgt monatlich im
-                                Voraus über Stripe. Rechnungen werden elektronisch übermittelt.</p>
+                        <hr class="border-navy-border" />
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">5. Laufzeit und Kündigung</h2>
-                            <p class="mb-4">Der Pro-Plan verlängert sich automatisch um einen Monat, sofern er nicht
-                                gekündigt wird. Die Kündigung ist jederzeit zum Ende des Abrechnungszeitraums über das
-                                Portal möglich.</p>
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">2. Begriffsbestimmungen</h3>
+                            <p><strong>Verbraucher</strong> ist jede natürliche Person, die ein Rechtsgeschäft zu
+                                Zwecken abschließt, die überwiegend weder ihrer gewerblichen noch ihrer selbständigen
+                                beruflichen Tätigkeit zugerechnet werden können.</p>
+                            <p class="mt-2"><strong>Unternehmer</strong> ist eine natürliche oder juristische Person
+                                oder eine rechtsfähige Personengesellschaft, die bei Vertragsschluss in Ausübung ihrer
+                                gewerblichen oder selbständigen beruflichen Tätigkeit handelt.</p>
+                            <p class="mt-2"><strong>Nutzer</strong> bezeichnet sowohl Verbraucher als auch Unternehmer,
+                                die einen Account auf Promptomizer.de besitzen.</p>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">6. Widerrufsrecht für Verbraucher</h2>
-                            <p class="mb-4">Verbrauchern steht ein 14-tägiges Widerrufsrecht zu. Das Widerrufsrecht
-                                erlischt bei sofortigem Leistungsbeginn auf ausdrücklichen Wunsch des Nutzers.</p>
+                        <hr class="border-navy-border" />
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">7. Haftung</h2>
-                            <p class="mb-4">Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit. Bei leichter
-                                Fahrlässigkeit haften wir nur für die Verletzung wesentlicher Vertragspflichten.</p>
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">3. Leistungsgegenstand</h3>
+                            <p>Promptomizer.de ist eine webbasierte Plattform zur Erstellung, Verwaltung und Speicherung
+                                von KI-Prompts. Der Dienst wird in zwei Varianten angeboten:</p>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-white">Free-Plan (kostenlos)</h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>Nutzung des Prompt-Editors</li>
+                                        <li>Speicherung von bis zu 10 Prompts</li>
+                                        <li>Zugriff auf Grundfunktionen</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-white">Pro-Plan (kostenpflichtig)</h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>Alle Funktionen des Free-Plans</li>
+                                        <li>Unbegrenzte Speicherung von Prompts</li>
+                                        <li>Zugriff auf alle aktuellen und zukünftigen Pro-Funktionen</li>
+                                        <li>Preis: 3,99 € pro Monat (inkl. gesetzlicher MwSt.)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
 
-                            <h2 class="text-2xl font-bold mt-8 mb-4">8. Schlussbestimmungen</h2>
-                            <p class="mb-4">Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand für
-                                Kaufleute ist Duisburg.</p>
-                        </div>
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">4. Vertragsschluss</h3>
+                            <p>Mit der Registrierung und Bestätigung der AGB gibt der Nutzer ein verbindliches Angebot
+                                zum Vertragsschluss ab. Der Vertrag kommt zustande, sobald der Anbieter die
+                                Registrierung per Bestätigungs-E-Mail bestätigt.</p>
+                            <p class="mt-2">Für den Pro-Plan kommt der kostenpflichtige Vertrag mit Abschluss des
+                                Bestellvorgangs und Bestätigung der Zahlung zustande.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">5. Preise, Zahlung und Rechnung</h3>
+                            <p>Alle Preise sind Endpreise inklusive der gesetzlichen Umsatzsteuer (derzeit 19 %).</p>
+                            <p class="mt-2">Die Zahlung erfolgt monatlich im Voraus über Stripe. Rechnungen werden
+                                automatisch erstellt und per E-Mail übermittelt.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">6. Laufzeit und Kündigung</h3>
+                            <p>Der Pro-Plan läuft auf unbestimmte Zeit und verlängert sich automatisch um jeweils einen
+                                Monat, sofern er nicht gekündigt wird.</p>
+                            <p class="mt-2">Kündigung ist jederzeit zum Ende des laufenden Abrechnungszeitraums über das
+                                Portal möglich. Nach Kündigung wird der Account auf den Free-Plan zurückgesetzt. Prompts
+                                über dem Limit bleiben erhalten, sind aber nicht mehr editierbar.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">7. Widerrufsrecht für Verbraucher</h3>
+                            <p>Verbrauchern steht ein gesetzliches 14-tägiges Widerrufsrecht zu. Dieses erlischt
+                                vorzeitig, wenn der Nutzer ausdrücklich verlangt, dass der Pro-Plan sofort aktiviert
+                                wird, und bestätigt, dass sein Widerrufsrecht damit erlischt.</p>
+                            <div class="mt-4 p-4 border border-navy-border bg-black/20 rounded-md text-sm italic">
+                                📌 <strong>Muster-Widerrufsformular:</strong> An Patrick Roßkothen,
+                                info@promptomizer.de. „Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über
+                                die Buchung des Pro-Plans.“
+                            </div>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">8. Nutzungsrechte und Inhalte</h3>
+                            <p>Sämtliche vom Nutzer erstellten Inhalte verbleiben im Eigentum des Nutzers. Der Anbieter
+                                räumt sich lediglich die für den technischen Betrieb erforderlichen Rechte ein.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">9. Haftung</h3>
+                            <p>Der Anbieter haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit. Bei leichter
+                                Fahrlässigkeit haftet er nur bei Verletzung wesentlicher Vertragspflichten
+                                (Kardinalpflichten).</p>
+                        </section>
+
+                        <p class="mt-8 text-xs text-slate-500 italic text-right">Schlussbestimmungen: Es gilt das Recht
+                            der Bundesrepublik Deutschland. | Stand: Februar 2026</p>
+                    </div>
+                </div>
+
+                <div id="view-cookies" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4 gap-4">
+                        <button onclick="switchView('konto')"
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-colors"
+                            title="Zurück">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-white">Cookie-Einstellungen & Erklärung</h2>
+                    </div>
+
+                    <div class="bg-white/5 rounded-2xl p-6 border border-navy-border">
+                        <!-- Cookiebot Declaration -->
+                        <script id="CookieDeclaration"
+                            src="https://consent.cookiebot.com/c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e/cd.js"
+                            type="text/javascript" async></script>
                     </div>
                 </div>
 
@@ -1275,7 +1509,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cookieconsent="ignore">
         // --- CONFIG ---
         const FIELDS = [
             { id: 'role', label: 'Rolle & Funktion', icon: 'fa-user-tie', placeholder: 'Wer soll die KI sein? (z.B. Senior SEO Experte)' },
@@ -2376,12 +2610,17 @@
 
         function switchView(viewId) {
 
-            ['view-editor', 'view-history', 'view-settings', 'view-konto', 'view-impressum', 'view-datenschutz', 'view-agb'].forEach(id => {
-                const el = document.getElementById(id);
+            const views = ['editor', 'history', 'settings', 'konto', 'impressum', 'datenschutz', 'agb', 'cookies'];
+            views.forEach(v => {
+                const el = document.getElementById('view-' + v);
                 if (el) el.classList.add('hidden');
             });
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
 
+            // Bestimmte Ansichten einblenden
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
             // Reset Nav Styles
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('active-nav');
@@ -4372,8 +4611,8 @@
         };
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="db.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" data-cookieconsent="ignore"></script>
+    <script src="db.js" data-cookieconsent="ignore"></script>
 </body>
 
 </html>
