@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e"
+        data-blockingmode="auto" type="text/javascript"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Promptomizer Beta</title>
     <meta name="theme-color" content="#020617">
@@ -732,9 +734,15 @@
                                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                                 </button>
                                 <button onclick="switchView('agb')"
-                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors group">
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 border-b border-navy-border transition-colors group">
                                     <span class="text-slate-300 group-hover:text-white transition-colors">AGB &
                                         Widerrufsbelehrung</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="switchView('cookies')"
+                                    class="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors group">
+                                    <span
+                                        class="text-slate-300 group-hover:text-white transition-colors">Cookie-Einstellungen</span>
                                     <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
                                 </button>
                             </div>
@@ -1153,6 +1161,24 @@
 
                         <p class="mt-8 text-xs text-slate-500 italic text-right">Schlussbestimmungen: Es gilt das Recht
                             der Bundesrepublik Deutschland. | Stand: Februar 2026</p>
+                    </div>
+                </div>
+
+                <div id="view-cookies" class="hidden max-w-4xl mx-auto fade-in pt-4 pb-20">
+                    <div class="flex items-center mb-6 border-b border-navy-border pb-4 gap-4">
+                        <button onclick="switchView('konto')"
+                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-colors"
+                            title="Zurück">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-white">Cookie-Einstellungen & Erklärung</h2>
+                    </div>
+
+                    <div class="bg-white/5 rounded-2xl p-6 border border-navy-border">
+                        <!-- Cookiebot Declaration -->
+                        <script id="CookieDeclaration"
+                            src="https://consent.cookiebot.com/c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e/cd.js"
+                            type="text/javascript" async></script>
                     </div>
                 </div>
 
@@ -2578,12 +2604,17 @@
 
         function switchView(viewId) {
 
-            ['view-editor', 'view-history', 'view-settings', 'view-konto', 'view-impressum', 'view-datenschutz', 'view-agb'].forEach(id => {
-                const el = document.getElementById(id);
+            const views = ['editor', 'history', 'settings', 'konto', 'impressum', 'datenschutz', 'agb', 'cookies'];
+            views.forEach(v => {
+                const el = document.getElementById('view-' + v);
                 if (el) el.classList.add('hidden');
             });
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
 
+            // Bestimmte Ansichten einblenden
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
             // Reset Nav Styles
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('active-nav');
