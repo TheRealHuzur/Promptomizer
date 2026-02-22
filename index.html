@@ -2306,12 +2306,55 @@
             const sel = window.getSelection();
             const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
 
-            // PRE handling: Enter should just insert a newline
+            // PRE handling:
+            // Shift + Enter -> Insert newline
+            // Enter (alone) -> Exit code box
             const pre = getClosestTag(anchor, ['PRE']);
             if (pre) {
                 ev.preventDefault();
-                // We use insertHTML or insertText to cross-browser insert a newline
-                document.execCommand('insertHTML', false, '\n');
+                const range = sel.getRangeAt(0);
+
+                if (ev.shiftKey) {
+                    // NORMAL NEWLINE (Shift + Enter):
+                    range.deleteContents();
+                    const br = document.createElement('br');
+                    range.insertNode(br);
+                    range.setStartAfter(br);
+                    range.setEndAfter(br);
+
+                    // Force visibility: if we are at the end, we need a filler BR
+                    const testRange = range.cloneRange();
+                    if (pre.lastChild) {
+                        testRange.setEndAfter(pre.lastChild);
+                        testRange.setStart(range.endContainer, range.endOffset);
+                        const frag = testRange.cloneContents();
+                        const isAtEnd = frag.textContent.trim() === "" && !frag.querySelector(':not(br)');
+                        if (isAtEnd) {
+                            const filler = document.createElement('br');
+                            range.insertNode(filler);
+                            range.setStartBefore(filler);
+                            range.setEndBefore(filler);
+                        }
+                    }
+
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } else {
+                    // EXIT (Enter alone):
+                    // Cleanup trailing BRs before exiting
+                    while (pre.lastChild && pre.lastChild.tagName === 'BR') pre.lastChild.remove();
+
+                    const nextBlock = document.createElement('div');
+                    nextBlock.innerHTML = '<br>';
+                    if (pre.nextSibling) pre.parentNode.insertBefore(nextBlock, pre.nextSibling);
+                    else pre.parentNode.appendChild(nextBlock);
+
+                    placeCaretAtStart(nextBlock);
+                    freeActiveFormat = null;
+                    updateFreeToolbarUI();
+                }
+
+                freeSyncHtmlToMarkdown();
                 return;
             }
 
