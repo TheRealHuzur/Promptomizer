@@ -298,7 +298,7 @@ window.db = {
 
     // --- BIBLIOTHEK (Szenarien) ---
     async saveScenario(scenario) {
-        if (!window.currentUser) return false;
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
 
         const { error } = await supabaseClient
             .from('library')
@@ -310,10 +310,14 @@ window.db = {
             });
 
         if (error) {
-            console.error("Library Save Error:", error);
-            return false;
+            console.error('Library Save Error:', error);
+            // Supabase transportiert RAISE EXCEPTION als error.message
+            if (error.message?.includes('FREE_LIMIT_REACHED')) {
+                return { success: false, reason: 'FREE_LIMIT_REACHED' };
+            }
+            return { success: false, reason: 'ERROR' };
         }
-        return true;
+        return { success: true };
     },
 
     async getScenarios() {
@@ -484,6 +488,24 @@ window.db = {
             console.error('deleteScenario error', e);
             return false;
         }
+    },
+
+    async getPromptCount() {
+        if (!window.currentUser) return 0;
+        const { count, error } = await supabaseClient
+            .from('library')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', window.currentUser.id);
+        if (error) {
+            console.error('Prompt Count Error:', error);
+            return 0;
+        }
+        return count ?? 0;
+    },
+
+    async getUserTier() {
+        const profile = await this.getProfile();
+        return profile?.tier ?? 'free';
     }
 };
 

@@ -662,6 +662,19 @@
                         </button>
                     </div>
                     <div id="prompts-body" class="px-4 pt-1 pb-2">
+                        <!-- Prompt-Counter (nur Free-User) -->
+                        <div id="prompt-counter-wrap"
+                            class="hidden px-2 py-2 mb-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span id="prompt-counter-text" class="font-medium tracking-wide">0 von 10 Prompts</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                                <div id="prompt-counter-bar"
+                                    class="h-full bg-brand-sky rounded-full transition-all duration-300"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
@@ -815,17 +828,39 @@
                         <section>
                             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Plan &
                                 Abonnement</h3>
-                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative">
                                 <div class="flex items-center justify-between mb-4">
                                     <div>
-                                        <div class="text-lg font-bold text-white" id="konto-plan-name">Free Plan</div>
+                                        <div class="text-lg font-bold text-white flex items-center gap-2"
+                                            id="konto-plan-name">
+                                            Free Plan
+                                        </div>
                                         <div class="text-sm text-slate-400">Aktueller Status</div>
                                     </div>
-                                    <div
+                                    <div id="konto-status-badge"
                                         class="px-3 py-1 bg-brand-sky/10 border border-brand-sky/20 rounded text-brand-sky text-xs font-bold uppercase tracking-wider">
-                                        Aktiv</div>
+                                        Aktiv
+                                    </div>
                                 </div>
-                                <p class="text-xs text-slate-500 italic">Abo-Verwaltung folgt in Kürze.</p>
+                                <!-- Counter Container for Free Users in Konto -->
+                                <div id="konto-prompt-counter" class="hidden mt-6 pt-4 border-t border-navy-border">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span id="konto-prompt-counter-text"
+                                            class="text-sm text-slate-300 font-medium">0 von 10 Prompts
+                                            gespeichert</span>
+                                        <button id="konto-btn-upgrade" onclick="openUpgradeModal()"
+                                            class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm cursor-not-allowed opacity-50 font-bold"
+                                            disabled>
+                                            <i class="fa-solid fa-arrow-up-right-dots mr-1"></i> Upgraden
+                                        </button>
+                                    </div>
+                                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
+                                        <div id="konto-prompt-counter-bar"
+                                            class="h-full bg-brand-sky rounded-full transition-all duration-300"
+                                            style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 italic mt-4">Abo-Verwaltung folgt in Kürze.</p>
                             </div>
                         </section>
 
@@ -1356,6 +1391,43 @@
             </div>
         </div>
     </div>
+    <!-- UPGRADE MODAL -->
+    <div id="modal-upgrade" class="ui-backdrop z-[150] hidden">
+        <div class="ui-modal max-w-sm w-full text-center p-8">
+            <!-- Icon -->
+            <div class="text-4xl mb-4">🚀</div>
+
+            <!-- Headline -->
+            <h2 class="text-xl font-bold text-white mb-2">
+                Deine 10 kostenlosen Prompts sind voll
+            </h2>
+
+            <!-- Subline -->
+            <p class="text-slate-400 text-sm mb-6">
+                Steige auf <strong class="text-white">Promptomizer Pro</strong> um — für unbegrenzte Prompts, Kategorien
+                und Bausteine.
+            </p>
+
+            <!-- Preis -->
+            <div class="bg-slate-800 rounded-xl p-4 mb-6">
+                <div class="text-3xl font-bold text-white">3,99 €</div>
+                <div class="text-slate-400 text-xs mt-1">pro Monat · inkl. 19 % MwSt. · jederzeit kündbar</div>
+            </div>
+
+            <!-- CTA -->
+            <button id="btn-upgrade-cta" onclick="closeUpgradeModal()"
+                class="w-full ui-btn ui-btn-primary mb-3 opacity-50 cursor-not-allowed" disabled
+                title="Payment-Integration folgt in Kürze">
+                Jetzt upgraden — bald verfügbar
+            </button>
+
+            <!-- Schließen -->
+            <button onclick="closeUpgradeModal()" class="text-slate-500 text-sm hover:text-slate-300 transition-colors">
+                Vielleicht später
+            </button>
+        </div>
+    </div>
+
     <div id="modal-auth"
         class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
@@ -3087,7 +3159,15 @@
             if (window.currentUser) {
                 nameEl.innerText = window.currentUser.email.split('@')[0];
                 emailEl.innerText = window.currentUser.email;
-                planEl.innerText = 'Pro Plan';
+
+                // NEU: echtes Tier aus DB lesen
+                const tier = await window.db.getUserTier();
+                planEl.innerHTML = tier === 'pro'
+                    ? 'Pro Plan <i class="fa-solid fa-crown text-brand-sky text-sm ml-1"></i>'
+                    : 'Free Plan';
+
+                // NEU: Counter auf Konto-Seite aktualisieren (falls Free-User)
+                await updatePromptCounter();
             } else {
                 nameEl.innerText = 'Gast';
                 emailEl.innerText = 'Nicht eingeloggt';
@@ -5039,6 +5119,17 @@
                 openAuthModal();
                 return;
             }
+
+            // NEU: Limit-Check vor dem Modal
+            const tier = await window.db.getUserTier();
+            if (tier === 'free') {
+                const count = await window.db.getPromptCount();
+                if (count >= 10) {
+                    openUpgradeModal();
+                    return;
+                }
+            }
+
             openSavePromptModal();
         }
 
@@ -5059,14 +5150,17 @@
                     document.getElementById('input-format')?.value || ''
                 ];
                 if (window.db && window.db.saveScenario) {
-                    const success = await window.db.saveScenario({
+                    const result = await window.db.saveScenario({
                         name: name,
                         category: catVal,
                         fields: fieldsData
                     });
 
-                    if (success) {
+                    if (result.success) {
                         loadLibrary();
+                        await updatePromptCounter();
+                    } else if (result.reason === 'FREE_LIMIT_REACHED') {
+                        openUpgradeModal();
                     } else {
                         alert("Fehler beim Speichern.");
                     }
@@ -5078,14 +5172,17 @@
                     return;
                 }
                 if (window.db && window.db.saveScenario) {
-                    const success = await window.db.saveScenario({
+                    const result = await window.db.saveScenario({
                         name: name,
                         category: catVal,
                         fields: { mode: 'free', text: raw }
                     });
 
-                    if (success) {
+                    if (result.success) {
                         loadLibrary();
+                        await updatePromptCounter();
+                    } else if (result.reason === 'FREE_LIMIT_REACHED') {
+                        openUpgradeModal();
                     } else {
                         alert("Fehler beim Speichern.");
                     }
@@ -5290,6 +5387,74 @@
                 window._driverObj.drive(startIndex);
             } else {
                 window._driverObj.drive();
+            }
+        }
+        function openUpgradeModal() {
+            document.getElementById('modal-upgrade').classList.remove('hidden');
+        }
+
+        function closeUpgradeModal() {
+            document.getElementById('modal-upgrade').classList.add('hidden');
+        }
+
+        async function updatePromptCounter() {
+            if (!window.db) return;
+            const tier = await window.db.getUserTier();
+            const wrap = document.getElementById('prompt-counter-wrap');
+            if (!wrap) return;
+
+            if (tier !== 'free') {
+                wrap.classList.add('hidden');
+
+                // Also hide on account page
+                const accountCounter = document.getElementById('konto-prompt-counter');
+                if (accountCounter) accountCounter.classList.add('hidden');
+                const accountUpgradeBtn = document.getElementById('konto-btn-upgrade');
+                if (accountUpgradeBtn) accountUpgradeBtn.classList.add('hidden');
+
+                return;
+            }
+
+            const count = await window.db.getPromptCount();
+            const max = 10;
+            const pct = Math.min((count / max) * 100, 100);
+
+            wrap.classList.remove('hidden');
+            document.getElementById('prompt-counter-text').textContent =
+                `${count} von ${max} Prompts`;
+            document.getElementById('prompt-counter-bar').style.width = `${pct}%`;
+
+            // Warnung ab 8/10
+            const bar = document.getElementById('prompt-counter-bar');
+            bar.classList.remove('bg-brand-sky', 'bg-red-400', 'bg-amber-400');
+
+            if (count >= max) {
+                bar.classList.add('bg-red-400');
+            } else if (count >= 8) {
+                bar.classList.add('bg-amber-400');
+            } else {
+                bar.classList.add('bg-brand-sky');
+            }
+
+            // Sync with konto view if exists
+            const accountCounterText = document.getElementById('konto-prompt-counter-text');
+            if (accountCounterText) {
+                document.getElementById('konto-prompt-counter').classList.remove('hidden');
+                accountCounterText.textContent = `${count} von ${max} Prompts gespeichert`;
+
+                const accountBar = document.getElementById('konto-prompt-counter-bar');
+                accountBar.style.width = `${pct}%`;
+                accountBar.classList.remove('bg-brand-sky', 'bg-red-400', 'bg-amber-400');
+                if (count >= max) {
+                    accountBar.classList.add('bg-red-400');
+                } else if (count >= 8) {
+                    accountBar.classList.add('bg-amber-400');
+                } else {
+                    accountBar.classList.add('bg-brand-sky');
+                }
+
+                const accountUpgradeBtn = document.getElementById('konto-btn-upgrade');
+                if (accountUpgradeBtn) accountUpgradeBtn.classList.remove('hidden');
             }
         }
     </script>
