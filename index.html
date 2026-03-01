@@ -605,8 +605,7 @@
                                     <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast
                                     </div>
                                     <div id="user-status-sub"
-                                        class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">
-                                        Login
+                                        class="hidden text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">
                                     </div>
                                 </div>
                             </button>
@@ -1641,7 +1640,7 @@
             // (Wichtig für Gast-Modus oder falls der Login extrem schnell war)
             setTimeout(() => {
                 if (window.db && window.db.getScenarios) loadLibrary();
-                if (window.currentUser) updateUIAuth(window.currentUser);
+                updateUIAuth(window.currentUser);
             }, 500);
         });
 
