@@ -1306,6 +1306,163 @@
                     class="w-full py-3 bg-white text-navy-deep font-bold rounded-md flex justify-center gap-2 hover:bg-slate-100 transition-colors">
                     <i class="fa-brands fa-google"></i> Google Login
                 </button>
+
+                <div class="flex flex-col items-center gap-2 mt-4 text-sm">
+                    <button onclick="switchAuthMode('register')"
+                        class="text-slate-400 hover:text-brand-sky transition-colors">Noch kein Konto? Jetzt
+                        registrieren</button>
+                    <button onclick="openPasswordResetModal()"
+                        class="text-slate-400 hover:text-brand-sky transition-colors">Passwort vergessen?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="modal-register"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Registrieren</h3>
+                <button onclick="closeRegisterModal()" class="text-slate-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">E-Mail</label>
+                    <input id="register-email" type="email"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="name@mail.de" />
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort</label>
+                    <input id="register-password" type="password"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="••••••••" />
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort bestätigen</label>
+                    <input id="register-password-confirm" type="password"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="••••••••" />
+                </div>
+
+                <div class="flex items-start gap-2 mt-4">
+                    <input id="register-agb" type="checkbox" class="accent-brand-sky mt-1"
+                        onchange="toggleRegisterButton()" />
+                    <label for="register-agb" class="text-xs text-slate-400 leading-tight select-none">
+                        Ich habe die <button onclick="closeRegisterModal(); switchView('agb')"
+                            class="text-brand-sky hover:underline">AGB</button> und die <button
+                            onclick="closeRegisterModal(); switchView('datenschutz')"
+                            class="text-brand-sky hover:underline">Datenschutzerklärung</button> gelesen und akzeptiere
+                        sie.
+                    </label>
+                </div>
+
+                <div id="register-error" class="hidden text-sm text-red-400"></div>
+
+                <button id="btn-register-submit" onclick="handleEmailRegister()" disabled
+                    class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-sky">
+                    Registrieren
+                </button>
+
+                <div class="h-px bg-navy-border"></div>
+
+                <div class="flex justify-center mt-4 text-sm">
+                    <button onclick="switchAuthMode('login')"
+                        class="text-slate-400 hover:text-brand-sky transition-colors">Bereits registriert? Hier
+                        einloggen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER SUCCESS MODAL -->
+    <div id="modal-register-success"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6 text-center">
+            <div
+                class="w-16 h-16 bg-brand-sky/20 text-brand-sky rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Bitte bestätige deine E-Mail-Adresse</h3>
+            <p class="text-sm text-slate-400 mb-6 leading-relaxed">
+                Wir haben dir einen Bestätigungslink geschickt. Sobald du deine E-Mail bestätigt hast, kannst du dich
+                einloggen und loslegen.
+            </p>
+            <button onclick="closeRegisterSuccessModal(); openAuthModal();"
+                class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
+                Zum Login
+            </button>
+        </div>
+    </div>
+
+    <!-- PASSWORD RESET MODAL -->
+    <div id="modal-password-reset"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Passwort zurücksetzen</h3>
+                <button onclick="closePasswordResetModal()" class="text-slate-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm text-slate-400 mb-4">
+                    Gib deine E-Mail-Adresse ein. Wir senden dir einen Link, um ein neues Passwort festzulegen.
+                </p>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">E-Mail</label>
+                    <input id="reset-email" type="email"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="name@mail.de" />
+                </div>
+
+                <div id="reset-msg" class="hidden text-sm"></div>
+
+                <button onclick="handlePasswordReset()"
+                    class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
+                    Link senden
+                </button>
+
+                <div class="flex justify-center mt-4 text-sm">
+                    <button onclick="closePasswordResetModal(); openAuthModal();"
+                        class="text-slate-400 hover:text-brand-sky transition-colors">Zurück zum Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SET NEW PASSWORD MODAL -->
+    <div id="modal-password-new"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-navy-sidebar border border-navy-border w-full max-w-sm rounded-lg shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Neues Passwort vergeben</h3>
+                <button onclick="closePasswordNewModal()" class="text-slate-500 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Neues Passwort</label>
+                    <input id="new-password" type="password"
+                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                        placeholder="••••••••" />
+                </div>
+
+                <div id="new-password-msg" class="hidden text-sm"></div>
+
+                <button onclick="handlePasswordNewSave()"
+                    class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
+                    Passwort speichern
+                </button>
             </div>
         </div>
     </div>
@@ -1716,6 +1873,174 @@
 
             closeAuthModal();
         }
+
+        function switchAuthMode(mode) {
+            closeAuthModal();
+            closeRegisterModal();
+            if (mode === 'register') {
+                openRegisterModal();
+            } else if (mode === 'login') {
+                openAuthModal();
+            }
+        }
+
+        function openRegisterModal() {
+            const err = document.getElementById('register-error');
+            if (err) {
+                err.classList.add('hidden');
+                err.innerText = '';
+            }
+            const submitBtn = document.getElementById('btn-register-submit');
+            if (submitBtn) submitBtn.disabled = true;
+            const agbCheckbox = document.getElementById('register-agb');
+            if (agbCheckbox) agbCheckbox.checked = false;
+            document.getElementById('modal-register').classList.remove('hidden');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('modal-register').classList.add('hidden');
+        }
+
+        function toggleRegisterButton() {
+            const isChecked = document.getElementById('register-agb').checked;
+            document.getElementById('btn-register-submit').disabled = !isChecked;
+        }
+
+        async function handleEmailRegister() {
+            const email = (document.getElementById('register-email')?.value || '').trim();
+            const password = (document.getElementById('register-password')?.value || '').trim();
+            const passwordConfirm = (document.getElementById('register-password-confirm')?.value || '').trim();
+            const agbChecked = !!document.getElementById('register-agb')?.checked;
+
+            const err = document.getElementById('register-error');
+            const showErr = (msg) => {
+                if (!err) return;
+                err.innerText = msg;
+                err.classList.remove('hidden');
+            };
+
+            if (!email || !password || !passwordConfirm) {
+                showErr('Bitte alle Felder ausfüllen.');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showErr('Die Passwörter stimmen nicht überein.');
+                return;
+            }
+
+            if (!agbChecked) {
+                showErr('Bitte akzeptiere die AGB und Datenschutzerklärung.');
+                return;
+            }
+
+            const metadata = {
+                agb_accepted_at: new Date().toISOString(),
+                agb_version: '2026-03-01'
+            };
+
+            const { data, error } = await registerUser(email, password, metadata);
+            if (error) {
+                showErr(error.message || 'Registrierung fehlgeschlagen.');
+                return;
+            }
+
+            closeRegisterModal();
+            openRegisterSuccessModal();
+        }
+
+        function openRegisterSuccessModal() {
+            document.getElementById('modal-register-success').classList.remove('hidden');
+        }
+
+        function closeRegisterSuccessModal() {
+            document.getElementById('modal-register-success').classList.add('hidden');
+        }
+
+        function openPasswordResetModal() {
+            closeAuthModal();
+            const msg = document.getElementById('reset-msg');
+            if (msg) {
+                msg.classList.add('hidden');
+                msg.innerText = '';
+                msg.className = 'hidden text-sm';
+            }
+            document.getElementById('modal-password-reset').classList.remove('hidden');
+        }
+
+        function closePasswordResetModal() {
+            document.getElementById('modal-password-reset').classList.add('hidden');
+        }
+
+        async function handlePasswordReset() {
+            const email = (document.getElementById('reset-email')?.value || '').trim();
+            const msgEl = document.getElementById('reset-msg');
+
+            const showMsg = (msg, isError = false) => {
+                if (!msgEl) return;
+                msgEl.innerText = msg;
+                msgEl.className = `text-sm mt-3 ${isError ? 'text-red-400' : 'text-green-400'}`;
+                msgEl.classList.remove('hidden');
+            };
+
+            if (!email) {
+                showMsg('Bitte E-Mail eingeben.', true);
+                return;
+            }
+
+            const { error } = await requestPasswordReset(email);
+            if (error) {
+                showMsg(error.message || 'Fehler beim Senden des Links.', true);
+            } else {
+                showMsg('Ein Link zum Zurücksetzen des Passworts wurde gesendet.');
+            }
+        }
+
+        function openPasswordNewModal() {
+            const msg = document.getElementById('new-password-msg');
+            if (msg) {
+                msg.classList.add('hidden');
+                msg.innerText = '';
+            }
+            document.getElementById('modal-password-new').classList.remove('hidden');
+        }
+
+        function closePasswordNewModal() {
+            document.getElementById('modal-password-new').classList.add('hidden');
+        }
+
+        async function handlePasswordNewSave() {
+            const password = (document.getElementById('new-password')?.value || '').trim();
+            const msgEl = document.getElementById('new-password-msg');
+
+            const showMsg = (msg, isError = false) => {
+                if (!msgEl) return;
+                msgEl.innerText = msg;
+                msgEl.className = `text-sm mt-3 ${isError ? 'text-red-400' : 'text-green-400'}`;
+                msgEl.classList.remove('hidden');
+            };
+
+            if (!password) {
+                showMsg('Bitte ein Passwort eingeben.', true);
+                return;
+            }
+
+            const { error } = await updateUserPassword(password);
+            if (error) {
+                showMsg(error.message || 'Fehler beim Speichern des Passworts.', true);
+            } else {
+                closePasswordNewModal();
+                openAuthModal();
+            }
+        }
+
+        window.addEventListener('auth-password-recovery', () => {
+            closeAuthModal();
+            closeRegisterModal();
+            closePasswordResetModal();
+            openPasswordNewModal();
+        });
+
 
         // --- RENDER ---
         function renderStructuredFields() {

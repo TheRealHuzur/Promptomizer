@@ -32,6 +32,12 @@ function initSupabaseClient() {
 
     const { data } = supabaseClient.auth.onAuthStateChange((event, session) => {
         console.log("ðŸ” Auth Status:", event, session?.user?.email);
+        
+        if (event === 'PASSWORD_RECOVERY') {
+            const recoveryEvent = new CustomEvent('auth-password-recovery');
+            window.dispatchEvent(recoveryEvent);
+        }
+
         window.currentUser = session?.user || null;
         const authEvent = new CustomEvent('auth-state-changed', { detail: window.currentUser });
         window.dispatchEvent(authEvent);
@@ -66,9 +72,27 @@ async function loginWithGoogle() {
     }
 }
 
-// Email Auth
-async function registerUser(email, password) {
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+async function registerUser(email, password, metadata = {}) {
+    // metadata z.B. { agb_accepted_at: "...", agb_version: "..." }
+    const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+            data: metadata
+        }
+    });
+    return { data, error };
+}
+
+async function requestPasswordReset(email) {
+    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin
+    });
+    return { data, error };
+}
+
+async function updateUserPassword(newPassword) {
+    const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
     return { data, error };
 }
 
