@@ -594,19 +594,28 @@
 
                 <div class="mt-auto flex-shrink-0">
                     <div class="h-20 px-4 border-t border-navy-border bg-black/10 flex items-center">
-                        <button onclick="switchView('konto')"
-                            class="user-button w-full flex items-center gap-3 text-slate-400 hover:text-white transition-colors">
-                            <div
-                                class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <div class="sidebar-user-text text-left overflow-hidden">
-                                <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast</div>
-                                <div id="user-status-sub"
-                                    class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">Login
+                        <div class="w-full flex items-center justify-between gap-3">
+                            <button onclick="switchView('konto')"
+                                class="user-button flex items-center gap-3 text-slate-400 hover:text-white transition-colors overflow-hidden">
+                                <div
+                                    class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                    <i class="fa-solid fa-user"></i>
                                 </div>
-                            </div>
-                        </button>
+                                <div class="sidebar-user-text text-left overflow-hidden">
+                                    <div id="user-name-display" class="text-sm font-bold text-slate-200 truncate">Gast
+                                    </div>
+                                    <div id="user-status-sub"
+                                        class="text-[10px] text-brand-sky font-bold tracking-wider uppercase truncate">
+                                        Login
+                                    </div>
+                                </div>
+                            </button>
+                            <button id="btn-login-sidebar" onclick="openAuthModal()"
+                                class="hidden bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-1 px-3 rounded-md shadow-glow flex items-center gap-2 transform active:scale-95 transition-all text-xs whitespace-nowrap">
+                                <i class="fa-solid fa-right-to-bracket text-[10px]"></i>
+                                <span>Anmelden</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1640,15 +1649,20 @@
         function updateUIAuth(user) {
             const nameEl = document.getElementById('user-name-display');
             const subEl = document.getElementById('user-status-sub');
+            const loginBtn = document.getElementById('btn-login-sidebar');
             if (nameEl && subEl) {
                 if (user) {
                     nameEl.innerText = user.email.split('@')[0];
                     subEl.innerText = 'Pro Plan';
                     subEl.classList.add('text-brand-sky');
+                    subEl.classList.remove('hidden');
+                    if (loginBtn) loginBtn.classList.add('hidden');
                 } else {
                     nameEl.innerText = 'Gast';
-                    subEl.innerText = 'Klicken zum Login';
+                    subEl.innerText = '';
                     subEl.classList.remove('text-brand-sky');
+                    subEl.classList.add('hidden');
+                    if (loginBtn) loginBtn.classList.remove('hidden');
                 }
             }
         }
