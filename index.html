@@ -809,16 +809,23 @@
                         <!-- Profil -->
                         <section>
                             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil</h3>
-                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div
-                                        class="w-12 h-12 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xl font-bold">
-                                        <i class="fa-solid fa-user"></i>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-12 h-12 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xl font-bold">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <div id="konto-user-name" class="text-lg font-bold text-white">Gast</div>
+                                            <div id="konto-user-email" class="text-sm text-slate-400">Nicht eingeloggt
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div id="konto-user-name" class="text-lg font-bold text-white">Gast</div>
-                                        <div id="konto-user-email" class="text-sm text-slate-400">Nicht eingeloggt</div>
-                                    </div>
+                                    <button id="konto-btn-logout" onclick="handleLogout()"
+                                        class="hidden px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition-colors cursor-pointer">
+                                        Ausloggen
+                                    </button>
                                 </div>
                                 <p class="text-xs text-slate-500 italic">Weitere Einstellungen folgen.</p>
                             </div>
@@ -2006,6 +2013,11 @@
                 updateUIAuth(user);
                 loadLibrary();
                 checkOnboarding(user);
+
+                const kontoView = document.getElementById('view-konto');
+                if (kontoView && !kontoView.classList.contains('hidden')) {
+                    updateKontoView();
+                }
             });
 
             // 2. Fallback Start: Versucht es einmalig kurz nach Start 
@@ -3155,6 +3167,7 @@
             const nameEl = document.getElementById('konto-user-name');
             const emailEl = document.getElementById('konto-user-email');
             const planEl = document.getElementById('konto-plan-name');
+            const logoutBtn = document.getElementById('konto-btn-logout');
 
             if (window.currentUser) {
                 nameEl.innerText = window.currentUser.email.split('@')[0];
@@ -3168,10 +3181,17 @@
 
                 // NEU: Counter auf Konto-Seite aktualisieren (falls Free-User)
                 await updatePromptCounter();
+
+                if (logoutBtn) logoutBtn.classList.remove('hidden');
             } else {
                 nameEl.innerText = 'Gast';
                 emailEl.innerText = 'Nicht eingeloggt';
                 planEl.innerText = 'Free Plan';
+
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+
+                const accountCounter = document.getElementById('konto-prompt-counter');
+                if (accountCounter) accountCounter.classList.add('hidden');
             }
         }
 
