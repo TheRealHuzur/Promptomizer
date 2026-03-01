@@ -12,6 +12,12 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
+    <!-- Driver.js -->
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.js.iife.js"
+        data-cookieconsent="ignore"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.css"
+        data-cookieconsent="ignore">
+
     <script src="https://cdn.tailwindcss.com" data-cookieconsent="ignore"></script>
 
     <script data-cookieconsent="ignore">
@@ -191,6 +197,93 @@
             --sidebar-w: 16rem;
             --sidebar-w-collapsed: 4rem;
             --sidebar-current-w: var(--sidebar-w);
+        }
+
+        /* --- Driver.js Dark Theme Overrides --- */
+        .driver-popover {
+            background-color: #0f172a !important;
+            /* var(--navy-sidebar) */
+            color: #94a3b8 !important;
+            /* var(--muted) */
+            border: 1px solid #1e293b !important;
+            /* var(--navy-border) */
+            border-radius: 0.5rem !important;
+        }
+
+        .driver-popover-title {
+            color: #ffffff !important;
+            font-size: 1.125rem !important;
+            font-weight: bold !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .driver-popover-description {
+            color: #94a3b8 !important;
+            font-size: 0.875rem !important;
+            line-height: 1.4 !important;
+        }
+
+        .driver-popover-footer {
+            margin-top: 1rem !important;
+        }
+
+        .driver-popover-footer button {
+            background-color: transparent !important;
+            border: 1px solid #1e293b !important;
+            color: #e2e8f0 !important;
+            text-shadow: none !important;
+            border-radius: 0.375rem !important;
+            font-weight: 500 !important;
+        }
+
+        .driver-popover-footer button:hover {
+            background-color: #1e293b !important;
+        }
+
+        .driver-popover-footer .driver-popover-next-btn {
+            background-color: #0ea5e9 !important;
+            /* var(--brand-sky) */
+            border-color: #0ea5e9 !important;
+            color: #020617 !important;
+            /* var(--navy-deep) */
+        }
+
+        .driver-popover-footer .driver-popover-next-btn:hover {
+            background-color: #38bdf8 !important;
+            /* var(--brand-hover) */
+            border-color: #38bdf8 !important;
+        }
+
+        .driver-popover-close-btn {
+            color: #94a3b8 !important;
+        }
+
+        .driver-popover-close-btn:hover {
+            color: #ffffff !important;
+        }
+
+        /* Arrows */
+        .driver-popover .driver-popover-arrow-side-top {
+            border-bottom-color: #0f172a !important;
+        }
+
+        .driver-popover .driver-popover-arrow-side-bottom {
+            border-top-color: #0f172a !important;
+        }
+
+        .driver-popover .driver-popover-arrow-side-left {
+            border-right-color: #0f172a !important;
+        }
+
+        .driver-popover .driver-popover-arrow-side-right {
+            border-left-color: #0f172a !important;
+        }
+
+        .driver-popover-description strong,
+        .driver-popover-description b,
+        #onboarding-text strong,
+        #onboarding-text b {
+            color: #ffffff;
         }
 
         body.sidebar-collapsed {
@@ -501,7 +594,7 @@
                         <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
                     </div>
 
-                    <div class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
+                    <div id="mode-toggle-container" class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
                         <button onclick="setEditorMode('structured')" id="btn-mode-structured"
                             class="px-5 py-1 rounded text-xs font-bold transition-all bg-brand-sky text-navy-deep shadow-glow">
                             Strukturiert
@@ -559,7 +652,7 @@
                 <div id="sidebar-library" class="flex-1 min-h-0 overflow-y-auto p-0">
 
                     <div class="bg-navy-sidebar">
-                        <button onclick="togglePromptsSection()"
+                        <button id="sidebar-prompts-btn" onclick="togglePromptsSection()"
                             class="w-full flex items-center justify-between px-4 py-3 text-left">
                             <span class="flex items-center gap-2 text-base font-bold text-slate-400">
                                 <i class="fa-solid fa-layer-group"></i> Prompts
@@ -1205,7 +1298,7 @@
 
             <footer
                 class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
-                <div class="w-full max-w-4xl flex items-center gap-4">
+                <div id="editor-actions-container" class="w-full max-w-4xl flex items-center gap-4">
                     <div id="footer-save-wrap">
                         <button onclick="saveCurrentToLibrary()"
                             class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
@@ -1540,6 +1633,55 @@
             class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Hilfe</button>
     </div>
 
+    <!-- ONBOARDING MODAL -->
+    <div id="modal-onboarding"
+        class="fixed inset-0 z-[150] hidden bg-black/90 flex justify-center items-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-navy-sidebar border border-navy-border w-full max-w-[560px] rounded-xl shadow-2xl flex flex-col relative overflow-hidden">
+            <!-- Header & Close -->
+            <div class="flex items-center justify-between p-6 pb-2 relative z-10">
+                <div class="flex gap-2" id="onboarding-dots">
+                    <!-- Dots will be generated via JS -->
+                </div>
+                <button onclick="closeOnboardingModal()" class="text-slate-500 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Body Content -->
+            <div class="p-6 pt-4 flex-grow relative z-10 min-h-[250px] flex flex-col justify-center">
+                <h3 id="onboarding-title" class="text-2xl font-bold text-white mb-4"></h3>
+                <div id="onboarding-text" class="text-slate-300 leading-relaxed space-y-4"></div>
+                <div id="onboarding-visual" class="mt-6 hidden flex justify-center"></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 pt-0 mt-auto flex justify-between items-center relative z-10">
+                <button id="btn-onboarding-back" onclick="onboardingPrevStep()"
+                    class="text-sm text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Zurück
+                </button>
+                <div id="onboarding-primary-actions" class="flex gap-3">
+                    <button id="btn-onboarding-secondary" onclick="onboardingSecondaryAction()"
+                        class="hidden py-2 px-4 rounded-md text-sm font-bold bg-navy-deep border border-navy-border text-slate-300 hover:bg-slate-800 transition-all">
+                    </button>
+                    <button id="btn-onboarding-next" onclick="onboardingNextStep()"
+                        class="py-2 px-6 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95 text-sm">
+                        Weiter <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subtle background glow -->
+            <div
+                class="absolute -top-32 -right-32 w-64 h-64 bg-brand-sky/10 rounded-full blur-3xl pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none z-0">
+            </div>
+        </div>
+    </div>
+
     <div id="modal-snippet-delete" class="ui-backdrop z-[120] hidden">
         <div class="ui-modal ui-modal-sm">
             <h3 class="ui-modal-title mb-4">Unwiderruflich löschen?</h3>
@@ -1791,6 +1933,7 @@
                 // UI und Bibliothek sofort aktualisieren
                 updateUIAuth(user);
                 loadLibrary();
+                checkOnboarding(user);
             });
 
             // 2. Fallback Start: Versucht es einmalig kurz nach Start 
@@ -1798,6 +1941,7 @@
             setTimeout(() => {
                 if (window.db && window.db.getScenarios) loadLibrary();
                 updateUIAuth(window.currentUser);
+                checkOnboarding(window.currentUser);
             }, 500);
         });
 
@@ -4952,6 +5096,202 @@
         window.openSnippets = (id) => {
             openSnippetCategory(id);
         };
+
+        // --- ONBOARDING MODAL & DRIVER.JS LOGIC ---
+        let onboardingCurrentStep = 1;
+
+        const onboardingSteps = [
+            {
+                title: "Willkommen bei Promptomizer 👋",
+                text: "<p>Promptomizer hilft dir, bessere KI-Prompts zu bauen — strukturiert, wiederverwendbar und in Sekunden abrufbar.</p><p>Baue dir deine persönliche <b>Prompt-Bibliothek</b> auf: Speichere deine besten Prompts, organisiere sie in Kategorien und greife jederzeit darauf zurück — statt jedes Mal von vorne anzufangen.</p><p>Wir zeigen dir kurz wie es funktioniert.</p>",
+                visual: false
+            },
+            // Steps 2 and 3 are handled by Driver.js
+            {
+                title: "", // Dynamically set for step 4
+                text: "", // Dynamically set for step 4
+                visual: false
+            }
+        ];
+
+        async function checkOnboarding(user) {
+            if (window.onboardingChecked) return;
+            window.onboardingChecked = true;
+
+            if (!user) {
+                if (localStorage.getItem('onboarding_seen') !== 'true') {
+                    openOnboardingModal(1);
+                }
+            } else {
+                if (window.db && window.db.getProfile) {
+                    const profile = await window.db.getProfile();
+                    if (profile && !profile.onboarding_completed) {
+                        openOnboardingModal(1);
+                    }
+                }
+            }
+        }
+
+        function openOnboardingModal(stepNumber) {
+            onboardingCurrentStep = stepNumber;
+            document.getElementById('modal-onboarding').classList.remove('hidden');
+            renderOnboardingStep();
+        }
+
+        function closeOnboardingModalAndSave() {
+            document.getElementById('modal-onboarding').classList.add('hidden');
+
+            if (window.currentUser) {
+                if (window.db && window.db.updateProfile) {
+                    window.db.updateProfile({ onboarding_completed: true });
+                }
+            } else {
+                localStorage.setItem('onboarding_seen', 'true');
+            }
+        }
+
+        // Ensure standard UI close handles saving if they X out early
+        function closeOnboardingModal() {
+            closeOnboardingModalAndSave();
+            if (window._driverObj) {
+                window._driverObj.destroy();
+                window._driverObj = null;
+            }
+        }
+
+        function renderOnboardingStep() {
+            const isLastStep = onboardingCurrentStep === 4;
+            const stepData = onboardingSteps[isLastStep ? 1 : 0]; // Index 0 is step 1, Index 1 is step 4
+
+            // Render Dots
+            const dotsContainer = document.getElementById('onboarding-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 1; i <= 4; i++) {
+                dotsContainer.innerHTML += `<div class="w-2.5 h-2.5 rounded-full ${i === onboardingCurrentStep ? 'bg-brand-sky' : 'bg-slate-700'}"></div>`;
+            }
+
+            const titleEl = document.getElementById('onboarding-title');
+            const textEl = document.getElementById('onboarding-text');
+            const visualEl = document.getElementById('onboarding-visual');
+            visualEl.classList.add('hidden'); // No visuals in Hybrid steps 1 & 4
+
+            const backBtn = document.getElementById('btn-onboarding-back');
+            const nextBtn = document.getElementById('btn-onboarding-next');
+            const secondaryBtn = document.getElementById('btn-onboarding-secondary');
+
+            if (isLastStep) {
+                if (window.currentUser) {
+                    titleEl.innerText = "Du startest mit dem Free-Plan";
+                    textEl.innerHTML = "<p>Du kannst bis zu <b>10 Prompts</b> kostenlos speichern. Voller Zugriff auf Editor, Bausteine und Kategorien ist inklusive.</p><p>Für unbegrenzte Prompts: <b>Pro-Plan für 3,99 €/Monat</b>.</p>";
+                    secondaryBtn.classList.remove('hidden');
+                    secondaryBtn.innerText = "Pro-Plan ansehen";
+                    nextBtn.innerHTML = `Loslegen <i class="fa-solid fa-check ml-2 text-xs"></i>`;
+                } else {
+                    titleEl.innerText = "Einfach ausprobieren — kostenlos";
+                    textEl.innerHTML = "<p>Du kannst den Editor, Bausteine und Kategorien sofort nutzen — ohne Account.</p><p>Wenn du Prompts speichern möchtest, brauchst du einen kostenlosen Account. Der Free-Plan gibt dir bis zu <b>10 gespeicherte Prompts</b>. Für unbegrenzte Prompts gibt es den <b>Pro-Plan für 3,99 €/Monat</b>.</p>";
+                    secondaryBtn.classList.remove('hidden');
+                    secondaryBtn.innerText = "Erst mal ausprobieren";
+                    nextBtn.innerHTML = `Jetzt kostenlos registrieren <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>`;
+                }
+                backBtn.classList.remove('invisible');
+            } else { // Step 1
+                titleEl.innerText = stepData.title;
+                textEl.innerHTML = stepData.text;
+                secondaryBtn.classList.add('hidden');
+                backBtn.classList.add('invisible');
+                nextBtn.innerHTML = `Weiter <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>`;
+            }
+        }
+
+        function onboardingNextStep() {
+            if (onboardingCurrentStep === 1) {
+                // Launch Driver.js for Steps 2 & 3
+                document.getElementById('modal-onboarding').classList.add('hidden');
+                startDriverTour();
+            } else if (onboardingCurrentStep === 4) {
+                if (window.currentUser) {
+                    closeOnboardingModalAndSave();
+                } else {
+                    closeOnboardingModalAndSave();
+                    openAuthModal();
+                    switchAuthMode('register');
+                }
+            }
+        }
+
+        function onboardingPrevStep() {
+            if (onboardingCurrentStep === 4) {
+                // Open driver to last step if they go back from 4
+                document.getElementById('modal-onboarding').classList.add('hidden');
+                startDriverTour(1); // 0-indexed, so 1 is the second driver step (Step 3 overall)
+            }
+        }
+
+        function onboardingSecondaryAction() {
+            if (window.currentUser) {
+                window.open('#', '_blank'); // To be replaced with actual URL later
+            } else {
+                closeOnboardingModalAndSave();
+            }
+        }
+
+        function startDriverTour(startIndex = 0) {
+            const driver = window.driver.js.driver;
+
+            window._driverObj = driver({
+                showProgress: false,
+                allowClose: true,
+                doneBtnText: 'Weiter →',
+                nextBtnText: 'Weiter →',
+                prevBtnText: '← Zurück',
+                onDestroyStarted: () => {
+                    if (window._driverObj.hasNextStep()) {
+                        window._driverObj.destroy();
+                        closeOnboardingModalAndSave(); // Save if they explicitly exit early
+                    } else {
+                        // Tour fully finished, show step 4
+                        window._driverObj.destroy();
+                        openOnboardingModal(4);
+                    }
+                },
+                steps: [
+                    {
+                        element: '#mode-toggle-container',
+                        popover: {
+                            title: 'Zwei Modi, ein Ziel',
+                            description: 'Im <b>Strukturierten Modus</b> füllst du einzelne Felder aus — Promptomizer baut daraus automatisch einen vollständigen Prompt. Im <b>Freien Modus</b> schreibst du direkt drauflos.',
+                            side: "bottom",
+                            align: 'center'
+                        }
+                    },
+                    {
+                        element: '#editor-actions-container',
+                        popover: {
+                            title: 'Prompt fertig? Zwei Klicks genügen',
+                            description: 'Mit <b>Kopieren</b> landet dein Prompt sofort in der Zwischenablage — bereit zum Einfügen in ChatGPT, Claude oder jedes andere KI-Tool.<br><br>Mit <b>Prompt speichern</b> legst du ihn in deiner persönlichen Bibliothek ab — mit Namen und Kategorie, jederzeit wieder abrufbar.',
+                            side: "top",
+                            align: 'center'
+                        }
+                    },
+                    {
+                        element: '#sidebar-prompts-btn',
+                        popover: {
+                            title: 'Organisiere deine Prompts',
+                            description: 'Alle gespeicherten Prompts findest du hier in der Sidebar — das ist <b>deine persönliche Prompt-Bibliothek</b>. Lege eigene <b>Kategorien</b> an, um alles übersichtlich zu halten. <b>Bausteine</b> sind wiederverwendbare Textbausteine — einmal anlegen, immer wieder einsetzen.',
+                            side: "right",
+                            align: 'start'
+                        }
+                    }
+                ]
+            });
+
+            // Allow driving to a specific index (e.g. going "Back" from modal step 4)
+            if (startIndex > 0) {
+                window._driverObj.drive(startIndex);
+            } else {
+                window._driverObj.drive();
+            }
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" data-cookieconsent="ignore"></script>

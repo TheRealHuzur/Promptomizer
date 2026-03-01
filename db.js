@@ -32,7 +32,7 @@ function initSupabaseClient() {
 
     const { data } = supabaseClient.auth.onAuthStateChange((event, session) => {
         console.log("ðŸ” Auth Status:", event, session?.user?.email);
-        
+
         if (event === 'PASSWORD_RECOVERY') {
             const recoveryEvent = new CustomEvent('auth-password-recovery');
             window.dispatchEvent(recoveryEvent);
@@ -111,7 +111,34 @@ async function handleLogout() {
 // ---------------------------------------------------------
 
 window.db = {
-    
+    // --- PROFILES ---
+    async getProfile() {
+        if (!window.currentUser) return null;
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', window.currentUser.id)
+            .single();
+        if (error) {
+            console.error("Profile Fetch Error:", error);
+            return null;
+        }
+        return data;
+    },
+
+    async updateProfile(patch) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update(patch)
+            .eq('id', window.currentUser.id);
+        if (error) {
+            console.error("Profile Update Error:", error);
+            return false;
+        }
+        return true;
+    },
+
     // --- PROMPTS (Historie) ---
     async savePrompt(entry) {
         if (window.currentUser) {
@@ -130,7 +157,7 @@ window.db = {
             // 🍪 SESSION SAVE (Gast)
             let history = JSON.parse(sessionStorage.getItem('promptomizer_history') || '[]');
             // Lokale ID generieren falls nicht vorhanden
-            if(!entry.id) entry.id = Date.now();
+            if (!entry.id) entry.id = Date.now();
             history.unshift(entry);
             if (history.length > 50) history.pop();
             sessionStorage.setItem('promptomizer_history', JSON.stringify(history));
@@ -145,7 +172,7 @@ window.db = {
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(50);
-            
+
             if (error) {
                 console.error("Cloud Fetch Error:", error);
                 return [];
@@ -261,7 +288,7 @@ window.db = {
 
     // --- BIBLIOTHEK (Szenarien) ---
     async saveScenario(scenario) {
-        if (!window.currentUser) return false; 
+        if (!window.currentUser) return false;
 
         const { error } = await supabaseClient
             .from('library')
@@ -271,7 +298,7 @@ window.db = {
                 fields: scenario.fields,
                 category: scenario.category ?? null
             });
-        
+
         if (error) {
             console.error("Library Save Error:", error);
             return false;
@@ -288,7 +315,7 @@ window.db = {
             .select('*')
             .eq('user_id', uid)
             .order('created_at', { ascending: false });
-        
+
         if (error) {
             console.error("Library Fetch Error:", error);
             return [];
@@ -425,7 +452,7 @@ window.db = {
 
         return true;
     },
-    
+
     async deleteScenario(id) {
         try {
             if (!window.currentUser) return false;
