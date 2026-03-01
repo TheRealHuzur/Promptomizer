@@ -128,13 +128,23 @@ window.db = {
 
     async updateProfile(patch) {
         if (!window.currentUser) return false;
-        const { error } = await supabaseClient
+        console.log("Versuche Profil zu updaten für ID:", window.currentUser.id, patch);
+        const { data, error } = await supabaseClient
             .from('profiles')
             .update(patch)
-            .eq('id', window.currentUser.id);
+            .eq('id', window.currentUser.id)
+            .select(); // Select added to return the updated row
+
         if (error) {
-            console.error("Profile Update Error:", error);
+            console.error("Profile Update Error (Möglicherweise RLS Policy fehlend):", error);
+            alert("Fehler beim Speichern in Supabase. Fehlt eventuell die UPDATE Policy für die profiles Tabelle?\n\nError: " + error.message);
             return false;
+        }
+
+        if (!data || data.length === 0) {
+            console.warn("Profile Update Warnung: Keine Zeile wurde aktualisiert. RLS blockiert möglicherweise das Update.");
+        } else {
+            console.log("Profil erfolgreich aktualisiert:", data);
         }
         return true;
     },
