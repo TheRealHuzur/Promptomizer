@@ -857,8 +857,7 @@
                                             class="text-sm text-slate-300 font-medium">0 von 10 Prompts
                                             gespeichert</span>
                                         <button id="konto-btn-upgrade" onclick="openUpgradeModal()"
-                                            class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm cursor-not-allowed opacity-50 font-bold"
-                                            disabled>
+                                            class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
                                             <i class="fa-solid fa-arrow-up-right-dots mr-1"></i> Upgraden
                                         </button>
                                     </div>
@@ -868,7 +867,13 @@
                                             style="width: 0%"></div>
                                     </div>
                                 </div>
-                                <p class="text-xs text-slate-500 italic mt-4">Abo-Verwaltung folgt in Kürze.</p>
+                                <div class="mt-4 flex items-center gap-3">
+                                    <button id="konto-btn-manage-billing" onclick="handleManageBilling()"
+                                        class="hidden text-xs bg-brand-sky/15 hover:bg-brand-sky/25 text-brand-sky px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
+                                        <i class="fa-solid fa-credit-card mr-1"></i> Abo verwalten
+                                    </button>
+                                    <p id="konto-billing-hint" class="text-xs text-slate-500 italic">Stripe-Testabo verfügbar.</p>
+                                </div>
                             </div>
                         </section>
 
@@ -1423,10 +1428,9 @@
             </div>
 
             <!-- CTA -->
-            <button id="btn-upgrade-cta" onclick="closeUpgradeModal()"
-                class="w-full ui-btn ui-btn-primary mb-3 opacity-50 cursor-not-allowed" disabled
-                title="Payment-Integration folgt in Kürze">
-                Jetzt upgraden — bald verfügbar
+            <button id="btn-upgrade-cta" onclick="handleUpgradeCTA()"
+                class="w-full ui-btn ui-btn-primary mb-3">
+                Jetzt upgraden
             </button>
 
             <!-- Schließen -->
@@ -2014,6 +2018,7 @@
                 updateUIAuth(user);
                 loadLibrary();
                 checkOnboarding(user);
+                maybeHandleBillingReturn();
 
                 const kontoView = document.getElementById('view-konto');
                 if (kontoView && !kontoView.classList.contains('hidden')) {
@@ -2027,19 +2032,23 @@
                 if (window.db && window.db.getScenarios) loadLibrary();
                 updateUIAuth(window.currentUser);
                 checkOnboarding(window.currentUser);
+                maybeHandleBillingReturn();
             }, 500);
         });
 
         // --- AUTH UI UPDATE ---
-        function updateUIAuth(user) {
+        async function updateUIAuth(user) {
             const nameEl = document.getElementById('user-name-display');
             const subEl = document.getElementById('user-status-sub');
             const loginBtn = document.getElementById('btn-login-sidebar');
             if (nameEl && subEl) {
                 if (user) {
                     nameEl.innerText = user.email.split('@')[0];
-                    subEl.innerText = 'Pro Plan';
-                    subEl.classList.add('text-brand-sky');
+                    const tier = window.db && window.db.getUserTier
+                        ? await window.db.getUserTier()
+                        : 'free';
+                    subEl.innerText = tier === 'pro' ? 'Pro Plan' : 'Free Plan';
+                    subEl.classList.toggle('text-brand-sky', tier === 'pro');
                     subEl.classList.remove('hidden');
                     if (loginBtn) loginBtn.classList.add('hidden');
                 } else {
@@ -3193,6 +3202,10 @@
 
                 const accountCounter = document.getElementById('konto-prompt-counter');
                 if (accountCounter) accountCounter.classList.add('hidden');
+                const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
+                if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
+                const billingHint = document.getElementById('konto-billing-hint');
+                if (billingHint) billingHint.innerText = 'Melde dich an, um dein Testabo zu verwalten.';
             }
         }
 
@@ -5418,6 +5431,74 @@
             document.getElementById('modal-upgrade').classList.add('hidden');
         }
 
+        function setUpgradeButtonLoading(loading) {
+            const btn = document.getElementById('btn-upgrade-cta');
+            if (!btn) return;
+            btn.disabled = loading;
+            btn.classList.toggle('opacity-60', loading);
+            btn.classList.toggle('cursor-wait', loading);
+            btn.innerText = loading ? 'Checkout wird geöffnet...' : 'Jetzt upgraden';
+        }
+
+        async function handleUpgradeCTA() {
+            if (!window.currentUser) {
+                closeUpgradeModal();
+                openAuthModal();
+                return;
+            }
+
+            try {
+                setUpgradeButtonLoading(true);
+                const result = await window.db.createProCheckoutSession();
+                if (!result?.url) throw new Error('Keine Checkout-URL erhalten.');
+                window.location.href = result.url;
+            } catch (err) {
+                console.error('Upgrade CTA Fehler:', err);
+                alert('Stripe-Checkout konnte nicht gestartet werden. Prüfe die Supabase-Function-Secrets und versuche es erneut.');
+            } finally {
+                setUpgradeButtonLoading(false);
+            }
+        }
+
+        async function handleManageBilling() {
+            try {
+                const result = await window.db.createCustomerPortalSession();
+                if (!result?.url) throw new Error('Keine Portal-URL erhalten.');
+                window.location.href = result.url;
+            } catch (err) {
+                console.error('Billing Portal Fehler:', err);
+                alert('Das Billing-Portal konnte nicht geöffnet werden. Prüfe, ob bereits ein Stripe-Kunde existiert.');
+            }
+        }
+
+        async function maybeHandleBillingReturn() {
+            const params = new URLSearchParams(window.location.search);
+            const checkout = params.get('checkout');
+            const billing = params.get('billing');
+
+            if (!window.currentUser || (!checkout && !billing)) return;
+
+            if ((checkout === 'success' || billing === 'return') && window.db?.syncStripeSubscription) {
+                try {
+                    await window.db.syncStripeSubscription();
+                    await updateUIAuth(window.currentUser);
+                    await updatePromptCounter();
+                    const kontoView = document.getElementById('view-konto');
+                    if (kontoView && !kontoView.classList.contains('hidden')) {
+                        await updateKontoView();
+                    }
+                } catch (err) {
+                    console.error('Stripe Sync nach Redirect fehlgeschlagen:', err);
+                }
+            }
+
+            params.delete('checkout');
+            params.delete('billing');
+            const nextQuery = params.toString();
+            const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`;
+            window.history.replaceState({}, '', nextUrl);
+        }
+
         async function updatePromptCounter() {
             if (!window.db) return;
             const tier = await window.db.getUserTier();
@@ -5432,6 +5513,10 @@
                 if (accountCounter) accountCounter.classList.add('hidden');
                 const accountUpgradeBtn = document.getElementById('konto-btn-upgrade');
                 if (accountUpgradeBtn) accountUpgradeBtn.classList.add('hidden');
+                const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
+                if (manageBillingBtn) manageBillingBtn.classList.remove('hidden');
+                const billingHint = document.getElementById('konto-billing-hint');
+                if (billingHint) billingHint.innerText = 'Dein Stripe-Abo kannst du im Customer Portal verwalten.';
 
                 return;
             }
@@ -5476,6 +5561,10 @@
 
                 const accountUpgradeBtn = document.getElementById('konto-btn-upgrade');
                 if (accountUpgradeBtn) accountUpgradeBtn.classList.remove('hidden');
+                const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
+                if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
+                const billingHint = document.getElementById('konto-billing-hint');
+                if (billingHint) billingHint.innerText = 'Wechsel bei Bedarf in den Stripe-Testcheckout.';
             }
         }
     </script>

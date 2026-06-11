@@ -506,6 +506,33 @@ window.db = {
     async getUserTier() {
         const profile = await this.getProfile();
         return profile?.tier ?? 'free';
+    },
+
+    async createProCheckoutSession() {
+        const { data, error } = await supabaseClient.functions.invoke('create-stripe-checkout-session');
+        if (error) {
+            console.error('Checkout Session Error:', error);
+            throw error;
+        }
+        return data;
+    },
+
+    async createCustomerPortalSession() {
+        const { data, error } = await supabaseClient.functions.invoke('create-stripe-portal-session');
+        if (error) {
+            console.error('Customer Portal Error:', error);
+            throw error;
+        }
+        return data;
+    },
+
+    async syncStripeSubscription() {
+        const { data, error } = await supabaseClient.functions.invoke('sync-stripe-subscription');
+        if (error) {
+            console.error('Stripe Sync Error:', error);
+            throw error;
+        }
+        return data;
     }
 };
 
