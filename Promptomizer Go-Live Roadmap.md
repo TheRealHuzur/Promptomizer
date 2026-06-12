@@ -51,7 +51,7 @@ Das ist ein echtes Sicherheitsproblem. Nutzerinhalte duerfen nicht unkontrollier
 - [x] Secrets, Trigger und Zugriffsregeln in Supabase sauber dokumentieren (`supabase/functions/send-welcome-email/README.md`)
 - [x] Logging fuer Fehler und Missbrauch aktivieren (abgelehnte Aufrufe und Fehler landen in den Edge-Function-Logs)
 
-**Noch offen (Deployment):** Migration pushen, `WELCOME_EMAIL_SECRET` setzen, Function deployen und den `x-welcome-secret`-Header im Database-Webhook ergaenzen — Schritte stehen im README. Ohne den Header gehen danach keine Willkommens-Mails mehr raus.
+**Deployment erledigt (12.06.2026):** Secret gesetzt, Migration angewendet, Function deployed, `x-welcome-secret`-Header im Webhook ergaenzt, doppelter Webhook geloescht. End-to-End verifiziert: ohne Secret 401, unbekannter User 403, echter Signup loest genau eine Mail aus, Wiederholungsaufrufe werden uebersprungen.
 
 **Warum kritisch**
 Sobald E-Mail-Versand offen angreifbar ist, riskierst du Spam, Kosten und Reputationsschaeden.
