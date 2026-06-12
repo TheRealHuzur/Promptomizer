@@ -129,9 +129,11 @@ Keine Layout-Brueche, keine blockierenden UX-Bugs, keine unbedienbaren Modals.
 
 ### 10b. Tote Duplikat-Funktionen in index.html entfernen
 Nebenbefund aus dem XSS-Audit (12.06.2026): `loadSnippetsForField` und `loadSnippetsForFieldDemo` sind in `index.html` doppelt definiert (erste Definitionen ca. Zeile 4014-4095, zweite ca. Zeile 4774-4780). Die spaeteren Definitionen ueberschreiben die frueheren — die ersten Versionen (mit eigenem Rendering in `#library-snippets`) sind toter Code.
-- [ ] per Suche verifizieren, welche Definition zuletzt im Script steht und damit aktiv ist
-- [ ] die toten ersten Definitionen entfernen
-- [ ] im Browser pruefen, dass das Klicken auf ein Editor-Feld weiterhin die passende Baustein-Kategorie in der linken Sidebar oeffnet
+- [x] per Suche verifizieren, welche Definition zuletzt im Script steht und damit aktiv ist (Befund: beide Definitions-Paare hatten keinerlei Aufrufer mehr — auch die spaeteren waren tot)
+- [x] die toten Definitionen entfernen (beide Paare plus das nur von dort referenzierte `insertSnippet`; `insertSnippetText`/`insertSnippetEncoded` bleiben, die nutzt das lebende Accordion)
+- [x] im Browser pruefen (Accordion oeffnet/laedt Kategorien korrekt, Feld-Fokus setzt `activeFieldId`, keine Konsolen-Fehler)
+
+**Erledigt (12.06.2026), ein Hinweis:** Das frueher angedachte Verhalten "Klick auf ein Editor-Feld oeffnet automatisch die passende Baustein-Kategorie" existiert im Live-Code nicht (und existierte auch vor dem Aufraeumen nicht — es starb, als die Accordion-Sidebar die alte Render-Logik abloeste). Feld-Fokus markiert nur das aktive Feld; Kategorien oeffnet man im Accordion. Falls das Auto-Oeffnen gewuenscht ist, waere das ein kleines Feature (Fokus-Handler -> `openSnippetCategory(fieldId)`), kein Cleanup.
 
 **Warum sinnvoll**
 Kein Bug, aber toter Code taeuscht beim Lesen falsches Verhalten vor (das XSS-Audit waere fast daran haengen geblieben) und vergroessert die Angriffsflaeche bei kuenftigen Aenderungen.

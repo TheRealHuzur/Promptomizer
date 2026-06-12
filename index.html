@@ -4011,21 +4011,6 @@
             setActiveField('free');
         }
 
-        function loadSnippetsForFieldDemo(fieldId) {
-            const container = document.getElementById('library-snippets');
-            const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
-            container.innerHTML = `
-                <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">Passend für: ${fieldLabel}</div>
-                <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippet('${fieldId}', 'Beispiel Textbaustein')">
-                    <div class="text-sm text-slate-300 group-hover:text-white truncate">Beispiel Baustein</div>
-                </div>
-            `;
-        }
-
-        function insertSnippet(fieldId, text) {
-            insertSnippetText(text, fieldId);
-        }
-
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
@@ -4054,44 +4039,6 @@
             ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
             const pos = start + text.length;
             ta.setSelectionRange(pos, pos);
-        }
-
-        async function loadSnippetsForField(fieldId) {
-            const container = document.getElementById('library-snippets');
-            activeFieldId = fieldId;
-
-            if (!isLeftOpen) toggleSidebar('left');
-
-            if (currentMode === 'structured' && (!fieldId || fieldId === 'free')) {
-                container.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>';
-                return;
-            }
-
-            if (!window.db || !window.db.getSnippets) {
-                container.innerHTML = '<div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>';
-                return;
-            }
-
-            const snippets = await window.db.getSnippets({ mode: currentMode, fieldId: activeFieldId });
-            const fieldLabel = FIELDS.find(f => f.id === fieldId)?.label || 'Feld';
-            const headerLabel = currentMode === 'free' ? 'Bausteine (Frei)' : `Passend für: ${fieldLabel}`;
-
-            if (!snippets || snippets.length === 0) {
-                container.innerHTML = `
-                    <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">${headerLabel}</div>
-                    <div class="text-xs text-slate-600 italic py-2">Keine Bausteine.</div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="text-[10px] text-brand-sky font-bold mb-1 uppercase tracking-wider opacity-70">${headerLabel}</div>
-                ${snippets.map(snippet => `
-                    <div class="group flex items-center p-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick='insertSnippetText(${jsArg(snippet.content)}, ${jsArg(fieldId)})'>
-                        <div class="text-sm text-slate-300 group-hover:text-white truncate">${escapeHtml(snippet.name)}</div>
-                    </div>
-                `).join('')}
-            `;
         }
 
         function setActiveField(fieldId) {
@@ -4769,14 +4716,6 @@
             await loadSnippetSection(id);
             const header = document.getElementById(`snip-body-${id}`)?.previousElementSibling;
             if (header && header.scrollIntoView) header.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        async function loadSnippetsForField(fieldId) {
-            await openSnippetCategory(fieldId);
-        }
-
-        function loadSnippetsForFieldDemo(fieldId) {
-            openSnippetCategory(fieldId);
         }
 
         function historyGetTimestamp(item) {
