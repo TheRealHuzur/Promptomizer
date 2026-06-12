@@ -78,7 +78,8 @@ async function registerUser(email, password, metadata = {}) {
         email,
         password,
         options: {
-            data: metadata
+            data: metadata,
+            emailRedirectTo: window.location.origin
         }
     });
     return { data, error };

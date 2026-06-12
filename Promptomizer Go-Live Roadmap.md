@@ -72,17 +72,21 @@ Die Texte beschreiben heute schon Ablaeufe, die das Produkt technisch noch nicht
 Diese Punkte sind nicht optional, wenn du naechste Woche echte Nutzer gewinnen willst.
 
 ### 6. Auth- und Account-Flows komplett testen
-- [ ] Registrierung
-- [ ] E-Mail-Bestaetigung
-- [ ] Login
-- [ ] Logout
-- [ ] Passwort vergessen
-- [ ] Passwort zuruecksetzen
-- [ ] Google Login
-- [ ] Verhalten mit deaktivierten Cookies / Consent-Szenarien pruefen
+- [x] Registrierung (Formular-Validierung getestet: Submit erst nach AGB-Haken aktiv; E2E mit echtem Mail-Empfang -> manueller Resttest, s.u.)
+- [x] E-Mail-Bestaetigung (Verify-Link bestaetigt Account, Session wird per URL-Fragment uebernommen, UI zeigt User + korrekt FREE PLAN)
+- [x] Login (per Formular-Button und per API getestet)
+- [x] Logout (Session aus Storage entfernt, UI zurueck auf Gast)
+- [x] Passwort zuruecksetzen (Recovery-Link -> `modal-password-new` erscheint -> Speichern; neues Passwort akzeptiert, altes wird abgelehnt)
+- [ ] Passwort vergessen: Anfrage-Formular bewusst nicht abgesendet (haette echte Mail an Testadresse ausgeloest); die kritische Link-Verarbeitung ist getestet. Manuell: einmal mit echter Adresse anfordern und Mail-Empfang pruefen
+- [ ] Google Login: manuell testen (OAuth-Consent laesst sich nicht automatisieren)
+- [ ] Verhalten mit deaktivierten Cookies / Consent-Szenarien: manuell auf der Live-Domain pruefen (Cookiebot laeuft auf localhost nicht — "domain not authorized")
+
+**Getestet am 12.06.2026 (lokale Preview gegen Live-Supabase, Testuser danach geloescht). Zwei Fixes dabei:**
+1. `site_url` in der Supabase-Auth-Config war kaputt (` promptomizer.vercel.app` — fuehrendes Leerzeichen, kein `https://`, falsche Domain). Bestaetigungs-Mails haetten Nutzer auf eine kaputte/falsche URL geleitet. Jetzt: `https://www.promptomizer.de`.
+2. `registerUser` gibt jetzt `emailRedirectTo: window.location.origin` mit (wie `resetPasswordForEmail`), damit der Bestaetigungslink zur Domain zurueckfuehrt, auf der registriert wurde.
 
 **Done-Definition**
-Jeder Flow funktioniert auf Desktop und Mobile ohne manuelle Nacharbeit.
+Jeder Flow funktioniert auf Desktop und Mobile ohne manuelle Nacharbeit. (Mobile-Durchgang gehoert zu Punkt 10.)
 
 ### 7. Supabase-RLS und Datenzugriffe auditieren
 - [x] fuer `profiles`, `library`, `prompt_history`, `snippets`, `prompt_categories` alle Policies pruefen (RLS auf allen 5 Tabellen aktiv, Owner-Checks via `auth.uid()` vorhanden)
