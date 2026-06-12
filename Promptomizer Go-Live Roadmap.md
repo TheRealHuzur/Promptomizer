@@ -125,6 +125,15 @@ Menschen zahlen nicht fuer etwas, das unfertig wirkt.
 **Done-Definition**
 Keine Layout-Brueche, keine blockierenden UX-Bugs, keine unbedienbaren Modals.
 
+### 10b. Tote Duplikat-Funktionen in index.html entfernen
+Nebenbefund aus dem XSS-Audit (12.06.2026): `loadSnippetsForField` und `loadSnippetsForFieldDemo` sind in `index.html` doppelt definiert (erste Definitionen ca. Zeile 4014-4095, zweite ca. Zeile 4774-4780). Die spaeteren Definitionen ueberschreiben die frueheren — die ersten Versionen (mit eigenem Rendering in `#library-snippets`) sind toter Code.
+- [ ] per Suche verifizieren, welche Definition zuletzt im Script steht und damit aktiv ist
+- [ ] die toten ersten Definitionen entfernen
+- [ ] im Browser pruefen, dass das Klicken auf ein Editor-Feld weiterhin die passende Baustein-Kategorie in der linken Sidebar oeffnet
+
+**Warum sinnvoll**
+Kein Bug, aber toter Code taeuscht beim Lesen falsches Verhalten vor (das XSS-Audit waere fast daran haengen geblieben) und vergroessert die Angriffsflaeche bei kuenftigen Aenderungen.
+
 ---
 
 ## Phase 3: Betriebsfaehigkeit
