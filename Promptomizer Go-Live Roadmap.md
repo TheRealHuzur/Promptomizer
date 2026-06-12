@@ -101,11 +101,13 @@ Jeder Flow funktioniert auf Desktop und Mobile ohne manuelle Nacharbeit. (Mobile
 Ein SaaS mit schwacher Multi-Tenant-Trennung ist geschaeftlich nicht tragbar.
 
 ### 8. Service Worker und Caching ueberarbeiten
-- [ ] pruefen, ob `sw.js` veraltete Versionen zu aggressiv cached
-- [ ] keine kritischen CDN-Abhaengigkeiten blind offline cachen
-- [ ] sauber definieren, wann neue Releases ausgeliefert werden
-- [ ] Update-Verhalten nach Deployment testen
-- [ ] Fallbacks fuer defekte oder stale Caches einbauen
+- [x] pruefen, ob `sw.js` veraltete Versionen zu aggressiv cached (tat er: Cache-first fuer alles inkl. `index.html` und Tailwind-CDN — Releases haetten Bestandsnutzer nie erreicht)
+- [x] keine kritischen CDN-Abhaengigkeiten blind offline cachen (kein Caching mehr)
+- [x] sauber definieren, wann neue Releases ausgeliefert werden (ohne Service Worker: sofort beim naechsten Seitenaufruf, direkt vom Server/Vercel-CDN)
+- [x] Update-Verhalten nach Deployment testen (Kill-Switch in Preview verifiziert: alter Cache geloescht, Registrierung entfernt, Tab neu geladen, App laeuft)
+- [x] Fallbacks fuer defekte oder stale Caches einbauen (Kill-Switch raeumt alle Caches ab)
+
+**Entscheidung (12.06.2026):** Der Worker wurde im aktuellen Code gar nicht mehr registriert — aber vom 04.01. bis 16.01.2026 war eine Registrierung live. Clients aus dem Fenster haengen auf dem alten Cache-first-Worker fest. `sw.js` ist jetzt ein Kill-Switch: ersetzt beim naechsten Besuch den Alt-Worker (Browser prueft sw.js bei Navigation/24h), loescht alle Caches, deregistriert sich, laedt offene Tabs neu. Danach laeuft die App ohne Service Worker — solange alles Wesentliche eine Supabase-Verbindung braucht, bringt ein Offline-Cache nur Staleness-Risiken. `sw.js` muss mit deployt werden und darf nicht geloescht werden, solange Alt-Clients existieren koennen.
 
 **Warum kritisch**
 Veraltete Assets im Browser sind ein haeufiger Grund fuer "bei mir funktioniert's nicht".
