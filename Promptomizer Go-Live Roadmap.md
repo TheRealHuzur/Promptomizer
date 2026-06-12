@@ -8,7 +8,7 @@ Promptomizer in einen Zustand bringen, in dem:
 - das Produkt bei echtem Traffic stabil und vertrauenswuerdig wirkt
 
 ## Status
-Aktuell kein Go-Live fuer einen bezahlten SaaS empfehlenswert.
+Zahlungsfluss fuer den Pro-Plan ist live getestet und funktioniert. Weitere Launch-Themen ausserhalb des Billing-Flows bleiben offen.
 
 ---
 
@@ -20,36 +20,38 @@ Diese Punkte muessen vor einem bezahlten Start erledigt sein.
 - [x] Upgrade-Button im Produkt an echten Kaufprozess anbinden
 - [x] erfolgreichem Kauf ein verlaessliches `tier = pro` zuweisen
 - [x] Kuendigung, Downgrade und Rueckfall auf `free` technisch abbilden
-- [ ] Testkaeufe vollstaendig durchspielen
-- [ ] pruefen, ob Rechnungen, Steuern und Kundendaten korrekt verarbeitet werden
+- [x] Testkaeufe vollstaendig durchspielen
+- [x] pruefen, ob Rechnungen, Steuern und Kundendaten korrekt verarbeitet werden
 
 **Warum kritisch**
 Der Pro-Plan wird beworben, ist aber aktuell nicht kaufbar. Damit kannst du keinen serioesen SaaS monetarisieren.
 
 ### 2. Planstatus im UI korrigieren
 - [x] Sidebar-Logik korrigieren, damit eingeloggte Nutzer nicht automatisch als `Pro Plan` angezeigt werden
-- [ ] ueberall denselben Tier-Status verwenden
-- [ ] Free-/Pro-Grenzen konsistent im gesamten Produkt darstellen
-- [ ] Upgrade-Hinweise nur dann zeigen, wenn sie fachlich korrekt sind
+- [x] ueberall denselben Tier-Status verwenden
+- [x] Free-/Pro-Grenzen konsistent im gesamten Produkt darstellen
+- [x] Upgrade-Hinweise nur dann zeigen, wenn sie fachlich korrekt sind
 
 **Warum kritisch**
 Falsche Plananzeigen zerstoeren Vertrauen und fuehren zu Supportfaellen und Streit bei zahlenden Kunden.
 
 ### 3. Frontend-XSS und unsichere DOM-Injektionen beheben
-- [ ] alle `innerHTML`-Stellen pruefen, die Nutzerdaten rendern
-- [ ] Prompt-Namen, Snippet-Namen, Kategorien und Favoriten nur escaped oder per `textContent` rendern
-- [ ] ein einheitliches Sanitizing-Konzept einfuehren
-- [ ] Regressionstest fuer gespeicherte Inhalte mit Sonderzeichen und HTML-Payloads machen
+- [x] alle `innerHTML`-Stellen pruefen, die Nutzerdaten rendern
+- [x] Prompt-Namen, Snippet-Namen, Kategorien und Favoriten nur escaped oder per `textContent` rendern
+- [x] ein einheitliches Sanitizing-Konzept einfuehren (`escapeHtml` fuer Markup, `jsArg` fuer Inline-Handler-Argumente)
+- [x] Regressionstest fuer gespeicherte Inhalte mit Sonderzeichen und HTML-Payloads machen (manuell im Browser gegen alle Render-Pfade gefahren)
 
 **Warum kritisch**
 Das ist ein echtes Sicherheitsproblem. Nutzerinhalte duerfen nicht unkontrolliert als HTML zurueck ins DOM geschrieben werden.
 
 ### 4. Edge Functions und Backend-Flaechen absichern
-- [ ] pruefen, ob die Welcome-Mail-Function oeffentlich missbraucht werden kann
-- [ ] Authentifizierung oder Signaturpruefung fuer Function-Aufrufe einbauen
-- [ ] Rate Limiting / Abuse-Schutz fuer Mail-Versand definieren
-- [ ] Secrets, Trigger und Zugriffsregeln in Supabase sauber dokumentieren
-- [ ] Logging fuer Fehler und Missbrauch aktivieren
+- [x] pruefen, ob die Welcome-Mail-Function oeffentlich missbraucht werden kann (war sie: anon-Key genuegte, beliebige Empfaenger moeglich)
+- [x] Authentifizierung oder Signaturpruefung fuer Function-Aufrufe einbauen (Shared Secret `WELCOME_EMAIL_SECRET` + User-Existenz-Check)
+- [x] Rate Limiting / Abuse-Schutz fuer Mail-Versand definieren (Einmal-Versand pro Account via `profiles.welcome_email_sent_at`)
+- [x] Secrets, Trigger und Zugriffsregeln in Supabase sauber dokumentieren (`supabase/functions/send-welcome-email/README.md`)
+- [x] Logging fuer Fehler und Missbrauch aktivieren (abgelehnte Aufrufe und Fehler landen in den Edge-Function-Logs)
+
+**Noch offen (Deployment):** Migration pushen, `WELCOME_EMAIL_SECRET` setzen, Function deployen und den `x-welcome-secret`-Header im Database-Webhook ergaenzen — Schritte stehen im README. Ohne den Header gehen danach keine Willkommens-Mails mehr raus.
 
 **Warum kritisch**
 Sobald E-Mail-Versand offen angreifbar ist, riskierst du Spam, Kosten und Reputationsschaeden.
@@ -199,12 +201,12 @@ Nicht technisch blockerhaft, aber wichtig fuer Umsatz.
 Nur wenn alle Punkte erfuellt sind:
 
 - [ ] Nutzer koennen sich zuverlaessig registrieren und anmelden
-- [ ] Free und Pro sind technisch korrekt getrennt
-- [ ] Pro kann tatsaechlich gekauft werden
-- [ ] Kuendigung / Downgrade funktionieren
+- [x] Free und Pro sind technisch korrekt getrennt
+- [x] Pro kann tatsaechlich gekauft werden
+- [x] Kuendigung / Downgrade funktionieren
 - [ ] keine bekannten XSS- oder groben Sicherheitsluecken offen
 - [ ] Rechtstexte passen zum echten Produkt
-- [ ] keine offensichtlichen Platzhalter oder Fake-CTAs mehr im Produkt
+- [x] keine offensichtlichen Platzhalter oder Fake-CTAs mehr im Produkt
 - [ ] Fehlertracking und Basis-Monitoring sind aktiv
 - [ ] Mobile und Desktop wurden einmal sauber durchgetestet
 
