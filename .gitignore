@@ -1,0 +1,5 @@
+# Supabase CLI Arbeitsdateien (enthalten u.a. Secrets wie welcome-secret.txt)
+supabase/.temp/
+
+# Lokale Claude-Code-Einstellungen
+.claude/

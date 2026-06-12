@@ -85,11 +85,13 @@ Diese Punkte sind nicht optional, wenn du naechste Woche echte Nutzer gewinnen w
 Jeder Flow funktioniert auf Desktop und Mobile ohne manuelle Nacharbeit.
 
 ### 7. Supabase-RLS und Datenzugriffe auditieren
-- [ ] fuer `profiles`, `library`, `prompt_history`, `snippets`, `prompt_categories` alle Policies pruefen
-- [ ] sicherstellen, dass Nutzer nur ihre eigenen Daten lesen und schreiben koennen
-- [ ] pruefen, ob Updates/Deletes still scheitern
-- [ ] Free-Limit-Logik serverseitig belastbar machen
-- [ ] Sonderfaelle testen: geloeschte Accounts, doppelte Requests, parallele Tabs
+- [x] fuer `profiles`, `library`, `prompt_history`, `snippets`, `prompt_categories` alle Policies pruefen (RLS auf allen 5 Tabellen aktiv, Owner-Checks via `auth.uid()` vorhanden)
+- [x] sicherstellen, dass Nutzer nur ihre eigenen Daten lesen und schreiben koennen (kritischer Fund behoben: Clients konnten eigene `profiles`-Spalten wie `tier` und `stripe_customer_id` frei updaten -> Self-Upgrade auf Pro und Zugriff auf fremde Stripe-Portale moeglich; jetzt per Spalten-Grants auf `onboarding_completed` beschraenkt, anon komplett ohne Tabellenzugriff)
+- [x] pruefen, ob Updates/Deletes still scheitern (db.js prueft bei kritischen Pfaden bereits `select()`-Rueckgaben; RLS-Verhalten verifiziert)
+- [x] Free-Limit-Logik serverseitig belastbar machen (Trigger gehaertet: `SET search_path`, Advisory Lock gegen Race bei parallelen Inserts; Limit + `FREE_LIMIT_REACHED` end-to-end mit Testuser verifiziert)
+- [x] Sonderfaelle testen: geloeschte Accounts (FK `ON DELETE CASCADE` auf allen Tabellen, Kaskade verifiziert), doppelte Requests / parallele Tabs (Unique-Index `prompt_categories(user_id, name)`, Advisory Lock im Limit-Trigger)
+
+**Audit durchgefuehrt und deployed (12.06.2026):** Migration `20260612130000_harden_rls_and_free_limit.sql`. End-to-End-Tests mit echtem Testuser gegen die Live-DB: `tier`-Update 403, `stripe_customer_id`-Update 403, `onboarding_completed`-Update 200, anon-Lesezugriff 401, Insert mit fremder `user_id` 403, 11. Library-Insert blockiert mit `FREE_LIMIT_REACHED`, Cross-Tenant-Lese-Leck negativ, Account-Loeschung kaskadiert sauber. Zusaetzlich `profiles_tier_check` (nur `free`/`pro`), `NOT NULL` auf `library.user_id` / `prompt_history.user_id`, `.gitignore` fuer `supabase/.temp/` (enthaelt Secrets).
 
 **Warum kritisch**
 Ein SaaS mit schwacher Multi-Tenant-Trennung ist geschaeftlich nicht tragbar.
