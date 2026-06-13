@@ -3,6 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
+    <script
+        src="https://js-de.sentry-cdn.com/512c66ce8708042334c396a8fccc8083.min.js"
+        crossorigin="anonymous"
+        data-cookieconsent="ignore"
+    ></script>
+    <script data-cookieconsent="ignore">
+        Sentry.onLoad(function() {
+            Sentry.init({
+                dsn: "https://512c66ce8708042334c396a8fccc8083@o4511559646969856.ingest.de.sentry.io/4511559663091792",
+                environment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'development' : 'production',
+            });
+        });
+    </script>
     <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e"
         data-blockingmode="auto" type="text/javascript"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
