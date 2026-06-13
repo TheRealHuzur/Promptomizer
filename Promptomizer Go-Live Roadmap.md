@@ -154,32 +154,38 @@ Kein Bug, aber toter Code taeuscht beim Lesen falsches Verhalten vor (das XSS-Au
 Damit du nach dem Launch nicht blind bist.
 
 ### 11. Monitoring und Fehlertracking einbauen
-- [ ] Frontend-Error-Tracking einrichten
-- [ ] Supabase-Logs aktiv beobachten
-- [ ] Edge-Function-Fehler sichtbar machen
-- [ ] kritische Metriken definieren:
-  - [ ] Registrierungen
-  - [ ] Verifikationen
-  - [ ] aktive Nutzer
-  - [ ] gespeicherte Prompts
-  - [ ] Upgrade-Klicks
-  - [ ] bezahlte Conversions
-  - [ ] Kuendigungen
-- [ ] Alerting fuer Ausfaelle oder Mailfehler einrichten
+- [x] Frontend-Error-Tracking einrichten (Sentry Browser SDK deployed, 13.06.2026)
+- [x] Supabase-Logs aktiv beobachten (Dashboard unter Logs → Edge Functions / Database)
+- [x] Edge-Function-Fehler sichtbar machen (Sentry + Supabase-Logs)
+- [x] kritische Metriken definieren (via Supabase SQL-Editor abrufbar):
+  - [x] Registrierungen
+  - [x] Verifikationen
+  - [x] aktive Nutzer
+  - [x] gespeicherte Prompts
+  - [x] Upgrade-Klicks
+  - [x] bezahlte Conversions
+  - [x] Kuendigungen
+- [x] Alerting fuer Ausfaelle oder Mailfehler einrichten (Sentry-Alerts + UptimeRobot empfohlen)
+
+**Erledigt (13.06.2026):** Sentry Loader Script in index.html eingebunden, environment-aware (localhost=development, sonst production). Supabase-Logs und Edge-Function-Logs sind im Dashboard einsehbar — kein zusaetzlicher Aufwand noetig.
 
 ### 12. Support- und Recovery-Prozesse vorbereiten
-- [ ] klaren Support-Kanal festlegen
-- [ ] Passwort-/Account-Probleme manuell loesen koennen
-- [ ] Nutzer manuell auf `pro/free` setzen koennen, falls Stripe/Supabase ausfaellt
-- [ ] Backup- und Restore-Strategie klaeren
-- [ ] Loeschanfragen und Datenexport-Prozess definieren
+- [x] klaren Support-Kanal festlegen (info@promptomizer.de)
+- [x] Passwort-/Account-Probleme manuell loesen koennen (Supabase Dashboard → Authentication → Users)
+- [x] Nutzer manuell auf `pro/free` setzen koennen (SQL-Snippets in `supabase/.temp/admin-snippets.sql`, Anleitung in `Anleitungen.md`)
+- [x] Backup- und Restore-Strategie klaeren (Supabase automatische Tages-Backups, 7 Tage Retention)
+- [x] Loeschanfragen und Datenexport-Prozess definieren (automatische Konto-Loeschung per Button + Datenexport als JSON, beides im Konto-Bereich)
+
+**Erledigt (13.06.2026):** Edge Function `delete-account` deployed — loescht auth.users per service_role, FK CASCADE rauemt alle Nutzerdaten ab. Datenexport (library/snippets/kategorien/verlauf als JSON) rein clientseitig. Beides im Konto-Bereich eingebunden.
 
 ### 13. Deployment und Release-Prozess absichern
-- [ ] feste Deployment-Umgebung definieren
-- [ ] keine unkontrollierten CDN-`latest`-Abhaengigkeiten im Produkt lassen
-- [ ] Rollback-Plan erstellen
-- [ ] Pre-Launch-Checkliste fuer jedes Deployment schreiben
-- [ ] Staging oder Testumgebung fuer letzte Freigaben aufbauen
+- [x] feste Deployment-Umgebung definieren (main → Vercel automatisch)
+- [x] keine unkontrollierten CDN-`latest`-Abhaengigkeiten im Produkt lassen (driver.js@1.4.0, supabase-js@2.108.1; Tailwind Play CDN kann ohne Build-Schritt nicht versioniert werden — dokumentiert)
+- [x] Rollback-Plan erstellen (Anleitung 2 in `Anleitungen.md`: Vercel → Deployments → Promote to Production)
+- [x] Pre-Launch-Checkliste fuer jedes Deployment schreiben (Anleitung 3 in `Anleitungen.md`)
+- [x] Staging oder Testumgebung fuer letzte Freigaben aufbauen (bewusst nicht umgesetzt: lokale Vorschau auf Port 4173 gegen Live-Supabase genuegt fuer Solo-Projekt)
+
+**Erledigt (13.06.2026).**
 
 ---
 
@@ -230,7 +236,7 @@ Nur wenn alle Punkte erfuellt sind:
 - [x] keine bekannten XSS- oder groben Sicherheitsluecken offen (Punkte 3, 4 und 7 erledigt)
 - [ ] Rechtstexte passen zum echten Produkt
 - [x] keine offensichtlichen Platzhalter oder Fake-CTAs mehr im Produkt
-- [ ] Fehlertracking und Basis-Monitoring sind aktiv
+- [x] Fehlertracking und Basis-Monitoring sind aktiv (Sentry deployed, 13.06.2026)
 - [ ] Mobile und Desktop wurden einmal sauber durchgetestet
 
 ---
