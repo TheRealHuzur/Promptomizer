@@ -113,11 +113,15 @@ Ein SaaS mit schwacher Multi-Tenant-Trennung ist geschaeftlich nicht tragbar.
 Veraltete Assets im Browser sind ein haeufiger Grund fuer "bei mir funktioniert's nicht".
 
 ### 9. UI auf Vertrauensniveau bringen
-- [ ] veraltete Hinweise entfernen, z. B. `Early Access bis 01.04.2026`
-- [ ] "bald verfuegbar"-Elemente aus bezahlungsnahen Bereichen entfernen
-- [ ] alle toten Buttons und Platzhalterlinks beseitigen
-- [ ] konsistente Fehlermeldungen statt `alert()`-Popups einbauen
-- [ ] klare Erfolgs- und Fehlerzustaende definieren
+- [x] veraltete Hinweise entfernen: `Early Access bis 01.04.2026` aus dem Header entfernt (Datum lag in der Vergangenheit)
+- [x] "bald verfuegbar"-Elemente beseitigt: der deaktivierte Platzhalter-Button "Konto löschen — demnächst verfügbar" ist jetzt ein funktionierender "Konto-Löschung beantragen"-Button (mailto an info@promptomizer.de mit vorausgefülltem Betreff/Text), der dem in Datenschutz/AGB dokumentierten Löschweg entspricht
+- [x] alle toten Buttons und Platzhalterlinks beseitigt: tote Funktion `handlePromptCategoryPlaceholder` ("Kategorie-Funktion folgt im nächsten Schritt") entfernt (hatte keinen Aufrufer); keine weiteren toten Buttons/`href="#"` gefunden
+- [x] konsistente Fehlermeldungen statt `alert()`-Popups: einheitliche, nicht-blockierende `showToast(message, type)`-Komponente (error/info/success) eingefuehrt; alle 24 `alert()`-Aufrufe in `index.html` und `db.js` ersetzt; entwickler-orientierte Texte (RLS-Policy-Hinweis, Supabase-Function-Secrets) wandern in `console.error` statt vor den Nutzer
+- [x] klare Erfolgs- und Fehlerzustaende: Toast-Typen visuell unterschieden (Rand-Farbe), `role="alert"` fuer Fehler / `role="status"` fuer Rest, Auto-Ausblenden nach 4s (6s bei Billing-Fehlern)
+
+**Erledigt (13.06.2026), im Browser verifiziert** (Toasts rendern korrekt, echter Validierungspfad `handleCopyAndSave` feuert Toast statt `alert`, keine Konsolen-Fehler, Header sauber, Lösch-Button ist echter mailto-Link).
+
+**Bewusst nicht geaendert:** Die Hinweise "Stripe-Testabo verfügbar" / "Wechsel in den Stripe-Testcheckout" im Konto-Bereich. Stripe laeuft aktuell im Sandbox-/Testmodus (`metadata[env]=sandbox` in `_shared/stripe.ts`) — die "Test"-Formulierung ist also ehrlich. Beim Umstellen auf den Stripe-Live-Modus muessen diese Texte (und Punkt 5, Rechtstexte) angepasst werden.
 
 **Warum kritisch**
 Menschen zahlen nicht fuer etwas, das unfertig wirkt.
@@ -219,11 +223,11 @@ Nicht technisch blockerhaft, aber wichtig fuer Umsatz.
 ## Minimaler Launch-Standard
 Nur wenn alle Punkte erfuellt sind:
 
-- [ ] Nutzer koennen sich zuverlaessig registrieren und anmelden
+- [x] Nutzer koennen sich zuverlaessig registrieren und anmelden (Kern-Flows getestet; Restpunkte: manueller Mail-Empfang-Check + Google-OAuth, s. Punkt 6)
 - [x] Free und Pro sind technisch korrekt getrennt
 - [x] Pro kann tatsaechlich gekauft werden
 - [x] Kuendigung / Downgrade funktionieren
-- [ ] keine bekannten XSS- oder groben Sicherheitsluecken offen
+- [x] keine bekannten XSS- oder groben Sicherheitsluecken offen (Punkte 3, 4 und 7 erledigt)
 - [ ] Rechtstexte passen zum echten Produkt
 - [x] keine offensichtlichen Platzhalter oder Fake-CTAs mehr im Produkt
 - [ ] Fehlertracking und Basis-Monitoring sind aktiv

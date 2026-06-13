@@ -570,6 +570,45 @@
         #CookiebotWidget {
             display: none !important;
         }
+
+        /* Toast-Meldungen (ersetzen alert()-Popups) */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            max-width: min(90vw, 28rem);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            background: #1e293b;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-error { border-color: rgba(248, 113, 113, 0.5); }
+        .toast-success { border-color: rgba(74, 222, 128, 0.5); }
+        .toast-info { border-color: rgba(56, 189, 248, 0.5); }
     </style>
 </head>
 
@@ -592,7 +631,6 @@
                     <div class="flex items-center select-none leading-none">
                         <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
                         <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-                        <span class="italic text-sm font-medium text-slate-500 ml-3">Early Access bis 01.04.2026</span>
                     </div>
 
                     <div id="mode-toggle-container" class="flex bg-navy-deep p-1 rounded-lg border border-navy-border">
@@ -913,10 +951,13 @@
                             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Gefahrenzone
                             </h3>
                             <div class="bg-navy-sidebar border border-red-500/20 rounded-lg p-6">
-                                <button disabled
-                                    class="px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-md font-bold text-sm opacity-50 cursor-not-allowed">
-                                    Konto löschen — demnächst verfügbar
-                                </button>
+                                <p class="text-sm text-slate-400 mb-4">Du kannst dein Konto und alle dazugehörigen Daten
+                                    jederzeit löschen lassen. Wir bearbeiten deine Anfrage und bestätigen die Löschung
+                                    per E-Mail.</p>
+                                <a href="mailto:info@promptomizer.de?subject=Konto%20l%C3%B6schen&body=Bitte%20l%C3%B6schen%20Sie%20mein%20Promptomizer-Konto%20und%20alle%20zugeh%C3%B6rigen%20Daten."
+                                    class="inline-flex items-center px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-md font-bold text-sm transition-colors">
+                                    <i class="fa-solid fa-trash-can mr-2"></i> Konto-Löschung beantragen
+                                </a>
                             </div>
                         </section>
                     </div>
@@ -2973,12 +3014,12 @@
             try {
                 const ok = await window.db.updateSnippet(snippetId, patch);
                 if (!ok) {
-                    alert('Baustein konnte nicht verschoben werden.');
+                    showToast('Baustein konnte nicht verschoben werden.', 'error');
                     return;
                 }
             } catch (err) {
                 console.error('Baustein Update Fehler:', err);
-                alert('Baustein konnte nicht verschoben werden. Bitte Konsole prüfen.');
+                showToast('Baustein konnte nicht verschoben werden.', 'error');
                 return;
             }
 
@@ -3101,7 +3142,7 @@
             }
 
             if (!newName) {
-                alert('Bitte einen Namen eingeben.');
+                showToast('Bitte einen Namen eingeben.', 'info');
                 return;
             }
 
@@ -3116,7 +3157,7 @@
             });
 
             if (exists) {
-                alert('Kategorie existiert bereits.');
+                showToast('Diese Kategorie existiert bereits.', 'info');
                 return;
             }
 
@@ -3127,7 +3168,7 @@
 
             const ok = await window.db.renamePromptCategory(id, oldName, newName);
             if (!ok) {
-                alert('Kategorie konnte nicht umbenannt werden. Bitte Konsole prüfen.');
+                showToast('Kategorie konnte nicht umbenannt werden. Bitte erneut versuchen.', 'error');
                 return;
             }
 
@@ -3166,7 +3207,7 @@
 
             const ok = await window.db.deletePromptCategory(id, name);
             if (!ok) {
-                alert('Kategorie konnte nicht gelöscht werden. Bitte Konsole prüfen.');
+                showToast('Kategorie konnte nicht gelöscht werden. Bitte erneut versuchen.', 'error');
                 return;
             }
 
@@ -3792,14 +3833,14 @@
             } else {
                 const raw = getFreeMarkdownFromEditor().replace(/\r\n/g, '\n');
                 if (!raw.trim()) {
-                    alert("Bitte gib erst etwas ein!");
+                    showToast("Bitte gib erst etwas ein.", "info");
                     return;
                 }
                 finalText = raw;
             }
 
             if (!finalText || !finalText.trim()) {
-                alert("Bitte gib erst etwas ein!");
+                showToast("Bitte gib erst etwas ein.", "info");
                 return;
             }
 
@@ -4014,7 +4055,7 @@
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
-                if (!editor) { alert('Freies Textfeld nicht gefunden.'); return; }
+                if (!editor) { showToast('Freies Textfeld nicht gefunden.', 'error'); return; }
                 const range = getFreeInsertionRange(editor);
                 insertTextAtCursor(editor, text, range);
                 freeSyncHtmlToMarkdown();
@@ -4032,7 +4073,7 @@
             }
 
             const ta = document.getElementById(`input-${target}`);
-            if (!ta) { alert('Zielfeld nicht gefunden: ' + target); return; }
+            if (!ta) { showToast('Zielfeld nicht gefunden: ' + target, 'error'); return; }
             ta.focus();
             const start = (ta.selectionStart ?? ta.value.length);
             const end = (ta.selectionEnd ?? ta.value.length);
@@ -4278,11 +4319,6 @@
             openPromptEditModal(id);
         }
 
-        function handlePromptCategoryPlaceholder() {
-            closePromptItemMenu();
-            alert('Kategorie-Funktion folgt im nÃ¤chsten Schritt.');
-        }
-
         function handleAskDeletePrompt() {
             const catKey = promptMenuCategoryKey;
             const id = promptMenuPromptId;
@@ -4341,7 +4377,7 @@
 
         function openPromptCategoryModal(prefill = '') {
             if (!window.currentUser) {
-                alert('Bitte einloggen.');
+                showToast('Bitte zuerst einloggen.', 'info');
                 openAuthModal();
                 return;
             }
@@ -4364,12 +4400,12 @@
             const inp = document.getElementById('prompt-category-name');
             const name = (inp?.value || '').trim();
             if (!name) {
-                alert('Bitte einen Namen eingeben.');
+                showToast('Bitte einen Namen eingeben.', 'info');
                 return;
             }
             const ok = await window.db.createPromptCategory(name);
             if (!ok) {
-                alert('Fehler beim Speichern.');
+                showToast('Speichern fehlgeschlagen. Bitte erneut versuchen.', 'error');
                 return;
             }
             await refreshPromptLibraryAndCategories();
@@ -4452,12 +4488,12 @@
                 const ok = await window.db.updateScenario(id, { category: catVal });
                 if (!ok) {
                     console.error('Kategorie konnte nicht gespeichert werden.');
-                    alert('Kategorie konnte nicht gespeichert werden. Bitte Konsole prüfen.');
+                    showToast('Kategorie konnte nicht gespeichert werden. Bitte erneut versuchen.', 'error');
                     return;
                 }
             } catch (err) {
                 console.error('Kategorie Update Fehler:', err);
-                alert('Kategorie konnte nicht gespeichert werden. Bitte Konsole prüfen.');
+                showToast('Kategorie konnte nicht gespeichert werden. Bitte erneut versuchen.', 'error');
                 return;
             }
 
@@ -4505,6 +4541,28 @@
         // noch der Skript-Kontext verlassen werden kann.
         function jsArg(value) {
             return escapeHtml(JSON.stringify(value));
+        }
+
+        // Nicht-blockierende Statusmeldung statt alert().
+        // type: 'error' | 'success' | 'info'
+        function showToast(message, type = 'error', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            // Reflow erzwingen, damit die Einblend-Transition greift
+            void toast.offsetWidth;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 250);
+            }, duration);
         }
 
         function renderSnippetsAccordion() {
@@ -4898,7 +4956,7 @@
 
         function openSnippetModal(prefill = {}) {
             if (!window.currentUser) {
-                alert("Bitte einloggen...");
+                showToast("Bitte zuerst einloggen.", "info");
                 openAuthModal();
                 return;
             }
@@ -4937,7 +4995,7 @@
             const category = categoryEl?.value;
 
             if (!name || !content) {
-                alert("Name und Text sind Pflicht.");
+                showToast("Name und Text sind Pflichtfelder.", "info");
                 return;
             }
 
@@ -4973,7 +5031,7 @@
                     await loadManageSnippetsPage();
                 }
             } else {
-                alert("Fehler beim Speichern.");
+                showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
             }
         }
 
@@ -5146,13 +5204,13 @@
                     } else if (result.reason === 'FREE_LIMIT_REACHED') {
                         openUpgradeModal();
                     } else {
-                        alert("Fehler beim Speichern.");
+                        showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
                     }
                 }
             } else {
                 const raw = getFreeMarkdownFromEditor().replace(/\r\n/g, '\n');
                 if (!raw.trim()) {
-                    alert("Bitte Text eingeben.");
+                    showToast("Bitte Text eingeben.", "info");
                     return;
                 }
                 if (window.db && window.db.saveScenario) {
@@ -5168,7 +5226,7 @@
                     } else if (result.reason === 'FREE_LIMIT_REACHED') {
                         openUpgradeModal();
                     } else {
-                        alert("Fehler beim Speichern.");
+                        showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
                     }
                 }
             }
@@ -5404,7 +5462,7 @@
                 window.location.href = result.url;
             } catch (err) {
                 console.error('Upgrade CTA Fehler:', err);
-                alert('Stripe-Checkout konnte nicht gestartet werden. Prüfe die Supabase-Function-Secrets und versuche es erneut.');
+                showToast('Checkout konnte nicht gestartet werden. Bitte später erneut versuchen.', 'error', 6000);
             } finally {
                 setUpgradeButtonLoading(false);
             }
@@ -5417,7 +5475,7 @@
                 window.location.href = result.url;
             } catch (err) {
                 console.error('Billing Portal Fehler:', err);
-                alert('Das Billing-Portal konnte nicht geöffnet werden. Prüfe, ob bereits ein Stripe-Kunde existiert.');
+                showToast('Das Verwaltungsportal konnte nicht geöffnet werden. Bitte später erneut versuchen.', 'error', 6000);
             }
         }
 
@@ -5518,6 +5576,8 @@
             }
         }
     </script>
+
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" data-cookieconsent="ignore"></script>
     <script src="db.js" data-cookieconsent="ignore"></script>

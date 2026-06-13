@@ -137,8 +137,11 @@ window.db = {
             .select(); // Select added to return the updated row
 
         if (error) {
+            // Technische Details (z.B. fehlende RLS-Policy) nur in die Konsole, nicht zum Nutzer
             console.error("Profile Update Error (Möglicherweise RLS Policy fehlend):", error);
-            alert("Fehler beim Speichern in Supabase. Fehlt eventuell die UPDATE Policy für die profiles Tabelle?\n\nError: " + error.message);
+            if (typeof window.showToast === 'function') {
+                window.showToast("Profil konnte nicht gespeichert werden. Bitte erneut versuchen.", "error");
+            }
             return false;
         }
 
