@@ -102,3 +102,84 @@ Der Nutzer sieht die Änderung beim nächsten Seitenaufruf oder nach einem Logou
 - Die SQL-Snippets liegen auch in `supabase/.temp/admin-snippets.sql` zum Kopieren bereit (die Datei ist gitignored, also nicht im Repo).
 
 ---
+
+## Anleitung 2: Rollback — vorherige Version wiederherstellen
+
+### Wann brauchst du das?
+
+Du hast etwas deployed und merkst danach, dass etwas kaputt ist — ein JS-Fehler, ein Layout-Problem, eine Edge Function die nicht mehr antwortet. Vercel erlaubt dir, mit einem Klick auf einen früheren Stand zurückzuspringen, ohne Git anfassen zu müssen.
+
+### Schritte
+
+1. Gehe auf [https://vercel.com/dashboard](https://vercel.com/dashboard) und wähle das Projekt **Promptomizer**
+2. Klicke oben auf den Tab **Deployments**
+3. Du siehst eine Liste aller bisherigen Deploys mit Zeitstempel und Commit-Nachricht
+4. Suche den letzten funktionierenden Deploy (der Zeitstempel vor deinem kaputten Commit)
+5. Klicke auf die **drei Punkte** rechts neben dem Eintrag → **Promote to Production**
+6. Vercel schaltet sofort auf diesen Stand um — kein neuer Build, keine Wartezeit
+
+### Was passiert dabei?
+
+- Die Dateien auf `www.promptomizer.de` werden sofort auf den alten Stand gewechselt
+- Dein Git-Repository bleibt unverändert — du machst keinen `git revert` oder ähnliches
+- Edge Functions in Supabase sind davon **nicht** betroffen — die laufen unabhängig von Vercel
+- Datenbank-Migrationen sind ebenfalls **nicht** rückgängig zu machen — ein Rollback in Vercel hilft nur bei Frontend-Fehlern
+
+### Danach
+
+Sobald du den Fehler im Code behoben hast, machst du einen normalen `git push` — Vercel deployt automatisch den neuen Stand und überschreibt das manuelle Rollback.
+
+---
+
+## Anleitung 3: Pre-Deploy-Checkliste
+
+Diese Checkliste vor jedem `git push` durchgehen, wenn du etwas Wesentliches geändert hast.
+
+### Vor dem Push
+
+- [ ] Lokale Vorschau geöffnet (Port 4173) und die geänderte Funktion einmal manuell getestet
+- [ ] Browser-Konsole offen — keine roten Fehlermeldungen
+- [ ] Wenn du Supabase-Tabellen oder RLS-Policies geändert hast: Migration in `supabase/migrations/` liegt vor und wurde mit `npx supabase db push --linked` deployed
+- [ ] Wenn du eine Edge Function geändert hast: `npx supabase functions deploy <name>` ausgeführt
+- [ ] Commit-Nachricht beschreibt was und warum (nicht nur "fix")
+
+### Nach dem Push
+
+- [ ] Vercel-Dashboard aufmachen und prüfen, dass der Deploy-Status auf **Ready** wechselt (dauert ~30 Sekunden)
+- [ ] `www.promptomizer.de` im Browser aufrufen und kurz die geänderte Stelle prüfen
+- [ ] Sentry-Dashboard kurz checken — keine neuen Issues aufgetaucht
+
+### Bei Stripe-relevanten Änderungen zusätzlich
+
+- [ ] Stripe-Dashboard → Webhooks → letzten Event prüfen ob er ankam
+- [ ] Einen Test-Checkout im Sandbox-Modus durchklicken
+
+---
+
+## Anleitung 4: CDN-Abhängigkeiten aktualisieren
+
+### Überblick
+
+Die App lädt mehrere Bibliotheken von externen CDN-Servern. Diese sind auf feste Versionen eingefroren, damit eine Aktualisierung beim Anbieter nichts kaputt machen kann.
+
+| Bibliothek | Aktuelle Version | CDN |
+|---|---|---|
+| driver.js | 1.4.0 | jsdelivr |
+| @supabase/supabase-js | 2.108.1 | jsdelivr |
+| Font Awesome | 6.4.0 | cdnjs |
+| Tailwind CSS | Play CDN (kein Pinning möglich) | tailwindcss.com |
+| Google Fonts (Inter) | — (versionlos, stabil) | fonts.googleapis.com |
+| Sentry | Hash in URL (effektiv eingefroren) | sentry-cdn.com |
+
+**Tailwind-Sonderfall:** Der Play CDN von `cdn.tailwindcss.com` enthält einen JIT-Compiler, der beim Laden deine HTML-Klassen live scannt und CSS generiert. Eine fixe Version wäre nur mit einem Build-Schritt (Tailwind CLI) möglich, den das Projekt bewusst nicht hat. Das Risiko ist gering — Tailwind Labs ändert den Play CDN selten breaking.
+
+### Wann und wie aktualisieren?
+
+Nur aktualisieren wenn es einen konkreten Grund gibt (Sicherheitslücke, benötigtes Feature). Nicht blind auf "latest" aktualisieren.
+
+1. Neue Version auf [npmjs.com](https://npmjs.com) oder im jeweiligen GitHub-Repo nachschlagen
+2. In `index.html` die Versionsnummer in der URL ändern — z.B. `driver.js@1.4.0` → `driver.5.0`
+3. Lokal testen (Port 4173, Konsole auf Fehler prüfen)
+4. Committen und pushen
+
+---
