@@ -959,18 +959,27 @@
                             </div>
                         </section>
 
+                        <!-- Datenexport -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Meine Daten</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                                <p class="text-sm text-slate-400 mb-4">Lade alle deine gespeicherten Daten (Bibliothek, Snippets, Kategorien, Verlauf) als JSON-Datei herunter.</p>
+                                <button onclick="exportUserData()"
+                                    class="inline-flex items-center px-4 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 rounded-md font-bold text-sm transition-colors">
+                                    <i class="fa-solid fa-download mr-2"></i> Daten exportieren
+                                </button>
+                            </div>
+                        </section>
+
                         <!-- Konto löschen -->
                         <section>
-                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Gefahrenzone
-                            </h3>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Gefahrenzone</h3>
                             <div class="bg-navy-sidebar border border-red-500/20 rounded-lg p-6">
-                                <p class="text-sm text-slate-400 mb-4">Du kannst dein Konto und alle dazugehörigen Daten
-                                    jederzeit löschen lassen. Wir bearbeiten deine Anfrage und bestätigen die Löschung
-                                    per E-Mail.</p>
-                                <a href="mailto:info@promptomizer.de?subject=Konto%20l%C3%B6schen&body=Bitte%20l%C3%B6schen%20Sie%20mein%20Promptomizer-Konto%20und%20alle%20zugeh%C3%B6rigen%20Daten."
+                                <p class="text-sm text-slate-400 mb-4">Dein Konto und alle zugehörigen Daten werden sofort und unwiderruflich gelöscht.</p>
+                                <button onclick="confirmDeleteAccount()"
                                     class="inline-flex items-center px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-md font-bold text-sm transition-colors">
-                                    <i class="fa-solid fa-trash-can mr-2"></i> Konto-Löschung beantragen
-                                </a>
+                                    <i class="fa-solid fa-trash-can mr-2"></i> Konto löschen
+                                </button>
                             </div>
                         </section>
                     </div>
@@ -3262,6 +3271,68 @@
                 if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
                 if (billingHint) billingHint.innerText = 'Melde dich an, um dein Testabo zu verwalten.';
+            }
+        }
+
+        async function exportUserData() {
+            if (!window.currentUser) {
+                showToast('Du musst eingeloggt sein, um deine Daten zu exportieren.', 'error');
+                return;
+            }
+            try {
+                const [library, snippets, categories, history] = await Promise.all([
+                    window.db.supabase.from('library').select('*'),
+                    window.db.supabase.from('snippets').select('*'),
+                    window.db.supabase.from('prompt_categories').select('*'),
+                    window.db.supabase.from('prompt_history').select('*'),
+                ]);
+                const exportData = {
+                    exportedAt: new Date().toISOString(),
+                    library: library.data ?? [],
+                    snippets: snippets.data ?? [],
+                    categories: categories.data ?? [],
+                    history: history.data ?? [],
+                };
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `promptomizer-export-${new Date().toISOString().slice(0, 10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Export erfolgreich heruntergeladen.', 'success');
+            } catch (e) {
+                console.error('exportUserData Fehler:', e);
+                showToast('Export fehlgeschlagen. Bitte versuche es erneut.', 'error');
+            }
+        }
+
+        async function confirmDeleteAccount() {
+            if (!window.currentUser) {
+                showToast('Du musst eingeloggt sein, um dein Konto zu löschen.', 'error');
+                return;
+            }
+            const confirmed = window.confirm('Bist du sicher? Dein Konto und alle Daten werden sofort und unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.');
+            if (!confirmed) return;
+
+            try {
+                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error ?? res.statusText);
+                }
+                showToast('Dein Konto wurde gelöscht.', 'info', 6000);
+                setTimeout(() => window.db.handleLogout(), 1500);
+            } catch (e) {
+                console.error('confirmDeleteAccount Fehler:', e);
+                showToast('Konto löschen fehlgeschlagen: ' + e.message, 'error');
             }
         }
 
