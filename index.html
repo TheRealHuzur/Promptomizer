@@ -714,35 +714,6 @@
                         </button>
                     </div>
                     <div id="prompts-body" class="px-4 pt-1 pb-2">
-                        <!-- Prompt-Counter (nur Free-User) -->
-                        <div id="prompt-counter-wrap"
-                            class="hidden px-2 py-2 mb-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span id="prompt-counter-text" class="font-medium tracking-wide">0 von 10 Prompts</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
-                                <div id="prompt-counter-bar"
-                                    class="h-full bg-brand-sky rounded-full transition-all duration-300"
-                                    style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Kategorien-Counter (nur Free-User) -->
-                        <div id="category-counter-wrap"
-                            class="hidden px-2 py-2 mb-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span id="category-counter-text" class="font-medium tracking-wide">0 von 5 Kategorien</span>
-                                <button id="category-upgrade-btn"
-                                    class="hidden text-[10px] text-amber-400 hover:text-amber-300 font-bold uppercase tracking-wide transition-colors"
-                                    onclick="openUpgradeModal('categories')">Upgraden</button>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
-                                <div id="category-counter-bar"
-                                    class="h-full bg-brand-sky rounded-full transition-all duration-300"
-                                    style="width: 0%"></div>
-                            </div>
-                        </div>
-
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
@@ -761,6 +732,19 @@
                             <div id="library-snippets" class="space-y-0.5">
                                 <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt-Counter (nur Free-User) -->
+                    <div id="prompt-counter-wrap"
+                        class="hidden mx-4 mb-3 px-2 py-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span id="prompt-counter-text" class="font-medium tracking-wide">0 von 10 Prompts</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                            <div id="prompt-counter-bar"
+                                class="h-full bg-brand-sky rounded-full transition-all duration-300"
+                                style="width: 0%"></div>
                         </div>
                     </div>
 
@@ -1443,8 +1427,7 @@
                     <div id="footer-save-wrap">
                         <button onclick="saveCurrentToLibrary()"
                             class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Prompt speichern</span>
+                            <span>In Bibliothek speichern</span>
                         </button>
                     </div>
                     <div class="ml-auto flex items-center gap-4">
@@ -2138,7 +2121,6 @@
 
                 if (user) {
                     updatePromptCounter();
-                    updateCategoryCounter();
                 }
 
                 const kontoView = document.getElementById('view-konto');
@@ -2394,6 +2376,7 @@
         }
 
         window.addEventListener('auth-password-recovery', () => {
+            window.isPasswordRecovery = true;
             closeAuthModal();
             closeRegisterModal();
             closePasswordResetModal();
@@ -3293,7 +3276,6 @@
 
             closeDeleteCategoryModal();
             await refreshPromptLibraryAndCategories();
-            updateCategoryCounter();
             await loadManageCategoriesPage();
         }
 
@@ -3332,7 +3314,6 @@
 
                 // Counter auf Konto-Seite aktualisieren (falls Free-User)
                 await updatePromptCounter();
-                await updateCategoryCounter();
 
                 if (logoutBtn) logoutBtn.classList.remove('hidden');
             } else {
@@ -4580,7 +4561,9 @@
                 return;
             }
             await refreshPromptLibraryAndCategories();
-            updateCategoryCounter();
+            if (settingsCurrentPage === 'categories') {
+                await loadManageCategoriesPage();
+            }
             if (isSavePromptModalOpen()) {
                 setSavePromptCategory(name);
             }
@@ -5434,6 +5417,7 @@
 
         async function checkOnboarding(user) {
             if (window.onboardingChecked) return;
+            if (window.isPasswordRecovery) return;
             window.onboardingChecked = true;
 
             if (!user) {
@@ -5735,7 +5719,6 @@
                     await window.db.syncStripeSubscription();
                     await updateUIAuth(window.currentUser);
                     await updatePromptCounter();
-                    await updateCategoryCounter();
                     const kontoView = document.getElementById('view-konto');
                     if (kontoView && !kontoView.classList.contains('hidden')) {
                         await updateKontoView();
@@ -5827,39 +5810,6 @@
             }
         }
 
-        async function updateCategoryCounter() {
-            if (!window.db) return;
-            const tier = await window.db.getUserTier();
-            const wrap = document.getElementById('category-counter-wrap');
-            if (!wrap) return;
-
-            if (tier !== 'free') {
-                wrap.classList.add('hidden');
-                return;
-            }
-
-            const count = await window.db.getCategoryCount();
-            const max = 5;
-            const pct = Math.min((count / max) * 100, 100);
-
-            wrap.classList.remove('hidden');
-            document.getElementById('category-counter-text').textContent = `${count} von ${max} Kategorien`;
-            const bar = document.getElementById('category-counter-bar');
-            bar.style.width = `${pct}%`;
-            bar.classList.remove('bg-brand-sky', 'bg-red-400', 'bg-amber-400');
-
-            const upgradeBtn = document.getElementById('category-upgrade-btn');
-            if (count >= max) {
-                bar.classList.add('bg-red-400');
-                if (upgradeBtn) upgradeBtn.classList.remove('hidden');
-            } else if (count >= 4) {
-                bar.classList.add('bg-amber-400');
-                if (upgradeBtn) upgradeBtn.classList.add('hidden');
-            } else {
-                bar.classList.add('bg-brand-sky');
-                if (upgradeBtn) upgradeBtn.classList.add('hidden');
-            }
-        }
     </script>
 
     <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
