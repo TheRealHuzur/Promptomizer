@@ -965,8 +965,9 @@
                             <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
                                 <p class="text-sm text-slate-400 mb-4">Lade alle deine gespeicherten Daten (Bibliothek, Snippets, Kategorien, Verlauf) als JSON-Datei herunter.</p>
                                 <button onclick="exportUserData()"
-                                    class="inline-flex items-center px-4 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 rounded-md font-bold text-sm transition-colors">
-                                    <i class="fa-solid fa-download mr-2"></i> Daten exportieren
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700 rounded-md font-bold text-sm transition-colors">
+                                    <i class="fa-solid fa-download"></i> Daten exportieren
+                                    <span class="text-[10px] font-bold uppercase tracking-wider bg-brand-sky/20 text-brand-sky border border-brand-sky/30 rounded px-1.5 py-0.5">Pro</span>
                                 </button>
                             </div>
                         </section>
@@ -1474,12 +1475,12 @@
             <div class="text-4xl mb-4">🚀</div>
 
             <!-- Headline -->
-            <h2 class="text-xl font-bold text-white mb-2">
+            <h2 id="upgrade-modal-headline" class="text-xl font-bold text-white mb-2">
                 Deine 10 kostenlosen Prompts sind voll
             </h2>
 
             <!-- Subline -->
-            <p class="text-slate-400 text-sm mb-6">
+            <p id="upgrade-modal-subline" class="text-slate-400 text-sm mb-6">
                 Steige auf <strong class="text-white">Promptomizer Pro</strong> um — für unbegrenzte Prompts, Kategorien
                 und Bausteine.
             </p>
@@ -3302,6 +3303,11 @@
                 showToast('Du musst eingeloggt sein, um deine Daten zu exportieren.', 'error');
                 return;
             }
+            const tier = await window.db.getUserTier();
+            if (tier !== 'pro') {
+                openUpgradeModal('export');
+                return;
+            }
             try {
                 const [library, snippets, categories, history] = await Promise.all([
                     window.db.supabase.from('library').select('*'),
@@ -4510,9 +4516,14 @@
                 showToast('Bitte einen Namen eingeben.', 'info');
                 return;
             }
-            const ok = await window.db.createPromptCategory(name);
-            if (!ok) {
-                showToast('Speichern fehlgeschlagen. Bitte erneut versuchen.', 'error');
+            const result = await window.db.createPromptCategory(name);
+            if (!result.success) {
+                if (result.reason === 'CATEGORY_LIMIT_REACHED') {
+                    closePromptCategoryModal();
+                    openUpgradeModal('categories');
+                } else {
+                    showToast('Speichern fehlgeschlagen. Bitte erneut versuchen.', 'error');
+                }
                 return;
             }
             await refreshPromptLibraryAndCategories();
@@ -5274,7 +5285,7 @@
             if (tier === 'free') {
                 const count = await window.db.getPromptCount();
                 if (count >= 10) {
-                    openUpgradeModal();
+                    openUpgradeModal('library_full');
                     return;
                 }
             }
@@ -5309,7 +5320,7 @@
                         loadLibrary();
                         await updatePromptCounter();
                     } else if (result.reason === 'FREE_LIMIT_REACHED') {
-                        openUpgradeModal();
+                        openUpgradeModal('library_full');
                     } else {
                         showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
                     }
@@ -5331,7 +5342,7 @@
                         loadLibrary();
                         await updatePromptCounter();
                     } else if (result.reason === 'FREE_LIMIT_REACHED') {
-                        openUpgradeModal();
+                        openUpgradeModal('library_full');
                     } else {
                         showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
                     }
@@ -5539,6 +5550,7 @@
             }
         }
         let selectedUpgradeInterval = 'year';
+        let currentUpgradeCta = 'Einführungspreis sichern';
 
         function selectUpgradeInterval(interval) {
             selectedUpgradeInterval = interval === 'month' ? 'month' : 'year';
@@ -5565,7 +5577,38 @@
             if (monthCheck) monthCheck.className = `fa-${!isYear ? 'solid' : 'regular'} fa-circle${!isYear ? '-check' : ''} ${!isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
         }
 
-        function openUpgradeModal() {
+        const UPGRADE_CONTEXTS = {
+            library_full: {
+                headline: 'Deine 10 kostenlosen Prompts sind voll',
+                subline: 'Steige auf <strong class="text-white">Promptomizer Pro</strong> um — für unbegrenzte Prompts, Kategorien und Bausteine.',
+                cta: 'Bibliothek erweitern'
+            },
+            export: {
+                headline: 'Export ist ein Pro-Feature',
+                subline: 'Exportiere deine gesamte Bibliothek, Snippets und den Verlauf als JSON — mit <strong class="text-white">Promptomizer Pro</strong>.',
+                cta: 'Bibliothek sichern'
+            },
+            categories: {
+                headline: 'Du hast alle 5 freien Kategorien genutzt',
+                subline: 'Organisiere deine Prompts in unbegrenzt viele Kategorien — mit <strong class="text-white">Promptomizer Pro</strong>.',
+                cta: 'Kategorien erweitern'
+            },
+            default: {
+                headline: 'Promptomizer Pro freischalten',
+                subline: 'Steige auf <strong class="text-white">Promptomizer Pro</strong> um — für unbegrenzte Prompts, Kategorien und Bausteine.',
+                cta: 'Einführungspreis sichern'
+            }
+        };
+
+        function openUpgradeModal(context = 'default') {
+            const ctx = UPGRADE_CONTEXTS[context] || UPGRADE_CONTEXTS.default;
+            const headline = document.getElementById('upgrade-modal-headline');
+            const subline = document.getElementById('upgrade-modal-subline');
+            if (headline) headline.textContent = ctx.headline;
+            if (subline) subline.innerHTML = ctx.subline;
+            currentUpgradeCta = ctx.cta;
+            const ctaBtn = document.getElementById('btn-upgrade-cta');
+            if (ctaBtn && !ctaBtn.disabled) ctaBtn.textContent = ctx.cta;
             selectUpgradeInterval(selectedUpgradeInterval);
             document.getElementById('modal-upgrade').classList.remove('hidden');
         }
@@ -5580,7 +5623,7 @@
             btn.disabled = loading;
             btn.classList.toggle('opacity-60', loading);
             btn.classList.toggle('cursor-wait', loading);
-            btn.innerText = loading ? 'Checkout wird geöffnet...' : 'Einführungspreis sichern';
+            btn.textContent = loading ? 'Checkout wird geöffnet...' : currentUpgradeCta;
         }
 
         async function handleUpgradeCTA() {

@@ -356,15 +356,18 @@ window.db = {
     },
 
     async createPromptCategory(name) {
-        if (!window.currentUser) return false;
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
         const { error } = await supabaseClient
             .from('prompt_categories')
             .insert({ user_id: window.currentUser.id, name });
         if (error) {
             console.error("Prompt Category Create Error:", error);
-            return false;
+            if (error.message?.includes('CATEGORY_LIMIT_REACHED')) {
+                return { success: false, reason: 'CATEGORY_LIMIT_REACHED' };
+            }
+            return { success: false, reason: 'ERROR' };
         }
-        return true;
+        return { success: true };
     },
 
     async renamePromptCategory(categoryId, oldName, newName) {
