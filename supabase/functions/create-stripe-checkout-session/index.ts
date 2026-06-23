@@ -20,7 +20,19 @@ Deno.serve(async (req) => {
     const profile = await getProfile(user.id);
     const customerId = await ensureStripeCustomer(profile, user);
     const baseUrl = getAppBaseUrl(req);
-    const priceId = getEnv("STRIPE_PRICE_ID_PRO");
+
+    // Abrechnungsintervall aus dem Request lesen (Default: monatlich).
+    let interval: "month" | "year" = "month";
+    try {
+      const body = await req.json();
+      if (body && body.interval === "year") interval = "year";
+    } catch (_) {
+      // Kein/ungueltiger Body -> monatlich.
+    }
+
+    const priceId = interval === "year"
+      ? getEnv("STRIPE_PRICE_ID_PRO_YEARLY")
+      : getEnv("STRIPE_PRICE_ID_PRO");
 
     const params = new URLSearchParams();
     params.set("mode", "subscription");
@@ -33,8 +45,10 @@ Deno.serve(async (req) => {
     params.set("allow_promotion_codes", "true");
     params.set("metadata[app]", "promptomizer");
     params.set("metadata[plan]", "pro");
+    params.set("metadata[interval]", interval);
     params.set("metadata[env]", "sandbox");
     params.set("subscription_data[metadata][supabase_user_id]", user.id);
+    params.set("subscription_data[metadata][interval]", interval);
     params.set("subscription_data[metadata][app]", "promptomizer");
     params.set("subscription_data[metadata][plan]", "pro");
     params.set("subscription_data[metadata][env]", "sandbox");

@@ -512,8 +512,9 @@ window.db = {
         return profile?.tier ?? 'free';
     },
 
-    async createProCheckoutSession() {
-        const { data, error } = await supabaseClient.functions.invoke('create-stripe-checkout-session');
+    async createProCheckoutSession(interval = 'month') {
+        const body = { interval: interval === 'year' ? 'year' : 'month' };
+        const { data, error } = await supabaseClient.functions.invoke('create-stripe-checkout-session', { body });
         if (error) {
             console.error('Checkout Session Error:', error);
             throw error;

@@ -1484,16 +1484,39 @@
                 und Bausteine.
             </p>
 
-            <!-- Preis -->
-            <div class="bg-slate-800 rounded-xl p-4 mb-6">
-                <div class="text-3xl font-bold text-white">3,99 €</div>
-                <div class="text-slate-400 text-xs mt-1">pro Monat · inkl. 19 % MwSt. · jederzeit kündbar</div>
+            <!-- Preisauswahl: Jahr (empfohlen) / Monat -->
+            <div class="space-y-3 mb-3 text-left">
+                <button type="button" id="upgrade-opt-year" onclick="selectUpgradeInterval('year')"
+                    class="w-full rounded-xl p-4 border-2 border-brand-sky bg-slate-800 transition-colors flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-bold text-white">39,99 € / Jahr</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-brand-sky text-navy-deep rounded px-1.5 py-0.5">2 Monate gratis</span>
+                        </div>
+                        <div class="text-slate-400 text-xs mt-1">entspricht ~3,33 € / Monat · inkl. MwSt.</div>
+                    </div>
+                    <i id="upgrade-check-year" class="fa-solid fa-circle-check text-brand-sky text-xl"></i>
+                </button>
+
+                <button type="button" id="upgrade-opt-month" onclick="selectUpgradeInterval('month')"
+                    class="w-full rounded-xl p-4 border-2 border-navy-border bg-slate-800/40 transition-colors flex items-center justify-between">
+                    <div>
+                        <div class="text-lg font-bold text-white">3,99 € / Monat</div>
+                        <div class="text-slate-400 text-xs mt-1">inkl. MwSt. · jederzeit kündbar</div>
+                    </div>
+                    <i id="upgrade-check-month" class="fa-regular fa-circle text-slate-500 text-xl"></i>
+                </button>
             </div>
+
+            <!-- Founder-Hinweis -->
+            <p class="text-slate-500 text-xs mb-4">
+                Einführungspreis für frühe Nutzer. Der Preis bleibt erhalten, solange dein Abo aktiv bleibt.
+            </p>
 
             <!-- CTA -->
             <button id="btn-upgrade-cta" onclick="handleUpgradeCTA()"
                 class="w-full ui-btn ui-btn-primary mb-3">
-                Jetzt upgraden
+                Einführungspreis sichern
             </button>
 
             <!-- Schließen -->
@@ -5515,7 +5538,35 @@
                 window._driverObj.drive();
             }
         }
+        let selectedUpgradeInterval = 'year';
+
+        function selectUpgradeInterval(interval) {
+            selectedUpgradeInterval = interval === 'month' ? 'month' : 'year';
+
+            const yearOpt = document.getElementById('upgrade-opt-year');
+            const monthOpt = document.getElementById('upgrade-opt-month');
+            const yearCheck = document.getElementById('upgrade-check-year');
+            const monthCheck = document.getElementById('upgrade-check-month');
+            if (!yearOpt || !monthOpt) return;
+
+            const isYear = selectedUpgradeInterval === 'year';
+
+            yearOpt.classList.toggle('border-brand-sky', isYear);
+            yearOpt.classList.toggle('bg-slate-800', isYear);
+            yearOpt.classList.toggle('border-navy-border', !isYear);
+            yearOpt.classList.toggle('bg-slate-800/40', !isYear);
+
+            monthOpt.classList.toggle('border-brand-sky', !isYear);
+            monthOpt.classList.toggle('bg-slate-800', !isYear);
+            monthOpt.classList.toggle('border-navy-border', isYear);
+            monthOpt.classList.toggle('bg-slate-800/40', isYear);
+
+            if (yearCheck) yearCheck.className = `fa-${isYear ? 'solid' : 'regular'} fa-circle${isYear ? '-check' : ''} ${isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
+            if (monthCheck) monthCheck.className = `fa-${!isYear ? 'solid' : 'regular'} fa-circle${!isYear ? '-check' : ''} ${!isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
+        }
+
         function openUpgradeModal() {
+            selectUpgradeInterval(selectedUpgradeInterval);
             document.getElementById('modal-upgrade').classList.remove('hidden');
         }
 
@@ -5529,7 +5580,7 @@
             btn.disabled = loading;
             btn.classList.toggle('opacity-60', loading);
             btn.classList.toggle('cursor-wait', loading);
-            btn.innerText = loading ? 'Checkout wird geöffnet...' : 'Jetzt upgraden';
+            btn.innerText = loading ? 'Checkout wird geöffnet...' : 'Einführungspreis sichern';
         }
 
         async function handleUpgradeCTA() {
@@ -5541,7 +5592,7 @@
 
             try {
                 setUpgradeButtonLoading(true);
-                const result = await window.db.createProCheckoutSession();
+                const result = await window.db.createProCheckoutSession(selectedUpgradeInterval);
                 if (!result?.url) throw new Error('Keine Checkout-URL erhalten.');
                 window.location.href = result.url;
             } catch (err) {
