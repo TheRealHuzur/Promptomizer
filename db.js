@@ -180,12 +180,14 @@ window.db = {
 
     async getHistory() {
         if (window.currentUser) {
-            // ☁️ CLOUD FETCH
+            // ☁️ CLOUD FETCH — Free-User sehen max. 10 Einträge
+            const tier = await this.getUserTier();
+            const historyLimit = tier === 'pro' ? 50 : 10;
             const { data, error } = await supabaseClient
                 .from('prompt_history')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(50);
+                .limit(historyLimit);
 
             if (error) {
                 console.error("Cloud Fetch Error:", error);
@@ -505,6 +507,19 @@ window.db = {
             .eq('user_id', window.currentUser.id);
         if (error) {
             console.error('Prompt Count Error:', error);
+            return 0;
+        }
+        return count ?? 0;
+    },
+
+    async getCategoryCount() {
+        if (!window.currentUser) return 0;
+        const { count, error } = await supabaseClient
+            .from('prompt_categories')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', window.currentUser.id);
+        if (error) {
+            console.error('Category Count Error:', error);
             return 0;
         }
         return count ?? 0;

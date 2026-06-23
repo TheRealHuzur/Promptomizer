@@ -27,6 +27,7 @@ Deno.serve(async (req) => {
       subscriptionId: subscription?.id ?? null,
       subscriptionStatus: subscription?.status ?? null,
       priceId: subscription?.items?.data?.[0]?.price?.id ?? null,
+      billingInterval: subscription?.items?.data?.[0]?.price?.recurring?.interval ?? null,
     });
 
     await updateProfileByUserId(user.id, patch);

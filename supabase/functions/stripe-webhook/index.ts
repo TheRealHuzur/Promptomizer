@@ -14,11 +14,13 @@ async function applySubscriptionObject(subscription: Record<string, any>) {
   if (!customerId) return;
 
   const priceId = subscription.items?.data?.[0]?.price?.id ?? null;
+  const billingInterval = subscription.items?.data?.[0]?.price?.recurring?.interval ?? null;
   const patch = buildBillingPatch({
     customerId,
     subscriptionId: subscription.id ?? null,
     subscriptionStatus: subscription.status ?? null,
     priceId,
+    billingInterval,
     email: null,
   });
 

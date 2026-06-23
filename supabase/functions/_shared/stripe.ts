@@ -180,6 +180,7 @@ export function buildBillingPatch(input: {
   subscriptionId?: string | null;
   subscriptionStatus?: string | null;
   priceId?: string | null;
+  billingInterval?: string | null;
   email?: string | null;
 }) {
   const patch: Record<string, unknown> = {
@@ -189,6 +190,7 @@ export function buildBillingPatch(input: {
     subscription_status: input.subscriptionStatus ?? null,
     tier: deriveTier(input.subscriptionStatus),
     billing_updated_at: new Date().toISOString(),
+    billing_interval: input.billingInterval ?? null,
   };
 
   if (input.email !== undefined) {

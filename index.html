@@ -727,6 +727,22 @@
                             </div>
                         </div>
 
+                        <!-- Kategorien-Counter (nur Free-User) -->
+                        <div id="category-counter-wrap"
+                            class="hidden px-2 py-2 mb-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span id="category-counter-text" class="font-medium tracking-wide">0 von 5 Kategorien</span>
+                                <button id="category-upgrade-btn"
+                                    class="hidden text-[10px] text-amber-400 hover:text-amber-300 font-bold uppercase tracking-wide transition-colors"
+                                    onclick="openUpgradeModal('categories')">Upgraden</button>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                                <div id="category-counter-bar"
+                                    class="h-full bg-brand-sky rounded-full transition-all duration-300"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+
                         <div id="library-scenarios" class="space-y-0.5">
                             <div class="text-xs text-slate-600 italic py-2">Lade...</div>
                         </div>
@@ -839,6 +855,13 @@
                         <h2 class="text-2xl font-bold text-white">Historie</h2>
                     </div>
                     <div id="history-list" class="space-y-4"></div>
+                    <div id="history-limit-hint" class="hidden mt-6 py-4 border-t border-navy-border text-center">
+                        <p class="text-xs text-slate-500 mb-2">Du siehst die letzten 10 Einträge des Free-Plans.</p>
+                        <button onclick="openUpgradeModal('history_limit')"
+                            class="text-xs text-brand-sky hover:text-brand-hover font-bold transition-colors">
+                            Mit Pro unbegrenzten Verlauf freischalten →
+                        </button>
+                    </div>
                 </div>
 
                 <div id="view-settings" class="hidden max-w-4xl mx-auto fade-in pt-4">
@@ -894,7 +917,13 @@
                                             id="konto-plan-name">
                                             Free Plan
                                         </div>
-                                        <div class="text-sm text-slate-400">Aktueller Status</div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <div class="text-sm text-slate-400">Aktueller Status</div>
+                                            <div id="konto-billing-interval"
+                                                class="hidden text-xs text-slate-500 bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5">
+                                                Monatsabo
+                                            </div>
+                                        </div>
                                     </div>
                                     <div id="konto-status-badge"
                                         class="px-3 py-1 bg-brand-sky/10 border border-brand-sky/20 rounded text-brand-sky text-xs font-bold uppercase tracking-wider">
@@ -2107,6 +2136,11 @@
                 checkOnboarding(user);
                 maybeHandleBillingReturn();
 
+                if (user) {
+                    updatePromptCounter();
+                    updateCategoryCounter();
+                }
+
                 const kontoView = document.getElementById('view-konto');
                 if (kontoView && !kontoView.classList.contains('hidden')) {
                     updateKontoView();
@@ -3259,6 +3293,7 @@
 
             closeDeleteCategoryModal();
             await refreshPromptLibraryAndCategories();
+            updateCategoryCounter();
             await loadManageCategoriesPage();
         }
 
@@ -3278,8 +3313,26 @@
                     ? 'Pro Plan <i class="fa-solid fa-crown text-brand-sky text-sm ml-1"></i>'
                     : 'Free Plan';
 
-                // NEU: Counter auf Konto-Seite aktualisieren (falls Free-User)
+                // Billing-Interval anzeigen (nur Pro-User)
+                const intervalEl = document.getElementById('konto-billing-interval');
+                if (intervalEl) {
+                    if (tier === 'pro') {
+                        const profile = await window.db.getProfile();
+                        const interval = profile?.billing_interval;
+                        if (interval) {
+                            intervalEl.textContent = interval === 'year' ? 'Jahresabo' : 'Monatsabo';
+                            intervalEl.classList.remove('hidden');
+                        } else {
+                            intervalEl.classList.add('hidden');
+                        }
+                    } else {
+                        intervalEl.classList.add('hidden');
+                    }
+                }
+
+                // Counter auf Konto-Seite aktualisieren (falls Free-User)
                 await updatePromptCounter();
+                await updateCategoryCounter();
 
                 if (logoutBtn) logoutBtn.classList.remove('hidden');
             } else {
@@ -3399,7 +3452,7 @@
             const saveWrap = document.getElementById('footer-save-wrap');
             if (saveWrap) saveWrap.classList.toggle('hidden', viewId !== 'editor');
 
-            if (viewId === 'history' && window.db) window.db.getHistory().then(renderHistoryList);
+            if (viewId === 'history' && window.db) loadHistory();
         }
 
         function setEditorMode(mode) {
@@ -4527,6 +4580,7 @@
                 return;
             }
             await refreshPromptLibraryAndCategories();
+            updateCategoryCounter();
             if (isSavePromptModalOpen()) {
                 setSavePromptCategory(name);
             }
@@ -5052,8 +5106,15 @@
 
         async function loadHistory() {
             if (!window.db) return;
+            const tier = await window.db.getUserTier();
             const history = await window.db.getHistory();
             renderHistoryList(history);
+
+            const hint = document.getElementById('history-limit-hint');
+            if (hint) {
+                const showHint = tier === 'free' && history.length >= 10;
+                hint.classList.toggle('hidden', !showHint);
+            }
         }
 
         function renderFavoritesList(history) {
@@ -5593,6 +5654,11 @@
                 subline: 'Organisiere deine Prompts in unbegrenzt viele Kategorien — mit <strong class="text-white">Promptomizer Pro</strong>.',
                 cta: 'Kategorien erweitern'
             },
+            history_limit: {
+                headline: 'Vollständiger Verlauf mit Pro',
+                subline: 'Als Free-Nutzer siehst du die letzten 10 Einträge. Mit <strong class="text-white">Promptomizer Pro</strong> hast du Zugriff auf deinen vollständigen Verlauf.',
+                cta: 'Verlauf freischalten'
+            },
             default: {
                 headline: 'Promptomizer Pro freischalten',
                 subline: 'Steige auf <strong class="text-white">Promptomizer Pro</strong> um — für unbegrenzte Prompts, Kategorien und Bausteine.',
@@ -5669,6 +5735,7 @@
                     await window.db.syncStripeSubscription();
                     await updateUIAuth(window.currentUser);
                     await updatePromptCounter();
+                    await updateCategoryCounter();
                     const kontoView = document.getElementById('view-konto');
                     if (kontoView && !kontoView.classList.contains('hidden')) {
                         await updateKontoView();
@@ -5722,10 +5789,16 @@
 
             if (count >= max) {
                 bar.classList.add('bg-red-400');
+                sessionStorage.removeItem('_p_warn8_shown');
             } else if (count >= 8) {
                 bar.classList.add('bg-amber-400');
+                if (!sessionStorage.getItem('_p_warn8_shown')) {
+                    sessionStorage.setItem('_p_warn8_shown', '1');
+                    showToast(`Noch ${max - count} von ${max} Prompts frei — bald ist dein Free-Limit erreicht.`, 'info');
+                }
             } else {
                 bar.classList.add('bg-brand-sky');
+                sessionStorage.removeItem('_p_warn8_shown');
             }
 
             // Sync with konto view if exists
@@ -5751,6 +5824,40 @@
                 if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
                 if (billingHint) billingHint.innerText = 'Wechsel bei Bedarf in den Stripe-Testcheckout.';
+            }
+        }
+
+        async function updateCategoryCounter() {
+            if (!window.db) return;
+            const tier = await window.db.getUserTier();
+            const wrap = document.getElementById('category-counter-wrap');
+            if (!wrap) return;
+
+            if (tier !== 'free') {
+                wrap.classList.add('hidden');
+                return;
+            }
+
+            const count = await window.db.getCategoryCount();
+            const max = 5;
+            const pct = Math.min((count / max) * 100, 100);
+
+            wrap.classList.remove('hidden');
+            document.getElementById('category-counter-text').textContent = `${count} von ${max} Kategorien`;
+            const bar = document.getElementById('category-counter-bar');
+            bar.style.width = `${pct}%`;
+            bar.classList.remove('bg-brand-sky', 'bg-red-400', 'bg-amber-400');
+
+            const upgradeBtn = document.getElementById('category-upgrade-btn');
+            if (count >= max) {
+                bar.classList.add('bg-red-400');
+                if (upgradeBtn) upgradeBtn.classList.remove('hidden');
+            } else if (count >= 4) {
+                bar.classList.add('bg-amber-400');
+                if (upgradeBtn) upgradeBtn.classList.add('hidden');
+            } else {
+                bar.classList.add('bg-brand-sky');
+                if (upgradeBtn) upgradeBtn.classList.add('hidden');
             }
         }
     </script>
