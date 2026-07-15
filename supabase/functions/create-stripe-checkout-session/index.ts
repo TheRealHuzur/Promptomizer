@@ -43,6 +43,9 @@ Deno.serve(async (req) => {
     params.set("line_items[0][price]", priceId);
     params.set("line_items[0][quantity]", "1");
     params.set("allow_promotion_codes", "true");
+    params.set("automatic_tax[enabled]", "true");
+    params.set("billing_address_collection", "required");
+    params.set("tax_id_collection[enabled]", "true");
     params.set("metadata[app]", "promptomizer");
     params.set("metadata[plan]", "pro");
     params.set("metadata[interval]", interval);
