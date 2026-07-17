@@ -34,3 +34,13 @@ entrypoint = "./functions/stripe-webhook/index.ts"
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/delete-account/index.ts"
+
+[functions.cancel-subscription]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/cancel-subscription/index.ts"
+
+[functions.request-withdrawal]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/request-withdrawal/index.ts"
