@@ -17,7 +17,7 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 
 ## 2. Tech-Stack & Architektur
 
-- **Frontend:** Eine einzige große Datei [`index.html`](index.html) (~270 KB) mit eingebettetem `<style>` und `<script>`. **Kein Framework, kein Bundler, kein Build.** Tailwind kommt per CDN (`cdn.tailwindcss.com`), Font Awesome + Inter ebenfalls per CDN.
+- **Frontend:** Eine einzige große Datei [`index.html`](index.html) (~270 KB) mit eingebettetem `<style>` und `<script>`. **Kein Framework, kein Bundler, kein Build.** Tailwind, Font Awesome, Inter und Driver.js liegen lokal unter [`vendor/`](vendor/) (kein CDN mehr, seit 16.07.2026 — Tailwind wird einmalig per CLI kompiliert, siehe [`vendor/tailwind/README.md`](vendor/tailwind/README.md), keine Live-Build-Pipeline).
 - **Datenzugriff/Auth:** [`db.js`](db.js) kapselt den Supabase-Client und stellt `window.db.*` sowie Auth-Funktionen (`loginUser`, `registerUser`, `handleLogout`, `requestPasswordReset`, `updateUserPassword`, `loginWithGoogle`) bereit.
 - **Backend:** Supabase (Postgres + Auth + Edge Functions). Billing über Stripe (aktuell **Sandbox/Test-Modus**, siehe §6).
 - **Consent:** Cookiebot (läuft nur auf den autorisierten Domains, **nicht** auf localhost — die „domain not authorized"-Warnungen lokal sind erwartbar).

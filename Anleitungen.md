@@ -156,30 +156,34 @@ Diese Checkliste vor jedem `git push` durchgehen, wenn du etwas Wesentliches ge�
 
 ---
 
-## Anleitung 4: CDN-Abhängigkeiten aktualisieren
+## Anleitung 4: Vendor-Abhängigkeiten aktualisieren
 
 ### Überblick
 
-Die App lädt mehrere Bibliotheken von externen CDN-Servern. Diese sind auf feste Versionen eingefroren, damit eine Aktualisierung beim Anbieter nichts kaputt machen kann.
+Seit 16.07.2026 liegen alle Frontend-Bibliotheken lokal unter [`vendor/`](vendor/) statt auf externen CDN-Servern (Grund: Produktionstauglichkeit, weniger Drittland-/Consent-Risiken, keine Abhängigkeit von CDN-Verfügbarkeit). Einzige Ausnahme: Sentry und Cookiebot bleiben CDN-geladen (Consent-Management bzw. Fehler-Tracking-SDK, beide mit fixer/gehashter Version effektiv eingefroren).
 
-| Bibliothek | Aktuelle Version | CDN |
+| Bibliothek | Aktuelle Version | Ablage |
 |---|---|---|
-| driver.js | 1.4.0 | jsdelivr |
-| @supabase/supabase-js | 2.108.1 | jsdelivr |
-| Font Awesome | 6.4.0 | cdnjs |
-| Tailwind CSS | Play CDN (kein Pinning möglich) | tailwindcss.com |
-| Google Fonts (Inter) | — (versionlos, stabil) | fonts.googleapis.com |
-| Sentry | Hash in URL (effektiv eingefroren) | sentry-cdn.com |
-
-**Tailwind-Sonderfall:** Der Play CDN von `cdn.tailwindcss.com` enthält einen JIT-Compiler, der beim Laden deine HTML-Klassen live scannt und CSS generiert. Eine fixe Version wäre nur mit einem Build-Schritt (Tailwind CLI) möglich, den das Projekt bewusst nicht hat. Das Risiko ist gering — Tailwind Labs ändert den Play CDN selten breaking.
+| driver.js | 1.4.0 | `vendor/driverjs/` |
+| @supabase/supabase-js | 2.108.1 | `vendor/supabase/` |
+| Font Awesome | 6.4.0 | `vendor/fontawesome/` |
+| Tailwind CSS | 3.4.17, lokal per CLI kompiliert | `vendor/tailwind/` (siehe `vendor/tailwind/README.md`) |
+| Google Fonts (Inter) | v20 (variable font, alle Gewichte 300–700) | `vendor/fonts/inter/` |
+| Sentry | Hash in URL (weiterhin CDN, effektiv eingefroren) | — |
 
 ### Wann und wie aktualisieren?
 
 Nur aktualisieren wenn es einen konkreten Grund gibt (Sicherheitslücke, benötigtes Feature). Nicht blind auf "latest" aktualisieren.
 
-1. Neue Version auf [npmjs.com](https://npmjs.com) oder im jeweiligen GitHub-Repo nachschlagen
-2. In `index.html` die Versionsnummer in der URL ändern — z.B. `driver.js@1.4.0` → `driver.5.0`
-3. Lokal testen (Port 4173, Konsole auf Fehler prüfen)
-4. Committen und pushen
+**driver.js / Font Awesome / Inter / Supabase-js** (statische Dateien, kein Build):
+1. Neue Version-Dateien von der jeweiligen Quelle herunterladen (jsdelivr/cdnjs/fonts.googleapis.com) und die Dateien unter `vendor/<lib>/` ersetzen.
+2. Bei Font Awesome/Inter: referenzierte Webfont-Dateien (`.woff2`/`.ttf`) mit herunterladen, Pfade in der CSS ggf. anpassen.
+3. Lokal testen (Port 4173, Konsole auf Fehler prüfen).
+4. Committen und pushen.
+
+**Tailwind** (Build-Schritt, siehe `vendor/tailwind/README.md`):
+1. `tailwind.config.js` bei Theme-Änderungen anpassen.
+2. Mit der Tailwind-CLI neu kompilieren (`vendor/tailwind/README.md` enthält den genauen Befehl).
+3. `vendor/tailwind/tailwind.css` committen.
 
 ---

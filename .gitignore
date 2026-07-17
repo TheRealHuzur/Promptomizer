@@ -3,3 +3,7 @@ supabase/.temp/
 
 # Lokale Claude-Code-Einstellungen
 .claude/
+
+# Lokale KI-Agent-Skills (z.B. per "npx skills add" installiert)
+.agents/
+skills-lock.json
