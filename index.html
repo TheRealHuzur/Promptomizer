@@ -10,9 +10,30 @@
     ></script>
     <script data-cookieconsent="ignore">
         Sentry.onLoad(function() {
+            var scrubKeys = ['email', 'authorization', 'password', 'prompt', 'content'];
+            var scrubObject = function(obj) {
+                if (!obj || typeof obj !== 'object') return;
+                Object.keys(obj).forEach(function(key) {
+                    if (scrubKeys.indexOf(key.toLowerCase()) !== -1) {
+                        obj[key] = '[Filtered]';
+                    } else if (typeof obj[key] === 'object') {
+                        scrubObject(obj[key]);
+                    }
+                });
+            };
             Sentry.init({
                 dsn: "https://512c66ce8708042334c396a8fccc8083@o4511559646969856.ingest.de.sentry.io/4511559663091792",
                 environment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'development' : 'production',
+                beforeSend: function(event) {
+                    scrubObject(event.request);
+                    scrubObject(event.extra);
+                    scrubObject(event.contexts);
+                    if (event.user) {
+                        delete event.user.email;
+                        delete event.user.ip_address;
+                    }
+                    return event;
+                },
             });
         });
     </script>
@@ -25,49 +46,18 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <!-- Driver.js -->
-    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.4.0/dist/driver.js.iife.js"
+    <!-- Driver.js (lokal, Version 1.4.0) -->
+    <script src="vendor/driverjs/driver.js.iife.js"
         data-cookieconsent="ignore"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.4.0/dist/driver.css"
+    <link rel="stylesheet" href="vendor/driverjs/driver.css"
         data-cookieconsent="ignore">
 
-    <script src="https://cdn.tailwindcss.com" data-cookieconsent="ignore"></script>
+    <!-- Tailwind CSS: lokal mit der Tailwind-CLI kompiliert, kein Live-Build (siehe vendor/tailwind/README.md) -->
+    <link rel="stylesheet" href="vendor/tailwind/tailwind.css" data-cookieconsent="ignore">
 
-    <script data-cookieconsent="ignore">
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            deep: '#020617',    // Slate 950 (Main Stage)
-                            sidebar: '#0f172a', // Slate 900 (Sidebar)
-                            border: '#1e293b',  // Slate 800 (Borders)
-                        },
-                        brand: {
-                            sky: '#0ea5e9',    // DEIN ORIGINAL (Sky 500)
-                            hover: '#38bdf8',  // Heller beim Drüberfahren (Hover Effekt umgedreht)
-                        },
-                        slate: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 20px -5px rgba(56, 189, 248, 0.3)',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css"
         data-cookieconsent="ignore">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+    <link href="vendor/fonts/inter/inter.css" rel="stylesheet"
         data-cookieconsent="ignore">
 
     <style>
@@ -931,10 +921,18 @@
                                             style="width: 0%"></div>
                                     </div>
                                 </div>
-                                <div class="mt-4 flex items-center gap-3">
+                                <div class="mt-4 flex items-center gap-3 flex-wrap">
                                     <button id="konto-btn-manage-billing" onclick="handleManageBilling()"
                                         class="hidden text-xs bg-brand-sky/15 hover:bg-brand-sky/25 text-brand-sky px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
                                         <i class="fa-solid fa-credit-card mr-1"></i> Abo verwalten
+                                    </button>
+                                    <button id="konto-btn-cancel-subscription" onclick="openCancelSubscriptionModal()"
+                                        class="hidden text-xs bg-slate-700/50 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
+                                        <i class="fa-solid fa-ban mr-1"></i> Vertrag kündigen
+                                    </button>
+                                    <button id="konto-btn-withdrawal" onclick="openWithdrawalModal()"
+                                        class="hidden text-xs bg-slate-700/50 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
+                                        <i class="fa-solid fa-rotate-left mr-1"></i> Vertrag widerrufen
                                     </button>
                                     <p id="konto-billing-hint" class="text-xs text-slate-500 italic">Stripe-Testabo verfügbar.</p>
                                 </div>
@@ -1013,8 +1011,7 @@
                     <div class="space-y-6 text-slate-300 leading-relaxed">
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">Anbieter</h3>
-                            <p>Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg</p>
-                            <p>Vertreten durch: Patrick Roßkothen</p>
+                            <p>Patrick Roßkothen<br>Mercatorstraße 108<br>47051 Duisburg</p>
                         </section>
 
                         <hr class="border-navy-border" />
@@ -1022,13 +1019,6 @@
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">Kontakt</h3>
                             <p>Telefon: 0177 / 35 22 745<br>E-Mail: info@promptomizer.de</p>
-                        </section>
-
-                        <hr class="border-navy-border" />
-
-                        <section>
-                            <h3 class="text-xl font-bold text-white mb-3">Berufsbezeichnung</h3>
-                            <p>Freiberufler</p>
                         </section>
 
                         <hr class="border-navy-border" />
@@ -1043,9 +1033,6 @@
                                 unseres Verantwortungsbereichs liegen und wir auf die zukünftige Gestaltung keinen
                                 Einfluss haben. Sollten aus Ihrer Sicht Inhalte gegen geltendes Recht verstoßen oder
                                 unangemessen sein, teilen Sie uns dies bitte mit.</p>
-                            <p class="mt-4">Die rechtlichen Hinweise auf dieser Seite sowie alle Fragen und
-                                Streitigkeiten im Zusammenhang mit der Gestaltung dieser Internetseite unterliegen dem
-                                Recht der Bundesrepublik Deutschland.</p>
                         </section>
 
                         <hr class="border-navy-border" />
@@ -1070,6 +1057,14 @@
                                 rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen, etwa
                                 durch Spam-E-Mails, vor.</p>
                         </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">Verbraucherstreitbeilegung</h3>
+                            <p>Der Anbieter ist nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor
+                                einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+                        </section>
                     </div>
                 </div>
 
@@ -1084,6 +1079,8 @@
                     </div>
 
                     <div class="space-y-6 text-slate-300 leading-relaxed overflow-y-auto pr-2">
+                        <p class="italic text-sm">Stand: 16. Juli 2026</p>
+
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">1. Datenschutz auf einen Blick</h3>
                             <h4 class="text-lg font-semibold text-white mb-2">Allgemeine Hinweise</h4>
@@ -1139,22 +1136,68 @@
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Supabase</h4>
                             <p>Nutzerdaten (Konten, gespeicherte Prompts, Authentifizierung) werden bei Supabase
                                 gespeichert. Anbieter ist die Supabase Inc., 970 Trestle Glen Rd, Oakland, CA 94610,
-                                USA.</p>
+                                USA. Das konkrete Supabase-Projekt und seine produktive Datenbank sind in
+                                <strong>eu-central-1, Frankfurt</strong>, eingerichtet. Supabase kann daneben für
+                                Support, Sicherheit, Abrechnung oder technische Administration weitere Daten
+                                entsprechend seinen eigenen Vertrags- und Datenschutzbedingungen verarbeiten.</p>
 
-                            <div class="my-4 p-4 border border-brand-sky/20 bg-brand-sky/5 rounded-md text-sm italic">
-                                🔒 Die Daten werden in der Region eu-central-1 (Frankfurt) verarbeitet.
-                            </div>
-
-                            <p>Supabase verarbeitet folgende Daten:</p>
+                            <p class="mt-4">Supabase verarbeitet insbesondere folgende Daten:</p>
                             <ul class="list-disc pl-6 space-y-1 mt-1">
                                 <li>E-Mail-Adresse und Passwort-Hash bei Registrierung</li>
-                                <li>Authentifizierungs-Tokens (Session-Management)</li>
-                                <li>Gespeicherte Prompts und Kategorien</li>
+                                <li>Nutzer-ID</li>
+                                <li>Registrierungs- und Bestätigungszeitpunkte</li>
+                                <li>Sitzungs- und Authentifizierungsdaten</li>
+                                <li>Onboarding-Status</li>
+                                <li>Gespeicherte Prompts, Prompt-Verlauf, Bausteine und Kategorien</li>
                                 <li>Plan-Status (Free/Pro) und Nutzungsmetadaten</li>
+                                <li>Stripe-Kunden-, Abonnement- und Preiskennungen</li>
+                                <li>Abrechnungsintervall und Abonnementstatus</li>
                             </ul>
                             <p class="mt-2">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO
                                 (Vertragserfüllung) und Art. 6 Abs. 1 lit. f DSGVO. Ein AVV wurde abgeschlossen. Weitere
                                 Informationen: https://supabase.com/privacy</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Sentry (Fehler-Tracking)</h4>
+                            <p>Zur Erkennung und Behebung technischer Fehler setzen wir Sentry ein. Anbieter ist
+                                Functional Software, Inc. (Sentry), 45 Fremont Street, 8th Floor, San Francisco, CA
+                                94105, USA. Die Event-Datenregion ist auf EU eingestellt, die Datenübermittlung
+                                erfolgt an die europäische Ingestion-Region (<code>ingest.de.sentry.io</code>).</p>
+                            <p class="mt-2">Zum Schutz Ihrer Daten sind mehrere Maßnahmen kombiniert:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li>Ein clientseitiger <code>beforeSend</code>-Filter entfernt beziehungsweise
+                                    bereinigt Felder wie E-Mail-Adresse, Authorization, Passwort, Prompt und Content,
+                                    bevor ein Fehler-Event überhaupt gesendet wird</li>
+                                <li>Zusätzlich ist im Sentry-Dashboard Data Scrubbing aktiviert</li>
+                                <li>Die Speicherung von IP-Adressen ist deaktiviert</li>
+                                <li>Die Aufbewahrungsdauer beträgt aktuell 30 Tage</li>
+                                <li>Es wird kein Session Replay eingesetzt</li>
+                            </ul>
+                            <p class="mt-2 text-sm italic text-slate-400">Trotz dieser Maßnahmen kann Sentry
+                                technisch bedingt kurzfristig Verbindungsdaten verarbeiten; eine Übermittlung einer
+                                IP-Adresse an den Anbieter kann daher nicht absolut ausgeschlossen werden. Sentry
+                                dient ausschließlich der technischen Fehleranalyse, nicht der Werbung oder dem
+                                Nutzertracking.</p>
+                            <p class="mt-2">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+                                (berechtigtes Interesse an einem funktionsfähigen, fehlerfreien Dienst). Ein AVV wurde
+                                abgeschlossen. Weitere Informationen: https://sentry.io/privacy/</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Cookiebot (Consent-Management)</h4>
+                            <p>Zur Einholung und Verwaltung Ihrer Cookie-Einwilligung nutzen wir Cookiebot. Anbieter
+                                ist die Usercentrics A/S, Havnegade 39, 1058 Kopenhagen, Dänemark.</p>
+                            <p class="mt-2">Beim Aufruf der Website wird ein technisch notwendiger Cookie
+                                (<code>CookieConsent</code>) gesetzt, der Ihre Einwilligungsentscheidung für die
+                                aktuelle Domain speichert (Speicherdauer: aktuell ein Monat). Dabei können
+                                insbesondere folgende Daten verarbeitet werden: Einwilligungsstatus, Consent-ID, Datum
+                                und Uhrzeit der Entscheidung, Domain, Browser- und Geräteinformationen sowie technisch
+                                erforderliche Verbindungsdaten.</p>
+                            <p class="mt-2">Die technische Verarbeitung erfolgt nach der aktuell eingesetzten
+                                Konfiguration innerhalb der Europäischen Union beziehungsweise des Europäischen
+                                Wirtschaftsraums, insbesondere in Irland.</p>
+                            <p class="mt-2">Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+                                (berechtigtes Interesse an einer rechtskonformen Einwilligungsverwaltung) bzw. Art. 6
+                                Abs. 1 lit. c DSGVO (gesetzliche Pflicht zur Einholung wirksamer Einwilligungen). Ein
+                                AVV wurde abgeschlossen. Weitere Informationen:
+                                https://www.cookiebot.com/de/privacy-policy/</p>
                         </section>
 
                         <hr class="border-navy-border" />
@@ -1163,14 +1206,22 @@
                             <h3 class="text-xl font-bold text-white mb-3">3. Allgemeine Hinweise und
                                 Pflichtinformationen</h3>
                             <h4 class="text-lg font-semibold text-white mb-2">Verantwortliche Stelle</h4>
-                            <p>Patrick Roßkothen<br>Mercatorstr. 108<br>47051 Duisburg<br>E-Mail:
+                            <p>Patrick Roßkothen<br>Mercatorstraße 108<br>47051 Duisburg<br>E-Mail:
                                 info@promptomizer.de<br>Telefon: 0177 / 35 22 745</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Speicherdauer</h4>
                             <p>Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist oder solange es für die
-                                Vertragserfüllung erforderlich ist. Nach Löschung Ihres Kontos werden personenbezogene
-                                Daten innerhalb von 30 Tagen gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten
-                                entgegenstehen (z. B. Rechnungsdaten: 10 Jahre gem. § 147 AO).</p>
+                                Vertragserfüllung erforderlich ist.</p>
+                            <p class="mt-2">Bei erfolgreicher Kontolöschung werden die aktiven, unmittelbar mit dem
+                                Konto verbundenen Nutzerdaten aus dem Produktivsystem gelöscht. Technisch notwendige
+                                Sicherungskopien (Backups) können bis zu ihrer planmäßigen Überschreibung
+                                fortbestehen; die aktuelle Backup-Konfiguration sieht eine automatische
+                                Überschreibung nach 7 Tagen vor.</p>
+                            <p class="mt-2">Gesetzlich aufzubewahrende Rechnungs- und Geschäftsdaten werden von der
+                                Löschung ausgenommen, gesperrt und erst nach Ablauf der gesetzlichen Fristen gelöscht.
+                                Rechnungen und andere Buchungsbelege werden grundsätzlich acht Jahre aufbewahrt; für
+                                andere steuerlich oder handelsrechtlich relevante Unterlagen können abweichende
+                                gesetzliche Aufbewahrungsfristen gelten.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Rechtsgrundlagen</h4>
                             <p>Wir verarbeiten Ihre Daten auf folgenden Rechtsgrundlagen:</p>
@@ -1206,59 +1257,138 @@
                                 Schloss-Symbol Ihres Browsers.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Widerruf Ihrer Einwilligung</h4>
-                            <p>Viele Datenverarbeitungsvorgänge sind nur mit Ihrer Einwilligung möglich. Diese können
-                                Sie jederzeit widerrufen (z. B. per E-Mail an info@promptomizer.de). Die Rechtmäßigkeit
-                                der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.</p>
+                            <p>Soweit eine Verarbeitung auf Ihrer Einwilligung beruht, können Sie diese Einwilligung
+                                jederzeit mit Wirkung für die Zukunft widerrufen (z. B. über die Cookie-Einstellungen
+                                oder per E-Mail an info@promptomizer.de). Die Rechtmäßigkeit der bis zum Widerruf
+                                erfolgten Verarbeitung bleibt unberührt.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">4. Datenerfassung auf Promptomizer.de</h3>
-                            <h4 class="text-lg font-semibold text-white mb-2">Cookies</h4>
-                            <p>Promptomizer.de verwendet Cookies. Technisch notwendige Cookies (z. B. für die Anmeldung
-                                und Session-Verwaltung) werden auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO gesetzt und
-                                erfordern keine Einwilligung. Alle weiteren Cookies werden nur nach Ihrer ausdrücklichen
-                                Einwilligung über unser Cookie-Consent-Tool gesetzt.</p>
+                            <h4 class="text-lg font-semibold text-white mb-2">Cookies und Browserspeicher</h4>
+                            <p>Cookiebot setzt den technisch notwendigen <code>CookieConsent</code>-Cookie zur
+                                Speicherung Ihrer Einwilligungsentscheidung (siehe Abschnitt 2).</p>
+                            <p class="mt-2">Darüber hinaus nutzt die Anwendung Local Storage beziehungsweise Session
+                                Storage für technisch erforderliche Funktionen. Dazu gehören je nach Nutzung:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li>Authentifizierungs- und Sitzungstokens</li>
+                                <li>die Einstellung „Angemeldet bleiben"</li>
+                                <li>der Onboarding-Status</li>
+                                <li>temporäre Gast-Historie</li>
+                                <li>technische UI- und Warnzustände</li>
+                            </ul>
+                            <p class="mt-2">Session-Storage-Daten werden grundsätzlich mit dem Ende der
+                                Browsersitzung gelöscht. Local-Storage-Daten bleiben bis zur Löschung durch die
+                                Anwendung oder den Nutzer gespeichert.</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Rechtsgrundlage für zwingend erforderliche
+                                Zugriffe ist § 25 Abs. 2 TDDDG in Verbindung mit Art. 6 Abs. 1 lit. b beziehungsweise
+                                lit. f DSGVO. Nicht notwendige Speicherungen erfolgen nur nach Einwilligung.</p>
                             <p class="mt-2 text-sm italic">Sie können Ihre Cookie-Einstellungen jederzeit über den Link
-                                „Cookie-Einstellungen“ in der App anpassen.</p>
+                                „Cookie-Einstellungen" in der App anpassen.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Registrierung und Nutzerkonto</h4>
-                            <p>Zur Nutzung von Promptomizer.de ist eine Registrierung erforderlich. Dabei erheben wir
-                                E-Mail-Adresse, Passwort (verschlüsselt), Zeitpunkt der Registrierung und Plan-Status.
-                                Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO zur
-                                Vertragserfüllung.</p>
+                            <p>Für die dauerhafte cloudbasierte Speicherung und die Nutzung eines persönlichen Kontos
+                                ist eine Registrierung erforderlich; Teile des Editors können auch ohne Registrierung
+                                als Gast genutzt werden.</p>
+                            <p class="mt-2">Bei der Registrierung erheben wir E-Mail-Adresse, Passwort (gespeichert
+                                als sicherer Hash, nicht im Klartext), Zeitpunkt der Registrierung und Plan-Status.</p>
+                            <p class="mt-2">Bestätigungs- und Passwort-Reset-Mails werden über Supabase Auth
+                                abgewickelt. Zusätzlich erfolgt eine einmalige Willkommensmail über Brevo (siehe
+                                eigener Abschnitt unten). Alternativ zur Registrierung mit E-Mail-Adresse und
+                                Passwort ist optional eine Anmeldung mit Google möglich (siehe eigener Abschnitt
+                                unten).</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Die Verarbeitung erfolgt auf Grundlage von
+                                Art. 6 Abs. 1 lit. b DSGVO zur Vertragserfüllung. Diese Daten werden an Supabase als
+                                Auftragsverarbeiter übermittelt.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Gespeicherte Prompts und Inhalte</h4>
                             <p>Prompts, Kategorien und Bausteine, die Sie in der App erstellen und speichern, werden in
                                 unserer Datenbank (Supabase) gespeichert. Diese Inhalte gehören Ihnen. Wir verwenden sie
-                                ausschließlich zur Erbringung des Dienstes und nicht für eigene Zwecke.</p>
-                            <p class="mt-2 text-sm italic text-slate-400 text-sm">Sie können Ihre Inhalte jederzeit
-                                löschen oder die Löschung Ihres gesamten Kontos über info@promptomizer.de beantragen.
-                            </p>
+                                ausschließlich zur Erbringung des Dienstes und nicht für eigene Zwecke. Insbesondere
+                                werden Ihre Inhalte nicht zum Training eigener oder fremder KI-Modelle verwendet; die
+                                Anwendung übermittelt gespeicherte Prompts nicht automatisch an OpenAI, Anthropic,
+                                Google Gemini oder andere generative KI-Dienste.</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Sie können Ihre Inhalte jederzeit selbst
+                                löschen. Das Konto kann in den Kontoeinstellungen selbst gelöscht werden; bei aktivem
+                                Pro-Abonnement wird die Kontolöschung technisch blockiert, das Abonnement muss
+                                zunächst gekündigt und beendet werden. Anschließend kann das auf Free zurückgestufte
+                                Konto gelöscht werden. Rechteanfragen können zusätzlich weiterhin an
+                                info@promptomizer.de gerichtet werden.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Zahlungsabwicklung (Stripe)</h4>
-                            <p>Für die Abwicklung von Abonnements nutzen wir Stripe. Stripe verarbeitet Zahlungsdaten
-                                (Kreditkarte, SEPA-Lastschrift) und erstellt Rechnungen in unserem Auftrag. Wir
-                                speichern keine Zahlungsdaten selbst. Die Verarbeitung erfolgt auf Grundlage von Art. 6
-                                Abs. 1 lit. b DSGVO.</p>
+                            <p>Für die Abwicklung von Abonnements setzen wir Stripe für den Bestellvorgang, die
+                                Zahlungsabwicklung, die Abonnementverwaltung und die Bereitstellung der Rechnungen
+                                ein. Anbieter ist die Stripe Inc., 510 Townsend Street, San Francisco, CA 94103, USA
+                                (für EU-Nutzer: Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal
+                                Dock, Dublin, Irland).</p>
+                            <p class="mt-2">Stripe verarbeitet dabei insbesondere:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-1">
+                                <li>Zahlungsdaten (je nach Verfügbarkeit Kreditkarte, Apple Pay, Google Pay, Amazon
+                                    Pay, PayPal, Klarna, SEPA-Lastschrift)</li>
+                                <li>Rechnungsanschrift</li>
+                                <li>gegebenenfalls freiwillig beziehungsweise für die Abrechnung angegebene
+                                    Umsatzsteuer-ID</li>
+                                <li>Stripe-Kundennummer</li>
+                                <li>Tarif und Abrechnungsintervall</li>
+                                <li>Preis-ID</li>
+                                <li>Abonnementstatus</li>
+                                <li>Rechnungsdaten</li>
+                                <li>Zahlungsstatus</li>
+                                <li>technische Betrugs- und Sicherheitsdaten</li>
+                            </ul>
+                            <p class="mt-2 text-sm italic text-slate-400">Wir speichern selbst keine vollständigen
+                                Zahlungsdaten. Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
+                                Ein AVV wurde mit Stripe abgeschlossen. Weitere Informationen:
+                                https://stripe.com/de/privacy</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Anmeldung mit Google</h4>
+                            <p>Die Anmeldung mit Google ist freiwillig. Alternativ bleibt die Anmeldung mit
+                                E-Mail-Adresse und Passwort möglich.</p>
+                            <p class="mt-2">Beim Google-Login können Name, E-Mail-Adresse, Profilbild,
+                                Google-Nutzerkennung sowie technische Login-Daten verarbeitet werden. Es werden keine
+                                weitergehenden Google-Daten angefordert. Ihr Google-Passwort wird dabei nicht an
+                                Promptomizer übermittelt.</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Anbieter für Nutzer im Europäischen
+                                Wirtschaftsraum ist grundsätzlich Google Ireland Limited, Gordon House, Barrow
+                                Street, Dublin 4, Irland. Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1
+                                lit. b DSGVO. Weitere Informationen erhalten Sie in den Datenschutzinformationen von
+                                Google: https://policies.google.com/privacy</p>
+
+                            <h4 class="text-lg font-semibold text-white mt-6 mb-2">Versand von Willkommens- und
+                                Servicemails über Brevo</h4>
+                            <p>Für den Mailversand setzen wir Brevo ein. Anbieter ist die Brevo SAS, 106 Boulevard
+                                Haussmann, 75008 Paris, Frankreich.</p>
+                            <p class="mt-2">Brevo wird für die einmalige Willkommensmail nach der Registrierung und
+                                gegebenenfalls für technische Servicemails eingesetzt. Verarbeitet werden insbesondere
+                                E-Mail-Adresse, interne Nutzer-ID, verwendete Vorlage, Versandzeitpunkt, Zustellstatus
+                                und technische Fehlerdaten. Es findet darüber kein Newsletter- oder Werbeversand
+                                statt, sofern keine separate Einwilligung eingeholt wird.</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Die Verarbeitung erfolgt auf Grundlage von
+                                Art. 6 Abs. 1 lit. b DSGVO, ergänzend gegebenenfalls Art. 6 Abs. 1 lit. f DSGVO. Ein
+                                AVV wurde abgeschlossen.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Kontaktaufnahme per E-Mail</h4>
                             <p>Wenn Sie uns per E-Mail kontaktieren, werden Ihre Angaben (Name, E-Mail-Adresse,
-                                Nachrichteninhalt) zur Bearbeitung Ihrer Anfrage gespeichert. Die Verarbeitung erfolgt
-                                auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. b DSGVO.</p>
+                                Nachrichteninhalt) zur Bearbeitung Ihrer Anfrage gespeichert. Eine Weitergabe erfolgt
+                                nur, soweit dies zur Bearbeitung der Anfrage erforderlich ist, ein beauftragter
+                                technischer Dienstleister eingesetzt wird oder eine gesetzliche Verpflichtung
+                                besteht.</p>
+                            <p class="mt-2 text-sm italic text-slate-400">Die Verarbeitung erfolgt auf Grundlage von
+                                Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. b DSGVO.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">5. Analyse-Tools</h3>
-                            <p>Aktuell setzt Promptomizer.de keine Analyse-Tools ein. Sollte dies in Zukunft geändert
-                                werden, wird diese Datenschutzerklärung entsprechend aktualisiert.</p>
+                            <p>Promptomizer.de setzt keine Web-Analyse-, Werbe- oder Marketingtracking-Tools ein. Das
+                                unter Abschnitt 2 genannte Sentry ist technisches Fehlertracking, Cookiebot ist
+                                Consent-Management — beide dienen nicht der Marketinganalyse. Sollte sich dies in
+                                Zukunft ändern, wird diese Datenschutzerklärung entsprechend aktualisiert und eine
+                                erneute Einwilligung eingeholt, sofern erforderlich.</p>
                         </section>
-
-                        <p class="mt-8 text-xs text-slate-500 italic text-right">Quelle: Angepasst auf Grundlage von
-                            e-recht24.de | Stand: Februar 2026</p>
                     </div>
                 </div>
 
@@ -1274,11 +1404,7 @@
 
                     <div class="space-y-6 text-slate-300 leading-relaxed overflow-y-auto pr-2">
                         <section>
-                            <p class="italic text-sm">Stand: Februar 2026</p>
-                            <div class="mt-4 p-4 border border-brand-sky/20 bg-brand-sky/5 rounded-md text-sm italic">
-                                ⚠️ <strong>Hinweis:</strong> Dieser Entwurf dient als Arbeitsgrundlage. Eine rechtliche
-                                Prüfung wird empfohlen.
-                            </div>
+                            <p class="italic text-sm">Stand: 16. Juli 2026</p>
                         </section>
 
                         <hr class="border-navy-border" />
@@ -1286,7 +1412,7 @@
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">1. Anbieter und Geltungsbereich</h3>
                             <p>Anbieter und Vertragspartner ist:</p>
-                            <p class="mt-2">Patrick Roßkothen, Freiberufler<br>Mercatorstr. 108, 47051
+                            <p class="mt-2">Patrick Roßkothen, Freiberufler<br>Mercatorstraße 108, 47051
                                 Duisburg<br>E-Mail: info@promptomizer.de<br>Telefon: 0177 / 35 22 745</p>
                             <p class="mt-4">Diese AGB gelten für alle Verträge über die Nutzung der
                                 Software-as-a-Service-Plattform Promptomizer.de, die über die Website oder
@@ -1317,87 +1443,246 @@
                                 <div>
                                     <h4 class="text-lg font-semibold text-white">Free-Plan (kostenlos)</h4>
                                     <ul class="list-disc pl-6 space-y-1">
-                                        <li>Nutzung des Prompt-Editors</li>
-                                        <li>Speicherung von bis zu 10 Prompts</li>
-                                        <li>Zugriff auf Grundfunktionen</li>
+                                        <li>Nutzung des strukturierten und freien Prompt-Editors</li>
+                                        <li>Speicherung von bis zu 10 Prompts in der Bibliothek</li>
+                                        <li>Anzeige der letzten 10 Verlaufseinträge</li>
+                                        <li>Erstellung von bis zu 5 Prompt-Kategorien</li>
+                                        <li>Nutzung der in der Anwendung als kostenlos angebotenen Baustein- und
+                                            Grundfunktionen</li>
                                     </ul>
                                 </div>
                                 <div>
                                     <h4 class="text-lg font-semibold text-white">Pro-Plan (kostenpflichtig)</h4>
                                     <ul class="list-disc pl-6 space-y-1">
-                                        <li>Alle Funktionen des Free-Plans</li>
-                                        <li>Unbegrenzte Speicherung von Prompts</li>
-                                        <li>Zugriff auf alle aktuellen und zukünftigen Pro-Funktionen</li>
-                                        <li>Preis: 3,99 € pro Monat (inkl. gesetzlicher MwSt.)</li>
+                                        <li>Unbegrenzte Anzahl von Prompts in der Bibliothek</li>
+                                        <li>Unbegrenzte Anzahl von Prompt-Kategorien</li>
+                                        <li>Anzeige von bis zu 50 Verlaufseinträgen</li>
+                                        <li>Export der gespeicherten Daten und Inhalte im JSON-Format</li>
+                                        <li>Nutzung der Funktionen, die in der Anwendung ausdrücklich als
+                                            Pro-Funktionen gekennzeichnet sind</li>
+                                        <li>Preis: 3,99 € pro Monat oder 39,99 € pro Jahr, jeweils einschließlich der
+                                            jeweils anwendbaren gesetzlichen Umsatzsteuer, wählbar bei Vertragsschluss</li>
                                     </ul>
                                 </div>
                             </div>
+                            <p class="mt-4">Der Anbieter schuldet die Bereitstellung des Dienstes gemäß der jeweils
+                                aktuellen Beschreibung in der Anwendung, nicht jedoch einen bestimmten Arbeitserfolg
+                                oder die Eignung für einen bestimmten Zweck.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">4. Vertragsschluss</h3>
-                            <p>Mit der Registrierung und Bestätigung der AGB gibt der Nutzer ein verbindliches Angebot
-                                zum Vertragsschluss ab. Der Vertrag kommt zustande, sobald der Anbieter die
-                                Registrierung per Bestätigungs-E-Mail bestätigt.</p>
-                            <p class="mt-2">Für den Pro-Plan kommt der kostenpflichtige Vertrag mit Abschluss des
-                                Bestellvorgangs und Bestätigung der Zahlung zustande.</p>
+                            <h3 class="text-xl font-bold text-white mb-3">4. Einführungspreis und Preisgarantie für
+                                frühe Nutzer</h3>
+                            <p>Der Einführungspreis kann bis einschließlich 31. Oktober 2026 abgeschlossen werden.</p>
+                            <p class="mt-2">Für bis zu diesem Datum abgeschlossene Abonnements beträgt der Preis
+                                3,99 € monatlich beziehungsweise 39,99 € jährlich.</p>
+                            <p class="mt-2">Der Preis bleibt für das bei Vertragsschluss gewählte Abrechnungsintervall
+                                erhalten, solange dasselbe Abonnement ohne Unterbrechung fortbesteht.</p>
+                            <p class="mt-2">Die Preisgarantie endet bei Kündigung oder sonstiger Beendigung des
+                                Abonnements, bei einem späteren Neuabschluss sowie bei einem Wechsel des
+                                Abrechnungsintervalls. Nach Ende der Preisgarantie gilt der bei einem neuen
+                                Vertragsschluss beziehungsweise Tarifwechsel dann angebotene Preis.</p>
+                            <p class="mt-2">Gesetzlich vorgeschriebene Änderungen von Steuern oder Abgaben können
+                                berücksichtigt werden.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">5. Preise, Zahlung und Rechnung</h3>
-                            <p>Alle Preise sind Endpreise inklusive der gesetzlichen Umsatzsteuer (derzeit 19 %).</p>
-                            <p class="mt-2">Die Zahlung erfolgt monatlich im Voraus über Stripe. Rechnungen werden
-                                automatisch erstellt und per E-Mail übermittelt.</p>
+                            <h3 class="text-xl font-bold text-white mb-3">5. Vertragsschluss</h3>
+                            <p>Die Darstellung der Angebote auf der Website ist eine unverbindliche Einladung zur
+                                Registrierung.</p>
+                            <p class="mt-2">Der kostenlose Nutzungsvertrag kommt nach erfolgreicher Registrierung und
+                                Freischaltung des Kontos zustande.</p>
+                            <p class="mt-2">Der kostenpflichtige Vertrag für den Pro-Plan kommt nach Abschluss des
+                                Bestellvorgangs über Stripe und erfolgreicher Bestätigung des Abonnements zustande.</p>
+                            <p class="mt-2">Die Nutzung von Promptomizer.de ist Personen ab 16 Jahren vorbehalten. Mit
+                                der Registrierung bestätigt der Nutzer, mindestens 16 Jahre alt zu sein. Minderjährige
+                                zwischen 16 und 17 Jahren dürfen ein kostenpflichtiges Pro-Abonnement nur mit
+                                Zustimmung ihrer gesetzlichen Vertreter abschließen, soweit der Vertrag nicht
+                                ausnahmsweise ohne Zustimmung wirksam ist. Die bloße Altersangabe ersetzt keine
+                                erforderliche Zustimmung.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">6. Laufzeit und Kündigung</h3>
-                            <p>Der Pro-Plan läuft auf unbestimmte Zeit und verlängert sich automatisch um jeweils einen
-                                Monat, sofern er nicht gekündigt wird.</p>
-                            <p class="mt-2">Kündigung ist jederzeit zum Ende des laufenden Abrechnungszeitraums über das
-                                Portal möglich. Nach Kündigung wird der Account auf den Free-Plan zurückgesetzt. Prompts
-                                über dem Limit bleiben erhalten, sind aber nicht mehr editierbar.</p>
+                            <h3 class="text-xl font-bold text-white mb-3">6. Preise, Zahlung und Rechnung</h3>
+                            <p>Alle Preise sind Endpreise und verstehen sich inklusive der jeweils anwendbaren
+                                gesetzlichen Umsatzsteuer.</p>
+                            <p class="mt-2">Die Zahlung des Pro-Plans erfolgt je nach gewähltem Abrechnungszeitraum
+                                monatlich oder jährlich im Voraus über den Zahlungsdienstleister Stripe. Als
+                                Zahlungsmethoden stehen grundsätzlich Kredit- und Debitkarten, Apple Pay, Google Pay,
+                                Amazon Pay, PayPal, Klarna und SEPA-Lastschrift zur Verfügung; verfügbar sind im
+                                konkreten Checkout jeweils nur die dort tatsächlich angezeigten Zahlungsmethoden. Die
+                                Abbuchung erfolgt jeweils zum Beginn des neuen Abrechnungszeitraums.</p>
+                            <p class="mt-2">Rechnungen werden automatisch erstellt und per E-Mail an die hinterlegte
+                                Adresse übermittelt.</p>
+                            <p class="mt-2">Promptomizer speichert selbst keine vollständigen Karten- oder Bankdaten;
+                                die Zahlungsabwicklung erfolgt über Stripe.</p>
+                            <p class="mt-2">Bei Zahlungsverzug ist der Anbieter berechtigt, den Zugang zum Pro-Plan
+                                bis zum Ausgleich des ausstehenden Betrags einzuschränken.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">7. Widerrufsrecht für Verbraucher</h3>
-                            <p>Verbrauchern steht ein gesetzliches 14-tägiges Widerrufsrecht zu. Dieses erlischt
-                                vorzeitig, wenn der Nutzer ausdrücklich verlangt, dass der Pro-Plan sofort aktiviert
-                                wird, und bestätigt, dass sein Widerrufsrecht damit erlischt.</p>
-                            <div class="mt-4 p-4 border border-navy-border bg-black/20 rounded-md text-sm italic">
-                                📌 <strong>Muster-Widerrufsformular:</strong> An Patrick Roßkothen,
-                                info@promptomizer.de. „Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über
-                                die Buchung des Pro-Plans.“
+                            <h3 class="text-xl font-bold text-white mb-3">7. Laufzeit, Kündigung und Downgrade</h3>
+                            <p>Der Pro-Plan läuft auf unbestimmte Zeit und verlängert sich automatisch um den gewählten
+                                Abrechnungszeitraum (einen Monat bzw. ein Jahr), sofern er nicht gekündigt wird.</p>
+                            <p class="mt-2">Der Nutzer kann den Pro-Plan jederzeit zum Ende des laufenden
+                                Abrechnungszeitraums kündigen. Die Kündigung erfolgt über das Konto-Portal in der App
+                                (Konto → Plan &amp; Abonnement → Abo verwalten) oder per E-Mail an
+                                info@promptomizer.de.</p>
+                            <p class="mt-2">Nach Kündigung behält der Nutzer bis zum Ende des bezahlten Zeitraums
+                                Zugang zum Pro-Plan. Danach wird der Account auf den Free-Plan zurückgesetzt. Inhalte
+                                über dem Free-Plan-Limit werden dabei nicht gelöscht. Neue Prompts können jedoch nicht
+                                gespeichert werden, solange das Free-Limit erreicht oder überschritten ist.</p>
+                            <p class="mt-2">Ein Free-Konto kann jederzeit über die Kontoeinstellungen gelöscht werden.
+                                Besteht ein aktives Pro-Abonnement, blockiert die Anwendung die Kontolöschung; das
+                                Abonnement muss zunächst gekündigt werden. Die Kontolöschung ist erst möglich, nachdem
+                                der Pro-Zeitraum beendet und das Konto auf Free zurückgestuft wurde. Die
+                                Kontolöschung ist endgültig; gesetzlich aufzubewahrende Rechnungs- und Geschäftsdaten
+                                bleiben davon unberührt.</p>
+                            <p class="mt-2">Der Anbieter kann den Vertrag aus wichtigem Grund fristlos kündigen,
+                                insbesondere bei schwerem Verstoß gegen diese AGB oder bei Missbrauch des Dienstes.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">8. Widerrufsrecht für Verbraucher</h3>
+                            <p><strong>Widerrufsrecht</strong></p>
+                            <p class="mt-2">Verbraucher haben das Recht, binnen 14 Tagen ohne Angabe von Gründen
+                                diesen Vertrag zu widerrufen. Die Widerrufsfrist beginnt mit dem Vertragsschluss.</p>
+                            <p class="mt-2">Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Patrick Roßkothen,
+                                Mercatorstraße 108, 47051 Duisburg, E-Mail: info@promptomizer.de) mittels einer
+                                eindeutigen Erklärung über Ihren Entschluss, diesen Vertrag zu widerrufen,
+                                informieren. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung
+                                über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.</p>
+                            <p class="mt-4"><strong>Widerrufsfolgen</strong></p>
+                            <p class="mt-2">Wenn Sie diesen Vertrag widerrufen, erstatten wir Ihnen alle Zahlungen,
+                                die wir von Ihnen im Rahmen dieses Vertrages erhalten haben, unverzüglich und
+                                spätestens binnen 14 Tagen ab dem Tag, an dem die Mitteilung über Ihren Widerruf bei
+                                uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das
+                                Sie bei der ursprünglichen Transaktion eingesetzt haben; in keinem Fall werden Ihnen
+                                wegen dieser Rückzahlung Entgelte berechnet.</p>
+                            <p class="mt-2">Entsprechend unserer Geschäftsentscheidung erfolgt die Erstattung
+                                vollständig, auch wenn der Pro-Plan innerhalb der Widerrufsfrist bereits genutzt
+                                wurde. Es wird kein Wertersatz verlangt.</p>
+                            <div class="mt-4 p-4 border border-navy-border bg-black/20 rounded-md text-sm">
+                                <p class="italic">📌 <strong>Muster-Widerrufsformular</strong></p>
+                                <p class="mt-2 italic">Wenn Sie den Vertrag widerrufen wollen, füllen Sie bitte dieses
+                                    Formular aus und senden Sie es zurück.</p>
+                                <p class="mt-3 italic">An: Patrick Roßkothen, Mercatorstraße 108, 47051 Duisburg,
+                                    E-Mail: info@promptomizer.de</p>
+                                <p class="mt-2 italic">Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*)
+                                    abgeschlossenen Vertrag über die Bereitstellung des Pro-Plans auf
+                                    Promptomizer.de</p>
+                                <p class="mt-2 italic">Bestellt am (*):<br>Name des/der Verbraucher(s):<br>Anschrift
+                                    des/der Verbraucher(s):<br>Unterschrift des/der Verbraucher(s) (nur bei
+                                    Mitteilung auf Papier):<br>Datum:</p>
+                                <p class="mt-2 italic">(*) Unzutreffendes streichen.</p>
                             </div>
+                            <p class="mt-4">Für Unternehmer besteht kein Widerrufsrecht.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">8. Nutzungsrechte und Inhalte</h3>
-                            <p>Sämtliche vom Nutzer erstellten Inhalte verbleiben im Eigentum des Nutzers. Der Anbieter
-                                räumt sich lediglich die für den technischen Betrieb erforderlichen Rechte ein.</p>
+                            <h3 class="text-xl font-bold text-white mb-3">9. Nutzungsrechte und Inhalte</h3>
+                            <p>Der Nutzer räumt dem Anbieter das für den Betrieb des Dienstes erforderliche technische
+                                Recht ein, gespeicherte Inhalte (Prompts, Kategorien, Bausteine) auf den Servern zu
+                                speichern und dem Nutzer zugänglich zu machen.</p>
+                            <p class="mt-2">Sämtliche vom Nutzer erstellten Inhalte verbleiben im Eigentum des
+                                Nutzers. Der Anbieter verwendet diese Inhalte nicht für eigene Werbezwecke und nicht
+                                zum Training eigener oder fremder KI-Modelle. Eine Verarbeitung durch technische
+                                Auftragsverarbeiter erfolgt nur, soweit dies für Betrieb, Speicherung, Sicherheit und
+                                Bereitstellung des Dienstes erforderlich ist; Einzelheiten ergeben sich aus der
+                                Datenschutzerklärung.</p>
+                            <p class="mt-2">Der Nutzer ist verantwortlich dafür, dass seine Inhalte keine Rechte
+                                Dritter verletzen und nicht gegen geltendes Recht verstoßen.</p>
                         </section>
 
                         <hr class="border-navy-border" />
 
                         <section>
-                            <h3 class="text-xl font-bold text-white mb-3">9. Haftung</h3>
-                            <p>Der Anbieter haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit. Bei leichter
-                                Fahrlässigkeit haftet er nur bei Verletzung wesentlicher Vertragspflichten
-                                (Kardinalpflichten).</p>
+                            <h3 class="text-xl font-bold text-white mb-3">10. Pflichten des Nutzers</h3>
+                            <p>Der Nutzer verpflichtet sich:</p>
+                            <ul class="list-disc pl-6 space-y-1 mt-2">
+                                <li>Zugangsdaten vertraulich zu behandeln und nicht an Dritte weiterzugeben</li>
+                                <li>Den Dienst nicht für rechtswidrige Zwecke zu nutzen</li>
+                                <li>Keine automatisierten Zugriffe (Scraping, Bots) auf den Dienst durchzuführen, die
+                                    den Betrieb beeinträchtigen</li>
+                                <li>Keine Inhalte zu speichern, die gegen geltendes Recht oder Rechte Dritter
+                                    verstoßen</li>
+                            </ul>
                         </section>
 
-                        <p class="mt-8 text-xs text-slate-500 italic text-right">Schlussbestimmungen: Es gilt das Recht
-                            der Bundesrepublik Deutschland. | Stand: Februar 2026</p>
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">11. Verfügbarkeit</h3>
+                            <p>Der Anbieter bemüht sich um eine hohe Verfügbarkeit des Dienstes, übernimmt jedoch
+                                keine Garantie für eine ununterbrochene Verfügbarkeit. Wartungsarbeiten und technisch
+                                bedingte Ausfälle können zu vorübergehenden Einschränkungen führen.</p>
+                            <p class="mt-2">Geplante Wartungsarbeiten werden nach Möglichkeit vorab kommuniziert.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">12. Haftung</h3>
+                            <p>Der Anbieter haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei
+                                Verletzung von Leben, Körper oder Gesundheit.</p>
+                            <p class="mt-2">Bei leichter Fahrlässigkeit haftet der Anbieter nur bei Verletzung
+                                wesentlicher Vertragspflichten (Kardinalpflichten) und begrenzt auf den
+                                vertragstypisch vorhersehbaren Schaden.</p>
+                            <p class="mt-2">Promptomizer führt die vom Nutzer erstellten Prompts nicht selbst in
+                                einem KI-Modell aus. Der Anbieter übernimmt keine Gewähr für Ergebnisse, die externe
+                                KI-Dienste aufgrund eines Prompts erzeugen, und haftet nicht für die Qualität,
+                                Richtigkeit oder Eignung solcher extern erzeugten Inhalte.</p>
+                            <p class="mt-2">Zwingende gesetzliche Haftung, insbesondere nach dem
+                                Produkthaftungsgesetz, bleibt unberührt.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">13. Änderungen des Dienstes und der AGB</h3>
+                            <p>Der Anbieter behält sich vor, den Funktionsumfang des Dienstes weiterzuentwickeln und
+                                anzupassen, sofern die wesentlichen Leistungsmerkmale erhalten bleiben.</p>
+                            <p class="mt-2">Änderungen dieser AGB sind aus rechtlichen, sicherheitsbezogenen oder
+                                technisch notwendigen Gründen möglich. Sie dürfen das vertragliche Gleichgewicht
+                                nicht unangemessen zum Nachteil des Nutzers verschieben. Über wesentliche Änderungen
+                                wird rechtzeitig in Textform informiert. Soweit eine ausdrückliche Zustimmung
+                                gesetzlich erforderlich ist, werden Änderungen erst nach dieser Zustimmung
+                                Vertragsbestandteil. Gesetzliche Kündigungs- und Widerspruchsrechte bleiben
+                                unberührt.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">14. Datenschutz</h3>
+                            <p>Der Anbieter verarbeitet personenbezogene Daten zur Vertragsdurchführung. Details
+                                ergeben sich aus der in der Anwendung jederzeit erreichbaren
+                                Datenschutzerklärung.</p>
+                        </section>
+
+                        <hr class="border-navy-border" />
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-3">15. Verbraucherstreitbeilegung</h3>
+                            <p>Der Anbieter ist nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor
+                                einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+                        </section>
+
+                        <p class="mt-8 text-xs text-slate-500 italic text-right">16. Schlussbestimmungen: Es gilt das
+                            Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts. | Stand: 16.
+                            Juli 2026</p>
                     </div>
                 </div>
 
@@ -1871,6 +2156,64 @@
             <div class="ui-actions">
                 <button onclick="closeDeleteSnippetModal()" class="ui-btn ui-btn-ghost">Nein</button>
                 <button onclick="confirmDeleteSnippet()" class="ui-btn ui-btn-danger">Ja</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cancel-subscription" class="ui-backdrop z-[130] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <div id="cancel-sub-step-confirm">
+                <h3 class="ui-modal-title mb-2">Pro-Abo kündigen</h3>
+                <p class="text-sm text-slate-400 mb-4">Dein Abo wird zum Ende des aktuellen Abrechnungszeitraums
+                    gekündigt. Bis dahin bleibt dein Pro-Zugang bestehen.</p>
+                <div class="ui-actions">
+                    <button onclick="closeCancelSubscriptionModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
+                    <button id="cancel-sub-confirm-btn" onclick="confirmCancelSubscription()"
+                        class="ui-btn ui-btn-danger">Jetzt kündigen</button>
+                </div>
+            </div>
+            <div id="cancel-sub-step-done" class="hidden">
+                <h3 class="ui-modal-title mb-2"><i class="fa-solid fa-circle-check text-brand-sky mr-2"></i>Kündigung
+                    bestätigt</h3>
+                <div class="text-sm text-slate-300 space-y-1 mb-4">
+                    <p>Vertragsgegenstand: Promptomizer Pro-Plan-Abonnement</p>
+                    <p>Eingegangen am: <span id="cancel-sub-declared-at"></span></p>
+                    <p>Vertragsende: <span id="cancel-sub-period-end"></span></p>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Du behältst bis zum Vertragsende vollen Zugriff auf den
+                    Pro-Plan.</p>
+                <div class="ui-actions">
+                    <button onclick="closeCancelSubscriptionModal()" class="ui-btn ui-btn-primary">Schließen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-withdrawal" class="ui-backdrop z-[130] hidden">
+        <div class="ui-modal ui-modal-sm">
+            <div id="withdrawal-step-confirm">
+                <h3 class="ui-modal-title mb-2">Vertrag widerrufen</h3>
+                <p class="text-sm text-slate-400 mb-4">Du kannst dein Pro-Abo innerhalb von 14 Tagen nach
+                    Vertragsschluss widerrufen. Der Vertrag endet dann sofort, bereits gezahlte Beträge werden
+                    vollständig erstattet.</p>
+                <div class="ui-actions">
+                    <button onclick="closeWithdrawalModal()" class="ui-btn ui-btn-ghost">Abbrechen</button>
+                    <button id="withdrawal-confirm-btn" onclick="confirmWithdrawal()"
+                        class="ui-btn ui-btn-danger">Widerruf erklären</button>
+                </div>
+            </div>
+            <div id="withdrawal-step-done" class="hidden">
+                <h3 class="ui-modal-title mb-2"><i class="fa-solid fa-circle-check text-brand-sky mr-2"></i>Widerruf
+                    eingegangen</h3>
+                <div class="text-sm text-slate-300 space-y-1 mb-4">
+                    <p>Inhalt: Widerruf des Vertrags über den Promptomizer Pro-Plan</p>
+                    <p>Eingegangen am: <span id="withdrawal-declared-at"></span></p>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Dein Abonnement wurde sofort beendet. Eine Bestätigung wurde
+                    an deine E-Mail-Adresse gesendet. Die Erstattung erfolgt innerhalb von 14 Tagen.</p>
+                <div class="ui-actions">
+                    <button onclick="closeWithdrawalModal()" class="ui-btn ui-btn-primary">Schließen</button>
+                </div>
             </div>
         </div>
     </div>
@@ -3327,6 +3670,10 @@
                 if (accountCounter) accountCounter.classList.add('hidden');
                 const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
                 if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
+                const cancelSubBtn = document.getElementById('konto-btn-cancel-subscription');
+                if (cancelSubBtn) cancelSubBtn.classList.add('hidden');
+                const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
+                if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
                 if (billingHint) billingHint.innerText = 'Melde dich an, um dein Testabo zu verwalten.';
             }
@@ -3389,6 +3736,10 @@
                 });
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
+                    if (err.error === 'ACTIVE_SUBSCRIPTION') {
+                        showToast('Dein Konto kann nicht gelöscht werden, solange ein aktives Pro-Abo besteht. Bitte kündige zuerst dein Abo über "Abo verwalten".', 'error', 8000);
+                        return;
+                    }
                     throw new Error(err.error ?? res.statusText);
                 }
                 showToast('Dein Konto wurde gelöscht.', 'info', 6000);
@@ -3396,6 +3747,115 @@
             } catch (e) {
                 console.error('confirmDeleteAccount Fehler:', e);
                 showToast('Konto löschen fehlgeschlagen: ' + e.message, 'error');
+            }
+        }
+
+        function formatDeDate(isoString) {
+            if (!isoString) return '—';
+            return new Date(isoString).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        function openCancelSubscriptionModal() {
+            document.getElementById('cancel-sub-step-confirm').classList.remove('hidden');
+            document.getElementById('cancel-sub-step-done').classList.add('hidden');
+            document.getElementById('modal-cancel-subscription').classList.remove('hidden');
+        }
+
+        function closeCancelSubscriptionModal() {
+            document.getElementById('modal-cancel-subscription').classList.add('hidden');
+        }
+
+        async function confirmCancelSubscription() {
+            const btn = document.getElementById('cancel-sub-confirm-btn');
+            btn.disabled = true;
+            try {
+                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/cancel-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    if (data.error === 'ALREADY_CANCELLED') {
+                        showToast('Dein Abo ist bereits zum Periodenende gekündigt.', 'info');
+                        closeCancelSubscriptionModal();
+                        return;
+                    }
+                    if (data.error === 'NO_ACTIVE_SUBSCRIPTION') {
+                        showToast('Kein aktives Abo gefunden.', 'error');
+                        closeCancelSubscriptionModal();
+                        return;
+                    }
+                    throw new Error(data.error ?? res.statusText);
+                }
+
+                document.getElementById('cancel-sub-declared-at').textContent = formatDeDate(data.declaredAt);
+                document.getElementById('cancel-sub-period-end').textContent = formatDeDate(data.periodEnd);
+                document.getElementById('cancel-sub-step-confirm').classList.add('hidden');
+                document.getElementById('cancel-sub-step-done').classList.remove('hidden');
+
+                await window.db.syncStripeSubscription();
+                await updateKontoView();
+            } catch (e) {
+                console.error('confirmCancelSubscription Fehler:', e);
+                showToast('Kündigung fehlgeschlagen: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function openWithdrawalModal() {
+            document.getElementById('withdrawal-step-confirm').classList.remove('hidden');
+            document.getElementById('withdrawal-step-done').classList.add('hidden');
+            document.getElementById('modal-withdrawal').classList.remove('hidden');
+        }
+
+        function closeWithdrawalModal() {
+            document.getElementById('modal-withdrawal').classList.add('hidden');
+        }
+
+        async function confirmWithdrawal() {
+            const btn = document.getElementById('withdrawal-confirm-btn');
+            btn.disabled = true;
+            try {
+                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/request-withdrawal', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    if (data.error === 'WITHDRAWAL_PERIOD_EXPIRED') {
+                        showToast('Die 14-tägige Widerrufsfrist ist bereits abgelaufen. Du kannst dein Abo weiterhin regulär kündigen.', 'error', 8000);
+                        closeWithdrawalModal();
+                        return;
+                    }
+                    if (data.error === 'NO_ACTIVE_SUBSCRIPTION') {
+                        showToast('Kein aktives Abo gefunden.', 'error');
+                        closeWithdrawalModal();
+                        return;
+                    }
+                    throw new Error(data.error ?? res.statusText);
+                }
+
+                document.getElementById('withdrawal-declared-at').textContent = formatDeDate(data.declaredAt);
+                document.getElementById('withdrawal-step-confirm').classList.add('hidden');
+                document.getElementById('withdrawal-step-done').classList.remove('hidden');
+
+                await window.db.syncStripeSubscription();
+                await updateKontoView();
+                await updatePromptCounter();
+            } catch (e) {
+                console.error('confirmWithdrawal Fehler:', e);
+                showToast('Widerruf fehlgeschlagen: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -5751,6 +6211,10 @@
                 if (accountUpgradeBtn) accountUpgradeBtn.classList.add('hidden');
                 const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
                 if (manageBillingBtn) manageBillingBtn.classList.remove('hidden');
+                const cancelSubBtn = document.getElementById('konto-btn-cancel-subscription');
+                if (cancelSubBtn) cancelSubBtn.classList.remove('hidden');
+                const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
+                if (withdrawalBtn) withdrawalBtn.classList.remove('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
                 if (billingHint) billingHint.innerText = 'Dein Stripe-Abo kannst du im Customer Portal verwalten.';
 
@@ -5805,6 +6269,10 @@
                 if (accountUpgradeBtn) accountUpgradeBtn.classList.remove('hidden');
                 const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
                 if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
+                const cancelSubBtn = document.getElementById('konto-btn-cancel-subscription');
+                if (cancelSubBtn) cancelSubBtn.classList.add('hidden');
+                const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
+                if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
                 if (billingHint) billingHint.innerText = 'Wechsel bei Bedarf in den Stripe-Testcheckout.';
             }
@@ -5814,7 +6282,7 @@
 
     <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js" data-cookieconsent="ignore"></script>
+    <script src="vendor/supabase/supabase.js" data-cookieconsent="ignore"></script>
     <script src="db.js" data-cookieconsent="ignore"></script>
 </body>
 

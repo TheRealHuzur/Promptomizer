@@ -1,4 +1,4 @@
-import { getAdminClient, handleCors, jsonResponse } from "../_shared/stripe.ts";
+import { deriveTier, getAdminClient, handleCors, jsonResponse } from "../_shared/stripe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
@@ -27,6 +27,18 @@ Deno.serve(async (req) => {
   }
 
   const adminClient = getAdminClient();
+
+  const { data: profile, error: profileError } = await adminClient
+    .from("profiles")
+    .select("subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profileError) throw profileError;
+
+  if (profile && deriveTier(profile.subscription_status) === "pro") {
+    return jsonResponse({ error: "ACTIVE_SUBSCRIPTION" }, 409);
+  }
+
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
   if (error) {
     console.error("delete-account: Fehler beim Loeschen von", user.id, error.message);
