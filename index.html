@@ -1788,10 +1788,10 @@
                     class="w-full rounded-xl p-4 border-2 border-brand-sky bg-slate-800 transition-colors flex items-center justify-between">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-lg font-bold text-white">39,99 € / Jahr</span>
+                            <span class="text-lg font-bold text-white">39,99 € pro Jahr</span>
                             <span class="text-[10px] font-bold uppercase tracking-wider bg-brand-sky text-navy-deep rounded px-1.5 py-0.5">2 Monate gratis</span>
                         </div>
-                        <div class="text-slate-400 text-xs mt-1">entspricht ~3,33 € / Monat · inkl. MwSt.</div>
+                        <div class="text-slate-400 text-xs mt-1">entspricht ~3,33 € pro Monat · inkl. MwSt.</div>
                     </div>
                     <i id="upgrade-check-year" class="fa-solid fa-circle-check text-brand-sky text-xl"></i>
                 </button>
@@ -1799,7 +1799,7 @@
                 <button type="button" id="upgrade-opt-month" onclick="selectUpgradeInterval('month')"
                     class="w-full rounded-xl p-4 border-2 border-navy-border bg-slate-800/40 transition-colors flex items-center justify-between">
                     <div>
-                        <div class="text-lg font-bold text-white">3,99 € / Monat</div>
+                        <div class="text-lg font-bold text-white">3,99 € pro Monat</div>
                         <div class="text-slate-400 text-xs mt-1">inkl. MwSt. · jederzeit kündbar</div>
                     </div>
                     <i id="upgrade-check-month" class="fa-regular fa-circle text-slate-500 text-xl"></i>
@@ -1844,9 +1844,16 @@
 
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort</label>
-                    <input id="auth-password" type="password"
-                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                        placeholder="••••••••" />
+                    <div class="relative mt-2">
+                        <input id="auth-password" type="password"
+                            class="w-full rounded-md p-3 pr-10 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                            placeholder="••••••••" />
+                        <button type="button" onclick="togglePasswordVisibility('auth-password', 'auth-password-toggle-icon')"
+                                class="absolute right-0 top-0 h-full px-3 text-slate-500 hover:text-brand-sky transition-colors"
+                                title="Passwort anzeigen">
+                            <i id="auth-password-toggle-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <label class="flex items-center gap-2 text-sm text-slate-300 select-none">
@@ -1900,16 +1907,30 @@
 
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort</label>
-                    <input id="register-password" type="password"
-                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                        placeholder="••••••••" />
+                    <div class="relative mt-2">
+                        <input id="register-password" type="password"
+                            class="w-full rounded-md p-3 pr-10 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                            placeholder="••••••••" />
+                        <button type="button" onclick="togglePasswordVisibility('register-password', 'register-password-toggle-icon')"
+                                class="absolute right-0 top-0 h-full px-3 text-slate-500 hover:text-brand-sky transition-colors"
+                                title="Passwort anzeigen">
+                            <i id="register-password-toggle-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passwort bestätigen</label>
-                    <input id="register-password-confirm" type="password"
-                        class="w-full mt-2 rounded-md p-3 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
-                        placeholder="••••••••" />
+                    <div class="relative mt-2">
+                        <input id="register-password-confirm" type="password"
+                            class="w-full rounded-md p-3 pr-10 bg-navy-deep border border-navy-border text-slate-200 focus:border-brand-sky outline-none"
+                            placeholder="••••••••" />
+                        <button type="button" onclick="togglePasswordVisibility('register-password-confirm', 'register-password-confirm-toggle-icon')"
+                                class="absolute right-0 top-0 h-full px-3 text-slate-500 hover:text-brand-sky transition-colors"
+                                title="Passwort anzeigen">
+                            <i id="register-password-confirm-toggle-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex items-start gap-2 mt-4">
@@ -2528,6 +2549,17 @@
             }
 
             document.getElementById('modal-auth').classList.remove('hidden');
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            icon.classList.toggle('fa-eye', showing);
+            icon.classList.toggle('fa-eye-slash', !showing);
         }
 
         async function handleEmailLogin() {
@@ -5539,9 +5571,7 @@
                         </div>
 
                         <div id="history-text-${id}"
-                             class="text-sm font-mono text-slate-400 max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-2 overscroll-contain">
-                            ${text}
-                        </div>
+                             class="text-sm font-mono text-slate-400 max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-2 overscroll-contain">${text}</div>
                     </div>
                 `;
             }).join('');
@@ -5944,13 +5974,13 @@
             if (isLastStep) {
                 if (window.currentUser) {
                     titleEl.innerText = "Du startest mit dem Free-Plan";
-                    textEl.innerHTML = "<p>Du kannst bis zu <b>10 Prompts</b> kostenlos speichern. Voller Zugriff auf Editor, Bausteine und Kategorien ist inklusive.</p><p>Für unbegrenzte Prompts: <b>Pro-Plan für 3,99 €/Monat</b>.</p>";
+                    textEl.innerHTML = "<p>Du kannst bis zu <b>10 Prompts</b> kostenlos speichern. Voller Zugriff auf Editor, Bausteine und Kategorien ist inklusive.</p><p>Für unbegrenzte Prompts: <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
                     secondaryBtn.classList.remove('hidden');
                     secondaryBtn.innerText = "Pro-Plan ansehen";
                     nextBtn.innerHTML = `Loslegen <i class="fa-solid fa-check ml-2 text-xs"></i>`;
                 } else {
                     titleEl.innerText = "Einfach ausprobieren — kostenlos";
-                    textEl.innerHTML = "<p>Du kannst den Editor, Bausteine und Kategorien sofort nutzen — ohne Account.</p><p>Wenn du Prompts speichern möchtest, brauchst du einen kostenlosen Account. Der Free-Plan gibt dir bis zu <b>10 gespeicherte Prompts</b>. Für unbegrenzte Prompts gibt es den <b>Pro-Plan für 3,99 €/Monat</b>.</p>";
+                    textEl.innerHTML = "<p>Du kannst den Editor, Bausteine und Kategorien sofort nutzen — ohne Account.</p><p>Wenn du Prompts speichern möchtest, brauchst du einen kostenlosen Account. Der Free-Plan gibt dir bis zu <b>10 gespeicherte Prompts</b>. Für unbegrenzte Prompts gibt es den <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
                     secondaryBtn.classList.remove('hidden');
                     secondaryBtn.innerText = "Erst mal ausprobieren";
                     nextBtn.innerHTML = `Jetzt kostenlos registrieren <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>`;
