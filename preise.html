@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="de" class="dark antialiased">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preise – Promptomizer</title>
+    <meta name="description" content="Vergleiche Promptomizer Free und Pro: Funktionen, Preise und Einführungspreis für frühe Nutzer.">
+    <meta name="theme-color" content="#020617">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Zentrales Enddatum des Pro-Einführungspreises, auch von index.html genutzt -->
+    <script src="intro-price.js"></script>
+
+    <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+    <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* preise.html ist eine normale scrollende Seite, kein App-Shell wie index.html */
+        body {
+            overflow: auto;
+        }
+
+        /* Eigene Klasse statt Tailwinds "hidden md:block": styles.css definiert
+           .hidden mit !important, das würde die responsive md:block-Variante überstimmen. */
+        .pricing-table-desktop {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .pricing-table-desktop {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-navy-deep text-slate-400 min-h-screen">
+
+    <!-- Kopfzeile -->
+    <header class="border-b border-navy-border">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center select-none leading-none">
+                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
+                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
+            </a>
+            <a href="index.html" class="ui-btn ui-btn-ghost text-sm">
+                <i class="fa-solid fa-arrow-left"></i> Zur App
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
+
+        <!-- Kopfbereich -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Wähle den passenden Promptomizer-Plan</h1>
+            <p class="text-slate-400 text-base md:text-lg">
+                Starte kostenlos oder sichere dir Promptomizer Pro zum Einführungspreis.
+            </p>
+            <p id="pricing-early-user-hint" class="text-slate-500 text-sm mt-3"></p>
+        </div>
+
+        <!-- Tarifkarten -->
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+
+            <!-- FREE -->
+            <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 flex flex-col">
+                <h2 class="text-xl font-bold text-white mb-2">Free</h2>
+                <p class="text-sm text-slate-400 mb-6">
+                    Für alle, die Promptomizer kennenlernen und erste Prompts organisieren möchten.
+                </p>
+
+                <div class="mb-1">
+                    <span class="text-3xl font-bold text-white">0 €</span>
+                </div>
+                <div class="text-slate-500 text-xs mb-6">dauerhaft kostenlos</div>
+
+                <a href="index.html?intent=register" class="ui-btn ui-btn-ghost border border-navy-border w-full mb-6">
+                    Kostenlos starten
+                </a>
+
+                <ul class="space-y-3 text-sm flex-1">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Bis zu 10 gespeicherte Inhalte (Prompts und Bausteine zusammen)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Bis zu 10 sichtbare Historie-Einträge</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Bis zu 5 Kategorien</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Prompts erstellen und kopieren</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Bibliothek und Bausteine ausprobieren</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- PRO -->
+            <div class="relative rounded-xl border-2 border-brand-sky bg-slate-800/40 p-6 md:p-8 flex flex-col shadow-glow">
+                <span class="absolute -top-3 left-6 text-[10px] font-bold uppercase tracking-wider bg-brand-sky text-navy-deep rounded px-2 py-1">
+                    Einführungspreis
+                </span>
+
+                <h2 class="text-xl font-bold text-white mb-2 mt-2">Pro</h2>
+                <p class="text-sm text-slate-400 mb-6">
+                    Für alle, die regelmäßig mit KI arbeiten und ihre besten Prompts dauerhaft organisieren möchten.
+                </p>
+
+                <!-- Intervall-Auswahl (gleiches Muster wie im Upgrade-Modal) -->
+                <div class="space-y-3 mb-4">
+                    <button type="button" id="pricing-opt-year" onclick="selectPricingInterval('year')"
+                        class="w-full rounded-xl p-4 border-2 border-brand-sky bg-slate-800 transition-colors flex items-center justify-between text-left">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-white">39,99 € pro Jahr</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider bg-brand-sky text-navy-deep rounded px-1.5 py-0.5">2 Monate gratis</span>
+                            </div>
+                            <div class="text-slate-400 text-xs mt-1">entspricht ~3,33 € pro Monat · inkl. MwSt.</div>
+                        </div>
+                        <i id="pricing-check-year" class="fa-solid fa-circle-check text-brand-sky text-xl"></i>
+                    </button>
+
+                    <button type="button" id="pricing-opt-month" onclick="selectPricingInterval('month')"
+                        class="w-full rounded-xl p-4 border-2 border-navy-border bg-slate-800/40 transition-colors flex items-center justify-between text-left">
+                        <div>
+                            <div class="text-lg font-bold text-white">3,99 € pro Monat</div>
+                            <div class="text-slate-400 text-xs mt-1">inkl. MwSt. · jederzeit kündbar</div>
+                        </div>
+                        <i id="pricing-check-month" class="fa-regular fa-circle text-slate-500 text-xl"></i>
+                    </button>
+                </div>
+
+                <p id="pricing-intro-hint" class="text-slate-500 text-xs mb-4"></p>
+
+                <a id="pricing-pro-cta" href="index.html?intent=checkout&interval=year"
+                    class="ui-btn ui-btn-primary w-full mb-6">
+                    Einführungspreis sichern
+                </a>
+
+                <ul class="space-y-3 text-sm flex-1">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Unbegrenzt gespeicherte Prompts und Bausteine</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Unbegrenzte Kategorien</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Bis zu 50 sichtbare Historie-Einträge</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Export und Backup</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-brand-sky mt-0.5"></i>
+                        <span>Alle zukünftigen Pro-Funktionen</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Vergleichstabelle -->
+        <section class="mt-16">
+            <h2 class="text-xl font-bold text-white mb-6 text-center">Im Vergleich</h2>
+
+            <!-- Desktop: Tabelle -->
+            <div class="pricing-table-desktop rounded-lg border border-navy-border overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-navy-sidebar text-slate-300">
+                            <th class="text-left font-bold p-4">Funktion</th>
+                            <th class="text-left font-bold p-4">Free</th>
+                            <th class="text-left font-bold p-4">Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t border-navy-border">
+                            <td class="p-4">Gespeicherte Inhalte</td>
+                            <td class="p-4">10 insgesamt</td>
+                            <td class="p-4 text-white font-medium">Unbegrenzt</td>
+                        </tr>
+                        <tr class="border-t border-navy-border bg-black/10">
+                            <td class="p-4">Historie</td>
+                            <td class="p-4">10 Einträge</td>
+                            <td class="p-4 text-white font-medium">50 Einträge</td>
+                        </tr>
+                        <tr class="border-t border-navy-border">
+                            <td class="p-4">Kategorien</td>
+                            <td class="p-4">5</td>
+                            <td class="p-4 text-white font-medium">Unbegrenzt</td>
+                        </tr>
+                        <tr class="border-t border-navy-border bg-black/10">
+                            <td class="p-4">Export und Backup</td>
+                            <td class="p-4">Nein</td>
+                            <td class="p-4 text-white font-medium">Ja</td>
+                        </tr>
+                        <tr class="border-t border-navy-border">
+                            <td class="p-4">Preis</td>
+                            <td class="p-4">0 €</td>
+                            <td class="p-4 text-white font-medium">Ab 3,99 €</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobil: gestapelte Karten -->
+            <div class="md:hidden space-y-3">
+                <div class="rounded-lg border border-navy-border p-4">
+                    <div class="text-slate-300 font-bold mb-2">Gespeicherte Inhalte</div>
+                    <div class="flex justify-between text-sm"><span>Free</span><span>10 insgesamt</span></div>
+                    <div class="flex justify-between text-sm"><span>Pro</span><span class="text-white font-medium">Unbegrenzt</span></div>
+                </div>
+                <div class="rounded-lg border border-navy-border p-4">
+                    <div class="text-slate-300 font-bold mb-2">Historie</div>
+                    <div class="flex justify-between text-sm"><span>Free</span><span>10 Einträge</span></div>
+                    <div class="flex justify-between text-sm"><span>Pro</span><span class="text-white font-medium">50 Einträge</span></div>
+                </div>
+                <div class="rounded-lg border border-navy-border p-4">
+                    <div class="text-slate-300 font-bold mb-2">Kategorien</div>
+                    <div class="flex justify-between text-sm"><span>Free</span><span>5</span></div>
+                    <div class="flex justify-between text-sm"><span>Pro</span><span class="text-white font-medium">Unbegrenzt</span></div>
+                </div>
+                <div class="rounded-lg border border-navy-border p-4">
+                    <div class="text-slate-300 font-bold mb-2">Export und Backup</div>
+                    <div class="flex justify-between text-sm"><span>Free</span><span>Nein</span></div>
+                    <div class="flex justify-between text-sm"><span>Pro</span><span class="text-white font-medium">Ja</span></div>
+                </div>
+                <div class="rounded-lg border border-navy-border p-4">
+                    <div class="text-slate-300 font-bold mb-2">Preis</div>
+                    <div class="flex justify-between text-sm"><span>Free</span><span>0 €</span></div>
+                    <div class="flex justify-between text-sm"><span>Pro</span><span class="text-white font-medium">Ab 3,99 €</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="mt-16 max-w-3xl mx-auto">
+            <h2 class="text-xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
+
+            <div class="space-y-2" id="pricing-faq">
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="pricing-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="togglePricingFaq(this)">
+                        <span class="text-slate-200 font-medium">Kann ich jederzeit kündigen?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="pricing-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Ja. Das monatliche und das jährliche Abonnement können über die bestehende Kontoverwaltung
+                        gekündigt werden. Der Zugang bleibt bis zum Ende des bereits bezahlten Abrechnungszeitraums
+                        bestehen.
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="pricing-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="togglePricingFaq(this)">
+                        <span class="text-slate-200 font-medium">Was bedeutet Einführungspreis?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="pricing-faq-body hidden px-4 pb-4 text-sm text-slate-400" id="faq-intro-price-body">
+                        Der Preis von 3,99 € pro Monat beziehungsweise 39,99 € pro Jahr gilt nur während der
+                        Einführungsphase. Danach kostet Promptomizer Pro für neue Abonnenten 4,99 € pro Monat.
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="pricing-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="togglePricingFaq(this)">
+                        <span class="text-slate-200 font-medium">Behalte ich meinen Einführungspreis?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="pricing-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Ja. Wenn du während der Einführungsphase abschließt, behältst du deinen Preis, solange dein
+                        Abonnement ohne Unterbrechung aktiv bleibt.
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="pricing-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="togglePricingFaq(this)">
+                        <span class="text-slate-200 font-medium">Was passiert bei einer Kündigung?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="pricing-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Nach Ablauf des bezahlten Zeitraums wird das Konto wieder auf den Free-Plan umgestellt.
+                        Vorhandene Daten werden dabei nicht gelöscht — sie bleiben erhalten, neue Free-Limits gelten
+                        aber für künftige Ergänzungen.
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="pricing-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="togglePricingFaq(this)">
+                        <span class="text-slate-200 font-medium">Kann ich zwischen Monats- und Jahresabo wählen?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="pricing-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Ja. Promptomizer Pro ist monatlich für 3,99 € oder jährlich für 39,99 € erhältlich.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-navy-border mt-16">
+        <div class="max-w-5xl mx-auto px-6 py-8 text-center text-xs text-slate-600">
+            <a href="index.html" class="text-brand-sky hover:underline">Zurück zur App</a>
+        </div>
+    </footer>
+
+    <script>
+        // --- Intervall-Auswahl (Pro-Karte) ---
+        let pricingSelectedInterval = 'year';
+
+        function selectPricingInterval(interval) {
+            pricingSelectedInterval = interval === 'month' ? 'month' : 'year';
+            const isYear = pricingSelectedInterval === 'year';
+
+            const yearOpt = document.getElementById('pricing-opt-year');
+            const monthOpt = document.getElementById('pricing-opt-month');
+            const yearCheck = document.getElementById('pricing-check-year');
+            const monthCheck = document.getElementById('pricing-check-month');
+
+            yearOpt.classList.toggle('border-brand-sky', isYear);
+            yearOpt.classList.toggle('bg-slate-800', isYear);
+            yearOpt.classList.toggle('border-navy-border', !isYear);
+            yearOpt.classList.toggle('bg-slate-800/40', !isYear);
+
+            monthOpt.classList.toggle('border-brand-sky', !isYear);
+            monthOpt.classList.toggle('bg-slate-800', !isYear);
+            monthOpt.classList.toggle('border-navy-border', isYear);
+            monthOpt.classList.toggle('bg-slate-800/40', isYear);
+
+            yearCheck.className = `fa-${isYear ? 'solid' : 'regular'} fa-circle${isYear ? '-check' : ''} ${isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
+            monthCheck.className = `fa-${!isYear ? 'solid' : 'regular'} fa-circle${!isYear ? '-check' : ''} ${!isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
+
+            document.getElementById('pricing-pro-cta').href = `index.html?intent=checkout&interval=${pricingSelectedInterval}`;
+        }
+
+        // --- FAQ Accordion ---
+        function togglePricingFaq(button) {
+            const body = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            const isOpen = !body.classList.contains('hidden');
+            body.classList.toggle('hidden', isOpen);
+            icon.classList.toggle('rotate-180', !isOpen);
+        }
+
+        // --- Einführungspreis-Datum (zentral in intro-price.js) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof INTRO_PRICE_END_DATE_DISPLAY === 'undefined') return;
+
+            const earlyUserHint = document.getElementById('pricing-early-user-hint');
+            if (earlyUserHint) {
+                earlyUserHint.textContent =
+                    `Frühe Nutzer, die bis zum ${INTRO_PRICE_END_DATE_DISPLAY} abschließen, behalten ihren ` +
+                    'Einführungspreis, solange ihr Abonnement aktiv bleibt – und sichern sich den Founder-Badge, ' +
+                    'den es danach nie wieder geben wird.';
+            }
+
+            const introHint = document.getElementById('pricing-intro-hint');
+            if (introHint) {
+                introHint.innerHTML =
+                    `Einführungspreis gültig bis ${INTRO_PRICE_END_DATE_DISPLAY}.<br>` +
+                    'Danach kostet Promptomizer Pro für Neukunden 4,99 € pro Monat.<br>' +
+                    'Wer während der Einführungsphase abschließt, behält den Preis von 3,99 € pro Monat ' +
+                    'beziehungsweise 39,99 € pro Jahr, solange das Abonnement ohne Unterbrechung aktiv bleibt – ' +
+                    'inklusive Founder-Badge, den es danach nie wieder geben wird.';
+            }
+
+            const faqIntroBody = document.getElementById('faq-intro-price-body');
+            if (faqIntroBody) {
+                faqIntroBody.textContent =
+                    `Der Preis von 3,99 € pro Monat beziehungsweise 39,99 € pro Jahr gilt nur während der ` +
+                    `Einführungsphase (bis ${INTRO_PRICE_END_DATE_DISPLAY}). Danach kostet Promptomizer Pro für ` +
+                    'neue Abonnenten 4,99 € pro Monat.';
+            }
+        });
+    </script>
+</body>
+
+</html>
