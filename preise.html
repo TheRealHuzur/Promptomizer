@@ -66,7 +66,7 @@
         </div>
 
         <!-- Tarifkarten -->
-        <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="grid md:grid-cols-2 gap-6">
 
             <!-- FREE -->
             <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 flex flex-col">
@@ -177,10 +177,10 @@
 
         <!-- Vergleichstabelle -->
         <section class="mt-16">
-            <h2 class="text-xl font-bold text-white mb-6 text-center">Im Vergleich</h2>
+            <h2 class="text-xl font-bold text-white mb-6 text-center">Tarife im Vergleich</h2>
 
             <!-- Desktop: Tabelle -->
-            <div class="pricing-table-desktop rounded-lg border border-navy-border overflow-hidden">
+            <div class="pricing-table-desktop rounded-xl border-2 border-brand-sky bg-slate-800/40 shadow-glow overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="bg-navy-sidebar text-slate-300">
@@ -220,7 +220,7 @@
             </div>
 
             <!-- Mobil: gestapelte Karten -->
-            <div class="md:hidden space-y-3">
+            <div class="md:hidden space-y-3 rounded-xl border-2 border-brand-sky bg-slate-800/40 p-3 shadow-glow">
                 <div class="rounded-lg border border-navy-border p-4">
                     <div class="text-slate-300 font-bold mb-2">Gespeicherte Inhalte</div>
                     <div class="flex justify-between text-sm"><span>Free</span><span>10 insgesamt</span></div>
@@ -371,8 +371,7 @@
             if (earlyUserHint) {
                 earlyUserHint.textContent =
                     `Frühe Nutzer, die bis zum ${INTRO_PRICE_END_DATE_DISPLAY} abschließen, behalten ihren ` +
-                    'Einführungspreis, solange ihr Abonnement aktiv bleibt – und sichern sich den Founder-Badge, ' +
-                    'den es danach nie wieder geben wird.';
+                    'Einführungspreis, solange ihr Abonnement aktiv bleibt – und sichern sich den Founder-Badge.';
             }
 
             const introHint = document.getElementById('pricing-intro-hint');
@@ -382,7 +381,7 @@
                     'Danach kostet Promptomizer Pro für Neukunden 4,99 € pro Monat.<br>' +
                     'Wer während der Einführungsphase abschließt, behält den Preis von 3,99 € pro Monat ' +
                     'beziehungsweise 39,99 € pro Jahr, solange das Abonnement ohne Unterbrechung aktiv bleibt – ' +
-                    'inklusive Founder-Badge, den es danach nie wieder geben wird.';
+                    'inklusive Founder-Badge.';
             }
 
             const faqIntroBody = document.getElementById('faq-intro-price-body');

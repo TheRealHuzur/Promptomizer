@@ -1269,18 +1269,11 @@
             <!-- Founder-Hinweis: Text wird per JS mit INTRO_PRICE_END_DATE_DISPLAY befüllt (siehe intro-price.js) -->
             <p id="upgrade-founder-hint" class="text-slate-500 text-xs mb-4"></p>
 
-            <!-- Gut sichtbarer Hinweis auf die Pricing-Seite -->
+            <!-- Dezenter Hinweis auf die Pricing-Seite -->
             <a href="preise.html"
                 aria-label="Pricing-Seite öffnen: Preise und Funktionen vergleichen"
-                class="mb-4 flex items-center gap-3 rounded-xl border-2 border-brand-sky bg-brand-sky/10 p-3 text-left transition-colors hover:bg-brand-sky/25">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-sky text-navy-deep">
-                    <i class="fa-solid fa-tags"></i>
-                </span>
-                <span class="min-w-0 flex-1">
-                    <span class="block text-sm font-bold text-white">Zur Pricing-Seite</span>
-                    <span class="block text-xs text-slate-300">Alle Preise und Funktionen vergleichen</span>
-                </span>
-                <i class="fa-solid fa-arrow-right text-brand-sky"></i>
+                class="mb-4 block rounded-lg border border-navy-border bg-slate-800/40 p-3 text-center text-xs font-medium text-brand-sky transition-colors hover:bg-slate-800/60">
+                Alle Preise und Funktionen vergleichen
             </a>
 
             <!-- CTA -->
@@ -1928,7 +1921,7 @@
                 founderHint.textContent =
                     `Einführungspreis bis zum ${INTRO_PRICE_END_DATE_DISPLAY}. ` +
                     'Der Preis bleibt erhalten, solange dein Abo ohne Unterbrechung aktiv bleibt. ' +
-                    'Dazu sicherst du dir den Founder-Badge, den es danach nie wieder geben wird.';
+                    'Dazu sicherst du dir den Founder-Badge.';
             }
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') safeRefreshSidebar();
@@ -1982,6 +1975,7 @@
                 checkOnboarding(window.currentUser);
                 maybeHandleBillingReturn();
                 maybeHandlePricingIntent(window.currentUser);
+                if (window.currentUser) updatePromptCounter();
             }, 500);
         });
 
@@ -2006,6 +2000,8 @@
                     subEl.classList.remove('text-brand-sky');
                     subEl.classList.add('hidden');
                     if (loginBtn) loginBtn.classList.remove('hidden');
+                    const promptCounter = document.getElementById('prompt-counter-wrap');
+                    if (promptCounter) promptCounter.classList.add('hidden');
                 }
             }
         }
