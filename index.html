@@ -1269,9 +1269,18 @@
             <!-- Founder-Hinweis: Text wird per JS mit INTRO_PRICE_END_DATE_DISPLAY befüllt (siehe intro-price.js) -->
             <p id="upgrade-founder-hint" class="text-slate-500 text-xs mb-4"></p>
 
-            <!-- Alle Funktionen vergleichen -->
-            <a href="preise.html" class="block text-center text-brand-sky text-xs hover:underline mb-4">
-                Alle Funktionen vergleichen
+            <!-- Gut sichtbarer Hinweis auf die Pricing-Seite -->
+            <a href="preise.html"
+                aria-label="Pricing-Seite öffnen: Preise und Funktionen vergleichen"
+                class="mb-4 flex items-center gap-3 rounded-xl border-2 border-brand-sky bg-brand-sky/10 p-3 text-left transition-colors hover:bg-brand-sky/25">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-sky text-navy-deep">
+                    <i class="fa-solid fa-tags"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-sm font-bold text-white">Zur Pricing-Seite</span>
+                    <span class="block text-xs text-slate-300">Alle Preise und Funktionen vergleichen</span>
+                </span>
+                <i class="fa-solid fa-arrow-right text-brand-sky"></i>
             </a>
 
             <!-- CTA -->
@@ -1917,7 +1926,7 @@
             const founderHint = document.getElementById('upgrade-founder-hint');
             if (founderHint && typeof INTRO_PRICE_END_DATE_DISPLAY !== 'undefined') {
                 founderHint.textContent =
-                    `Einführungspreis für frühe Nutzer – gültig bis ${INTRO_PRICE_END_DATE_DISPLAY}. ` +
+                    `Einführungspreis bis zum ${INTRO_PRICE_END_DATE_DISPLAY}. ` +
                     'Der Preis bleibt erhalten, solange dein Abo ohne Unterbrechung aktiv bleibt. ' +
                     'Dazu sicherst du dir den Founder-Badge, den es danach nie wieder geben wird.';
             }
