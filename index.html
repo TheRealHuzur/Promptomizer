@@ -140,13 +140,6 @@
                                 class="fa-solid fa-gear w-5 text-center group-hover:text-brand-sky transition-colors"></i>
                             <span class="nav-label text-sm font-medium">Einstellungen & Hilfe</span>
                         </div>
-                        <a href="preise.html"
-                            class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-                            <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
-                            <i
-                                class="fa-solid fa-tags w-5 text-center group-hover:text-brand-sky transition-colors"></i>
-                            <span class="nav-label text-sm font-medium">Preise</span>
-                        </a>
                     </div>
                 </div>
 
@@ -1553,12 +1546,7 @@
         class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
         <button onclick="handleEditPrompt()"
             class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
-        <button onclick="handlePromptVersions()"
-            class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60">
-            <span>Versionsverlauf</span>
-            <span class="rounded bg-brand-sky/10 px-1.5 py-0.5 text-[10px] font-bold text-brand-sky">PRO</span>
-        </button>
-        <div id="prompt-menu-category" class="relative group">
+        <div id="prompt-menu-category" class="relative group" onmouseleave="closePromptCategorySubmenu()">
             <button
                 class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
                 onmouseenter="openPromptCategorySubmenu()" onclick="return false;">
@@ -1566,7 +1554,7 @@
                 <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
             </button>
             <div id="prompt-category-submenu"
-                class="absolute top-0 left-full ml-2 w-64 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden">
+                class="absolute top-0 left-full w-64 hidden bg-navy-sidebar border border-navy-border rounded-lg shadow-2xl overflow-hidden">
                 <button
                     class="w-full flex items-center gap-2 px-4 py-2 text-left text-sm hover:bg-slate-800/60 text-brand-sky"
                     onclick="handlePromptCategoryCreateFromMenu(event)">
@@ -1747,7 +1735,7 @@
     </div>
 
     <div id="modal-prompt-versions" class="ui-backdrop z-[130] hidden">
-        <div class="ui-modal w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="ui-modal overflow-hidden flex flex-col" style="max-width:56rem;height:min(42rem,calc(100vh - 2rem));max-height:calc(100vh - 2rem);">
             <div class="ui-modal-header flex-none">
                 <div class="min-w-0">
                     <h3 class="ui-modal-title">Versionsverlauf</h3>
@@ -2551,7 +2539,7 @@
                           <h3 class="text-lg font-semibold text-white">Gespeicherte Prompts verwalten</h3>
                           <ul class="list-disc pl-6 space-y-2">
                             <li><strong>Bearbeiten</strong>: Lädt Name und Inhalt in den Haupteditor. Mit „Neue Version speichern“ bleibt jede frühere Fassung erhalten.</li>
-                            <li><strong>Versionsverlauf (Pro)</strong>: Vergleicht alte Fassungen mit der aktuellen Version und stellt eine gewählte Fassung als neue Version wieder her. Die Kategorie bleibt dabei unverändert.</li>
+                            <li><strong>Versionen im Bearbeitungsmodus (Pro)</strong>: Öffnet über „Bearbeiten“ → „Versionen“ den Vergleich und stellt alte Fassungen als neue Version wieder her. Die Kategorie bleibt dabei unverändert.</li>
                             <li><strong>Kategorie</strong>: Verschiebt den Prompt, ohne eine neue Inhaltsversion anzulegen.</li>
                             <li><strong>Löschen</strong>: Entfernt den Prompt einschließlich seines Versionsverlaufs (mit Sicherheitsabfrage).</li>
                           </ul>
@@ -4430,7 +4418,6 @@
                         <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${s.id})">
                             <div class="flex items-center justify-between w-full">
                                 <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title="${escapeHtml(s.name || '')}">${escapeHtml(s.name)}</div>
-                                <span class="ml-2 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">v${Math.max(1, Number(s.current_version) || 1)}</span>
                                 <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${s.id})">
                                     <i class="fa-solid fa-ellipsis"></i>
                                 </button>
@@ -4554,12 +4541,6 @@
             }
 
             startPromptEditSession(id);
-        }
-
-        function handlePromptVersions() {
-            const id = promptMenuPromptId;
-            closePromptItemMenu();
-            if (id) openPromptVersionsModal(id);
         }
 
         function handleAskDeletePrompt() {
@@ -4835,17 +4816,17 @@
             const updated = result.scenario;
             promptLibraryCache = (promptLibraryCache || []).map(item => item.id == updated.id ? updated : item);
             managePromptsCache = (managePromptsCache || []).map(item => item.id == updated.id ? updated : item);
-            promptEditSession.version = Number(updated.current_version) || (promptEditSession.version + 1);
+            const savedVersion = Number(updated.current_version) || (promptEditSession.version + 1);
+            promptEditSession.version = savedVersion;
             promptEditSession.category = normalizeCategoryName(updated.category);
             const nameInput = document.getElementById('prompt-edit-name');
             if (nameInput) nameInput.value = updated.name || name;
             promptEditSession.baseline = getPromptEditSerializedState();
             promptEditSession.dirty = false;
-            updatePromptEditBanner();
-            renderPromptEditFooter();
             renderPromptsAccordion();
             if (settingsCurrentPage === 'categories') renderManageCategoriesAccordion();
-            showToast(`Version ${promptEditSession.version} wurde gespeichert.`, 'success');
+            exitPromptEditSession(false);
+            showToast(`Version ${savedVersion} wurde gespeichert.`, 'success');
         }
 
         function formatPromptVersionDate(value) {
@@ -5252,6 +5233,10 @@
             `).join(''));
 
             list.innerHTML = items.join('');
+        }
+
+        function closePromptCategorySubmenu() {
+            document.getElementById('prompt-category-submenu')?.classList.add('hidden');
         }
 
         function handlePromptCategoryCreateFromMenu(ev) {
