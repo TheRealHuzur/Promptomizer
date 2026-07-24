@@ -239,6 +239,33 @@
 
                 <div id="view-editor" class="max-w-4xl mx-auto fade-in pb-20 h-full flex flex-col min-h-0">
 
+                    <div id="prompt-edit-banner"
+                        class="hidden mb-4 rounded-lg border border-brand-sky/30 bg-brand-sky/5 p-4">
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-brand-sky">Bibliotheks-Prompt bearbeiten</span>
+                                    <span id="prompt-edit-version-badge"
+                                        class="rounded bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-300">Version 1</span>
+                                    <span id="prompt-edit-category-badge"
+                                        class="truncate rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-400">Ohne Kategorie</span>
+                                </div>
+                                <label for="prompt-edit-name"
+                                    class="text-xs font-bold uppercase tracking-wider text-slate-400">Name</label>
+                                <input id="prompt-edit-name" type="text" class="ui-input mt-1"
+                                    placeholder="Name des Prompts" oninput="updatePromptEditDirtyState()" />
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" onclick="openActivePromptVersions()"
+                                    class="ui-btn ui-btn-ghost">
+                                    <i class="fa-solid fa-clock-rotate-left mr-2"></i>Versionen
+                                </button>
+                                <button type="button" onclick="requestPromptEditExit()"
+                                    class="ui-btn ui-btn-ghost">Bearbeitung beenden</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="editor-structured" class="space-y-8 pt-4">
                     </div>
 
@@ -1526,6 +1553,11 @@
         class="fixed z-[120] hidden bg-navy-sidebar border border-navy-border rounded-md shadow-xl w-44">
         <button onclick="handleEditPrompt()"
             class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
+        <button onclick="handlePromptVersions()"
+            class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60">
+            <span>Versionsverlauf</span>
+            <span class="rounded bg-brand-sky/10 px-1.5 py-0.5 text-[10px] font-bold text-brand-sky">PRO</span>
+        </button>
         <div id="prompt-menu-category" class="relative group">
             <button
                 class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
@@ -1714,12 +1746,55 @@
         </div>
     </div>
 
-    <div id="modal-prompt-edit" class="ui-backdrop z-[120] hidden">
+    <div id="modal-prompt-versions" class="ui-backdrop z-[130] hidden">
+        <div class="ui-modal w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="ui-modal-header flex-none">
+                <div class="min-w-0">
+                    <h3 class="ui-modal-title">Versionsverlauf</h3>
+                    <p id="prompt-versions-subtitle" class="truncate text-sm text-slate-400"></p>
+                </div>
+                <button onclick="closePromptVersionsModal()" class="ui-icon-btn" title="Schließen">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="prompt-versions-loading" class="py-12 text-center text-sm text-slate-500">Versionen werden geladen…</div>
+            <div id="prompt-versions-error" class="hidden rounded border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300"></div>
+
+            <div id="prompt-versions-content" class="hidden min-h-0 flex-1 overflow-hidden">
+                <div class="grid h-full min-h-0 grid-cols-1 gap-4 md:grid-cols-[15rem_minmax(0,1fr)]">
+                    <aside class="min-h-0 overflow-y-auto rounded-lg border border-navy-border bg-navy-deep/60 p-2">
+                        <div id="prompt-versions-list" class="space-y-1"></div>
+                        <button id="prompt-versions-load-more" type="button" onclick="loadMorePromptVersions()"
+                            class="hidden mt-3 w-full rounded px-3 py-2 text-xs font-bold text-brand-sky hover:bg-slate-800/60">
+                            Ältere laden
+                        </button>
+                    </aside>
+                    <section class="min-h-0 overflow-y-auto pr-1">
+                        <div id="prompt-version-comparison"></div>
+                        <div id="prompt-version-restore-confirm"
+                            class="hidden mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4">
+                            <p id="prompt-version-restore-copy" class="text-sm text-slate-200"></p>
+                            <p class="mt-1 text-xs text-slate-400">Die aktuelle Kategorie bleibt erhalten. Die Wiederherstellung wird als neue Version gespeichert.</p>
+                            <div class="mt-4 flex justify-end gap-2">
+                                <button type="button" onclick="cancelPromptVersionRestore()" class="ui-btn ui-btn-ghost">Abbrechen</button>
+                                <button id="prompt-version-restore-confirm-button" type="button"
+                                    onclick="confirmPromptVersionRestore()" class="ui-btn ui-btn-primary">Wiederherstellen</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-prompt-edit-discard" class="ui-backdrop z-[140] hidden">
         <div class="ui-modal ui-modal-sm">
-            <h3 class="ui-modal-title mb-2">Prompt bearbeiten</h3>
-            <p class="text-sm text-slate-400">Modal folgt im nÃ¤chsten Schritt.</p>
+            <h3 class="ui-modal-title mb-2">Ungespeicherte Änderungen</h3>
+            <p class="text-sm text-slate-400">Möchtest du die Bearbeitung wirklich verlassen? Deine noch nicht gespeicherten Änderungen gehen verloren.</p>
             <div class="ui-actions">
-                <button onclick="closePromptEditModal()" class="ui-btn ui-btn-ghost">SchlieÃŸen</button>
+                <button onclick="closePromptEditDiscardModal()" class="ui-btn ui-btn-ghost">Weiter bearbeiten</button>
+                <button onclick="confirmPromptEditDiscard()" class="ui-btn ui-btn-danger">Änderungen verwerfen</button>
             </div>
         </div>
     </div>
@@ -1877,6 +1952,16 @@
         let promptMenuCategoryKey = null;
         let pendingDeletePromptId = null;
         let pendingDeletePromptCategoryKey = null;
+        let promptEditSession = null;
+        let pendingPromptEditDiscardAction = null;
+        let promptVersionsState = {
+            promptId: null,
+            versions: [],
+            offset: 0,
+            hasMore: false,
+            selectedVersionNumber: null,
+            loading: false
+        };
         let savePromptSelectedCategory = '';
         let savePromptCategoryMenuOpen = false;
         let settingsMenuOpen = false;
@@ -2465,8 +2550,10 @@
 
                           <h3 class="text-lg font-semibold text-white">Gespeicherte Prompts verwalten</h3>
                           <ul class="list-disc pl-6 space-y-2">
-                            <li><strong>Löschen</strong>: Entfernt einen Prompt (mit Sicherheitsabfrage).</li>
-                            <li><strong>Bearbeiten</strong>: Wenn verfügbar, kannst du Prompt-Daten anpassen.</li>
+                            <li><strong>Bearbeiten</strong>: Lädt Name und Inhalt in den Haupteditor. Mit „Neue Version speichern“ bleibt jede frühere Fassung erhalten.</li>
+                            <li><strong>Versionsverlauf (Pro)</strong>: Vergleicht alte Fassungen mit der aktuellen Version und stellt eine gewählte Fassung als neue Version wieder her. Die Kategorie bleibt dabei unverändert.</li>
+                            <li><strong>Kategorie</strong>: Verschiebt den Prompt, ohne eine neue Inhaltsversion anzulegen.</li>
+                            <li><strong>Löschen</strong>: Entfernt den Prompt einschließlich seines Versionsverlaufs (mit Sicherheitsabfrage).</li>
                           </ul>
 
                           <hr class="border-navy-border" />
@@ -2652,6 +2739,7 @@
                             <div id="manage-prompt-${p.id}" class="group w-full py-1 px-1 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${p.id})">
                                 <div class="flex items-center justify-between w-full">
                                     <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title="${escapeHtml(p.name || '')}">${escapeHtml(p.name)}</div>
+                                    <span class="ml-2 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">v${Math.max(1, Number(p.current_version) || 1)}</span>
                                     <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${p.id})">
                                         <i class="fa-solid fa-ellipsis"></i>
                                     </button>
@@ -3200,8 +3288,9 @@
                 return;
             }
             try {
-                const [library, snippets, categories, history] = await Promise.all([
+                const [library, promptVersions, snippets, categories, history] = await Promise.all([
                     window.db.supabase.from('library').select('*'),
+                    window.db.supabase.from('prompt_versions').select('*'),
                     window.db.supabase.from('snippets').select('*'),
                     window.db.supabase.from('prompt_categories').select('*'),
                     window.db.supabase.from('prompt_history').select('*'),
@@ -3209,6 +3298,7 @@
                 const exportData = {
                     exportedAt: new Date().toISOString(),
                     library: library.data ?? [],
+                    promptVersions: promptVersions.data ?? [],
                     snippets: snippets.data ?? [],
                     categories: categories.data ?? [],
                     history: history.data ?? [],
@@ -3407,6 +3497,11 @@
         }
 
         function setEditorMode(mode) {
+            if (promptEditSession && mode !== promptEditSession.mode) {
+                showToast('Der Prompt-Typ bleibt beim Bearbeiten erhalten.', 'info');
+                return;
+            }
+
             // If not in editor view, switch to it
             const editorView = document.getElementById('view-editor');
             if (editorView && editorView.classList.contains('hidden')) {
@@ -4011,6 +4106,7 @@
                 freeActiveFormat = null;
                 updateFreeToolbarUI();
             }
+            updatePromptEditDirtyState();
         }
 
         function safeRefreshSidebar() {
@@ -4135,6 +4231,18 @@
         }
 
         async function handlePromptClick(id) {
+            if (promptEditSession) {
+                if (promptEditSession.id == id) {
+                    switchView('editor');
+                    return;
+                }
+                requestPromptEditAction(() => {
+                    exitPromptEditSession(true);
+                    handlePromptClick(id);
+                });
+                return;
+            }
+
             let scenarios = [];
             if (Array.isArray(promptLibraryCache) && promptLibraryCache.length) {
                 scenarios = promptLibraryCache;
@@ -4322,6 +4430,7 @@
                         <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${s.id})">
                             <div class="flex items-center justify-between w-full">
                                 <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title="${escapeHtml(s.name || '')}">${escapeHtml(s.name)}</div>
+                                <span class="ml-2 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">v${Math.max(1, Number(s.current_version) || 1)}</span>
                                 <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${s.id})">
                                     <i class="fa-solid fa-ellipsis"></i>
                                 </button>
@@ -4433,7 +4542,24 @@
         function handleEditPrompt() {
             const id = promptMenuPromptId;
             closePromptItemMenu();
-            openPromptEditModal(id);
+            if (!id) return;
+
+            if (promptEditSession && promptEditSession.id != id) {
+                const preservedDraft = promptEditSession.draft;
+                requestPromptEditAction(() => {
+                    exitPromptEditSession(false);
+                    startPromptEditSession(id, preservedDraft);
+                });
+                return;
+            }
+
+            startPromptEditSession(id);
+        }
+
+        function handlePromptVersions() {
+            const id = promptMenuPromptId;
+            closePromptItemMenu();
+            if (id) openPromptVersionsModal(id);
         }
 
         function handleAskDeletePrompt() {
@@ -4466,7 +4592,15 @@
                 return;
             }
 
-            await window.db.deleteScenario(id);
+            const deleted = await window.db.deleteScenario(id);
+            if (!deleted) {
+                showToast('Prompt konnte nicht gelöscht werden. Bitte erneut versuchen.', 'error');
+                closeDeletePromptModal();
+                return;
+            }
+            if (promptEditSession && promptEditSession.id == id) {
+                exitPromptEditSession(true);
+            }
 
             const el = document.getElementById(`prompt-item-${id}`);
             if (el) el.remove();
@@ -4482,15 +4616,552 @@
             }
         }
 
-        function openPromptEditModal(id) {
-            const modal = document.getElementById('modal-prompt-edit');
-            if (modal) modal.classList.remove('hidden');
+        function getCurrentLibraryFieldsPayload() {
+            if (currentMode === 'free') {
+                return {
+                    mode: 'free',
+                    text: getFreeMarkdownFromEditor().replace(/\r\n/g, '\n')
+                };
+            }
+
+            return [
+                document.getElementById('input-role')?.value || '',
+                document.getElementById('input-context')?.value || '',
+                document.getElementById('input-task')?.value || '',
+                '',
+                document.getElementById('input-format')?.value || ''
+            ];
         }
 
-        function closePromptEditModal() {
-            const modal = document.getElementById('modal-prompt-edit');
-            if (modal) modal.classList.add('hidden');
+        function captureEditorDraft() {
+            return {
+                mode: currentMode,
+                fields: getCurrentLibraryFieldsPayload(),
+                activeFieldId
+            };
         }
+
+        function restoreEditorDraft(draft) {
+            if (!draft) return;
+            setEditorMode(draft.mode === 'free' ? 'free' : 'structured');
+            if (draft.mode === 'free') {
+                freeSetMarkdown(draft.fields?.text || '');
+                setActiveField(draft.activeFieldId || 'free');
+            } else {
+                applyStructuredToEditor({ fields: draft.fields || [] });
+                setActiveField(draft.activeFieldId || null);
+            }
+        }
+
+        function setEditorFromScenario(scenario) {
+            const mode = isFreePrompt(scenario) ? 'free' : 'structured';
+            if (currentMode !== mode) setEditorMode(mode);
+            if (mode === 'free') {
+                freeSetMarkdown(scenario.fields?.text || '');
+                setActiveField('free');
+            } else {
+                applyStructuredToEditor(scenario);
+            }
+        }
+
+        function setPromptEditModeLocked(locked) {
+            ['btn-mode-structured', 'btn-mode-free'].forEach(id => {
+                const button = document.getElementById(id);
+                if (!button) return;
+                button.disabled = locked;
+                button.classList.toggle('opacity-50', locked);
+                button.classList.toggle('cursor-not-allowed', locked);
+                if (locked) {
+                    button.setAttribute('aria-disabled', 'true');
+                    button.title = 'Der Prompt-Typ bleibt beim Bearbeiten erhalten.';
+                } else {
+                    button.removeAttribute('aria-disabled');
+                    button.removeAttribute('title');
+                }
+            });
+        }
+
+        function getPromptEditSerializedState() {
+            const name = (document.getElementById('prompt-edit-name')?.value || '').trim();
+            return JSON.stringify({ name, fields: getCurrentLibraryFieldsPayload() });
+        }
+
+        function updatePromptEditBanner() {
+            if (!promptEditSession) return;
+            const version = document.getElementById('prompt-edit-version-badge');
+            const category = document.getElementById('prompt-edit-category-badge');
+            if (version) version.textContent = `Version ${promptEditSession.version}`;
+            if (category) category.textContent = promptEditSession.category || 'Ohne Kategorie';
+        }
+
+        function renderPromptEditFooter() {
+            const wrap = document.getElementById('footer-save-wrap');
+            if (!wrap) return;
+
+            if (!promptEditSession) {
+                wrap.innerHTML = `
+                    <button onclick="saveCurrentToLibrary()"
+                        class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                        <span>In Bibliothek speichern</span>
+                    </button>
+                `;
+                return;
+            }
+
+            const disabled = !promptEditSession.dirty;
+            wrap.innerHTML = `
+                <button id="btn-save-prompt-version" onclick="saveActivePromptVersion()" ${disabled ? 'disabled' : ''}
+                    class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}">
+                    <i class="fa-solid fa-code-branch"></i>
+                    <span>Neue Version speichern</span>
+                </button>
+            `;
+        }
+
+        function updatePromptEditDirtyState() {
+            if (!promptEditSession) return;
+            promptEditSession.dirty = getPromptEditSerializedState() !== promptEditSession.baseline;
+            renderPromptEditFooter();
+        }
+
+        async function startPromptEditSession(id, draftOverride = null) {
+            if (!window.db || !window.currentUser) return;
+            if (promptEditSession && promptEditSession.id == id) {
+                switchView('editor');
+                document.getElementById('prompt-edit-name')?.focus();
+                return;
+            }
+
+            let scenario = (promptLibraryCache || []).find(item => item.id == id);
+            if (!scenario) {
+                promptLibraryCache = await window.db.getScenarios();
+                scenario = (promptLibraryCache || []).find(item => item.id == id);
+            }
+            if (!scenario) {
+                showToast('Prompt konnte nicht geladen werden.', 'error');
+                return;
+            }
+
+            const draft = draftOverride || captureEditorDraft();
+            switchView('editor');
+            setEditorFromScenario(scenario);
+
+            promptEditSession = {
+                id: scenario.id,
+                mode: isFreePrompt(scenario) ? 'free' : 'structured',
+                version: Number(scenario.current_version) || 1,
+                category: normalizeCategoryName(scenario.category),
+                draft,
+                baseline: '',
+                dirty: false
+            };
+
+            const nameInput = document.getElementById('prompt-edit-name');
+            if (nameInput) nameInput.value = scenario.name || '';
+            document.getElementById('prompt-edit-banner')?.classList.remove('hidden');
+            setPromptEditModeLocked(true);
+            updatePromptEditBanner();
+            promptEditSession.baseline = getPromptEditSerializedState();
+            renderPromptEditFooter();
+            requestAnimationFrame(() => nameInput?.focus());
+        }
+
+        function requestPromptEditAction(action) {
+            if (!promptEditSession?.dirty) {
+                action();
+                return;
+            }
+            pendingPromptEditDiscardAction = action;
+            document.getElementById('modal-prompt-edit-discard')?.classList.remove('hidden');
+        }
+
+        function closePromptEditDiscardModal() {
+            document.getElementById('modal-prompt-edit-discard')?.classList.add('hidden');
+            pendingPromptEditDiscardAction = null;
+        }
+
+        function confirmPromptEditDiscard() {
+            const action = pendingPromptEditDiscardAction;
+            document.getElementById('modal-prompt-edit-discard')?.classList.add('hidden');
+            pendingPromptEditDiscardAction = null;
+            if (typeof action === 'function') action();
+        }
+
+        function requestPromptEditExit() {
+            if (!promptEditSession) return;
+            requestPromptEditAction(() => exitPromptEditSession(true));
+        }
+
+        function exitPromptEditSession(restoreDraft = true) {
+            if (!promptEditSession) return;
+            const draft = promptEditSession.draft;
+            promptEditSession = null;
+            document.getElementById('prompt-edit-banner')?.classList.add('hidden');
+            setPromptEditModeLocked(false);
+            renderPromptEditFooter();
+            if (restoreDraft) restoreEditorDraft(draft);
+        }
+
+        async function saveActivePromptVersion() {
+            if (!promptEditSession || !window.db?.saveScenarioVersion) return;
+            updatePromptEditDirtyState();
+            if (!promptEditSession.dirty) {
+                showToast('Es gibt keine neuen Änderungen.', 'info');
+                return;
+            }
+
+            const name = (document.getElementById('prompt-edit-name')?.value || '').trim();
+            if (!name) {
+                showToast('Bitte einen Namen eingeben.', 'info');
+                document.getElementById('prompt-edit-name')?.focus();
+                return;
+            }
+
+            const fields = getCurrentLibraryFieldsPayload();
+            if (promptEditSession.mode === 'free' && !fields.text.trim()) {
+                showToast('Bitte Text eingeben.', 'info');
+                return;
+            }
+
+            const button = document.getElementById('btn-save-prompt-version');
+            if (button) button.disabled = true;
+            const result = await window.db.saveScenarioVersion(promptEditSession.id, { name, fields });
+            if (!result.success) {
+                showToast('Neue Version konnte nicht gespeichert werden. Bitte erneut versuchen.', 'error');
+                renderPromptEditFooter();
+                return;
+            }
+
+            const updated = result.scenario;
+            promptLibraryCache = (promptLibraryCache || []).map(item => item.id == updated.id ? updated : item);
+            managePromptsCache = (managePromptsCache || []).map(item => item.id == updated.id ? updated : item);
+            promptEditSession.version = Number(updated.current_version) || (promptEditSession.version + 1);
+            promptEditSession.category = normalizeCategoryName(updated.category);
+            const nameInput = document.getElementById('prompt-edit-name');
+            if (nameInput) nameInput.value = updated.name || name;
+            promptEditSession.baseline = getPromptEditSerializedState();
+            promptEditSession.dirty = false;
+            updatePromptEditBanner();
+            renderPromptEditFooter();
+            renderPromptsAccordion();
+            if (settingsCurrentPage === 'categories') renderManageCategoriesAccordion();
+            showToast(`Version ${promptEditSession.version} wurde gespeichert.`, 'success');
+        }
+
+        function formatPromptVersionDate(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            return new Intl.DateTimeFormat('de-DE', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(date);
+        }
+
+        function getPromptForVersionModal() {
+            return (promptLibraryCache || []).find(item => item.id == promptVersionsState.promptId) || null;
+        }
+
+        async function openActivePromptVersions() {
+            if (promptEditSession) await openPromptVersionsModal(promptEditSession.id);
+        }
+
+        async function openPromptVersionsModal(promptId) {
+            if (!window.db || !window.currentUser) return;
+            const tier = await window.db.getUserTier();
+            if (tier !== 'pro') {
+                openUpgradeModal('version_history');
+                return;
+            }
+
+            let scenario = (promptLibraryCache || []).find(item => item.id == promptId);
+            if (!scenario) {
+                promptLibraryCache = await window.db.getScenarios();
+                scenario = (promptLibraryCache || []).find(item => item.id == promptId);
+            }
+            if (!scenario) {
+                showToast('Prompt konnte nicht geladen werden.', 'error');
+                return;
+            }
+
+            promptVersionsState = {
+                promptId: scenario.id,
+                versions: [],
+                offset: 0,
+                hasMore: false,
+                selectedVersionNumber: null,
+                loading: false
+            };
+            const subtitle = document.getElementById('prompt-versions-subtitle');
+            if (subtitle) subtitle.textContent = scenario.name || '';
+            document.getElementById('modal-prompt-versions')?.classList.remove('hidden');
+            await loadPromptVersionsPage(true);
+        }
+
+        function closePromptVersionsModal() {
+            document.getElementById('modal-prompt-versions')?.classList.add('hidden');
+            cancelPromptVersionRestore();
+            promptVersionsState = {
+                promptId: null,
+                versions: [],
+                offset: 0,
+                hasMore: false,
+                selectedVersionNumber: null,
+                loading: false
+            };
+        }
+
+        async function loadPromptVersionsPage(reset = false) {
+            if (promptVersionsState.loading || !promptVersionsState.promptId) return;
+            promptVersionsState.loading = true;
+            const loading = document.getElementById('prompt-versions-loading');
+            const content = document.getElementById('prompt-versions-content');
+            const errorBox = document.getElementById('prompt-versions-error');
+            if (reset) {
+                promptVersionsState.versions = [];
+                promptVersionsState.offset = 0;
+                promptVersionsState.selectedVersionNumber = null;
+                loading?.classList.remove('hidden');
+                content?.classList.add('hidden');
+            }
+            errorBox?.classList.add('hidden');
+
+            const result = await window.db.getPromptVersions(
+                promptVersionsState.promptId,
+                promptVersionsState.offset,
+                20
+            );
+            promptVersionsState.loading = false;
+
+            if (!result.success) {
+                loading?.classList.add('hidden');
+                if (result.reason === 'PRO_REQUIRED') {
+                    closePromptVersionsModal();
+                    openUpgradeModal('version_history');
+                    return;
+                }
+                if (errorBox) {
+                    errorBox.textContent = 'Der Versionsverlauf konnte nicht geladen werden. Bitte erneut versuchen.';
+                    errorBox.classList.remove('hidden');
+                }
+                return;
+            }
+
+            const knownIds = new Set(promptVersionsState.versions.map(version => String(version.id)));
+            result.versions.forEach(version => {
+                if (!knownIds.has(String(version.id))) promptVersionsState.versions.push(version);
+            });
+            promptVersionsState.offset = promptVersionsState.versions.length;
+            promptVersionsState.hasMore = result.hasMore;
+            if (promptVersionsState.selectedVersionNumber === null && promptVersionsState.versions.length) {
+                promptVersionsState.selectedVersionNumber = Number(
+                    promptVersionsState.versions[promptVersionsState.versions.length > 1 ? 1 : 0].version_number
+                );
+            }
+            loading?.classList.add('hidden');
+            content?.classList.remove('hidden');
+            renderPromptVersions();
+        }
+
+        async function loadMorePromptVersions() {
+            await loadPromptVersionsPage(false);
+        }
+
+        function selectPromptVersion(versionNumber) {
+            promptVersionsState.selectedVersionNumber = Number(versionNumber);
+            cancelPromptVersionRestore();
+            renderPromptVersions();
+        }
+
+        function normalizePromptSnapshot(snapshot) {
+            const free = isFreePrompt(snapshot);
+            const data = {
+                name: snapshot?.name || '',
+                mode: free ? 'Frei' : 'Strukturiert',
+                free,
+                text: '',
+                structured: { role: '', context: '', task: '', format: '' }
+            };
+            if (free) data.text = snapshot?.fields?.text || '';
+            else data.structured = extractStructuredFields(snapshot || {});
+            return data;
+        }
+
+        function promptSnapshotAsText(snapshot) {
+            if (isFreePrompt(snapshot)) return snapshot?.fields?.text || '';
+            return structuredPromptToText(snapshot || {});
+        }
+
+        function renderPromptComparisonValue(value) {
+            const stringValue = String(value ?? '');
+            if (!stringValue) return '<span class="italic text-slate-600">Leer</span>';
+            return `<div class="whitespace-pre-wrap break-words">${escapeHtml(stringValue)}</div>`;
+        }
+
+        function renderPromptVersions() {
+            const list = document.getElementById('prompt-versions-list');
+            const loadMore = document.getElementById('prompt-versions-load-more');
+            const comparison = document.getElementById('prompt-version-comparison');
+            const scenario = getPromptForVersionModal();
+            if (!list || !comparison || !scenario) return;
+
+            const currentVersion = Number(scenario.current_version) || 1;
+            list.innerHTML = promptVersionsState.versions.map(version => {
+                const number = Number(version.version_number) || 1;
+                const selected = number === promptVersionsState.selectedVersionNumber;
+                const restored = Number(version.restored_from_version) || null;
+                return `
+                    <button type="button" onclick="selectPromptVersion(${number})"
+                        class="w-full rounded-md border px-3 py-2 text-left transition-colors ${selected ? 'border-brand-sky bg-brand-sky/10' : 'border-transparent hover:bg-slate-800/60'}">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-sm font-bold ${selected ? 'text-brand-sky' : 'text-slate-200'}">Version ${number}</span>
+                            ${number === currentVersion ? '<span class="rounded bg-green-500/10 px-1.5 py-0.5 text-[10px] font-bold text-green-400">AKTUELL</span>' : ''}
+                        </div>
+                        <div class="mt-1 text-xs text-slate-500">${escapeHtml(formatPromptVersionDate(version.created_at))}</div>
+                        ${restored ? `<div class="mt-1 text-[10px] text-amber-300">Wiederhergestellt aus Version ${restored}</div>` : ''}
+                    </button>
+                `;
+            }).join('');
+            loadMore?.classList.toggle('hidden', !promptVersionsState.hasMore);
+
+            const selected = promptVersionsState.versions.find(
+                version => Number(version.version_number) === promptVersionsState.selectedVersionNumber
+            );
+            if (!selected) {
+                comparison.innerHTML = '<div class="py-10 text-center text-sm text-slate-500">Keine Version ausgewählt.</div>';
+                return;
+            }
+
+            const oldData = normalizePromptSnapshot(selected);
+            const currentData = normalizePromptSnapshot(scenario);
+            const rows = [
+                { label: 'Name', oldValue: oldData.name, currentValue: currentData.name },
+                { label: 'Modus', oldValue: oldData.mode, currentValue: currentData.mode }
+            ];
+            if (oldData.free && currentData.free) {
+                rows.push({ label: 'Inhalt', oldValue: oldData.text, currentValue: currentData.text });
+            } else if (!oldData.free && !currentData.free) {
+                rows.push(
+                    { label: 'Rolle & Funktion', oldValue: oldData.structured.role, currentValue: currentData.structured.role },
+                    { label: 'Kontext', oldValue: oldData.structured.context, currentValue: currentData.structured.context },
+                    { label: 'Aufgabe', oldValue: oldData.structured.task, currentValue: currentData.structured.task },
+                    { label: 'Format', oldValue: oldData.structured.format, currentValue: currentData.structured.format }
+                );
+            } else {
+                rows.push({
+                    label: 'Inhalt',
+                    oldValue: promptSnapshotAsText(selected),
+                    currentValue: promptSnapshotAsText(scenario)
+                });
+            }
+
+            comparison.innerHTML = `
+                <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h4 class="text-lg font-bold text-white">Version ${Number(selected.version_number)} mit aktuell vergleichen</h4>
+                        <p class="text-xs text-slate-500">Geänderte Felder sind hervorgehoben.</p>
+                    </div>
+                    ${Number(selected.version_number) === currentVersion ?
+                        '<span class="rounded bg-green-500/10 px-3 py-1 text-xs font-bold text-green-400">Aktuelle Version</span>' :
+                        '<button type="button" onclick="requestPromptVersionRestore()" class="ui-btn ui-btn-primary">Diese Version wiederherstellen</button>'}
+                </div>
+                <div class="space-y-3">
+                    ${rows.map(row => {
+                        const changed = String(row.oldValue ?? '') !== String(row.currentValue ?? '');
+                        const boxClass = changed ? 'border-amber-400/40 bg-amber-400/5' : 'border-navy-border bg-navy-deep/40';
+                        return `
+                            <div>
+                                <div class="mb-1 text-xs font-bold uppercase tracking-wider ${changed ? 'text-amber-300' : 'text-slate-500'}">${escapeHtml(row.label)}</div>
+                                <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
+                                    <div class="rounded-md border ${boxClass} p-3 text-sm text-slate-300">
+                                        <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Version ${Number(selected.version_number)}</div>
+                                        ${renderPromptComparisonValue(row.oldValue)}
+                                    </div>
+                                    <div class="rounded-md border ${boxClass} p-3 text-sm text-slate-300">
+                                        <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Aktuell · Version ${currentVersion}</div>
+                                        ${renderPromptComparisonValue(row.currentValue)}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function requestPromptVersionRestore() {
+            const scenario = getPromptForVersionModal();
+            if (!scenario || promptVersionsState.selectedVersionNumber === null) return;
+            const selected = promptVersionsState.selectedVersionNumber;
+            const next = (Number(scenario.current_version) || 1) + 1;
+            const copy = document.getElementById('prompt-version-restore-copy');
+            if (copy) {
+                const dirtyWarning = promptEditSession?.dirty
+                    ? ' Ungespeicherte Änderungen im Editor werden dabei verworfen.'
+                    : '';
+                copy.textContent = `Version ${selected} wird als neue Version ${next} wiederhergestellt.${dirtyWarning}`;
+            }
+            document.getElementById('prompt-version-restore-confirm')?.classList.remove('hidden');
+        }
+
+        function cancelPromptVersionRestore() {
+            document.getElementById('prompt-version-restore-confirm')?.classList.add('hidden');
+        }
+
+        async function confirmPromptVersionRestore() {
+            const promptId = promptVersionsState.promptId;
+            const versionNumber = promptVersionsState.selectedVersionNumber;
+            if (!promptId || versionNumber === null || !window.db?.restoreScenarioVersion) return;
+
+            const button = document.getElementById('prompt-version-restore-confirm-button');
+            if (button) button.disabled = true;
+            const result = await window.db.restoreScenarioVersion(promptId, versionNumber);
+            if (button) button.disabled = false;
+            if (!result.success) {
+                if (result.reason === 'PRO_REQUIRED') {
+                    closePromptVersionsModal();
+                    openUpgradeModal('version_history');
+                } else {
+                    showToast('Version konnte nicht wiederhergestellt werden. Bitte erneut versuchen.', 'error');
+                }
+                return;
+            }
+
+            const restored = result.scenario;
+            promptLibraryCache = (promptLibraryCache || []).map(item => item.id == restored.id ? restored : item);
+            managePromptsCache = (managePromptsCache || []).map(item => item.id == restored.id ? restored : item);
+            if (promptEditSession && promptEditSession.id == restored.id) {
+                setEditorFromScenario(restored);
+                const nameInput = document.getElementById('prompt-edit-name');
+                if (nameInput) nameInput.value = restored.name || '';
+                promptEditSession.version = Number(restored.current_version) || (promptEditSession.version + 1);
+                promptEditSession.category = normalizeCategoryName(restored.category);
+                promptEditSession.baseline = getPromptEditSerializedState();
+                promptEditSession.dirty = false;
+                updatePromptEditBanner();
+                renderPromptEditFooter();
+            }
+
+            renderPromptsAccordion();
+            if (settingsCurrentPage === 'categories') renderManageCategoriesAccordion();
+            cancelPromptVersionRestore();
+            await loadPromptVersionsPage(true);
+            showToast(`Version ${versionNumber} wurde als neue Version ${Number(restored.current_version) || ''} wiederhergestellt.`, 'success');
+        }
+
+        document.addEventListener('input', event => {
+            if (!promptEditSession) return;
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            if (target.id === 'input-free' || target.id === 'prompt-edit-name' || target.id.startsWith('input-')) {
+                updatePromptEditDirtyState();
+            }
+        });
+
+        window.addEventListener('beforeunload', event => {
+            if (!promptEditSession?.dirty) return;
+            event.preventDefault();
+            event.returnValue = '';
+        });
 
         function openPromptCategoryModal(prefill = '') {
             if (!window.currentUser) {
@@ -4626,6 +5297,10 @@
             promptOpenState[newKey] = true;
 
             promptLibraryCache = await window.db.getScenarios();
+            if (promptEditSession && promptEditSession.id == id) {
+                promptEditSession.category = normalizeCategoryName(catVal);
+                updatePromptEditBanner();
+            }
             renderPromptsAccordion();
 
             if (settingsCurrentPage === 'categories') {
@@ -5610,6 +6285,11 @@
                 headline: 'Vollständiger Verlauf mit Pro',
                 subline: 'Als Free-Nutzer siehst du die letzten 10 Einträge. Mit <strong class="text-white">Promptomizer Pro</strong> hast du Zugriff auf deinen vollständigen Verlauf.',
                 cta: 'Verlauf freischalten'
+            },
+            version_history: {
+                headline: 'Prompt-Versionen mit Pro',
+                subline: 'Deine Änderungen werden sicher versioniert. Mit <strong class="text-white">Promptomizer Pro</strong> kannst du alte Fassungen vergleichen und jederzeit wiederherstellen.',
+                cta: 'Versionen freischalten'
             },
             default: {
                 headline: 'Promptomizer Pro freischalten',

@@ -41,7 +41,7 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 | `supabase/migrations/*.sql` | DB-Migrationen (Quelle der Wahrheit für das Schema) |
 | `supabase/functions/*` | Edge Functions (Deno/TypeScript) |
 | `supabase/config.toml` | Function-Konfiguration (u.a. `verify_jwt`) |
-| `Promptomizer Go-Live Roadmap.md` | Aufgaben-/Fortschrittsliste bis zum Launch |
+| `/srv/wuw-storage/53_promptomizer/01_roadmaps/` | Nicht versionierte Roadmaps, Checklisten und Fortschrittsnotizen |
 | `AGB.md`, `Datenschutzerklaerung.md`, `Impressum.md` | Rechtstexte (auch als Views in `index.html` eingebettet) |
 
 ---
@@ -52,18 +52,20 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 - **anon key** steht (öffentlich, by design) in `db.js`. **service_role key** und **Management-API-Token** gehören **nicht** ins Repo (siehe §10).
 
 ### Tabellen (alle mit aktivem RLS)
-`profiles`, `library`, `prompt_history`, `snippets`, `prompt_categories`
+`profiles`, `library`, `prompt_versions`, `prompt_history`, `snippets`, `prompt_categories`
 
 - Jede Daten-Tabelle hat `user_id uuid` (bzw. `profiles.id`) mit FK auf `auth.users(id) ON DELETE CASCADE` → Account-Löschung räumt alle Nutzerdaten automatisch ab.
 - `profiles` wird beim Signup vom Trigger `handle_new_user` (auf `auth.users`) angelegt (`tier = 'free'`).
 
-### RLS-/Sicherheitsmodell (Stand 12.06.2026, Migration `20260612130000`)
+### RLS-/Sicherheitsmodell (Stand 24.07.2026, inkl. Migration `20260724182048`)
 - **Policies:** Lese-/Schreibzugriff nur auf eigene Zeilen (`auth.uid() = user_id` bzw. `= id`).
 - **`profiles` ist nur spaltenweise schreibbar:** `authenticated` darf per UPDATE **nur** `onboarding_completed` setzen. **Alle Billing-Felder (`tier`, `stripe_*`, `subscription_status`, …) schreiben ausschließlich die Edge Functions per `service_role`.**
   - ⚠️ **Wichtig:** Niemals `authenticated`/`anon` ein breites `GRANT UPDATE` auf `profiles` geben. Sonst kann sich jeder Nutzer selbst auf `tier='pro'` setzen (Gratis-Upgrade) oder fremde `stripe_customer_id` kapern. Genau diese Lücke wurde geschlossen.
 - **`anon`** hat **keinerlei** Tabellen-Grants (Gäste arbeiten rein clientseitig).
 - **Free-Limit:** Trigger `check_free_plan_limit` (BEFORE INSERT auf `library`) wirft `FREE_LIMIT_REACHED` ab 10 gespeicherten Prompts für Free-User. Gehärtet mit `SET search_path = public` und `pg_advisory_xact_lock` (gegen Race bei parallelen Tabs/Doppel-Requests). Das Frontend fängt die Meldung ab und öffnet das Upgrade-Modal.
-- Constraints: `profiles_tier_check` (nur `free`/`pro`), `NOT NULL` auf `library.user_id` & `prompt_history.user_id`, Unique-Index `prompt_categories(user_id, name)`.
+- **Prompt-Versionierung:** `library.current_version`/`updated_at` halten den aktuellen Stand. Private Trigger schreiben beim Anlegen und bei jeder Änderung von `name`/`fields` unveränderliche Snapshots nach `prompt_versions`; reine Kategorieänderungen erzeugen keine Version. Bestehende Prompts wurden als Version 1 übernommen.
+- **Pro-Zugriff:** Versionen werden auch für Free-Nutzer erzeugt, sind per RLS aber nur für den jeweiligen Eigentümer mit `profiles.tier = 'pro'` lesbar. Direkte Client-Schreibrechte auf `prompt_versions` existieren nicht. `restore_library_prompt_version` läuft als `SECURITY INVOKER`, übernimmt Name/Inhalt und erzeugt eine neue aktuelle Version; die Kategorie bleibt unverändert.
+- Constraints: `profiles_tier_check` (nur `free`/`pro`), `NOT NULL` auf `library.user_id` & `prompt_history.user_id`, Unique-Indizes `prompt_categories(user_id, name)` und `prompt_versions(prompt_id, version_number)`.
 
 ### Migrationen
 - Liegen in `supabase/migrations/`, Format `<timestamp>_<name>.sql`. **Sind die Quelle der Wahrheit fürs Schema.**
@@ -117,6 +119,8 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
   - **Technische/entwickler-orientierte Details** (RLS-Hinweise, Secret-Namen, Stack-Infos) gehören in `console.error`, **nicht** in den Toast vor dem Nutzer.
   - In `db.js` ist `showToast` nur defensiv erreichbar (`if (typeof window.showToast === 'function')`), weil `db.js` vor/unabhängig von `index.html` laufen kann.
 - **Zwei Editor-Modi:** `currentMode` ∈ `'structured'` (Felder: `role`, `context`, `task`, `format`) und `'free'` (ein Rich-/Markdown-Feld). Viele Funktionen verzweigen darauf.
+- **Bibliotheks-Bearbeitung:** `promptEditSession` lädt einen Prompt bewusst in den Haupteditor, sperrt den Moduswechsel und bewahrt den vorherigen Editorentwurf. Nur `saveActivePromptVersion()` aktualisiert Name/Inhalt als neue Version. Normales `handlePromptClick()` bleibt ein nicht verknüpftes Laden als Vorlage.
+- **Versionsverlauf:** `prompt_versions` ist nicht mit der allgemeinen `prompt_history` zu verwechseln. Pro-Nutzer vergleichen Bibliotheksversionen im Modal; ein Restore erzeugt stets eine neue Version und ändert keine Kategorie.
 - **Bausteine/Snippets:** laufen über das **Accordion** (`renderSnippetsAccordion`, `toggleSnippetSection`, `loadSnippetSection`, `openSnippetCategory`, `insertSnippetEncoded`/`insertSnippetText`). Ältere `loadSnippetsForField*`/`insertSnippet`-Funktionen wurden als toter Code entfernt — **nicht wieder einführen**.
 - **Sidebar/Tier-Anzeige:** überall denselben Tier-Status verwenden (`window.db.getUserTier()`), Upgrade-Hinweise nur zeigen, wenn fachlich korrekt.
 

@@ -343,6 +343,100 @@ window.db = {
         return data;
     },
 
+    async saveScenarioVersion(id, payload) {
+        if (!window.currentUser) {
+            return { success: false, reason: 'NOT_LOGGED_IN' };
+        }
+
+        const uid = window.currentUser.id;
+        const { data, error } = await supabaseClient
+            .from('library')
+            .update({
+                name: payload.name,
+                fields: payload.fields
+            })
+            .eq('id', id)
+            .eq('user_id', uid)
+            .select('*');
+
+        if (error) {
+            console.error('Prompt Version Save Error:', error);
+            return { success: false, reason: 'ERROR' };
+        }
+
+        if (!data || data.length !== 1) {
+            console.error('Prompt Version Save: keine eindeutige Zeile aktualisiert', { id, uid });
+            return { success: false, reason: 'NOT_FOUND' };
+        }
+
+        return { success: true, scenario: data[0] };
+    },
+
+    async getPromptVersions(promptId, offset = 0, limit = 20) {
+        if (!window.currentUser) {
+            return { success: false, reason: 'NOT_LOGGED_IN', versions: [], hasMore: false };
+        }
+
+        const tier = await this.getUserTier();
+        if (tier !== 'pro') {
+            return { success: false, reason: 'PRO_REQUIRED', versions: [], hasMore: false };
+        }
+
+        const safeOffset = Math.max(0, Number(offset) || 0);
+        const safeLimit = Math.min(50, Math.max(1, Number(limit) || 20));
+        const { data, error, count } = await supabaseClient
+            .from('prompt_versions')
+            .select('id, prompt_id, version_number, name, fields, created_at, restored_from_version', { count: 'exact' })
+            .eq('prompt_id', promptId)
+            .eq('user_id', window.currentUser.id)
+            .order('version_number', { ascending: false })
+            .range(safeOffset, safeOffset + safeLimit - 1);
+
+        if (error) {
+            console.error('Prompt Versions Fetch Error:', error);
+            return { success: false, reason: 'ERROR', versions: [], hasMore: false };
+        }
+
+        const versions = data || [];
+        return {
+            success: true,
+            versions,
+            hasMore: safeOffset + versions.length < (count || 0),
+            total: count || 0
+        };
+    },
+
+    async restoreScenarioVersion(promptId, versionNumber) {
+        if (!window.currentUser) {
+            return { success: false, reason: 'NOT_LOGGED_IN' };
+        }
+
+        const tier = await this.getUserTier();
+        if (tier !== 'pro') {
+            return { success: false, reason: 'PRO_REQUIRED' };
+        }
+
+        const { data, error } = await supabaseClient.rpc('restore_library_prompt_version', {
+            p_prompt_id: promptId,
+            p_version_number: versionNumber
+        });
+
+        if (error) {
+            console.error('Prompt Version Restore Error:', error);
+            return {
+                success: false,
+                reason: error.message?.includes('PROMPT_VERSION_NOT_FOUND') ? 'NOT_FOUND' : 'ERROR'
+            };
+        }
+
+        if (!data || data.length !== 1) {
+            console.error('Prompt Version Restore: keine eindeutige Zeile aktualisiert', { promptId, versionNumber });
+            return { success: false, reason: 'NOT_FOUND' };
+        }
+
+        return { success: true, scenario: data[0] };
+    },
+
     async getPromptCategories() {
         if (!window.currentUser) return [];
         const { data, error } = await supabaseClient
