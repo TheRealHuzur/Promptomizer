@@ -1759,9 +1759,8 @@
                         </button>
                     </aside>
                     <section class="min-h-0 overflow-y-auto pr-1">
-                        <div id="prompt-version-comparison"></div>
-                        <div id="prompt-version-restore-confirm"
-                            class="hidden mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4">
+                        <div id="prompt-version-restore-confirm" role="region" aria-live="polite"
+                            class="hidden sticky top-0 z-10 mb-4 rounded-lg border border-amber-400/40 bg-navy-sidebar p-4 shadow-xl">
                             <p id="prompt-version-restore-copy" class="text-sm text-slate-200"></p>
                             <p class="mt-1 text-xs text-slate-400">Die aktuelle Kategorie bleibt erhalten. Die Wiederherstellung wird als neue Version gespeichert.</p>
                             <div class="mt-4 flex justify-end gap-2">
@@ -1770,6 +1769,7 @@
                                     onclick="confirmPromptVersionRestore()" class="ui-btn ui-btn-primary">Wiederherstellen</button>
                             </div>
                         </div>
+                        <div id="prompt-version-comparison"></div>
                     </section>
                 </div>
             </div>
@@ -5043,7 +5043,7 @@
                     </div>
                     ${Number(selected.version_number) === currentVersion ?
                         '<span class="rounded bg-green-500/10 px-3 py-1 text-xs font-bold text-green-400">Aktuelle Version</span>' :
-                        '<button type="button" onclick="requestPromptVersionRestore()" class="ui-btn ui-btn-primary">Diese Version wiederherstellen</button>'}
+                        '<button id="prompt-version-restore-request" type="button" class="ui-btn ui-btn-primary">Diese Version wiederherstellen</button>'}
                 </div>
                 <div class="space-y-3">
                     ${rows.map(row => {
@@ -5067,6 +5067,7 @@
                     }).join('')}
                 </div>
             `;
+            comparison.querySelector('#prompt-version-restore-request')?.addEventListener('click', requestPromptVersionRestore);
         }
 
         function requestPromptVersionRestore() {
@@ -5081,7 +5082,12 @@
                     : '';
                 copy.textContent = `Version ${selected} wird als neue Version ${next} wiederhergestellt.${dirtyWarning}`;
             }
-            document.getElementById('prompt-version-restore-confirm')?.classList.remove('hidden');
+            const confirmation = document.getElementById('prompt-version-restore-confirm');
+            if (confirmation) {
+                confirmation.classList.remove('hidden');
+                confirmation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            document.getElementById('prompt-version-restore-confirm-button')?.focus();
         }
 
         function cancelPromptVersionRestore() {
