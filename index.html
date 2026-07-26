@@ -40,7 +40,7 @@
     <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e"
         data-blockingmode="auto" type="text/javascript"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Promptomizer Beta</title>
+    <title>Promptomizer</title>
     <meta name="theme-color" content="#020617">
 
     <link rel="manifest" href="manifest.json">
@@ -4823,9 +4823,10 @@
             if (nameInput) nameInput.value = updated.name || name;
             promptEditSession.baseline = getPromptEditSerializedState();
             promptEditSession.dirty = false;
+            exitPromptEditSession(false);
+            setEditorFromScenario(updated);
             renderPromptsAccordion();
             if (settingsCurrentPage === 'categories') renderManageCategoriesAccordion();
-            exitPromptEditSession(false);
             showToast(`Version ${savedVersion} wurde gespeichert.`, 'success');
         }
 
