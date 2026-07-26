@@ -1,5 +1,7 @@
 import {
+  awardBadge,
   buildBillingPatch,
+  deriveTier,
   ensureStripeCustomer,
   getAuthenticatedUser,
   getProfile,
@@ -31,6 +33,9 @@ Deno.serve(async (req) => {
     });
 
     await updateProfileByUserId(user.id, patch);
+    if (subscription?.metadata?.founder_badge_eligible === "true" && deriveTier(subscription.status) === "pro") {
+      await awardBadge(user.id, "founder", "intro_price_subscription");
+    }
 
     return jsonResponse({
       tier: patch.tier,

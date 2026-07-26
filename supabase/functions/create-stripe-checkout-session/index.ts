@@ -5,6 +5,7 @@ import {
   getAuthenticatedUser,
   getEnv,
   getProfile,
+  isFounderBadgeEligible,
   handleCors,
   jsonResponse,
   stripeRequest,
@@ -34,6 +35,7 @@ Deno.serve(async (req) => {
       ? getEnv("STRIPE_PRICE_ID_PRO_YEARLY")
       : getEnv("STRIPE_PRICE_ID_PRO");
 
+    const founderBadgeEligible = isFounderBadgeEligible();
     const params = new URLSearchParams();
     params.set("mode", "subscription");
     params.set("success_url", `${baseUrl}/?checkout=success`);
@@ -50,11 +52,13 @@ Deno.serve(async (req) => {
     params.set("metadata[plan]", "pro");
     params.set("metadata[interval]", interval);
     params.set("metadata[env]", "sandbox");
+    params.set("metadata[founder_badge_eligible]", founderBadgeEligible ? "true" : "false");
     params.set("subscription_data[metadata][supabase_user_id]", user.id);
     params.set("subscription_data[metadata][interval]", interval);
     params.set("subscription_data[metadata][app]", "promptomizer");
     params.set("subscription_data[metadata][plan]", "pro");
     params.set("subscription_data[metadata][env]", "sandbox");
+    params.set("subscription_data[metadata][founder_badge_eligible]", founderBadgeEligible ? "true" : "false");
 
     const session = await stripeRequest("/v1/checkout/sessions", { params });
 

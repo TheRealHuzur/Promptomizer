@@ -1,6 +1,7 @@
 import {
+  awardBadge,
   buildBillingPatch,
-  getAdminClient,
+  deriveTier,
   handleCors,
   jsonResponse,
   stripeRequest,
@@ -8,6 +9,11 @@ import {
   updateProfileByUserId,
   verifyStripeSignature,
 } from "../_shared/stripe.ts";
+
+async function awardFounderIfEligible(userId: string | undefined, metadata: Record<string, any> | undefined, status: string | undefined) {
+  if (!userId || metadata?.founder_badge_eligible !== "true" || deriveTier(status) !== "pro") return;
+  await awardBadge(userId, "founder", "intro_price_subscription");
+}
 
 async function applySubscriptionObject(subscription: Record<string, any>) {
   const customerId = subscription.customer as string | undefined;
@@ -25,6 +31,7 @@ async function applySubscriptionObject(subscription: Record<string, any>) {
   });
 
   await updateProfileByCustomerId(customerId, patch);
+  await awardFounderIfEligible(subscription.metadata?.supabase_user_id, subscription.metadata, subscription.status);
 }
 
 Deno.serve(async (req) => {
@@ -60,6 +67,7 @@ Deno.serve(async (req) => {
         } else {
           await updateProfileByCustomerId(object.customer, patch);
         }
+        await awardFounderIfEligible(object.client_reference_id, object.metadata, "active");
         break;
       }
 

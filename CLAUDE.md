@@ -52,20 +52,21 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 - **anon key** steht (öffentlich, by design) in `db.js`. **service_role key** und **Management-API-Token** gehören **nicht** ins Repo (siehe §10).
 
 ### Tabellen (alle mit aktivem RLS)
-`profiles`, `library`, `prompt_versions`, `prompt_history`, `snippets`, `prompt_categories`
+`profiles`, `library`, `prompt_versions`, `prompt_history`, `snippets`, `prompt_categories`, `badges`, `user_badges`
 
 - Jede Daten-Tabelle hat `user_id uuid` (bzw. `profiles.id`) mit FK auf `auth.users(id) ON DELETE CASCADE` → Account-Löschung räumt alle Nutzerdaten automatisch ab.
 - `profiles` wird beim Signup vom Trigger `handle_new_user` (auf `auth.users`) angelegt (`tier = 'free'`).
 
-### RLS-/Sicherheitsmodell (Stand 24.07.2026, inkl. Migration `20260724182048`)
+### RLS-/Sicherheitsmodell (Stand 26.07.2026, inkl. Migration `20260726142705`)
 - **Policies:** Lese-/Schreibzugriff nur auf eigene Zeilen (`auth.uid() = user_id` bzw. `= id`).
-- **`profiles` ist nur spaltenweise schreibbar:** `authenticated` darf per UPDATE **nur** `onboarding_completed` setzen. **Alle Billing-Felder (`tier`, `stripe_*`, `subscription_status`, …) schreiben ausschließlich die Edge Functions per `service_role`.**
+- **`profiles` ist nur spaltenweise schreibbar:** `authenticated` darf per UPDATE ausschließlich `onboarding_completed`, `display_name`, `default_editor_mode` und `active_badge_code` setzen. **Alle Billing-Felder (`tier`, `stripe_*`, `subscription_status`, …) schreiben ausschließlich die Edge Functions per `service_role`.**
   - ⚠️ **Wichtig:** Niemals `authenticated`/`anon` ein breites `GRANT UPDATE` auf `profiles` geben. Sonst kann sich jeder Nutzer selbst auf `tier='pro'` setzen (Gratis-Upgrade) oder fremde `stripe_customer_id` kapern. Genau diese Lücke wurde geschlossen.
 - **`anon`** hat **keinerlei** Tabellen-Grants (Gäste arbeiten rein clientseitig).
 - **Free-Limit:** Trigger `check_free_plan_limit` (BEFORE INSERT auf `library`) wirft `FREE_LIMIT_REACHED` ab 10 gespeicherten Prompts für Free-User. Gehärtet mit `SET search_path = public` und `pg_advisory_xact_lock` (gegen Race bei parallelen Tabs/Doppel-Requests). Das Frontend fängt die Meldung ab und öffnet das Upgrade-Modal.
+- **Badges:** `badges` ist der lesbare Katalog, `user_badges` enthält ausschließlich serverseitig vergebene Auszeichnungen. Ein zusammengesetzter FK von `profiles(id, active_badge_code)` auf `user_badges(user_id, badge_code)` verhindert die Auswahl unverdienter Badges. Der Founder-Badge wird bei berechtigten, bestätigten Stripe-Events idempotent vergeben.
 - **Prompt-Versionierung:** `library.current_version`/`updated_at` halten den aktuellen Stand. Private Trigger schreiben beim Anlegen und bei jeder Änderung von `name`/`fields` unveränderliche Snapshots nach `prompt_versions`; reine Kategorieänderungen erzeugen keine Version. Bestehende Prompts wurden als Version 1 übernommen.
 - **Pro-Zugriff:** Versionen werden auch für Free-Nutzer erzeugt, sind per RLS aber nur für den jeweiligen Eigentümer mit `profiles.tier = 'pro'` lesbar. Direkte Client-Schreibrechte auf `prompt_versions` existieren nicht. `restore_library_prompt_version` läuft als `SECURITY INVOKER`, übernimmt Name/Inhalt und erzeugt eine neue aktuelle Version; die Kategorie bleibt unverändert.
-- Constraints: `profiles_tier_check` (nur `free`/`pro`), `NOT NULL` auf `library.user_id` & `prompt_history.user_id`, Unique-Indizes `prompt_categories(user_id, name)` und `prompt_versions(prompt_id, version_number)`.
+- Constraints: `profiles_tier_check` (nur `free`/`pro`), `profiles_default_editor_mode_check`, Anzeigename maximal 40 Zeichen, `NOT NULL` auf `library.user_id` & `prompt_history.user_id`, Unique-Indizes `prompt_categories(user_id, name)` und `prompt_versions(prompt_id, version_number)`.
 
 ### Migrationen
 - Liegen in `supabase/migrations/`, Format `<timestamp>_<name>.sql`. **Sind die Quelle der Wahrheit fürs Schema.**
@@ -119,6 +120,8 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
   - **Technische/entwickler-orientierte Details** (RLS-Hinweise, Secret-Namen, Stack-Infos) gehören in `console.error`, **nicht** in den Toast vor dem Nutzer.
   - In `db.js` ist `showToast` nur defensiv erreichbar (`if (typeof window.showToast === 'function')`), weil `db.js` vor/unabhängig von `index.html` laufen kann.
 - **Zwei Editor-Modi:** `currentMode` ∈ `'structured'` (Felder: `role`, `context`, `task`, `format`) und `'free'` (ein Rich-/Markdown-Feld). Viele Funktionen verzweigen darauf.
+- **Standard-Editor:** `profiles.default_editor_mode` wird pro Konto gespeichert und beim ersten leeren Editor einer Sitzung angewendet. Geladene Inhalte und `promptEditSession` haben immer Vorrang.
+- **Profil/Badges:** Account-Daten laufen über `getAccountSettings`/`saveAccountSettings`/`getUserBadges`. Badge-Assets dürfen nur aus `assets/badges/*.svg` kommen; dynamische Namen und Texte weiterhin escapen.
 - **Bibliotheks-Bearbeitung:** `promptEditSession` lädt einen Prompt bewusst in den Haupteditor und sperrt den Moduswechsel. Abbrechen stellt den vorherigen Editorentwurf wieder her; ein erfolgreiches `saveActivePromptVersion()` beendet dagegen die Bearbeitung und lässt den aktualisierten Prompt im normalen Editor stehen. Normales `handlePromptClick()` bleibt ein nicht verknüpftes Laden als Vorlage.
 - **Versionsverlauf:** `prompt_versions` ist nicht mit der allgemeinen `prompt_history` zu verwechseln. Der Pro-Verlauf ist ausschließlich über „Bearbeiten“ → „Versionen“ erreichbar; ein Restore erzeugt stets eine neue Version und ändert keine Kategorie.
 - **Bausteine/Snippets:** laufen über das **Accordion** (`renderSnippetsAccordion`, `toggleSnippetSection`, `loadSnippetSection`, `openSnippetCategory`, `insertSnippetEncoded`/`insertSnippetText`). Ältere `loadSnippetsForField*`/`insertSnippet`-Funktionen wurden als toter Code entfernt — **nicht wieder einführen**.
@@ -164,7 +167,7 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 
 1. Nutzerdaten immer escapen (`escapeHtml`/`jsArg`/`textContent`).
 2. `tier` & Billing-Felder ausschließlich serverseitig (Edge Functions/service_role) setzen.
-3. `profiles` clientseitig nur `onboarding_completed` schreibbar lassen.
+3. `profiles` clientseitig nur für `onboarding_completed`, `display_name`, `default_editor_mode` und `active_badge_code` freigeben; niemals breites `UPDATE` erlauben.
 4. Keine `alert()` — `showToast` nutzen; technische Details nur in die Konsole.
 5. Keine toten Buttons / „demnächst verfügbar"-Platzhalter im Produkt (besonders in bezahlungsnahen Bereichen). Wenn ein Weg existiert (z.B. Konto-Löschung per Mail an `info@promptomizer.de`), echten Pfad anbieten.
 6. UI-Aussagen müssen zum echten Produktverhalten passen (z.B. „Test"-Wording nur solange Sandbox aktiv).

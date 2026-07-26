@@ -127,6 +127,101 @@ window.db = {
         return data;
     },
 
+
+    async getAccountSettings() {
+        if (!window.currentUser) return null;
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('display_name, default_editor_mode, active_badge_code, billing_interval, created_at')
+            .eq('id', window.currentUser.id)
+            .single();
+
+        if (error) {
+            console.error('Account Settings Fetch Error:', error);
+            return null;
+        }
+
+        return {
+            display_name: typeof data.display_name === 'string' ? data.display_name : '',
+            default_editor_mode: data.default_editor_mode === 'free' ? 'free' : 'structured',
+            active_badge_code: typeof data.active_badge_code === 'string' ? data.active_badge_code : null,
+            billing_interval: data.billing_interval || null,
+            created_at: data.created_at || null
+        };
+    },
+
+    async saveAccountSettings(settings) {
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
+
+        const rawName = typeof settings?.display_name === 'string' ? settings.display_name.trim() : '';
+        if (rawName.length > 40) return { success: false, reason: 'DISPLAY_NAME_TOO_LONG' };
+
+        const defaultEditorMode = settings?.default_editor_mode === 'free' ? 'free' : 'structured';
+        const activeBadgeCode = typeof settings?.active_badge_code === 'string' && settings.active_badge_code.trim()
+            ? settings.active_badge_code.trim()
+            : null;
+        const patch = {
+            display_name: rawName || null,
+            default_editor_mode: defaultEditorMode,
+            active_badge_code: activeBadgeCode
+        };
+
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .update(patch)
+            .eq('id', window.currentUser.id)
+            .select('display_name, default_editor_mode, active_badge_code')
+            .single();
+
+        if (error) {
+            console.error('Account Settings Update Error:', error);
+            return {
+                success: false,
+                reason: error.code === '23503' ? 'BADGE_NOT_EARNED' : 'ERROR'
+            };
+        }
+
+        return {
+            success: true,
+            settings: {
+                display_name: typeof data.display_name === 'string' ? data.display_name : '',
+                default_editor_mode: data.default_editor_mode === 'free' ? 'free' : 'structured',
+                active_badge_code: typeof data.active_badge_code === 'string' ? data.active_badge_code : null
+            }
+        };
+    },
+
+    async getUserBadges() {
+        if (!window.currentUser) return [];
+        const uid = window.currentUser.id;
+        const [catalogResult, awardsResult] = await Promise.all([
+            supabaseClient
+                .from('badges')
+                .select('code, name, description, icon_path, unlock_hint, is_secret, sort_order')
+                .eq('is_enabled', true)
+                .order('sort_order', { ascending: true }),
+            supabaseClient
+                .from('user_badges')
+                .select('badge_code, awarded_at, award_reason')
+                .eq('user_id', uid)
+        ]);
+
+        if (catalogResult.error || awardsResult.error) {
+            console.error('Badge Fetch Error:', catalogResult.error || awardsResult.error);
+            return [];
+        }
+
+        const awards = new Map((awardsResult.data || []).map(award => [award.badge_code, award]));
+        return (catalogResult.data || []).map(badge => {
+            const award = awards.get(badge.code);
+            return {
+                ...badge,
+                earned: Boolean(award),
+                awarded_at: award?.awarded_at || null,
+                award_reason: award?.award_reason || null
+            };
+        });
+    },
     async updateProfile(patch) {
         if (!window.currentUser) return false;
         console.log("Versuche Profil zu updaten für ID:", window.currentUser.id, patch);

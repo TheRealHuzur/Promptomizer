@@ -198,7 +198,7 @@
                         <div class="w-full flex items-center justify-between gap-3">
                             <button onclick="switchView('konto')"
                                 class="user-button flex items-center gap-3 text-slate-400 hover:text-white transition-colors overflow-hidden">
-                                <div
+                                <div id="sidebar-user-avatar"
                                     class="w-8 h-8 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
@@ -337,26 +337,75 @@
                     <div class="space-y-12">
                         <!-- Profil -->
                         <section>
-                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil</h3>
-                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-12 h-12 rounded bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xl font-bold">
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil &amp; Einstellungen</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative space-y-6">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div class="flex items-center gap-4 min-w-0">
+                                        <div id="konto-profile-avatar"
+                                            class="w-16 h-16 rounded-xl bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden">
                                             <i class="fa-solid fa-user"></i>
                                         </div>
-                                        <div>
-                                            <div id="konto-user-name" class="text-lg font-bold text-white">Gast</div>
-                                            <div id="konto-user-email" class="text-sm text-slate-400">Nicht eingeloggt
-                                            </div>
+                                        <div class="min-w-0">
+                                            <div id="konto-user-name" class="text-lg font-bold text-white truncate">Gast</div>
+                                            <div id="konto-user-email" class="text-sm text-slate-400 truncate">Nicht eingeloggt</div>
+                                            <div id="konto-auth-provider" class="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Nicht angemeldet</div>
                                         </div>
                                     </div>
                                     <button id="konto-btn-logout" onclick="handleLogout()"
-                                        class="hidden px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition-colors cursor-pointer">
+                                        class="hidden px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition-colors cursor-pointer self-start sm:self-auto">
                                         Ausloggen
                                     </button>
                                 </div>
-                                <p class="text-xs text-slate-500 italic">Weitere Einstellungen folgen.</p>
+
+                                <div class="border-t border-navy-border pt-5 space-y-5">
+                                    <div>
+                                        <label for="konto-display-name" class="block text-xs font-bold text-slate-300 mb-2">Anzeigename</label>
+                                        <input id="konto-display-name" type="text" maxlength="40" autocomplete="nickname"
+                                            placeholder="Optionaler Anzeigename"
+                                            class="w-full bg-slate-950/50 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-brand-sky disabled:opacity-50"
+                                            disabled>
+                                        <p class="mt-1.5 text-xs text-slate-500">Ohne Anzeigenamen verwenden wir den Teil deiner E-Mail-Adresse vor dem @.</p>
+                                    </div>
+
+                                    <fieldset>
+                                        <legend class="text-xs font-bold text-slate-300 mb-2">Standard-Editor beim Öffnen</legend>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <button id="konto-default-mode-structured" type="button" onclick="selectAccountEditorMode('structured')"
+                                                class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
+                                                <span class="block text-sm font-bold text-white"><i class="fa-solid fa-table-list mr-2 text-brand-sky"></i>Strukturiert</span>
+                                                <span class="mt-1 block text-xs text-slate-500">Rolle, Kontext, Aufgabe und Format als einzelne Felder.</span>
+                                            </button>
+                                            <button id="konto-default-mode-free" type="button" onclick="selectAccountEditorMode('free')"
+                                                class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
+                                                <span class="block text-sm font-bold text-white"><i class="fa-solid fa-align-left mr-2 text-brand-sky"></i>Frei</span>
+                                                <span class="mt-1 block text-xs text-slate-500">Ein freies Feld mit Markdown-Formatierung.</span>
+                                            </button>
+                                        </div>
+                                        <p class="mt-2 text-xs text-slate-500">Die Änderung gilt ab dem nächsten Öffnen eines leeren Editors. Geladene Prompts behalten ihren Modus.</p>
+                                    </fieldset>
+
+                                    <div class="flex justify-end">
+                                        <button id="konto-save-profile" type="button" onclick="saveAccountSettings()"
+                                            class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-2 px-4 rounded-md shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                            Einstellungen speichern
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Badges -->
+                        <section id="konto-badges-section" class="hidden">
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Badges</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                                <div class="flex items-start justify-between gap-4 mb-5">
+                                    <div>
+                                        <div class="text-sm font-bold text-white">Dein Profilbild</div>
+                                        <p class="mt-1 text-xs text-slate-500">Wähle eines deiner verdienten Badges. Gesperrte Badges zeigen dir die Freischaltbedingung.</p>
+                                    </div>
+                                    <div id="konto-active-badge-name" class="text-xs font-bold text-brand-sky whitespace-nowrap">Standard</div>
+                                </div>
+                                <div id="konto-badges-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                             </div>
                         </section>
 
@@ -1978,6 +2027,11 @@
         let lastSidebarRefreshTs = 0;
         let historyCacheById = {};
         let historyFullscreenState = {};
+        let accountSettingsCache = null;
+        let accountBadgesCache = [];
+        let accountSettingsDraft = null;
+        let editorPreferenceAppliedForUserId = null;
+
 
         document.addEventListener('DOMContentLoaded', () => {
             const sidebarScroll = document.getElementById('sidebar-library');
@@ -2053,30 +2107,127 @@
         });
 
         // --- AUTH UI UPDATE ---
+        function normalizeDefaultEditorMode(value) {
+            return value === 'free' ? 'free' : 'structured';
+        }
+
+        function getAccountFallbackName(user = window.currentUser) {
+            const email = typeof user?.email === 'string' ? user.email : '';
+            return email.includes('@') ? email.split('@')[0] : 'Nutzer';
+        }
+
+        function getAuthProviderLabel(user = window.currentUser) {
+            const provider = user?.app_metadata?.provider;
+            if (provider === 'google') return 'Google Login';
+            if (provider === 'email') return 'E-Mail & Passwort';
+            return user ? 'Angemeldet' : 'Nicht angemeldet';
+        }
+
+        function isSafeBadgeAssetPath(value) {
+            return typeof value === 'string' && /^assets\/badges\/[a-z0-9_-]+[.]svg$/.test(value);
+        }
+
+        function getActiveAccountBadge(settings = accountSettingsCache, badges = accountBadgesCache) {
+            const code = settings?.active_badge_code;
+            if (!code) return null;
+            return (badges || []).find(badge => badge.code === code && badge.earned) || null;
+        }
+
+        function renderProfileAvatar(container, badge) {
+            if (!container) return;
+            container.replaceChildren();
+            if (badge && isSafeBadgeAssetPath(badge.icon_path)) {
+                const image = document.createElement('img');
+                image.src = badge.icon_path;
+                image.alt = `${badge.name} Badge`;
+                image.className = 'w-full h-full object-cover';
+                container.appendChild(image);
+                container.title = badge.name;
+                return;
+            }
+
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid fa-user';
+            icon.setAttribute('aria-hidden', 'true');
+            container.appendChild(icon);
+            container.title = 'Standardprofil';
+        }
+
+        async function loadAccountProfileData() {
+            if (!window.currentUser || !window.db) {
+                accountSettingsCache = null;
+                accountBadgesCache = [];
+                return { settings: null, badges: [] };
+            }
+
+            const [settings, badges] = await Promise.all([
+                window.db.getAccountSettings ? window.db.getAccountSettings() : null,
+                window.db.getUserBadges ? window.db.getUserBadges() : []
+            ]);
+            accountSettingsCache = settings || {
+                display_name: '',
+                default_editor_mode: 'structured',
+                active_badge_code: null,
+                billing_interval: null,
+                created_at: null
+            };
+            accountSettingsCache.default_editor_mode = normalizeDefaultEditorMode(accountSettingsCache.default_editor_mode);
+            accountBadgesCache = Array.isArray(badges) ? badges : [];
+            return { settings: accountSettingsCache, badges: accountBadgesCache };
+        }
+
+        function isEditorEmptyForDefaultPreference() {
+            const structuredEmpty = FIELDS.every(field => {
+                const input = document.getElementById(`input-${field.id}`);
+                return !input || !input.value.trim();
+            });
+            const freeEmpty = !getFreeMarkdownFromEditor().trim();
+            return structuredEmpty && freeEmpty;
+        }
+
+        function applyDefaultEditorPreference(user, settings) {
+            if (!user || editorPreferenceAppliedForUserId === user.id) return;
+            editorPreferenceAppliedForUserId = user.id;
+            if (promptEditSession || !isEditorEmptyForDefaultPreference()) return;
+            const preferredMode = normalizeDefaultEditorMode(settings?.default_editor_mode);
+            if (currentMode !== preferredMode) setEditorMode(preferredMode);
+        }
+
         async function updateUIAuth(user) {
             const nameEl = document.getElementById('user-name-display');
             const subEl = document.getElementById('user-status-sub');
             const loginBtn = document.getElementById('btn-login-sidebar');
-            if (nameEl && subEl) {
-                if (user) {
-                    nameEl.innerText = user.email.split('@')[0];
-                    const tier = window.db && window.db.getUserTier
-                        ? await window.db.getUserTier()
-                        : 'free';
-                    subEl.innerText = tier === 'pro' ? 'Pro Plan' : 'Free Plan';
-                    subEl.classList.toggle('text-brand-sky', tier === 'pro');
-                    subEl.classList.remove('hidden');
-                    if (loginBtn) loginBtn.classList.add('hidden');
-                } else {
-                    nameEl.innerText = 'Gast';
-                    subEl.innerText = '';
-                    subEl.classList.remove('text-brand-sky');
-                    subEl.classList.add('hidden');
-                    if (loginBtn) loginBtn.classList.remove('hidden');
-                    const promptCounter = document.getElementById('prompt-counter-wrap');
-                    if (promptCounter) promptCounter.classList.add('hidden');
-                }
+            const avatarEl = document.getElementById('sidebar-user-avatar');
+            if (!nameEl || !subEl) return;
+
+            if (user) {
+                const [tier, accountData] = await Promise.all([
+                    window.db?.getUserTier ? window.db.getUserTier() : 'free',
+                    loadAccountProfileData()
+                ]);
+                const displayName = accountData.settings?.display_name || getAccountFallbackName(user);
+                nameEl.textContent = displayName;
+                subEl.textContent = tier === 'pro' ? 'Pro Plan' : 'Free Plan';
+                subEl.classList.toggle('text-brand-sky', tier === 'pro');
+                subEl.classList.remove('hidden');
+                if (loginBtn) loginBtn.classList.add('hidden');
+                renderProfileAvatar(avatarEl, getActiveAccountBadge(accountData.settings, accountData.badges));
+                applyDefaultEditorPreference(user, accountData.settings);
+                return;
             }
+
+            accountSettingsCache = null;
+            accountBadgesCache = [];
+            accountSettingsDraft = null;
+            editorPreferenceAppliedForUserId = null;
+            nameEl.textContent = 'Gast';
+            subEl.textContent = '';
+            subEl.classList.remove('text-brand-sky');
+            subEl.classList.add('hidden');
+            if (loginBtn) loginBtn.classList.remove('hidden');
+            const promptCounter = document.getElementById('prompt-counter-wrap');
+            if (promptCounter) promptCounter.classList.add('hidden');
+            renderProfileAvatar(avatarEl, null);
         }
 
         function closeAuthModal() {
@@ -3208,61 +3359,215 @@
             await loadManageCategoriesPage();
         }
 
+        function renderAccountEditorModeOptions() {
+            const selectedMode = normalizeDefaultEditorMode(accountSettingsDraft?.default_editor_mode);
+            ['structured', 'free'].forEach(mode => {
+                const button = document.getElementById(`konto-default-mode-${mode}`);
+                if (!button) return;
+                const selected = mode === selectedMode;
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                button.classList.toggle('border-brand-sky', selected);
+                button.classList.toggle('bg-brand-sky/10', selected);
+                button.classList.toggle('border-slate-700', !selected);
+                button.classList.toggle('bg-slate-950/40', !selected);
+            });
+        }
+
+        function selectAccountEditorMode(mode) {
+            if (!accountSettingsDraft || !window.currentUser) return;
+            accountSettingsDraft.default_editor_mode = normalizeDefaultEditorMode(mode);
+            renderAccountEditorModeOptions();
+        }
+
+        function getDraftActiveBadge() {
+            const code = accountSettingsDraft?.active_badge_code;
+            if (!code) return null;
+            return accountBadgesCache.find(badge => badge.code === code && badge.earned) || null;
+        }
+
+        function selectAccountBadge(code) {
+            if (!accountSettingsDraft || !window.currentUser) return;
+            if (code !== null) {
+                const badge = accountBadgesCache.find(item => item.code === code);
+                if (!badge?.earned) {
+                    showToast('Dieses Badge ist noch nicht freigeschaltet.', 'info');
+                    return;
+                }
+            }
+            accountSettingsDraft.active_badge_code = code;
+            renderAccountBadges();
+        }
+
+        function renderAccountBadges() {
+            const section = document.getElementById('konto-badges-section');
+            const grid = document.getElementById('konto-badges-grid');
+            const activeName = document.getElementById('konto-active-badge-name');
+            if (!section || !grid || !activeName) return;
+
+            if (!window.currentUser || accountBadgesCache.length === 0) {
+                section.classList.add('hidden');
+                grid.innerHTML = '';
+                renderProfileAvatar(document.getElementById('konto-profile-avatar'), null);
+                return;
+            }
+
+            section.classList.remove('hidden');
+            const selectedCode = accountSettingsDraft?.active_badge_code || null;
+            const standardSelected = selectedCode === null;
+            const items = [
+                `<button type="button" onclick="selectAccountBadge(null)"
+                    class="flex items-center gap-3 rounded-lg border p-3 text-left transition-colors ${standardSelected ? 'border-brand-sky bg-brand-sky/10' : 'border-slate-700 bg-slate-950/30 hover:border-slate-500'}">
+                    <span class="w-12 h-12 rounded-lg bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-white flex-shrink-0"><i class="fa-solid fa-user"></i></span>
+                    <span class="min-w-0"><span class="block text-sm font-bold text-white">Standardprofil</span><span class="block text-xs text-slate-500">Neutraler Benutzer-Avatar</span></span>
+                </button>`
+            ];
+
+            accountBadgesCache.forEach(badge => {
+                const selected = selectedCode === badge.code;
+                const icon = isSafeBadgeAssetPath(badge.icon_path)
+                    ? `<img src="${escapeHtml(badge.icon_path)}" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">`
+                    : '<span class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-award"></i></span>';
+                const status = badge.earned
+                    ? '<span class="text-[10px] font-bold uppercase tracking-wider text-brand-sky">Verdient</span>'
+                    : '<span class="text-[10px] font-bold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-lock mr-1"></i>Gesperrt</span>';
+                const action = badge.earned ? `onclick='selectAccountBadge(${jsArg(badge.code)})'` : 'disabled';
+                items.push(`
+                    <button type="button" ${action}
+                        class="flex items-center gap-3 rounded-lg border p-3 text-left transition-colors ${selected ? 'border-brand-sky bg-brand-sky/10' : 'border-slate-700 bg-slate-950/30'} ${badge.earned ? 'hover:border-slate-500' : 'opacity-60 cursor-not-allowed'}">
+                        ${icon}
+                        <span class="min-w-0 flex-1">
+                            <span class="flex items-center justify-between gap-2"><span class="block text-sm font-bold text-white truncate">${escapeHtml(badge.name)}</span>${status}</span>
+                            <span class="mt-0.5 block text-xs text-slate-400">${escapeHtml(badge.description)}</span>
+                            ${badge.earned ? '' : `<span class="mt-1 block text-[11px] text-slate-500">${escapeHtml(badge.unlock_hint)}</span>`}
+                        </span>
+                    </button>
+                `);
+            });
+
+            grid.innerHTML = items.join('');
+            const activeBadge = getDraftActiveBadge();
+            activeName.textContent = activeBadge?.name || 'Standard';
+            renderProfileAvatar(document.getElementById('konto-profile-avatar'), activeBadge);
+        }
+
+        async function saveAccountSettings() {
+            if (!window.currentUser || !window.db?.saveAccountSettings || !accountSettingsDraft) {
+                showToast('Bitte zuerst einloggen.', 'info');
+                return;
+            }
+
+            const displayNameInput = document.getElementById('konto-display-name');
+            const button = document.getElementById('konto-save-profile');
+            const displayName = (displayNameInput?.value || '').trim();
+            if (displayName.length > 40) {
+                showToast('Der Anzeigename darf höchstens 40 Zeichen lang sein.', 'info');
+                return;
+            }
+
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Wird gespeichert…';
+            }
+            const result = await window.db.saveAccountSettings({
+                display_name: displayName,
+                default_editor_mode: accountSettingsDraft.default_editor_mode,
+                active_badge_code: accountSettingsDraft.active_badge_code
+            });
+
+            if (!result.success) {
+                const message = result.reason === 'BADGE_NOT_EARNED'
+                    ? 'Dieses Badge ist nicht für dein Konto freigeschaltet.'
+                    : 'Deine Einstellungen konnten nicht gespeichert werden.';
+                showToast(message, 'error');
+            } else {
+                accountSettingsCache = { ...accountSettingsCache, ...result.settings };
+                accountSettingsDraft = { ...accountSettingsCache };
+                const visibleName = accountSettingsCache.display_name || getAccountFallbackName();
+                document.getElementById('konto-user-name').textContent = visibleName;
+                document.getElementById('user-name-display').textContent = visibleName;
+                renderAccountEditorModeOptions();
+                renderAccountBadges();
+                renderProfileAvatar(document.getElementById('sidebar-user-avatar'), getActiveAccountBadge());
+                showToast('Profil und Einstellungen wurden gespeichert.', 'success');
+            }
+
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Einstellungen speichern';
+            }
+        }
+
         async function updateKontoView() {
             const nameEl = document.getElementById('konto-user-name');
             const emailEl = document.getElementById('konto-user-email');
+            const providerEl = document.getElementById('konto-auth-provider');
             const planEl = document.getElementById('konto-plan-name');
             const logoutBtn = document.getElementById('konto-btn-logout');
+            const displayNameInput = document.getElementById('konto-display-name');
+            const saveButton = document.getElementById('konto-save-profile');
+            const modeButtons = ['structured', 'free'].map(mode => document.getElementById(`konto-default-mode-${mode}`));
 
             if (window.currentUser) {
-                nameEl.innerText = window.currentUser.email.split('@')[0];
-                emailEl.innerText = window.currentUser.email;
+                const [tier, accountData] = await Promise.all([
+                    window.db.getUserTier(),
+                    loadAccountProfileData()
+                ]);
+                const settings = accountData.settings;
+                accountSettingsDraft = { ...settings };
+                const visibleName = settings.display_name || getAccountFallbackName();
+                nameEl.textContent = visibleName;
+                emailEl.textContent = window.currentUser.email || 'Keine E-Mail hinterlegt';
+                providerEl.textContent = getAuthProviderLabel();
+                if (displayNameInput) {
+                    displayNameInput.value = settings.display_name || '';
+                    displayNameInput.disabled = false;
+                }
+                if (saveButton) saveButton.disabled = false;
+                modeButtons.forEach(button => { if (button) button.disabled = false; });
+                renderAccountEditorModeOptions();
+                renderAccountBadges();
+                renderProfileAvatar(document.getElementById('sidebar-user-avatar'), getActiveAccountBadge());
 
-                // NEU: echtes Tier aus DB lesen
-                const tier = await window.db.getUserTier();
                 planEl.innerHTML = tier === 'pro'
                     ? 'Pro Plan <i class="fa-solid fa-crown text-brand-sky text-sm ml-1"></i>'
                     : 'Free Plan';
-
-                // Billing-Interval anzeigen (nur Pro-User)
                 const intervalEl = document.getElementById('konto-billing-interval');
                 if (intervalEl) {
-                    if (tier === 'pro') {
-                        const profile = await window.db.getProfile();
-                        const interval = profile?.billing_interval;
-                        if (interval) {
-                            intervalEl.textContent = interval === 'year' ? 'Jahresabo' : 'Monatsabo';
-                            intervalEl.classList.remove('hidden');
-                        } else {
-                            intervalEl.classList.add('hidden');
-                        }
-                    } else {
-                        intervalEl.classList.add('hidden');
-                    }
+                    const interval = tier === 'pro' ? settings.billing_interval : null;
+                    intervalEl.textContent = interval === 'year' ? 'Jahresabo' : 'Monatsabo';
+                    intervalEl.classList.toggle('hidden', !interval);
                 }
 
-                // Counter auf Konto-Seite aktualisieren (falls Free-User)
                 await updatePromptCounter();
-
                 if (logoutBtn) logoutBtn.classList.remove('hidden');
-            } else {
-                nameEl.innerText = 'Gast';
-                emailEl.innerText = 'Nicht eingeloggt';
-                planEl.innerText = 'Free Plan';
-
-                if (logoutBtn) logoutBtn.classList.add('hidden');
-
-                const accountCounter = document.getElementById('konto-prompt-counter');
-                if (accountCounter) accountCounter.classList.add('hidden');
-                const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
-                if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
-                const cancelSubBtn = document.getElementById('konto-btn-cancel-subscription');
-                if (cancelSubBtn) cancelSubBtn.classList.add('hidden');
-                const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
-                if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
-                const billingHint = document.getElementById('konto-billing-hint');
-                if (billingHint) billingHint.innerText = 'Melde dich an, um dein Testabo zu verwalten.';
+                return;
             }
+
+            accountSettingsDraft = null;
+            nameEl.textContent = 'Gast';
+            emailEl.textContent = 'Nicht eingeloggt';
+            providerEl.textContent = 'Nicht angemeldet';
+            planEl.textContent = 'Free Plan';
+            if (displayNameInput) {
+                displayNameInput.value = '';
+                displayNameInput.disabled = true;
+            }
+            if (saveButton) saveButton.disabled = true;
+            modeButtons.forEach(button => { if (button) button.disabled = true; });
+            if (logoutBtn) logoutBtn.classList.add('hidden');
+            document.getElementById('konto-badges-section')?.classList.add('hidden');
+            renderProfileAvatar(document.getElementById('konto-profile-avatar'), null);
+
+            const accountCounter = document.getElementById('konto-prompt-counter');
+            if (accountCounter) accountCounter.classList.add('hidden');
+            const manageBillingBtn = document.getElementById('konto-btn-manage-billing');
+            if (manageBillingBtn) manageBillingBtn.classList.add('hidden');
+            const cancelSubBtn = document.getElementById('konto-btn-cancel-subscription');
+            if (cancelSubBtn) cancelSubBtn.classList.add('hidden');
+            const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
+            if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
+            const billingHint = document.getElementById('konto-billing-hint');
+            if (billingHint) billingHint.textContent = 'Melde dich an, um dein Testabo zu verwalten.';
         }
 
         async function exportUserData() {

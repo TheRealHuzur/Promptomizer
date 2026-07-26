@@ -8,6 +8,12 @@ export const corsHeaders = {
 
 const PRO_STATUSES = new Set(["active", "trialing", "past_due"]);
 
+export const FOUNDER_BADGE_END_DATE = "2026-11-01T00:00:00.000Z";
+
+export function isFounderBadgeEligible(now = new Date()) {
+  return now.getTime() < Date.parse(FOUNDER_BADGE_END_DATE);
+}
+
 export function handleCors(req: Request) {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -145,6 +151,25 @@ export async function updateProfileByCustomerId(customerId: string, patch: Recor
     .update(patch)
     .eq("stripe_customer_id", customerId);
   if (error) throw error;
+}
+
+export async function awardBadge(userId: string, badgeCode: string, awardReason: string) {
+  const admin = getAdminClient();
+  const { error: awardError } = await admin
+    .from("user_badges")
+    .upsert({
+      user_id: userId,
+      badge_code: badgeCode,
+      award_reason: awardReason,
+    }, { onConflict: "user_id,badge_code", ignoreDuplicates: true });
+  if (awardError) throw awardError;
+
+  const { error: profileError } = await admin
+    .from("profiles")
+    .update({ active_badge_code: badgeCode })
+    .eq("id", userId)
+    .is("active_badge_code", null);
+  if (profileError) throw profileError;
 }
 
 export async function ensureStripeCustomer(profile: Record<string, unknown>, user: { id: string; email?: string | null }) {
