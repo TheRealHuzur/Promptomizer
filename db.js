@@ -123,6 +123,15 @@ async function handleLogout() {
 // ---------------------------------------------------------
 
 window.db = {
+    async getSession() {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) {
+            console.error('Session Error:', error);
+            throw error;
+        }
+        return data.session;
+    },
+
     // --- PROFILES ---
     async getProfile() {
         if (!window.currentUser) return null;

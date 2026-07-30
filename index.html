@@ -3713,7 +3713,10 @@
             if (!confirmed) return;
 
             try {
-                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const session = await window.db.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.');
+                }
                 const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/delete-account', {
                     method: 'POST',
                     headers: {
@@ -3756,7 +3759,10 @@
             const btn = document.getElementById('cancel-sub-confirm-btn');
             btn.disabled = true;
             try {
-                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const session = await window.db.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.');
+                }
                 const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/cancel-subscription', {
                     method: 'POST',
                     headers: {
@@ -3788,7 +3794,10 @@
                 await updateKontoView();
             } catch (e) {
                 console.error('confirmCancelSubscription Fehler:', e);
-                showToast('Kündigung fehlgeschlagen: ' + e.message, 'error');
+                const message = e?.message === 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.'
+                    ? e.message
+                    : 'Die Kündigung konnte nicht durchgeführt werden. Bitte versuche es erneut.';
+                showToast(message, 'error');
             } finally {
                 btn.disabled = false;
             }
@@ -3808,7 +3817,10 @@
             const btn = document.getElementById('withdrawal-confirm-btn');
             btn.disabled = true;
             try {
-                const { data: { session } } = await window.db.supabase.auth.getSession();
+                const session = await window.db.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.');
+                }
                 const res = await fetch('https://nrrsroaubbpmjyexhuhi.supabase.co/functions/v1/request-withdrawal', {
                     method: 'POST',
                     headers: {
