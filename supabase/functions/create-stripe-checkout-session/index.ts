@@ -5,6 +5,7 @@ import {
   getAuthenticatedUser,
   getEnv,
   getProfile,
+  getStripeEnvironment,
   isFounderBadgeEligible,
   handleCors,
   jsonResponse,
@@ -35,6 +36,9 @@ Deno.serve(async (req) => {
       ? getEnv("STRIPE_PRICE_ID_PRO_YEARLY")
       : getEnv("STRIPE_PRICE_ID_PRO");
 
+    const taxRateId = getEnv("STRIPE_TAX_RATE_ID_DE_STANDARD");
+    const stripeEnvironment = getStripeEnvironment();
+
     const founderBadgeEligible = isFounderBadgeEligible();
     const params = new URLSearchParams();
     params.set("mode", "subscription");
@@ -45,19 +49,21 @@ Deno.serve(async (req) => {
     params.set("line_items[0][price]", priceId);
     params.set("line_items[0][quantity]", "1");
     params.set("allow_promotion_codes", "true");
-    params.set("automatic_tax[enabled]", "true");
     params.set("billing_address_collection", "required");
+    params.set("customer_update[address]", "auto");
+    params.set("customer_update[name]", "auto");
     params.set("tax_id_collection[enabled]", "true");
+    params.set("subscription_data[default_tax_rates][0]", taxRateId);
     params.set("metadata[app]", "promptomizer");
     params.set("metadata[plan]", "pro");
     params.set("metadata[interval]", interval);
-    params.set("metadata[env]", "sandbox");
+    params.set("metadata[env]", stripeEnvironment);
     params.set("metadata[founder_badge_eligible]", founderBadgeEligible ? "true" : "false");
     params.set("subscription_data[metadata][supabase_user_id]", user.id);
     params.set("subscription_data[metadata][interval]", interval);
     params.set("subscription_data[metadata][app]", "promptomizer");
     params.set("subscription_data[metadata][plan]", "pro");
-    params.set("subscription_data[metadata][env]", "sandbox");
+    params.set("subscription_data[metadata][env]", stripeEnvironment);
     params.set("subscription_data[metadata][founder_badge_eligible]", founderBadgeEligible ? "true" : "false");
 
     const session = await stripeRequest("/v1/checkout/sessions", { params });

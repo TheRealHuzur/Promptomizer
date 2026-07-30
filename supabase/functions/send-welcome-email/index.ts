@@ -54,14 +54,44 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Email does not match user." }, 403);
     }
 
-    // Einmal-Versand pro Account: schützt vor doppelten Triggern und Replays.
-    const { data: profile, error: profileError } = await admin
+    // Versand atomar reservieren, bevor Brevo aufgerufen wird. Dadurch kann bei
+    // parallelen Webhook-Aufrufen nur genau ein Request die Mail versenden.
+    const sentAt = new Date().toISOString();
+    const { data: claimedProfiles, error: claimError } = await admin
       .from("profiles")
-      .select("id, welcome_email_sent_at")
+      .update({ welcome_email_sent_at: sentAt })
       .eq("id", userId)
-      .maybeSingle();
-    if (profileError) throw profileError;
-    if (profile?.welcome_email_sent_at) {
+      .is("welcome_email_sent_at", null)
+      .select("id");
+    if (claimError) throw claimError;
+
+    let claimed = Array.isArray(claimedProfiles) && claimedProfiles.length === 1;
+    if (!claimed) {
+      const { data: existingProfile, error: profileError } = await admin
+        .from("profiles")
+        .select("id, welcome_email_sent_at")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profileError) throw profileError;
+
+      if (!existingProfile) {
+        const { data: insertedProfile, error: insertError } = await admin
+          .from("profiles")
+          .insert({
+            id: userId,
+            tier: "free",
+            plan_since: sentAt,
+            welcome_email_sent_at: sentAt,
+          })
+          .select("id")
+          .maybeSingle();
+
+        if (insertError && insertError.code !== "23505") throw insertError;
+        claimed = Boolean(insertedProfile);
+      }
+    }
+
+    if (!claimed) {
       console.log("send-welcome-email: bereits versendet, übersprungen", { userId });
       return jsonResponse({ status: "skipped", message: "Willkommens-Mail wurde bereits versendet." });
     }
@@ -82,20 +112,6 @@ Deno.serve(async (req) => {
     if (!brevoResponse.ok) {
       const errorText = await brevoResponse.text();
       throw new Error(`Brevo API Fehler (${brevoResponse.status}): ${errorText}`);
-    }
-
-    const sentAt = new Date().toISOString();
-    const { error: markError } = profile
-      ? await admin
-        .from("profiles")
-        .update({ welcome_email_sent_at: sentAt })
-        .eq("id", userId)
-      : await admin
-        .from("profiles")
-        .insert({ id: userId, tier: "free", plan_since: sentAt, welcome_email_sent_at: sentAt });
-    if (markError) {
-      // Mail ist bereits raus — Markierungsfehler nur loggen, Versand nicht als Fehler melden.
-      console.error("send-welcome-email: Versand-Markierung fehlgeschlagen", { userId, markError });
     }
 
     console.log("send-welcome-email: versendet", { userId });

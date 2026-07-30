@@ -16,9 +16,10 @@ nicht vor Missbrauch. Deshalb prüft die Function zusätzlich:
 2. **User-Existenz** — `record.id` muss ein realer Auth-User sein und
    `record.email` muss zu diesem User gehören. Beliebige Fremdadressen können
    damit nicht angeschrieben werden.
-3. **Einmal-Versand** — pro Account wird höchstens eine Willkommens-Mail
-   versendet (`profiles.welcome_email_sent_at`). Das wirkt gleichzeitig als
-   Rate Limit und Replay-Schutz.
+3. **Atomarer Einmal-Versand** — die Function reserviert den Versand vor dem
+   externen Brevo-Aufruf über `profiles.welcome_email_sent_at`. Parallele
+   Trigger-Aufrufe, Retries und Replays können dadurch höchstens einen
+   Brevo-Versand auslösen.
 
 Abgelehnte Aufrufe und Fehler werden per `console.error` geloggt und sind in
 den Supabase Edge-Function-Logs sichtbar (Dashboard → Edge Functions →

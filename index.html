@@ -463,7 +463,7 @@
                                         class="hidden text-xs bg-slate-700/50 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
                                         <i class="fa-solid fa-rotate-left mr-1"></i> Vertrag widerrufen
                                     </button>
-                                    <p id="konto-billing-hint" class="text-xs text-slate-500 italic">Stripe-Testabo verfügbar.</p>
+                                    <p id="konto-billing-hint" class="text-xs text-slate-500 italic">Abo-Verwaltung über Stripe.</p>
                                 </div>
                             </div>
                         </section>
@@ -1396,6 +1396,22 @@
                 </label>
 
                 <div id="auth-error" class="hidden text-sm text-red-400"></div>
+                <div id="auth-confirmation-resend" class="hidden -mt-2">
+                    <button
+                        id="btn-auth-confirmation-resend"
+                        type="button"
+                        onclick="handleResendSignupConfirmation()"
+                        class="text-sm font-semibold text-brand-sky hover:text-brand-hover transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        Bestätigungsmail erneut senden
+                    </button>
+                    <p
+                        id="auth-confirmation-resend-message"
+                        class="hidden mt-2 text-xs"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+                </div>
 
                 <button onclick="handleEmailLogin()"
                     class="w-full py-3 bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold rounded-md shadow-glow transition-all active:scale-95">
@@ -2234,6 +2250,22 @@
             document.getElementById('modal-auth').classList.add('hidden');
         }
 
+        function resetConfirmationResend() {
+            const wrapper = document.getElementById('auth-confirmation-resend');
+            const button = document.getElementById('btn-auth-confirmation-resend');
+            const message = document.getElementById('auth-confirmation-resend-message');
+
+            if (wrapper) wrapper.classList.add('hidden');
+            if (button) {
+                button.disabled = false;
+                button.innerText = 'Bestätigungsmail erneut senden';
+            }
+            if (message) {
+                message.className = 'hidden mt-2 text-xs';
+                message.innerText = '';
+            }
+        }
+
         function openAuthModal() {
             const remember = localStorage.getItem('promptomizer_remember') !== 'false';
             const cb = document.getElementById('auth-remember');
@@ -2250,6 +2282,7 @@
                 err.innerText = '';
             }
 
+            resetConfirmationResend();
             document.getElementById('modal-auth').classList.remove('hidden');
         }
 
@@ -2270,6 +2303,7 @@
             const remember = !!document.getElementById('auth-remember')?.checked;
 
             const err = document.getElementById('auth-error');
+            resetConfirmationResend();
             const showErr = (msg) => {
                 if (!err) return;
                 err.innerText = msg;
@@ -2285,11 +2319,71 @@
 
             const { data, error } = await loginUser(email, password);
             if (error) {
-                showErr(error.message || 'Login fehlgeschlagen.');
+                const isEmailNotConfirmed =
+                    error.code === 'email_not_confirmed'
+                    || /email not confirmed/i.test(error.message || '');
+
+                if (isEmailNotConfirmed) {
+                    showErr('E-Mail-Adresse noch nicht bestätigt.');
+                    document.getElementById('auth-confirmation-resend')?.classList.remove('hidden');
+                } else {
+                    showErr(error.message || 'Login fehlgeschlagen.');
+                }
                 return;
             }
 
             closeAuthModal();
+        }
+
+        async function handleResendSignupConfirmation() {
+            const email = (document.getElementById('auth-email')?.value || '').trim();
+            const button = document.getElementById('btn-auth-confirmation-resend');
+            const message = document.getElementById('auth-confirmation-resend-message');
+            const showMessage = (text, isError) => {
+                if (!message) return;
+                message.innerText = text;
+                message.className = 'mt-2 text-xs ' + (isError ? 'text-red-400' : 'text-emerald-400');
+            };
+
+            if (!email) {
+                showMessage('Bitte gib zuerst deine E-Mail-Adresse ein.', true);
+                return;
+            }
+            if (!button) return;
+
+            button.disabled = true;
+            button.innerText = 'Wird gesendet…';
+
+            try {
+                const { error } = await resendSignupConfirmation(email);
+                if (error) {
+                    const isRateLimited =
+                        error.status === 429
+                        || error.code === 'over_email_send_rate_limit'
+                        || /rate limit|seconds/i.test(error.message || '');
+
+                    showMessage(
+                        isRateLimited
+                            ? 'Bitte warte kurz, bevor du die Mail erneut anforderst.'
+                            : 'Die Bestätigungsmail konnte nicht erneut gesendet werden.',
+                        true
+                    );
+                    button.disabled = false;
+                    button.innerText = 'Bestätigungsmail erneut senden';
+                    return;
+                }
+
+                showMessage(
+                    'Bestätigungsmail wurde gesendet. Bitte prüfe auch deinen Spamordner.',
+                    false
+                );
+                button.innerText = 'E-Mail gesendet';
+            } catch (error) {
+                console.error('Confirmation resend failed:', error);
+                showMessage('Die Bestätigungsmail konnte nicht erneut gesendet werden.', true);
+                button.disabled = false;
+                button.innerText = 'Bestätigungsmail erneut senden';
+            }
         }
 
         function switchAuthMode(mode) {
@@ -3567,7 +3661,7 @@
             const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
             if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
             const billingHint = document.getElementById('konto-billing-hint');
-            if (billingHint) billingHint.textContent = 'Melde dich an, um dein Testabo zu verwalten.';
+            if (billingHint) billingHint.textContent = 'Melde dich an, um dein Abo zu verwalten.';
         }
 
         async function exportUserData() {
@@ -6788,7 +6882,7 @@
                 const withdrawalBtn = document.getElementById('konto-btn-withdrawal');
                 if (withdrawalBtn) withdrawalBtn.classList.add('hidden');
                 const billingHint = document.getElementById('konto-billing-hint');
-                if (billingHint) billingHint.innerText = 'Wechsel bei Bedarf in den Stripe-Testcheckout.';
+                if (billingHint) billingHint.innerText = 'Wechsel bei Bedarf in den sicheren Stripe-Checkout.';
             }
         }
 

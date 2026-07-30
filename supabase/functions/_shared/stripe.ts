@@ -33,8 +33,15 @@ export function jsonResponse(payload: unknown, status = 200) {
 
 export function getEnv(name: string) {
   const value = Deno.env.get(name);
-  if (!value) throw new Error(`Missing environment variable: ${name}`);
+  if (!value) throw new Error("Missing environment variable: " + name);
   return value;
+}
+
+export function getStripeEnvironment() {
+  const secretKey = getEnv("STRIPE_SECRET_KEY");
+  if (secretKey.includes("_live_")) return "live";
+  if (secretKey.includes("_test_")) return "sandbox";
+  throw new Error("Unable to determine Stripe environment from configured secret key.");
 }
 
 export function getAppBaseUrl(req: Request) {
@@ -184,7 +191,7 @@ export async function ensureStripeCustomer(profile: Record<string, unknown>, use
   params.set("email", user.email);
   params.set("metadata[supabase_user_id]", user.id);
   params.set("metadata[app]", "promptomizer");
-  params.set("metadata[env]", "sandbox");
+  params.set("metadata[env]", getStripeEnvironment());
 
   const customer = await stripeRequest("/v1/customers", { params });
   await updateProfileByUserId(user.id, {

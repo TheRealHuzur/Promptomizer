@@ -85,6 +85,17 @@ async function registerUser(email, password, metadata = {}) {
     return { data, error };
 }
 
+async function resendSignupConfirmation(email) {
+    const { data, error } = await supabaseClient.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+            emailRedirectTo: window.location.origin
+        }
+    });
+    return { data, error };
+}
+
 async function requestPasswordReset(email) {
     const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin

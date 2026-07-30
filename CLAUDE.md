@@ -101,9 +101,10 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 
 ## 6. Billing / Stripe — aktuell SANDBOX
 
-- Stripe läuft im **Test-/Sandbox-Modus** (`metadata[env]=sandbox` in `_shared/stripe.ts`).
-- Deshalb sind UI-Texte wie „Stripe-Testabo verfügbar" / „Stripe-Testcheckout" **bewusst ehrlich** und sollen so bleiben, **bis** auf Live-Modus umgestellt wird.
-- **Beim Umstieg auf Stripe-Live** anzupassen: diese UI-Texte, die Stripe-Keys/Preis-IDs, und die Rechtstexte (Roadmap Punkt 5).
+- Stripe läuft bis zum abgeschlossenen Live-Cutover im **Test-/Sandbox-Modus**. `getStripeEnvironment()` leitet `metadata[env]` automatisch aus dem serverseitigen Stripe-Schlüssel ab, damit beim Key-Wechsel keine Sandbox-Metadaten in Live-Objekten landen.
+- Umsatzsteuer wird bewusst **nicht über Stripe Tax**, sondern über die feste, inklusive deutsche 19-%-Tax-Rate aus dem Edge-Function-Secret `STRIPE_TAX_RATE_ID_DE_STANDARD` berechnet. `create-stripe-checkout-session` setzt sie als `subscription_data[default_tax_rates]` und speichert die im Checkout eingegebene Rechnungsadresse am Stripe-Kunden.
+- Die UI-Texte sind für den Livebetrieb vorbereitet und enthalten keine „Testabo/Testcheckout"-Formulierung mehr.
+- **Beim Umstieg auf Stripe-Live** anzupassen: Stripe-Live-Key, Live-Webhook-Secret, Live-Preis-IDs und Live-Tax-Rate-ID; Sandbox-Billing-Verweise in `profiles` dürfen nicht mit dem Live-Key weiterverwendet werden.
 - `tier` wird **nie** vom Client gesetzt, sondern nur über `stripe-webhook` / `sync-stripe-subscription` (service_role). `deriveTier(subscription_status)` entscheidet `free`/`pro`.
 
 ---
