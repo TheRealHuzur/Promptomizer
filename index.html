@@ -337,8 +337,8 @@
                     <div class="space-y-12">
                         <!-- Profil -->
                         <section>
-                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil &amp; Einstellungen</h3>
-                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative space-y-6">
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Profil</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div class="flex items-center gap-4 min-w-0">
                                         <div id="konto-profile-avatar"
@@ -357,55 +357,6 @@
                                     </button>
                                 </div>
 
-                                <div class="border-t border-navy-border pt-5 space-y-5">
-                                    <div>
-                                        <label for="konto-display-name" class="block text-xs font-bold text-slate-300 mb-2">Anzeigename</label>
-                                        <input id="konto-display-name" type="text" maxlength="40" autocomplete="nickname"
-                                            placeholder="Optionaler Anzeigename"
-                                            class="w-full bg-slate-950/50 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-brand-sky disabled:opacity-50"
-                                            disabled>
-                                        <p class="mt-1.5 text-xs text-slate-500">Ohne Anzeigenamen verwenden wir den Teil deiner E-Mail-Adresse vor dem @.</p>
-                                    </div>
-
-                                    <fieldset>
-                                        <legend class="text-xs font-bold text-slate-300 mb-2">Standard-Editor beim Öffnen</legend>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <button id="konto-default-mode-structured" type="button" onclick="selectAccountEditorMode('structured')"
-                                                class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
-                                                <span class="block text-sm font-bold text-white"><i class="fa-solid fa-table-list mr-2 text-brand-sky"></i>Strukturiert</span>
-                                                <span class="mt-1 block text-xs text-slate-500">Rolle, Kontext, Aufgabe und Format als einzelne Felder.</span>
-                                            </button>
-                                            <button id="konto-default-mode-free" type="button" onclick="selectAccountEditorMode('free')"
-                                                class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
-                                                <span class="block text-sm font-bold text-white"><i class="fa-solid fa-align-left mr-2 text-brand-sky"></i>Frei</span>
-                                                <span class="mt-1 block text-xs text-slate-500">Ein freies Feld mit Markdown-Formatierung.</span>
-                                            </button>
-                                        </div>
-                                        <p class="mt-2 text-xs text-slate-500">Die Änderung gilt ab dem nächsten Öffnen eines leeren Editors. Geladene Prompts behalten ihren Modus.</p>
-                                    </fieldset>
-
-                                    <div class="flex justify-end">
-                                        <button id="konto-save-profile" type="button" onclick="saveAccountSettings()"
-                                            class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-2 px-4 rounded-md shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                            Einstellungen speichern
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Badges -->
-                        <section id="konto-badges-section" class="hidden">
-                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Badges</h3>
-                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
-                                <div class="flex items-start justify-between gap-4 mb-5">
-                                    <div>
-                                        <div class="text-sm font-bold text-white">Dein Profilbild</div>
-                                        <p class="mt-1 text-xs text-slate-500">Wähle eines deiner verdienten Badges. Gesperrte Badges zeigen dir die Freischaltbedingung.</p>
-                                    </div>
-                                    <div id="konto-active-badge-name" class="text-xs font-bold text-brand-sky whitespace-nowrap">Standard</div>
-                                </div>
-                                <div id="konto-badges-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                             </div>
                         </section>
 
@@ -465,6 +416,60 @@
                                     </button>
                                     <p id="konto-billing-hint" class="text-xs text-slate-500 italic">Abo-Verwaltung über Stripe.</p>
                                 </div>
+                            </div>
+                        </section>
+
+                        <!-- Einstellungen -->
+                        <section>
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Einstellungen</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6 relative space-y-5">
+                                <div>
+                                    <label for="konto-display-name" class="block text-xs font-bold text-slate-300 mb-2">Anzeigename</label>
+                                    <input id="konto-display-name" type="text" maxlength="40" autocomplete="nickname"
+                                        placeholder="Optionaler Anzeigename"
+                                        class="w-full bg-slate-950/50 border border-slate-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-brand-sky disabled:opacity-50"
+                                        disabled>
+                                    <p class="mt-1.5 text-xs text-slate-500">Ohne Anzeigenamen verwenden wir den Teil deiner E-Mail-Adresse vor dem @.</p>
+                                </div>
+
+                                <fieldset>
+                                    <legend class="text-xs font-bold text-slate-300 mb-2">Standard-Editor beim Öffnen</legend>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <button id="konto-default-mode-structured" type="button" onclick="selectAccountEditorMode('structured')"
+                                            class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
+                                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-table-list mr-2 text-brand-sky"></i>Strukturiert</span>
+                                            <span class="mt-1 block text-xs text-slate-500">Rolle, Kontext, Aufgabe und Format als einzelne Felder.</span>
+                                        </button>
+                                        <button id="konto-default-mode-free" type="button" onclick="selectAccountEditorMode('free')"
+                                            class="text-left rounded-md border border-slate-700 bg-slate-950/40 p-3 transition-colors disabled:opacity-50" disabled>
+                                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-align-left mr-2 text-brand-sky"></i>Frei</span>
+                                            <span class="mt-1 block text-xs text-slate-500">Ein freies Feld mit Markdown-Formatierung.</span>
+                                        </button>
+                                    </div>
+                                    <p class="mt-2 text-xs text-slate-500">Die Änderung gilt ab dem nächsten Öffnen eines leeren Editors. Geladene Prompts behalten ihren Modus.</p>
+                                </fieldset>
+
+                                <div class="flex justify-end">
+                                    <button id="konto-save-profile" type="button" onclick="saveAccountSettings()"
+                                        class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-2 px-4 rounded-md shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Einstellungen speichern
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Badges -->
+                        <section id="konto-badges-section" class="hidden">
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Badges</h3>
+                            <div class="bg-navy-sidebar border border-navy-border rounded-lg p-6">
+                                <div class="flex items-start justify-between gap-4 mb-5">
+                                    <div>
+                                        <div class="text-sm font-bold text-white">Dein Profilbild</div>
+                                        <p class="mt-1 text-xs text-slate-500">Wähle eines deiner verdienten Badges. Gesperrte Badges zeigen dir die Freischaltbedingung.</p>
+                                    </div>
+                                    <div id="konto-active-badge-name" class="text-xs font-bold text-brand-sky whitespace-nowrap">Standard</div>
+                                </div>
+                                <div id="konto-badges-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                             </div>
                         </section>
 
