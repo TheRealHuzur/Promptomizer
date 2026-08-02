@@ -7,7 +7,21 @@
     <title>Promptomizer – Prompts erstellen, optimieren und verwalten</title>
     <meta name="description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen. Kostenlos starten.">
     <meta name="theme-color" content="#020617">
-    <!-- TODO Phase 1: OpenGraph, Twitter Card, Canonical, JSON-LD (Organization/SoftwareApplication/FAQPage) ergänzen -->
+    <link rel="canonical" href="https://www.promptomizer.de/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Promptomizer">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:url" content="https://www.promptomizer.de/">
+    <meta property="og:title" content="Promptomizer – Prompts erstellen, optimieren und verwalten">
+    <meta property="og:description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen. Kostenlos starten.">
+    <meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Promptomizer – Prompts erstellen, optimieren und verwalten">
+    <meta name="twitter:description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen.">
+    <meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -15,11 +29,70 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
 
-    <!-- Cache-Busting per Zeitstempel: nur für diesen Entwurf, damit Änderungen beim Testen zuverlässig ankommen -->
     <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
     <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
     <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://www.promptomizer.de/#organization",
+                "name": "Promptomizer",
+                "url": "https://www.promptomizer.de/",
+                "logo": "https://www.promptomizer.de/icon-512.png"
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://www.promptomizer.de/#website",
+                "name": "Promptomizer",
+                "url": "https://www.promptomizer.de/",
+                "inLanguage": "de-DE",
+                "publisher": { "@id": "https://www.promptomizer.de/#organization" }
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Brauche ich einen Account, um Promptomizer zu nutzen?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Nein. Prompts erstellen und kopieren funktioniert ohne Anmeldung. Nur wer Prompts dauerhaft in der Bibliothek speichern möchte, braucht ein kostenloses Konto."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Mit welchen KI-Tools funktionieren die Prompts?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Mit allen. Promptomizer erstellt reinen Text, den du in ChatGPT, Claude, Gemini oder jedes andere KI-Tool einfügen kannst."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Ist Promptomizer kostenlos?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Der Free-Plan ist dauerhaft kostenlos und für den Einstieg gedacht. Wer mehr Prompts und Bausteine speichern möchte, wechselt zu Pro."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Sind meine gespeicherten Prompts privat?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Ja. Gespeicherte Prompts, Kategorien und Bausteine sind an dein Konto gebunden und für niemand anderen sichtbar."
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
 
     <style>
         /* index.html ist jetzt die Marketing-Startseite, eine normale scrollende Seite, kein App-Shell mehr */
@@ -73,9 +146,12 @@
             </div>
 
             <div class="mt-12 rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow">
-                <img src="assets/screenshot-app.png"
-                    alt="Promptomizer-Oberfläche: Prompt-Bibliothek mit Kategorien links, strukturierter Editor mit Beispiel-Prompt rechts"
-                    width="3002" height="1758" class="rounded-lg w-full h-auto" loading="lazy">
+                <picture>
+                    <source srcset="assets/screenshot-app.webp" type="image/webp">
+                    <img src="assets/screenshot-app.png"
+                        alt="Promptomizer-Oberfläche: Prompt-Bibliothek mit Kategorien links, strukturierter Editor mit Beispiel-Prompt rechts"
+                        width="1600" height="937" class="rounded-lg w-full h-auto" loading="eager" fetchpriority="high">
+                </picture>
             </div>
         </section>
 
