@@ -1,7 +1,7 @@
 {
   "name": "Promptomizer",
   "short_name": "Promptomizer",
-  "start_url": "./index.html",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#1e293b",
   "theme_color": "#020617",
