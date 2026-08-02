@@ -43,7 +43,8 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 | `app.html` | Gesamte App: Markup, Styles, gesamte UI-Logik. Ausgeliefert unter `/app` (siehe §2, `vercel.json`) |
 | `preise.html` | Preisseite |
 | `impressum.html`, `datenschutz.html`, `agb.html` | Rechtstexte als eigene, indexierbare Seiten (seit 02.08.2026). Verlinkt im Footer von `index.html`/`preise.html`, **nicht** im App-Footer — innerhalb der App sind sie bewusst nur über Profilmenü erreichbar (2 Klicks, als ausreichend bewertet). Inhaltlich identisch mit den In-App-Views (`view-impressum`/`view-datenschutz`/`view-agb`) in `app.html` sowie mit `AGB.md`/`Datenschutzerklaerung.md`/`Impressum.md` — bei Rechtstext-Änderungen **alle Stellen** aktualisieren. |
-| `vercel.json` | Rewrites (aktuell nur `/app` → `app.html`, siehe §2) |
+| `vercel.json` | `cleanUrls`, `trailingSlash`, Redirects (siehe §2) |
+| `wissen/<slug>.html` | Wissensseiten (noch keine existieren, Stand 02.08.2026 — Infrastruktur/Template steht, Inhalte kommen erst Phase 4/7). Template und Publikations-Workflow: `/srv/wuw-storage/53_promptomizer/02_guides/wissensseite-template.html` + `wissensseiten-workflow.md` |
 | `db.js` | Supabase-Client, Auth, `window.db`-API |
 | `sw.js` | Service Worker — **Kill-Switch** (räumt alte Caches/Registrierungen ab) |
 | `manifest.json` | PWA-Manifest, `start_url` zeigt auf `/app` |
