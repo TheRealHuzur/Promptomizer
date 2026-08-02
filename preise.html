@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
 
-    <!-- Zentrales Enddatum des Pro-Einführungspreises, auch von index.html genutzt -->
+    <!-- Zentrales Enddatum des Pro-Einführungspreises, auch von app.html genutzt -->
     <script src="intro-price.js"></script>
 
     <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="styles.css">
 
     <style>
-        /* preise.html ist eine normale scrollende Seite, kein App-Shell wie index.html */
+        /* preise.html ist eine normale scrollende Seite, kein App-Shell wie app.html */
         body {
             overflow: auto;
         }
@@ -47,11 +47,11 @@
     <!-- Kopfzeile -->
     <header class="border-b border-navy-border">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="index.html" class="flex items-center select-none leading-none">
+            <a href="/" class="flex items-center select-none leading-none">
                 <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
                 <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
             </a>
-            <a href="index.html" class="ui-btn ui-btn-ghost text-sm">
+            <a href="/app" class="ui-btn ui-btn-ghost text-sm">
                 <i class="fa-solid fa-arrow-left"></i> Zur App
             </a>
         </div>
@@ -83,7 +83,7 @@
                 </div>
                 <div class="text-slate-500 text-xs mb-6">dauerhaft kostenlos</div>
 
-                <a href="index.html?intent=register" class="ui-btn ui-btn-ghost border border-navy-border w-full mb-6">
+                <a href="/app?intent=register" class="ui-btn ui-btn-ghost border border-navy-border w-full mb-6">
                     Kostenlos starten
                 </a>
 
@@ -148,7 +148,7 @@
 
                 <p id="pricing-intro-hint" class="text-slate-500 text-xs mb-4"></p>
 
-                <a id="pricing-pro-cta" href="index.html?intent=checkout&interval=year"
+                <a id="pricing-pro-cta" href="/app?intent=checkout&interval=year"
                     class="ui-btn ui-btn-primary w-full mb-6">
                     Einführungspreis sichern
                 </a>
@@ -323,8 +323,14 @@
     </main>
 
     <footer class="border-t border-navy-border mt-16">
-        <div class="max-w-5xl mx-auto px-6 py-8 text-center text-xs text-slate-600">
-            <a href="index.html" class="text-brand-sky hover:underline">Zurück zur App</a>
+        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+            <span>&copy; 2026 Promptomizer</span>
+            <div class="flex items-center gap-4">
+                <a href="/app" class="hover:text-slate-400">Zur App</a>
+                <a href="/impressum" class="hover:text-slate-400">Impressum</a>
+                <a href="/datenschutz" class="hover:text-slate-400">Datenschutz</a>
+                <a href="/agb" class="hover:text-slate-400">AGB</a>
+            </div>
         </div>
     </footer>
 
@@ -354,7 +360,7 @@
             yearCheck.className = `fa-${isYear ? 'solid' : 'regular'} fa-circle${isYear ? '-check' : ''} ${isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
             monthCheck.className = `fa-${!isYear ? 'solid' : 'regular'} fa-circle${!isYear ? '-check' : ''} ${!isYear ? 'text-brand-sky' : 'text-slate-500'} text-xl`;
 
-            document.getElementById('pricing-pro-cta').href = `index.html?intent=checkout&interval=${pricingSelectedInterval}`;
+            document.getElementById('pricing-pro-cta').href = `/app?intent=checkout&interval=${pricingSelectedInterval}`;
         }
 
         // --- FAQ Accordion ---

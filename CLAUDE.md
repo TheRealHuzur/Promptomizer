@@ -10,14 +10,20 @@ Diese Datei wird beim Sessionstart automatisch als Kontext geladen. Sie soll ein
 
 Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlichen **Bibliothek** speichern, in **Kategorien** organisieren und aus **Bausteinen** (Snippets) zusammensetzen. Free-Plan mit Limit, Pro-Plan per Stripe. Deutschsprachig.
 
-- **Produktiv-Domain:** https://www.promptomizer.de (Hauptdomain), `promptomizer.de` → 307-Redirect, `promptomizer.vercel.app` (Vercel-Default).
+- **Produktiv-Domain:** https://www.promptomizer.de (Hauptdomain), `promptomizer.de` → 301-Redirect (bis 02.08.2026 war das ein 307, per Vercel-API auf `redirectStatusCode: 301` korrigiert — Projekt-Domain-Setting, nicht in `vercel.json`), `promptomizer.vercel.app` (Vercel-Default).
 - **Hosting:** Vercel (statisches Hosting). Kein Build-Step — die Dateien werden direkt ausgeliefert.
+- **URL-Architektur (seit 02.08.2026, SEO/GEO-Roadmap Phase 0):** `/` ist die Marketing-Startseite (`index.html`, indexierbar), die eigentliche App liegt unter `/app` (physisch `app.html`, `noindex`). `vercel.json` setzt `"cleanUrls": true` — jede `.html`-Datei ist automatisch ohne Endung erreichbar (`app.html` → `/app`, `preise.html` → `/preise`, usw.) und die `.html`-URL redirected automatisch (308) auf die saubere URL. Gilt für **jede** `.html`-Datei im Repo-Root, auch künftige, ohne `vercel.json` anfassen zu müssen. Details siehe §2 und §3.
 
 ---
 
 ## 2. Tech-Stack & Architektur
 
-- **Frontend:** Eine einzige große Datei [`index.html`](index.html) (~270 KB) mit eingebettetem `<style>` und `<script>`. **Kein Framework, kein Bundler, kein Build.** Tailwind, Font Awesome, Inter und Driver.js liegen lokal unter [`vendor/`](vendor/) (kein CDN mehr, seit 16.07.2026 — Tailwind wird einmalig per CLI kompiliert, siehe [`vendor/tailwind/README.md`](vendor/tailwind/README.md), keine Live-Build-Pipeline).
+- **Frontend, zwei getrennte Dokumente seit dem `/app`-Umzug (02.08.2026):**
+  - [`app.html`](app.html) (~270 KB, vormals `index.html`) ist die eigentliche App: Markup, Styles, gesamte UI-Logik, mit eingebettetem `<style>` und `<script>`. Wird dank `cleanUrls` unter `/app` ausgeliefert (URL bleibt `/app`, Datei bleibt physisch `app.html`; `/app.html` redirected automatisch auf `/app`). Enthält `<base href="/">` im `<head>` — **wichtig:** dadurch lösen die weiterhin relativen Asset-Pfade in dieser Datei (`styles.css`, `db.js`, `vendor/...`) gegen die Domain-Wurzel auf, unabhängig davon, dass die URL `/app` und nicht `/` lautet (interne Links wie zu `/preise` sind bereits absolut geschrieben und bräuchten das `base` eigentlich nicht mehr, es bleibt aber für die Asset-Pfade nötig). **Beim Verschieben/Umbenennen dieser Datei immer den `<base>`-Mechanismus mitdenken**, sonst brechen alle Assets lautlos. Zusätzlich `<meta name="robots" content="noindex, follow">`, da die App-Oberfläche selbst nicht indexiert werden soll.
+  - [`index.html`](index.html) ist die öffentliche, indexierbare Marketing-Startseite (seit 02.08.2026, SEO/GEO-Roadmap Phase 0). Eigenständiges Dokument, kein App-Shell, normale scrollende Seite wie `preise.html`.
+  - **Kein Framework, kein Bundler, kein Build.** Tailwind, Font Awesome, Inter und Driver.js liegen lokal unter [`vendor/`](vendor/) (kein CDN mehr, seit 16.07.2026 — Tailwind wird einmalig per CLI kompiliert, siehe [`vendor/tailwind/README.md`](vendor/tailwind/README.md), keine Live-Build-Pipeline).
+  - ⚠️ **Falle bei neuen statischen Seiten:** `vendor/tailwind/tailwind.css` ist JIT-gepurged, `content` in `vendor/tailwind/tailwind.config.js` listet die HTML-Dateien einzeln auf (aktuell `index.html`, `app.html`, `preise.html`, `impressum.html`, `datenschutz.html`, `agb.html`). Eine neue `.html`-Datei, die dort nicht eingetragen ist, bekommt **stillschweigend keine Fehlermeldung**, sondern einfach fehlende Utility-Klassen (kaputte Abstände, fehlende Grid-Spalten, unsichtbare `md:`-Elemente). Bei jeder neuen Marketing-/Content-Seite: Datei zu `content` hinzufügen und mit der CLI neu kompilieren (Befehl in `vendor/tailwind/README.md`). Relevant vor allem für die SEO/GEO-Roadmap (Phase 3, 4, 7 bringen viele neue statische Seiten).
+  - `vercel.json` (neu, 02.08.2026): `"cleanUrls": true` (alle `.html`-Endungen sitewide weg, siehe oben), `"trailingSlash": false`, plus expliziter Redirect `/index.html` → `/` als Sicherheitsnetz. Interne Links in allen `.html`-Dateien sind entsprechend ohne `.html`-Endung geschrieben (z. B. `/preise`, nicht `/preise.html`). Apex-Domain `promptomizer.de` redirected mit 301 (war 307 bis 02.08.2026) — das ist eine Vercel-Projekt-Domain-Einstellung (`redirect`/`redirectStatusCode` am Domain-Objekt, per API/Dashboard steuerbar, **nicht** über `vercel.json`).
 - **Datenzugriff/Auth:** [`db.js`](db.js) kapselt den Supabase-Client und stellt `window.db.*` sowie Auth-Funktionen (`loginUser`, `registerUser`, `handleLogout`, `requestPasswordReset`, `updateUserPassword`, `loginWithGoogle`) bereit.
 - **Backend:** Supabase (Postgres + Auth + Edge Functions). Billing über Stripe (aktuell **Sandbox/Test-Modus**, siehe §6).
 - **Consent:** Cookiebot (läuft nur auf den autorisierten Domains, **nicht** auf localhost — die „domain not authorized"-Warnungen lokal sind erwartbar).
@@ -33,16 +39,20 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 
 | Datei | Zweck |
 |---|---|
-| `index.html` | Gesamte App: Markup, Styles, gesamte UI-Logik |
+| `index.html` | Marketing-Startseite (öffentlich, indexierbar) |
+| `app.html` | Gesamte App: Markup, Styles, gesamte UI-Logik. Ausgeliefert unter `/app` (siehe §2, `vercel.json`) |
+| `preise.html` | Preisseite |
+| `impressum.html`, `datenschutz.html`, `agb.html` | Rechtstexte als eigene, indexierbare Seiten (seit 02.08.2026). Verlinkt im Footer von `index.html`/`preise.html`, **nicht** im App-Footer — innerhalb der App sind sie bewusst nur über Profilmenü erreichbar (2 Klicks, als ausreichend bewertet). Inhaltlich identisch mit den In-App-Views (`view-impressum`/`view-datenschutz`/`view-agb`) in `app.html` sowie mit `AGB.md`/`Datenschutzerklaerung.md`/`Impressum.md` — bei Rechtstext-Änderungen **alle Stellen** aktualisieren. |
+| `vercel.json` | Rewrites (aktuell nur `/app` → `app.html`, siehe §2) |
 | `db.js` | Supabase-Client, Auth, `window.db`-API |
 | `sw.js` | Service Worker — **Kill-Switch** (räumt alte Caches/Registrierungen ab) |
-| `manifest.json` | PWA-Manifest |
+| `manifest.json` | PWA-Manifest, `start_url` zeigt auf `/app` |
 | `icon.png` | App-Icon |
 | `supabase/migrations/*.sql` | DB-Migrationen (Quelle der Wahrheit für das Schema) |
 | `supabase/functions/*` | Edge Functions (Deno/TypeScript) |
 | `supabase/config.toml` | Function-Konfiguration (u.a. `verify_jwt`) |
 | `/srv/wuw-storage/53_promptomizer/01_roadmaps/` | Nicht versionierte Roadmaps, Checklisten und Fortschrittsnotizen |
-| `AGB.md`, `Datenschutzerklaerung.md`, `Impressum.md` | Rechtstexte (auch als Views in `index.html` eingebettet) |
+| `AGB.md`, `Datenschutzerklaerung.md`, `Impressum.md` | Ursprungstexte der Rechtstexte (Quelle für die In-App-Views und die eigenständigen Seiten) |
 
 ---
 
