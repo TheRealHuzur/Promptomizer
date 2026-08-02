@@ -141,6 +141,8 @@ Diese Checkliste vor jedem `git push` durchgehen, wenn du etwas Wesentliches ge�
 - [ ] Browser-Konsole offen — keine roten Fehlermeldungen
 - [ ] Wenn du Supabase-Tabellen oder RLS-Policies geändert hast: Migration in `supabase/migrations/` liegt vor und wurde mit `npx supabase db push --linked` deployed
 - [ ] Wenn du eine Edge Function geändert hast: `npx supabase functions deploy <name>` ausgeführt
+- [ ] Wenn du `index.html`, `preise.html`, `impressum.html`, `datenschutz.html`, `agb.html` oder neue Wissensseiten geändert hast: `python3 tools/check-seo-meta.py` ausgeführt (prüft Title/Description/Canonical/JSON-LD-Validität, siehe Phase 1 der SEO/GEO-Roadmap)
+- [ ] Wenn du neue Tailwind-Klassen in einer `.html`-Datei benutzt hast: Datei in `vendor/tailwind/tailwind.config.js` → `content` eingetragen und neu kompiliert (siehe `vendor/tailwind/README.md`, `CLAUDE.md` §2)
 - [ ] Commit-Nachricht beschreibt was und warum (nicht nur "fix")
 
 ### Nach dem Push

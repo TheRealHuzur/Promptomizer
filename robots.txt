@@ -1,0 +1,23 @@
+# Promptomizer — robots.txt
+# Entscheidung (SEO/GEO-Roadmap Phase 1, 2026-08-02): KI-Crawler werden bewusst
+# NICHT ausgesperrt. Begründung: Wer KI-Crawler blockiert, verschwindet aus
+# KI-generierten Antworten (ChatGPT, Perplexity, Copilot, Gemini) — bei einem
+# jungen Produkt überwiegt der Sichtbarkeitsgewinn deutlich das Risiko, dass
+# eigene Inhalte in Trainingsdaten landen. Einzelbegründung siehe
+# /srv/wuw-storage/53_promptomizer/01_roadmaps/seo_geo/Phase-01-Technisches-SEO-und-Messbarkeit.md
+
+User-agent: *
+Disallow: /app
+Allow: /
+
+# Explizit erlaubte KI-Crawler (kein Disallow nötig, Default-Regel oben deckt
+# das schon ab — hier nur zur Dokumentation der bewussten Entscheidung pro Crawler):
+# GPTBot          (OpenAI, Training)          -> erlaubt
+# OAI-SearchBot   (OpenAI, ChatGPT-Suche)      -> erlaubt
+# ChatGPT-User    (Live-Abrufe durch Nutzer)   -> erlaubt
+# ClaudeBot / Claude-User (Anthropic)          -> erlaubt
+# PerplexityBot                                -> erlaubt
+# Google-Extended (Gemini-Training)            -> erlaubt
+# CCBot           (Common Crawl)               -> erlaubt
+
+Sitemap: https://www.promptomizer.de/sitemap.xml
