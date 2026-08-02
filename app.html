@@ -2423,6 +2423,7 @@
             const agbCheckbox = document.getElementById('register-agb');
             if (agbCheckbox) agbCheckbox.checked = false;
             document.getElementById('modal-register').classList.remove('hidden');
+            window.umami?.track('signup_started');
         }
 
         function closeRegisterModal() {
@@ -2473,6 +2474,7 @@
                 return;
             }
 
+            window.umami?.track('signup_completed');
             closeRegisterModal();
             openRegisterSuccessModal();
         }
@@ -6752,6 +6754,7 @@
 
             try {
                 setUpgradeButtonLoading(true);
+                window.umami?.track('checkout_started', { interval: selectedUpgradeInterval });
                 const result = await window.db.createProCheckoutSession(selectedUpgradeInterval);
                 if (!result?.url) throw new Error('Keine Checkout-URL erhalten.');
                 window.location.href = result.url;

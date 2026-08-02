@@ -5,6 +5,7 @@ import {
   handleCors,
   jsonResponse,
   stripeRequest,
+  trackUmamiEvent,
   updateProfileByCustomerId,
   updateProfileByUserId,
   verifyStripeSignature,
@@ -68,6 +69,7 @@ Deno.serve(async (req) => {
           await updateProfileByCustomerId(object.customer, patch);
         }
         await awardFounderIfEligible(object.client_reference_id, object.metadata, "active");
+        await trackUmamiEvent("subscription_completed");
         break;
       }
 

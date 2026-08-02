@@ -10,6 +10,32 @@ const PRO_STATUSES = new Set(["active", "trialing", "past_due"]);
 
 export const FOUNDER_BADGE_END_DATE = "2026-11-01T00:00:00.000Z";
 
+const UMAMI_WEBSITE_ID = "5196fd86-1829-472f-8cf3-c31d420aea9c";
+const UMAMI_HOSTNAME = "www.promptomizer.de";
+
+export async function trackUmamiEvent(name: string) {
+  try {
+    await fetch("https://cloud.umami.is/api/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "promptomizer-stripe-webhook",
+      },
+      body: JSON.stringify({
+        type: "event",
+        payload: {
+          website: UMAMI_WEBSITE_ID,
+          hostname: UMAMI_HOSTNAME,
+          url: "/app",
+          name,
+        },
+      }),
+    });
+  } catch (error) {
+    console.error("Umami event tracking failed", { name, error });
+  }
+}
+
 export function isFounderBadgeEligible(now = new Date()) {
   return now.getTime() < Date.parse(FOUNDER_BADGE_END_DATE);
 }
