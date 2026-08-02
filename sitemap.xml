@@ -2,7 +2,7 @@
 <!--
     Manuell gepflegt, kein Build-System vorhanden (siehe CLAUDE.md §2).
     lastmod nur aendern, wenn sich der jeweilige Seiteninhalt tatsaechlich
-    geaendert hat -- nicht bei jedem Deploy pauschal auf "heute" setzen
+    geaendert hat, nicht bei jedem Deploy pauschal auf "heute" setzen
     (SEO/GEO-Roadmap Phase 1, Arbeitsschritt 2).
     /app fehlt bewusst (noindex, siehe robots.txt).
 -->
