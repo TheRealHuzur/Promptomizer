@@ -20,6 +20,24 @@
         <priority>0.9</priority>
     </url>
     <url>
+        <loc>https://www.promptomizer.de/prompt-bibliothek</loc>
+        <lastmod>2026-08-03</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://www.promptomizer.de/prompt-erstellen</loc>
+        <lastmod>2026-08-03</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://www.promptomizer.de/prompt-vorlagen</loc>
+        <lastmod>2026-08-03</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
         <loc>https://www.promptomizer.de/impressum</loc>
         <lastmod>2026-08-02</lastmod>
         <changefreq>yearly</changefreq>

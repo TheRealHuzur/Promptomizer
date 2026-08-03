@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de" class="dark antialiased">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt-Vorlagen: einmal anlegen, immer nutzen</title>
+    <meta name="description" content="Fünf kopierfertige Prompt-Vorlagen und die Regel, welche Teile eines Prompts du nur einmal schreiben musst. Mit Bausteinen dauerhaft speichern, Server in Deutschland.">
+    <meta name="theme-color" content="#020617">
+    <link rel="canonical" href="https://www.promptomizer.de/prompt-vorlagen">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Promptomizer">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:url" content="https://www.promptomizer.de/prompt-vorlagen">
+    <meta property="og:title" content="Prompt-Vorlagen: einmal anlegen, immer nutzen">
+    <meta property="og:description" content="Fünf kopierfertige Prompt-Vorlagen und die Regel, welche Teile eines Prompts du nur einmal schreiben musst. Mit Bausteinen dauerhaft speichern, Server in Deutschland.">
+    <meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Prompt-Vorlagen: einmal anlegen, immer nutzen">
+    <meta name="twitter:description" content="Fünf kopierfertige Prompt-Vorlagen und die Regel, welche Teile eines Prompts du nur einmal schreiben musst. Mit Bausteinen dauerhaft speichern, Server in Deutschland.">
+    <meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+    <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* prompt-vorlagen.html ist eine normale scrollende Seite, kein App-Shell wie app.html */
+        body {
+            overflow: auto;
+        }
+    </style>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Promptomizer", "item": "https://www.promptomizer.de/" },
+                    { "@type": "ListItem", "position": 2, "name": "Prompt-Vorlagen", "item": "https://www.promptomizer.de/prompt-vorlagen" }
+                ]
+            },
+            {
+                "@type": "SoftwareApplication",
+                "name": "Promptomizer",
+                "url": "https://www.promptomizer.de/prompt-vorlagen",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Web",
+                "description": "Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.",
+                "offers": [
+                    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR" },
+                    { "@type": "Offer", "name": "Pro (monatlich)", "price": "3.99", "priceCurrency": "EUR" },
+                    { "@type": "Offer", "name": "Pro (jährlich)", "price": "39.99", "priceCurrency": "EUR" }
+                ]
+            },
+            {
+                "@type": "ItemList",
+                "name": "Fünf Prompt-Vorlagen",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Produkttext für eine Website", "description": "Prompt-Vorlage für einen Abschnitt auf einer Produktseite." },
+                    { "@type": "ListItem", "position": 2, "name": "Antwort auf eine schwierige Kundenanfrage", "description": "Prompt-Vorlage für eine sachliche Antwort im Kundenservice." },
+                    { "@type": "ListItem", "position": 3, "name": "Langes Dokument zusammenfassen", "description": "Prompt-Vorlage für eine strukturierte Zusammenfassung eines Fachtexts." },
+                    { "@type": "ListItem", "position": 4, "name": "Code-Review", "description": "Prompt-Vorlage für ein nach Schweregrad gegliedertes Code-Review." },
+                    { "@type": "ListItem", "position": 5, "name": "Aus einem Fachtext einen LinkedIn-Beitrag machen", "description": "Prompt-Vorlage, um einen Fachtext in einen LinkedIn-Beitrag zu verwandeln." }
+                ]
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Was ist eine Prompt-Vorlage?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Eine Prompt-Vorlage ist ein vorformulierter Prompt mit Platzhaltern für die Angaben, die sich von Fall zu Fall ändern. Die Teile, die gleich bleiben, meist Rolle und Format, sind ausformuliert. Die Teile, die den Einzelfall beschreiben, sind markiert und werden vor dem Einsatz ergänzt."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Kann ich die Vorlagen von dieser Seite einfach übernehmen?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Ja. Alle Vorlagen auf dieser Seite sind frei verwendbar, auch geschäftlich, ohne Namensnennung."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Funktionieren die Vorlagen mit ChatGPT?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Ja. Die Vorlagen bestehen aus reinem Text und funktionieren in ChatGPT, Claude, Gemini, Copilot und jedem anderen Werkzeug, das Texteingaben entgegennimmt."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Wie viele Vorlagen kann ich in Promptomizer speichern?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Im kostenlosen Zugang lassen sich insgesamt zehn Inhalte speichern, wobei Prompts und Bausteine zusammen gezählt werden. Mit Pro ist die Zahl unbegrenzt."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Werden meine Vorlagen für KI-Training verwendet?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Nein. Deine Inhalte liegen in einer Datenbank in Deutschland. Es ist kein KI-Modell eingebunden, an das sie übergeben werden."
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+    <!-- FAQPage-Schema dient hier nicht einem SERP-Rich-Snippet (Google hat FAQ-Rich-Results 2023
+         auf Behoerden-/Gesundheitsseiten beschraenkt), sondern der Extrahierbarkeit durch Sprachmodelle. -->
+
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
+        data-exclude-hash="true"></script>
+</head>
+
+<body class="bg-navy-deep text-slate-400 min-h-screen">
+
+    <!-- Kopfzeile -->
+    <header class="border-b border-navy-border">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center select-none leading-none">
+                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
+                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
+            </a>
+            <a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">
+                Kostenlos registrieren
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-12 md:py-16">
+
+        <!-- Hero -->
+        <section class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                Prompt-Vorlagen, die du einmal anlegst und immer wieder einsetzt
+            </h1>
+            <p class="text-slate-300 text-base mb-2">
+                Wer regelmäßig mit KI arbeitet, tippt dieselben Sätze immer wieder. Dieselbe Rollenbeschreibung,
+                dieselbe Formatvorgabe, denselben Hinweis auf die Zielgruppe. Das kostet jedes Mal ein paar Minuten
+                und geht jedes Mal ein bisschen anders aus, weil man es aus dem Gedächtnis neu formuliert.
+            </p>
+            <p class="text-slate-300 text-base md:text-lg">
+                Auf dieser Seite steht, welche Teile eines Prompts sich wiederverwenden lassen und welche nicht.
+                Darunter stehen fünf Vorlagen, die du kopieren und sofort einsetzen kannst (ChatGPT, Claude,
+                Gemini und mehr).
+            </p>
+        </section>
+
+        <!-- Entitätssatz -->
+        <p class="text-slate-300 text-center mb-16">
+            Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.
+        </p>
+
+        <!-- Problemaufriss -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold text-white mb-4">Warum du denselben Satz zum zwanzigsten Mal tippst</h2>
+            <p class="mb-4">
+                Ein Prompt sieht aus wie ein zusammenhängender Text, ist aber keiner. Er besteht aus Teilen, die
+                unterschiedlich schnell veralten.
+            </p>
+            <p class="mb-4">
+                Die Anweisung „Du bist eine erfahrene Texterin für B2B-Software" gilt für jeden Produkttext, den
+                du je schreiben lässt. Die Angabe „Zielgruppe sind IT-Leiterinnen in mittelständischen
+                Maschinenbaubetrieben" gilt für genau ein Projekt. Beide stehen im selben Prompt, direkt
+                untereinander, und werden deshalb meistens gemeinsam behandelt: gemeinsam getippt, gemeinsam
+                vergessen, gemeinsam neu geschrieben.
+            </p>
+            <p>
+                Sobald man sie trennt, schrumpft der Aufwand pro Prompt auf den Teil, der wirklich neu ist.
+            </p>
+        </section>
+
+        <!-- Eigenes Element: was wiederkehrt -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold text-white mb-4">Was an einem Prompt wiederkehrt und was nicht</h2>
+            <p class="mb-6">
+                Ein vollständiger Prompt beantwortet vier Fragen: Wer soll antworten, was soll getan werden, was
+                muss die KI dazu wissen, und wie soll das Ergebnis aussehen. Diese vier Teile unterscheiden sich
+                stark darin, wie oft du sie neu schreiben musst.
+            </p>
+
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm rounded-xl border-2 border-navy-border overflow-hidden">
+                    <thead>
+                        <tr class="bg-navy-sidebar text-slate-300">
+                            <th class="text-left font-bold p-4">Teil</th>
+                            <th class="text-left font-bold p-4">Beispiel</th>
+                            <th class="text-left font-bold p-4">Wiederverwendbar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t border-navy-border">
+                            <td class="p-4 font-bold text-white">Rolle</td>
+                            <td class="p-4">„Du bist eine erfahrene Texterin für B2B-Software."</td>
+                            <td class="p-4 text-white font-medium">fast immer</td>
+                        </tr>
+                        <tr class="border-t border-navy-border bg-black/10">
+                            <td class="p-4 font-bold text-white">Format</td>
+                            <td class="p-4">„Antworte in Stichpunkten, höchstens 120 Wörter, ohne Einleitungssatz."</td>
+                            <td class="p-4 text-white font-medium">fast immer</td>
+                        </tr>
+                        <tr class="border-t border-navy-border">
+                            <td class="p-4 font-bold text-white">Aufgabe</td>
+                            <td class="p-4">„Schreibe eine Produktbeschreibung."</td>
+                            <td class="p-4 text-white font-medium">oft, in wenigen Varianten</td>
+                        </tr>
+                        <tr class="border-t border-navy-border bg-black/10">
+                            <td class="p-4 font-bold text-white">Kontext</td>
+                            <td class="p-4">„Das Produkt heißt X, die Zielgruppe ist Y, der Preis liegt bei Z."</td>
+                            <td class="p-4 text-white font-medium">so gut wie nie</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mb-4">
+                Daraus folgt eine einfache Regel: Alles an einem Prompt, was nichts über den konkreten Einzelfall
+                aussagt, schreibst du einmal. Alles, was den Einzelfall beschreibt, schreibst du jedes Mal neu.
+            </p>
+            <p>
+                In der Praxis heißt das, dass zwei von vier Teilen dauerhaft liegen bleiben können. Genau das sind
+                Prompt-Vorlagen: nicht ganze fertige Prompts, sondern die Teile, die sich nicht ändern.
+            </p>
+        </section>
+
+        <!-- Fünf Vorlagen -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold text-white mb-4">Fünf Vorlagen zum Mitnehmen</h2>
+            <p class="mb-8">
+                Die folgenden Vorlagen sind nach denselben vier Teilen aufgebaut. Fett markiert ist jeweils, was du
+                übernehmen und dauerhaft behalten kannst. Der Rest wird pro Einsatz ausgefüllt. Jede Vorlage lässt
+                sich auch direkt im <a href="/prompt-erstellen" class="text-brand-sky hover:underline">Prompt-Generator</a>
+                öffnen und bearbeiten.
+            </p>
+
+            <div class="space-y-6">
+
+                <!-- Vorlage 1 -->
+                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-5 md:p-6">
+                    <h3 class="text-lg font-bold text-white mb-1">1. Produkttext für eine Website</h3>
+                    <p class="text-xs text-slate-500 mb-3">Als Baustein eignen sich Rolle und Format.</p>
+                    <pre id="vorlage-1-text" class="whitespace-pre-wrap text-sm text-slate-300 bg-navy-deep rounded-lg border border-navy-border p-4 mb-3"><strong class="text-white">Rolle:</strong> Du bist eine erfahrene Texterin für erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative und ohne Werbefloskeln.
+<strong class="text-white">Aufgabe:</strong> Schreibe einen Abschnitt für eine Produktseite über die unten beschriebene Funktion.
+<strong class="text-white">Kontext:</strong> Produkt: [Name]. Funktion: [was sie tut]. Zielgruppe: [wer sie nutzt]. Das größte Problem der Zielgruppe: [Problem].
+<strong class="text-white">Format:</strong> Eine Überschrift und zwei Absätze zu je höchstens 60 Wörtern. Keine Aufzählung. Kein Einleitungssatz über das Thema.</pre>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="ui-btn ui-btn-primary text-sm" onclick="copyVorlage('vorlage-1-text', this)">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <a href="/prompt-erstellen?role=Du%20bist%20eine%20erfahrene%20Texterin%20f%C3%BCr%20erkl%C3%A4rungsbed%C3%BCrftige%20Software.%20Du%20schreibst%20n%C3%BCchtern%2C%20ohne%20Superlative%20und%20ohne%20Werbefloskeln.&task=Schreibe%20einen%20Abschnitt%20f%C3%BCr%20eine%20Produktseite%20%C3%BCber%20die%20unten%20beschriebene%20Funktion.&context=Produkt%3A%20%5BName%5D.%20Funktion%3A%20%5Bwas%20sie%20tut%5D.%20Zielgruppe%3A%20%5Bwer%20sie%20nutzt%5D.%20Das%20gr%C3%B6%C3%9Fte%20Problem%20der%20Zielgruppe%3A%20%5BProblem%5D.&format=Eine%20%C3%9Cberschrift%20und%20zwei%20Abs%C3%A4tze%20zu%20je%20h%C3%B6chstens%2060%20W%C3%B6rtern.%20Keine%20Aufz%C3%A4hlung.%20Kein%20Einleitungssatz%20%C3%BCber%20das%20Thema."
+                            class="ui-btn ui-btn-ghost border border-navy-border text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Im Generator öffnen
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Vorlage 2 -->
+                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-5 md:p-6">
+                    <h3 class="text-lg font-bold text-white mb-1">2. Antwort auf eine schwierige Kundenanfrage</h3>
+                    <p class="text-xs text-slate-500 mb-3">
+                        Als Baustein eignen sich Rolle und Format. Der Satz „versprichst nichts, was nicht
+                        ausdrücklich im Kontext steht" ist der Teil, der den Unterschied macht, und genau der geht
+                        beim Neutippen als Erstes verloren.
+                    </p>
+                    <pre id="vorlage-2-text" class="whitespace-pre-wrap text-sm text-slate-300 bg-navy-deep rounded-lg border border-navy-border p-4 mb-3"><strong class="text-white">Rolle:</strong> Du bist erfahrene Mitarbeiterin im Kundenservice. Du bleibst sachlich, nimmst Kritik ernst und versprichst nichts, was nicht ausdrücklich im Kontext steht.
+<strong class="text-white">Aufgabe:</strong> Formuliere eine Antwort auf die unten stehende Anfrage.
+<strong class="text-white">Kontext:</strong> Anfrage: [Text einfügen]. Was tatsächlich passiert ist: [Sachverhalt]. Was wir anbieten können: [Angebot]. Was wir nicht anbieten können: [Grenze].
+<strong class="text-white">Format:</strong> E-Mail mit Anrede und Grußformel, höchstens 150 Wörter, ein konkreter nächster Schritt am Ende.</pre>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="ui-btn ui-btn-primary text-sm" onclick="copyVorlage('vorlage-2-text', this)">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <a href="/prompt-erstellen?role=Du%20bist%20erfahrene%20Mitarbeiterin%20im%20Kundenservice.%20Du%20bleibst%20sachlich%2C%20nimmst%20Kritik%20ernst%20und%20versprichst%20nichts%2C%20was%20nicht%20ausdr%C3%BCcklich%20im%20Kontext%20steht.&task=Formuliere%20eine%20Antwort%20auf%20die%20unten%20stehende%20Anfrage.&context=Anfrage%3A%20%5BText%20einf%C3%BCgen%5D.%20Was%20tats%C3%A4chlich%20passiert%20ist%3A%20%5BSachverhalt%5D.%20Was%20wir%20anbieten%20k%C3%B6nnen%3A%20%5BAngebot%5D.%20Was%20wir%20nicht%20anbieten%20k%C3%B6nnen%3A%20%5BGrenze%5D.&format=E-Mail%20mit%20Anrede%20und%20Gru%C3%9Fformel%2C%20h%C3%B6chstens%20150%20W%C3%B6rter%2C%20ein%20konkreter%20n%C3%A4chster%20Schritt%20am%20Ende."
+                            class="ui-btn ui-btn-ghost border border-navy-border text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Im Generator öffnen
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Vorlage 3 -->
+                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-5 md:p-6">
+                    <h3 class="text-lg font-bold text-white mb-1">3. Langes Dokument zusammenfassen</h3>
+                    <p class="text-xs text-slate-500 mb-3">Als Baustein eignen sich Rolle und Format.</p>
+                    <pre id="vorlage-3-text" class="whitespace-pre-wrap text-sm text-slate-300 bg-navy-deep rounded-lg border border-navy-border p-4 mb-3"><strong class="text-white">Rolle:</strong> Du bist Analystin und fasst Fachtexte für Menschen zusammen, die den Text nicht lesen werden, aber Entscheidungen daraus ableiten müssen.
+<strong class="text-white">Aufgabe:</strong> Fasse das unten stehende Dokument zusammen.
+<strong class="text-white">Kontext:</strong> Dokument: [Text einfügen]. Wer die Zusammenfassung liest: [Rolle]. Wofür sie gebraucht wird: [Entscheidung].
+<strong class="text-white">Format:</strong> Erst drei Sätze Kernaussage, dann höchstens fünf Stichpunkte mit Details, zuletzt eine Zeile „Offene Fragen". Keine Wiederholung der Kernaussage in den Stichpunkten.</pre>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="ui-btn ui-btn-primary text-sm" onclick="copyVorlage('vorlage-3-text', this)">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <a href="/prompt-erstellen?role=Du%20bist%20Analystin%20und%20fasst%20Fachtexte%20f%C3%BCr%20Menschen%20zusammen%2C%20die%20den%20Text%20nicht%20lesen%20werden%2C%20aber%20Entscheidungen%20daraus%20ableiten%20m%C3%BCssen.&task=Fasse%20das%20unten%20stehende%20Dokument%20zusammen.&context=Dokument%3A%20%5BText%20einf%C3%BCgen%5D.%20Wer%20die%20Zusammenfassung%20liest%3A%20%5BRolle%5D.%20Wof%C3%BCr%20sie%20gebraucht%20wird%3A%20%5BEntscheidung%5D.&format=Erst%20drei%20S%C3%A4tze%20Kernaussage%2C%20dann%20h%C3%B6chstens%20f%C3%BCnf%20Stichpunkte%20mit%20Details%2C%20zuletzt%20eine%20Zeile%20%E2%80%9EOffene%20Fragen%E2%80%9C.%20Keine%20Wiederholung%20der%20Kernaussage%20in%20den%20Stichpunkten."
+                            class="ui-btn ui-btn-ghost border border-navy-border text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Im Generator öffnen
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Vorlage 4 -->
+                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-5 md:p-6">
+                    <h3 class="text-lg font-bold text-white mb-1">4. Code-Review</h3>
+                    <p class="text-xs text-slate-500 mb-3">Als Baustein eignen sich Rolle und Format.</p>
+                    <pre id="vorlage-4-text" class="whitespace-pre-wrap text-sm text-slate-300 bg-navy-deep rounded-lg border border-navy-border p-4 mb-3"><strong class="text-white">Rolle:</strong> Du bist erfahrene Entwicklerin und führst ein Review durch. Du benennst Probleme, ohne den Code neu zu schreiben, solange nicht ausdrücklich danach gefragt wird.
+<strong class="text-white">Aufgabe:</strong> Prüfe den unten stehenden Code.
+<strong class="text-white">Kontext:</strong> Sprache und Version: [Angabe]. Was der Code tun soll: [Zweck]. Bekannte Einschränkungen: [Angabe]. Code: [einfügen].
+<strong class="text-white">Format:</strong> Gruppiert nach Schweregrad in drei Blöcken: blockierend, sollte geändert werden, Anmerkung. Je Punkt eine Zeile Begründung. Keine allgemeinen Ratschläge zu Codequalität.</pre>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="ui-btn ui-btn-primary text-sm" onclick="copyVorlage('vorlage-4-text', this)">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <a href="/prompt-erstellen?role=Du%20bist%20erfahrene%20Entwicklerin%20und%20f%C3%BChrst%20ein%20Review%20durch.%20Du%20benennst%20Probleme%2C%20ohne%20den%20Code%20neu%20zu%20schreiben%2C%20solange%20nicht%20ausdr%C3%BCcklich%20danach%20gefragt%20wird.&task=Pr%C3%BCfe%20den%20unten%20stehenden%20Code.&context=Sprache%20und%20Version%3A%20%5BAngabe%5D.%20Was%20der%20Code%20tun%20soll%3A%20%5BZweck%5D.%20Bekannte%20Einschr%C3%A4nkungen%3A%20%5BAngabe%5D.%20Code%3A%20%5Beinf%C3%BCgen%5D.&format=Gruppiert%20nach%20Schweregrad%20in%20drei%20Bl%C3%B6cken%3A%20blockierend%2C%20sollte%20ge%C3%A4ndert%20werden%2C%20Anmerkung.%20Je%20Punkt%20eine%20Zeile%20Begr%C3%BCndung.%20Keine%20allgemeinen%20Ratschl%C3%A4ge%20zu%20Codequalit%C3%A4t."
+                            class="ui-btn ui-btn-ghost border border-navy-border text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Im Generator öffnen
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Vorlage 5 -->
+                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-5 md:p-6">
+                    <h3 class="text-lg font-bold text-white mb-1">5. Aus einem Fachtext einen LinkedIn-Beitrag machen</h3>
+                    <p class="text-xs text-slate-500 mb-3">Als Baustein eignen sich Rolle und Format.</p>
+                    <pre id="vorlage-5-text" class="whitespace-pre-wrap text-sm text-slate-300 bg-navy-deep rounded-lg border border-navy-border p-4 mb-3"><strong class="text-white">Rolle:</strong> Du schreibst Beiträge für ein Fachpublikum. Du verzichtest auf Aufmerksamkeitshaken, rhetorische Fragen am Anfang und Emojis.
+<strong class="text-white">Aufgabe:</strong> Mache aus dem unten stehenden Text einen Beitrag.
+<strong class="text-white">Kontext:</strong> Text: [einfügen]. Was die Leserin danach wissen soll: [eine Aussage]. Was sie danach tun soll: [Handlung oder „nichts"].
+<strong class="text-white">Format:</strong> Höchstens 120 Wörter. Erster Satz enthält die Aussage, nicht die Ankündigung der Aussage. Kein Hashtag-Block.</pre>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="ui-btn ui-btn-primary text-sm" onclick="copyVorlage('vorlage-5-text', this)">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <a href="/prompt-erstellen?role=Du%20schreibst%20Beitr%C3%A4ge%20f%C3%BCr%20ein%20Fachpublikum.%20Du%20verzichtest%20auf%20Aufmerksamkeitshaken%2C%20rhetorische%20Fragen%20am%20Anfang%20und%20Emojis.&task=Mache%20aus%20dem%20unten%20stehenden%20Text%20einen%20Beitrag.&context=Text%3A%20%5Beinf%C3%BCgen%5D.%20Was%20die%20Leserin%20danach%20wissen%20soll%3A%20%5Beine%20Aussage%5D.%20Was%20sie%20danach%20tun%20soll%3A%20%5BHandlung%20oder%20%E2%80%9Enichts%E2%80%9C%5D.&format=H%C3%B6chstens%20120%20W%C3%B6rter.%20Erster%20Satz%20enth%C3%A4lt%20die%20Aussage%2C%20nicht%20die%20Ank%C3%BCndigung%20der%20Aussage.%20Kein%20Hashtag-Block."
+                            class="ui-btn ui-btn-ghost border border-navy-border text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Im Generator öffnen
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="text-xs text-slate-500 mt-6">
+                Alle Vorlagen auf dieser Seite sind frei verwendbar, auch geschäftlich, ohne Namensnennung.
+            </p>
+        </section>
+
+        <!-- TODO: H2 "Aus einer Vorlage wird ein Baustein" wartet auf echte Screenshots des
+             Bausteine-Bereichs im gefüllten Zustand (mindestens einer muss den Moment zeigen,
+             in dem ein Baustein in einen Prompt eingesetzt wird). Ohne echte Screenshots nicht
+             ausliefern, siehe Phase-03-Prompt-Vorlagen-Entwurf.md, Abschnitt 4.6. -->
+
+        <!-- Brücke zur Bibliothek -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold text-white mb-4">Wenn aus fünf Vorlagen fünfzig werden</h2>
+            <p class="mb-4">
+                Bausteine lösen das Problem der Wiederholung. Sie lösen nicht das Problem der Menge.
+            </p>
+            <p class="mb-4">
+                Sobald mehr als eine Handvoll fertiger Prompts zusammenkommt, stellt sich eine andere Frage: Wo
+                liegen sie, und wie findest du sie in sechs Wochen wieder. Darum kümmert sich
+                <a href="/prompt-bibliothek" class="text-brand-sky hover:underline">deine Prompt-Bibliothek</a>.
+            </p>
+        </section>
+
+        <!-- FAQ -->
+        <section class="mb-16">
+            <h2 class="text-xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
+            <div class="space-y-2" id="vorlagen-faq">
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="vorlagen-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="toggleVorlagenFaq(this)">
+                        <span class="text-slate-200 font-medium">Was ist eine Prompt-Vorlage?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="vorlagen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Eine Prompt-Vorlage ist ein vorformulierter Prompt mit Platzhaltern für die Angaben, die
+                        sich von Fall zu Fall ändern. Die Teile, die gleich bleiben, meist Rolle und Format, sind
+                        ausformuliert. Die Teile, die den Einzelfall beschreiben, sind markiert und werden vor dem
+                        Einsatz ergänzt.
+                    </div>
+                </div>
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="vorlagen-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="toggleVorlagenFaq(this)">
+                        <span class="text-slate-200 font-medium">Kann ich die Vorlagen von dieser Seite einfach übernehmen?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="vorlagen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Ja. Alle Vorlagen auf dieser Seite sind frei verwendbar, auch geschäftlich, ohne
+                        Namensnennung.
+                    </div>
+                </div>
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="vorlagen-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="toggleVorlagenFaq(this)">
+                        <span class="text-slate-200 font-medium">Funktionieren die Vorlagen mit ChatGPT?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="vorlagen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Ja. Die Vorlagen bestehen aus reinem Text und funktionieren in ChatGPT, Claude, Gemini,
+                        Copilot und jedem anderen Werkzeug, das Texteingaben entgegennimmt.
+                    </div>
+                </div>
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="vorlagen-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="toggleVorlagenFaq(this)">
+                        <span class="text-slate-200 font-medium">Wie viele Vorlagen kann ich in Promptomizer speichern?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="vorlagen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Im kostenlosen Zugang lassen sich insgesamt zehn Inhalte speichern, wobei Prompts und
+                        Bausteine zusammen gezählt werden. Mit Pro ist die Zahl unbegrenzt. Details auf der
+                        <a href="/preise" class="text-brand-sky hover:underline">Preisseite</a>.
+                    </div>
+                </div>
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="vorlagen-faq-toggle w-full flex items-center justify-between p-4 text-left"
+                        onclick="toggleVorlagenFaq(this)">
+                        <span class="text-slate-200 font-medium">Werden meine Vorlagen für KI-Training verwendet?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="vorlagen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Nein. Deine Inhalte liegen in einer Datenbank in Deutschland. Es ist kein KI-Modell
+                        eingebunden, an das sie übergeben werden.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preisanker -->
+        <section class="rounded-xl border-2 border-brand-sky bg-slate-800/40 p-6 md:p-8 shadow-glow mb-16 text-center">
+            <h2 class="text-lg font-bold text-white mb-2">Kostenlos starten, jederzeit upgraden</h2>
+            <p class="text-sm">
+                Promptomizer ist kostenlos nutzbar, mit bis zu zehn gespeicherten Inhalten und fünf Kategorien.
+                Wer mehr braucht, zahlt ab 3,99 € im Monat (Einführungspreis).
+                <a href="/preise" class="text-brand-sky hover:underline">Alle Details zu den Plänen</a>.
+            </p>
+        </section>
+
+        <!-- Abschluss-CTA -->
+        <section class="text-center rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow">
+            <h2 class="text-2xl font-bold text-white mb-3">Vorlagen dauerhaft griffbereit haben</h2>
+            <p class="mb-6">Kostenloses Konto anlegen und Bausteine sowie Prompts an einem Ort sammeln.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="/app?intent=register" class="ui-btn ui-btn-primary px-8">Kostenlos registrieren</a>
+                <a href="/prompt-erstellen" class="ui-btn ui-btn-ghost border border-navy-border px-8">Vorlage im Generator öffnen</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Vertrauensleiste -->
+    <div class="border-t border-navy-border">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+            <span><i class="fa-solid fa-flag mr-1.5"></i>Deutschland</span>
+            <span><i class="fa-solid fa-shield-halved mr-1.5"></i>DSGVO</span>
+            <span><i class="fa-solid fa-robot mr-1.5"></i>Kein KI-Training</span>
+            <span><i class="fa-solid fa-rotate-left mr-1.5"></i>Jederzeit kündbar</span>
+        </div>
+    </div>
+
+    <footer class="border-t border-navy-border">
+        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+            <span>&copy; 2026 Promptomizer</span>
+            <div class="flex items-center gap-4">
+                <a href="/preise" class="hover:text-slate-400">Preise</a>
+                <a href="/app" class="hover:text-slate-400">Zur App</a>
+                <a href="/impressum" class="hover:text-slate-400">Impressum</a>
+                <a href="/datenschutz" class="hover:text-slate-400">Datenschutz</a>
+                <a href="/agb" class="hover:text-slate-400">AGB</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function copyVorlage(elementId, button) {
+            const el = document.getElementById(elementId);
+            const text = el.innerText;
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Kopiert!';
+                setTimeout(() => { button.innerHTML = originalHTML; }, 2000);
+            } catch (err) {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        function toggleVorlagenFaq(button) {
+            const body = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            const isOpen = !body.classList.contains('hidden');
+            body.classList.toggle('hidden', isOpen);
+            icon.classList.toggle('rotate-180', !isOpen);
+        }
+    </script>
+</body>
+
+</html>
