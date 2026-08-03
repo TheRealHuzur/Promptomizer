@@ -64,7 +64,7 @@ async function loginWithGoogle() {
     try {
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo: window.location.origin }
+            options: { redirectTo: window.location.origin + '/app' }
         });
         if (error) throw error;
     } catch (err) {
@@ -79,7 +79,7 @@ async function registerUser(email, password, metadata = {}) {
         password,
         options: {
             data: metadata,
-            emailRedirectTo: window.location.origin
+            emailRedirectTo: window.location.origin + '/app'
         }
     });
     return { data, error };
@@ -90,7 +90,7 @@ async function resendSignupConfirmation(email) {
         type: 'signup',
         email,
         options: {
-            emailRedirectTo: window.location.origin
+            emailRedirectTo: window.location.origin + '/app'
         }
     });
     return { data, error };
@@ -98,7 +98,7 @@ async function resendSignupConfirmation(email) {
 
 async function requestPasswordReset(email) {
     const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin
+        redirectTo: window.location.origin + '/app'
     });
     return { data, error };
 }
