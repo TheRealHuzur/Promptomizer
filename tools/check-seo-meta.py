@@ -15,7 +15,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 # app.html bewusst ausgeschlossen: noindex, braucht kein Title/Description/Canonical-SEO
-INDEXABLE_PAGES = ["index.html", "preise.html", "impressum.html", "datenschutz.html", "agb.html"]
+INDEXABLE_PAGES = [
+    "index.html",
+    "preise.html",
+    "prompt-bibliothek.html",
+    "prompt-erstellen.html",
+    "prompt-vorlagen.html",
+    "impressum.html",
+    "datenschutz.html",
+    "agb.html",
+]
 
 errors = []
 warnings = []
@@ -53,11 +62,18 @@ if not (ROOT / "sitemap.xml").exists():
     errors.append("sitemap.xml fehlt")
 else:
     sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    sitemap_urls = set(re.findall(r"<loc>(https://www\.promptomizer\.de/[^<]*)</loc>", sitemap))
+    checked_urls = set()
     for name in INDEXABLE_PAGES:
         slug = "" if name == "index.html" else name.removesuffix(".html")
         url = f"https://www.promptomizer.de/{slug}"
+        checked_urls.add(url)
         if url.rstrip("/") not in sitemap and url not in sitemap:
             warnings.append(f"sitemap.xml: {url} nicht gefunden")
+
+    # Verhindert, dass neue Sitemap-Seiten versehentlich vom Meta-Check ausgenommen bleiben.
+    for url in sorted(sitemap_urls - checked_urls):
+        errors.append(f"sitemap.xml: {url} wird nicht durch INDEXABLE_PAGES geprüft")
 
 print(f"Geprüft: {len(INDEXABLE_PAGES)} Seiten + robots.txt + sitemap.xml\n")
 
