@@ -72,6 +72,7 @@
         data-cookieconsent="ignore">
 
     <link rel="stylesheet" href="styles.css" data-cookieconsent="ignore">
+    <link rel="stylesheet" href="library.css" data-cookieconsent="ignore">
 
     <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
         data-exclude-hash="true" data-cookieconsent="ignore"></script>
@@ -3713,11 +3714,11 @@
             }
             try {
                 const [library, promptVersions, snippets, categories, history] = await Promise.all([
-                    window.db.supabase.from('library').select('*'),
-                    window.db.supabase.from('prompt_versions').select('*'),
-                    window.db.supabase.from('snippets').select('*'),
-                    window.db.supabase.from('prompt_categories').select('*'),
-                    window.db.supabase.from('prompt_history').select('*'),
+                    window.db.getClient().from('library').select('id,user_id,name,fields,created_at,category,category_id,current_version,updated_at,description,is_favorite,last_used_at,archived_at,prompt_type'),
+                    window.db.getClient().from('prompt_versions').select('*'),
+                    window.db.getClient().from('snippets').select('*'),
+                    window.db.getClient().from('prompt_categories').select('*'),
+                    window.db.getClient().from('prompt_history').select('*'),
                 ]);
                 const exportData = {
                     exportedAt: new Date().toISOString(),
@@ -6942,6 +6943,7 @@
 
     <script src="vendor/supabase/supabase.js" data-cookieconsent="ignore"></script>
     <script src="db.js" data-cookieconsent="ignore"></script>
+    <script src="library.js" data-cookieconsent="ignore"></script>
 </body>
 
 </html>

@@ -602,21 +602,6 @@ window.db = {
             return false;
         }
 
-        const { data: rows, error: err2 } = await supabaseClient
-            .from('library')
-            .update({ category: newName })
-            .eq('user_id', uid)
-            .eq('category', oldName)
-            .select('id');
-
-        if (err2) {
-            console.error('Prompt Category Rename Library Error:', err2);
-            return false;
-        }
-
-        if (!rows || rows.length === 0) {
-            console.error('Prompt Category Rename: 0 prompts updated', { categoryId, uid, oldName, newName });
-        }
 
         return true;
     },
@@ -642,21 +627,6 @@ window.db = {
             return false;
         }
 
-        const { data: rows, error: err2 } = await supabaseClient
-            .from('library')
-            .update({ category: null })
-            .eq('user_id', uid)
-            .eq('category', categoryName)
-            .select('id');
-
-        if (err2) {
-            console.error('Prompt Category Delete Library Error:', err2);
-            return false;
-        }
-
-        if (!rows || rows.length === 0) {
-            console.error('Prompt Category Delete: 0 prompts updated', { categoryId, uid, categoryName });
-        }
 
         return true;
     },
@@ -767,5 +737,8 @@ window.db = {
         return data;
     }
 };
+
+// Bibliotheks-Erweiterungen bleiben in einer eigenen Datei, nutzen aber denselben Auth-Client.
+window.db.getClient = () => supabaseClient;
 
 

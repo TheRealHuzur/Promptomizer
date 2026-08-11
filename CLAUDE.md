@@ -46,6 +46,8 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 | `vercel.json` | `cleanUrls`, `trailingSlash`, Redirects (siehe §2) |
 | `wissen/<slug>.html` | Wissensseiten (noch keine existieren, Stand 02.08.2026 — Infrastruktur/Template steht, Inhalte kommen erst Phase 4/7). Template und Publikations-Workflow: `/srv/wuw-storage/53_promptomizer/02_guides/wissensseite-template.html` + `wissensseiten-workflow.md` |
 | `db.js` | Supabase-Client, Auth, `window.db`-API |
+| `library.js` | Eigenständige Bibliothekslogik für Karten-/Listenansicht, Suche, Filter, Metadaten, Archiv, Export und Pro-Massenaktionen |
+| `library.css` | Desktop-Design der Bibliothek; bewusst ohne appweites Responsive-Redesign |
 | `sw.js` | Service Worker — **Kill-Switch** (räumt alte Caches/Registrierungen ab) |
 | `manifest.json` | PWA-Manifest, `start_url` zeigt auf `/app` |
 | `icon.png` | App-Icon |
@@ -68,14 +70,15 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 - Jede Daten-Tabelle hat `user_id uuid` (bzw. `profiles.id`) mit FK auf `auth.users(id) ON DELETE CASCADE` → Account-Löschung räumt alle Nutzerdaten automatisch ab.
 - `profiles` wird beim Signup vom Trigger `handle_new_user` (auf `auth.users`) angelegt (`tier = 'free'`).
 
-### RLS-/Sicherheitsmodell (Stand 26.07.2026, inkl. Migration `20260726142705`)
+### RLS-/Sicherheitsmodell (Stand 11.08.2026, inkl. Migration `20260811191926`)
 - **Policies:** Lese-/Schreibzugriff nur auf eigene Zeilen (`auth.uid() = user_id` bzw. `= id`).
 - **`profiles` ist nur spaltenweise schreibbar:** `authenticated` darf per UPDATE ausschließlich `onboarding_completed`, `display_name`, `default_editor_mode` und `active_badge_code` setzen. **Alle Billing-Felder (`tier`, `stripe_*`, `subscription_status`, …) schreiben ausschließlich die Edge Functions per `service_role`.**
   - ⚠️ **Wichtig:** Niemals `authenticated`/`anon` ein breites `GRANT UPDATE` auf `profiles` geben. Sonst kann sich jeder Nutzer selbst auf `tier='pro'` setzen (Gratis-Upgrade) oder fremde `stripe_customer_id` kapern. Genau diese Lücke wurde geschlossen.
 - **`anon`** hat **keinerlei** Tabellen-Grants (Gäste arbeiten rein clientseitig).
 - **Free-Limit:** Trigger `check_free_plan_limit` (BEFORE INSERT auf `library`) wirft `FREE_LIMIT_REACHED` ab 10 gespeicherten Prompts für Free-User. Gehärtet mit `SET search_path = public` und `pg_advisory_xact_lock` (gegen Race bei parallelen Tabs/Doppel-Requests). Das Frontend fängt die Meldung ab und öffnet das Upgrade-Modal.
 - **Badges:** `badges` ist der lesbare Katalog, `user_badges` enthält ausschließlich serverseitig vergebene Auszeichnungen. Ein zusammengesetzter FK von `profiles(id, active_badge_code)` auf `user_badges(user_id, badge_code)` verhindert die Auswahl unverdienter Badges. Der Founder-Badge wird bei berechtigten, bestätigten Stripe-Events idempotent vergeben.
-- **Prompt-Versionierung:** `library.current_version`/`updated_at` halten den aktuellen Stand. Private Trigger schreiben beim Anlegen und bei jeder Änderung von `name`/`fields` unveränderliche Snapshots nach `prompt_versions`; reine Kategorieänderungen erzeugen keine Version. Bestehende Prompts wurden als Version 1 übernommen.
+- **Bibliothek V2:** `library.category_id` referenziert Kategorien zusammen mit `user_id` eigentümersicher; das alte Textfeld `category` bleibt während der Übergangszeit synchron erhalten. `description`, `is_favorite`, `last_used_at` und `archived_at` sind Metadaten. `prompt_type` und `search_vector` werden generiert; ein GIN-Index ermöglicht serverseitige Volltextsuche. Mehrfachaktionen laufen ausschließlich als Pro über `bulk_manage_library_prompts`.
+- **Prompt-Versionierung:** `library.current_version`/`updated_at` halten den aktuellen Stand. Private Trigger schreiben beim Anlegen und bei jeder Änderung von `name`/`fields` unveränderliche Snapshots nach `prompt_versions`; Beschreibungs-, Kategorie-, Favoriten-, Nutzungs- und Archivänderungen erzeugen keine Inhaltsversion. Bestehende Prompts wurden als Version 1 übernommen.
 - **Pro-Zugriff:** Versionen werden auch für Free-Nutzer erzeugt, sind per RLS aber nur für den jeweiligen Eigentümer mit `profiles.tier = 'pro'` lesbar. Direkte Client-Schreibrechte auf `prompt_versions` existieren nicht. `restore_library_prompt_version` läuft als `SECURITY INVOKER`, übernimmt Name/Inhalt und erzeugt eine neue aktuelle Version; die Kategorie bleibt unverändert.
 - Constraints: `profiles_tier_check` (nur `free`/`pro`), `profiles_default_editor_mode_check`, Anzeigename maximal 40 Zeichen, `NOT NULL` auf `library.user_id` & `prompt_history.user_id`, Unique-Indizes `prompt_categories(user_id, name)` und `prompt_versions(prompt_id, version_number)`.
 
