@@ -101,22 +101,6 @@
         return cleanText(prompt.description) || cleanText(promptToText(prompt)) || 'Noch keine Vorschau vorhanden.';
     }
 
-    async function copyText(text) {
-        try {
-            await navigator.clipboard.writeText(text);
-            return true;
-        } catch (_) {
-            const area = document.createElement('textarea');
-            area.value = text;
-            area.style.position = 'fixed';
-            area.style.opacity = '0';
-            document.body.appendChild(area);
-            area.select();
-            const ok = document.execCommand('copy');
-            area.remove();
-            return ok;
-        }
-    }
 
     function downloadFile(filename, content, mime) {
         const blob = new Blob([content], { type: mime });
@@ -349,7 +333,10 @@
         if (!history?.parentElement) return;
 
         const editor = Array.from(document.querySelectorAll('.nav-item'))
-            .find(item => item.getAttribute('onclick')?.includes("switchView('editor')"));
+            .find(item => {
+                const handler = item.getAttribute('onclick') || '';
+                return handler.includes('openEditorFromNavigation') || handler.includes("switchView('editor')");
+            });
         const settings = Array.from(document.querySelectorAll('.nav-item'))
             .find(item => item.getAttribute('onclick')?.includes('toggleSettingsMenu'));
         if (editor) editor.dataset.appView = 'editor';
@@ -445,7 +432,9 @@
             if (viewId !== 'library') document.getElementById('view-library')?.classList.add('hidden');
             original(viewId);
             const modeToggle = document.getElementById('mode-toggle-container');
+            const editorFooter = document.getElementById('editor-footer');
             if (modeToggle) modeToggle.classList.toggle('hidden', viewId === 'library');
+            if (editorFooter) editorFooter.classList.toggle('hidden', viewId === 'library');
             setActiveNavigation(viewId);
             if (viewId === 'library') openLibrary();
         };
@@ -552,32 +541,9 @@
         );
 
         state.categories.forEach(category => {
-            const row = document.createElement('div');
-            row.className = 'library-category-row';
-            row.style.display = 'flex';
-            row.style.alignItems = 'center';
-            const button = categoryButton(category.name, 'fa-folder', state.counts.categories[String(category.id)] || 0, 'category', category.id);
-            button.style.minWidth = '0';
-            button.style.flex = '1';
-            const tools = document.createElement('div');
-            tools.className = 'library-category-tools';
-            const rename = document.createElement('button');
-            rename.type = 'button';
-            rename.className = 'library-category-tool';
-            rename.title = 'Kategorie umbenennen';
-            rename.setAttribute('aria-label', 'Kategorie umbenennen');
-            rename.innerHTML = '<i class="fa-solid fa-pen"></i>';
-            rename.addEventListener('click', () => window.openManageCategoryRenameModal?.(category.id, category.name));
-            const remove = document.createElement('button');
-            remove.type = 'button';
-            remove.className = 'library-category-tool';
-            remove.title = 'Kategorie löschen';
-            remove.setAttribute('aria-label', 'Kategorie löschen');
-            remove.innerHTML = '<i class="fa-solid fa-trash"></i>';
-            remove.addEventListener('click', () => window.openManageCategoryDeleteModal?.(category.id, category.name));
-            tools.append(rename, remove);
-            row.append(button, tools);
-            categoryWrap.append(row);
+            categoryWrap.append(
+                categoryButton(category.name, 'fa-folder', state.counts.categories[String(category.id)] || 0, 'category', category.id)
+            );
         });
         const divider = document.createElement('div');
         divider.className = 'library-side-divider';
@@ -722,7 +688,7 @@
         button.className = 'library-use-button';
         button.title = 'Im Editor verwenden';
         button.setAttribute('aria-label', 'Im Editor verwenden');
-        button.innerHTML = '<i class="fa-solid fa-file-import"></i>';
+        button.innerHTML = '<i class="fa-solid fa-copy"></i>';
         button.addEventListener('click', event => usePrompt(event, prompt.id));
         return button;
     }
@@ -1042,7 +1008,6 @@
         const actions = document.createElement('div');
         actions.className = 'library-edit-actions';
         actions.append(
-            editAction('Kopieren', 'fa-copy', () => copyPrompt(prompt.id)),
             editAction('Duplizieren', 'fa-clone', () => duplicatePrompt(prompt.id)),
             editAction(prompt.archived_at ? 'Wiederherstellen' : 'Archivieren', prompt.archived_at ? 'fa-rotate-left' : 'fa-box-archive', () => archivePrompt(prompt.id, Boolean(prompt.archived_at)))
         );
@@ -1078,17 +1043,6 @@
         button.innerHTML = `<i class="fa-solid ${icon}"></i><span>${label}</span>`;
         button.addEventListener('click', handler);
         return button;
-    }
-
-    async function copyPrompt(id) {
-        const prompt = await db.getScenarioById(id);
-        if (!prompt) return window.showToast?.('Prompt konnte nicht geladen werden.', 'error');
-        const ok = await copyText(promptToText(prompt));
-        if (!ok) return window.showToast?.('Kopieren fehlgeschlagen.', 'error');
-        await db.markScenarioUsed(id);
-        track('library_prompt_copy');
-        window.showToast?.('Prompt wurde kopiert.', 'success');
-        await renderEditDetails(id);
     }
 
     async function duplicatePrompt(id) {

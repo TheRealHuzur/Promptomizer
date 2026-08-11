@@ -132,7 +132,7 @@
                         class="sidebar-nav-title text-[11px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-2">
                         Navigation</div>
                     <div class="space-y-0.5">
-                        <div onclick="switchView('editor')"
+                        <div onclick="openEditorFromNavigation()"
                             class="nav-item group relative flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer active-nav transition-all">
                             <span class="nav-indicator absolute left-0 top-0 bottom-0 w-[3px] bg-brand-sky"></span>
                             <i class="fa-solid fa-pen-to-square w-5 text-center text-brand-sky"></i>
@@ -249,6 +249,9 @@
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <button type="button" onclick="requestPromptEditExit()" class="ui-btn ui-btn-ghost mr-1" title="Zur Bibliothek">
+                                        <i class="fa-solid fa-arrow-left mr-2"></i>Zur Bibliothek
+                                    </button>
                                     <span class="text-xs font-bold uppercase tracking-wider text-brand-sky">Bibliotheks-Prompt bearbeiten</span>
                                     <span id="prompt-edit-version-badge"
                                         class="rounded bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-300">Version 1</span>
@@ -259,14 +262,6 @@
                                     class="text-xs font-bold uppercase tracking-wider text-slate-400">Name</label>
                                 <input id="prompt-edit-name" type="text" class="ui-input mt-1"
                                     placeholder="Name des Prompts" oninput="updatePromptEditDirtyState()" />
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="openActivePromptVersions()"
-                                    class="ui-btn ui-btn-ghost">
-                                    <i class="fa-solid fa-clock-rotate-left mr-2"></i>Versionen
-                                </button>
-                                <button type="button" onclick="requestPromptEditExit()"
-                                    class="ui-btn ui-btn-ghost">Bearbeitung beenden</button>
                             </div>
                         </div>
                     </div>
@@ -1271,7 +1266,7 @@
 
             </div>
 
-            <footer
+            <footer id="editor-footer"
                 class="h-20 border-t border-navy-border flex items-center justify-center px-8 z-30 flex-shrink-0 bg-navy-deep">
                 <div id="editor-actions-container" class="w-full max-w-4xl flex items-center gap-4">
                     <div id="footer-save-wrap">
@@ -3896,6 +3891,18 @@
             }
         }
 
+        function openEditorFromNavigation() {
+            const openEditor = () => switchView('editor');
+            if (!promptEditSession) {
+                openEditor();
+                return;
+            }
+            requestPromptEditAction(() => {
+                exitPromptEditSession(true);
+                openEditor();
+            });
+        }
+
         function switchView(viewId) {
 
             const views = ['editor', 'history', 'settings', 'konto', 'impressum', 'datenschutz', 'agb', 'cookies'];
@@ -4502,6 +4509,10 @@
                         mode: currentMode,
                         timestamp: new Date().toISOString()
                     });
+                }
+                if (promptEditSession?.id && window.db?.markScenarioUsed) {
+                    await window.db.markScenarioUsed(promptEditSession.id);
+                    window.PromptLibrary?.renderEditDetails?.(promptEditSession.id);
                 }
                 const btn = document.getElementById('btn-copy');
                 const originalHTML = btn.innerHTML;
@@ -5161,6 +5172,14 @@
                 document.getElementById('prompt-edit-name')?.focus();
                 return;
             }
+            if (promptEditSession) {
+                const preservedDraft = promptEditSession.draft;
+                requestPromptEditAction(() => {
+                    exitPromptEditSession(false);
+                    startPromptEditSession(id, preservedDraft);
+                });
+                return;
+            }
 
             let scenario = (promptLibraryCache || []).find(item => item.id == id);
             if (!scenario) {
@@ -5189,6 +5208,7 @@
             const nameInput = document.getElementById('prompt-edit-name');
             if (nameInput) nameInput.value = scenario.name || '';
             document.getElementById('prompt-edit-banner')?.classList.remove('hidden');
+            document.getElementById('view-editor')?.classList.add('prompt-edit-active');
             setPromptEditModeLocked(true);
             updatePromptEditBanner();
             promptEditSession.baseline = getPromptEditSerializedState();
@@ -5219,7 +5239,10 @@
 
         function requestPromptEditExit() {
             if (!promptEditSession) return;
-            requestPromptEditAction(() => exitPromptEditSession(true));
+            requestPromptEditAction(() => {
+                exitPromptEditSession(true);
+                switchView('library');
+            });
         }
 
         function exitPromptEditSession(restoreDraft = true) {
@@ -5227,6 +5250,7 @@
             const draft = promptEditSession.draft;
             promptEditSession = null;
             document.getElementById('prompt-edit-banner')?.classList.add('hidden');
+            document.getElementById('view-editor')?.classList.remove('prompt-edit-active');
             setPromptEditModeLocked(false);
             renderPromptEditFooter();
             if (restoreDraft) restoreEditorDraft(draft);

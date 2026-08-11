@@ -21,7 +21,7 @@ assert(!app.includes('window.db.supabase'));
 assert(library.includes("history.parentElement.insertBefore(item, history)"));
 assert(library.includes("view.id = 'view-library'"));
 assert(library.includes("const PAGE_SIZE = 24"));
-assert(library.includes("button.innerHTML = '<i class=\"fa-solid fa-file-import\"></i>'"));
+assert(library.includes("button.innerHTML = '<i class=\"fa-solid fa-copy\"></i>'"));
 assert(library.includes("button.setAttribute('aria-label', 'Im Editor verwenden')"));
 assert(library.includes("state.viewMode === 'cards' ? buildCard(prompt) : buildListRow(prompt)"));
 assert(!library.includes('fa-ellipsis'));
@@ -29,8 +29,22 @@ assert(!library.includes('window.confirm('));
 assert(library.includes("modal.setAttribute('aria-modal', 'true')"));
 
 assert(css.includes('.library-grid'));
+assert(!library.includes('Kategorie umbenennen'));
+assert(!library.includes('Kategorie löschen'));
+assert(!library.includes("editAction('Kopieren'"));
+assert(library.includes("editorFooter.classList.toggle('hidden', viewId === 'library')"));
+assert(library.includes("handler.includes('openEditorFromNavigation')"));
+
+assert(app.includes('id="editor-footer"'));
+assert(app.includes('onclick="openEditorFromNavigation()"'));
+assert(app.includes("switchView('library')"));
+assert(!app.includes('>Bearbeitung beenden</button>'));
 assert(css.includes('grid-template-columns: repeat(3, minmax(0, 1fr))'));
 assert(css.includes('.library-view button:focus-visible'));
+assert(css.includes('#view-editor.prompt-edit-active #input-free'));
+assert(css.includes('resize: vertical'));
+assert(!css.includes('radial-gradient'));
+assert(!css.includes('linear-gradient'));
 assert(!css.includes('@media'));
 
 for (const column of ['category_id', 'description', 'is_favorite', 'last_used_at', 'archived_at', 'search_vector']) {
