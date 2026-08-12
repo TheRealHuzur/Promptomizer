@@ -3,6 +3,7 @@
 
     const PAGE_SIZE = 24;
     const VIEW_KEY = 'promptomizer_library_view';
+    const CONTENT_KEY = 'promptomizer_library_content';
     const state = {
         initialized: false,
         loading: false,
@@ -31,6 +32,10 @@
     const librarySelect = 'id, user_id, name, fields, created_at, category, category_id, description, is_favorite, last_used_at, archived_at, prompt_type, current_version, updated_at';
     const db = window.db;
     const client = () => db?.getClient?.();
+
+    function isPromptArea() {
+        return document.getElementById('view-library')?.dataset.contentType !== 'snippets';
+    }
 
     function track(name, data = {}) {
         try {
@@ -368,9 +373,16 @@
                     <h2 class="library-title">Prompt-Bibliothek</h2>
                     <p class="library-subtitle">Finde bewährte Prompts wieder, nutze sie als Ausgangspunkt und halte deinen Bestand übersichtlich.</p>
                 </div>
-                <div class="library-view-toggle" aria-label="Darstellung wählen">
-                    <button id="library-view-cards" type="button" title="Kartenansicht" aria-label="Kartenansicht"><i class="fa-solid fa-table-cells-large"></i></button>
-                    <button id="library-view-list" type="button" title="Listenansicht" aria-label="Listenansicht"><i class="fa-solid fa-list"></i></button>
+                <div class="library-hero-actions">
+                    <div class="library-content-toggle" aria-label="Bibliotheksbereich wählen">
+                        <button id="library-content-prompts" type="button">Prompts</button>
+                        <button id="library-content-snippets" type="button">Bausteine</button>
+                    </div>
+                    <button id="library-create-snippet" class="library-primary-action hidden" type="button"><i class="fa-solid fa-plus"></i> Neuer Baustein</button>
+                    <div class="library-view-toggle" aria-label="Darstellung wählen">
+                        <button id="library-view-cards" type="button" title="Kartenansicht" aria-label="Kartenansicht"><i class="fa-solid fa-table-cells-large"></i></button>
+                        <button id="library-view-list" type="button" title="Listenansicht" aria-label="Listenansicht"><i class="fa-solid fa-list"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="library-toolbar">
@@ -445,6 +457,7 @@
     function bindControls() {
         let searchTimer = null;
         document.getElementById('library-search')?.addEventListener('input', event => {
+            if (!isPromptArea()) return;
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 state.search = event.target.value || '';
@@ -453,22 +466,33 @@
             }, 250);
         });
         document.getElementById('library-type')?.addEventListener('change', event => {
+            if (!isPromptArea()) return;
             state.promptType = event.target.value;
             track('library_filter_type', { type: state.promptType || 'all' });
             reloadItems();
         });
         document.getElementById('library-sort')?.addEventListener('change', event => {
+            if (!isPromptArea()) return;
             state.sort = event.target.value;
             track('library_sort', { sort: state.sort });
             reloadItems();
         });
-        document.getElementById('library-view-cards')?.addEventListener('click', () => setViewMode('cards'));
-        document.getElementById('library-view-list')?.addEventListener('click', () => setViewMode('list'));
-        document.getElementById('library-load-more')?.addEventListener('click', () => loadItems(false));
+        document.getElementById('library-view-cards')?.addEventListener('click', () => { if (isPromptArea()) setViewMode('cards'); });
+        document.getElementById('library-view-list')?.addEventListener('click', () => { if (isPromptArea()) setViewMode('list'); });
+        document.getElementById('library-load-more')?.addEventListener('click', () => { if (isPromptArea()) loadItems(false); });
         document.getElementById('library-add-category')?.addEventListener('click', () => {
+            if (!isPromptArea()) return;
             if (window.openPromptCategoryModal) window.openPromptCategoryModal();
         });
-        document.getElementById('library-selection-toggle')?.addEventListener('click', toggleSelectionMode);
+        document.getElementById('library-selection-toggle')?.addEventListener('click', () => { if (isPromptArea()) toggleSelectionMode(); });
+        document.getElementById('library-content-prompts')?.addEventListener('click', () => {
+            localStorage.setItem(CONTENT_KEY, 'prompts');
+            openPrompts();
+        });
+        document.getElementById('library-content-snippets')?.addEventListener('click', () => {
+            localStorage.setItem(CONTENT_KEY, 'snippets');
+            window.SnippetLibrary?.open();
+        });
     }
 
     function setViewMode(mode) {
@@ -527,6 +551,7 @@
     }
 
     function renderCategories() {
+        if (!isPromptArea()) return;
         const staticWrap = document.getElementById('library-static-filters');
         const categoryWrap = document.getElementById('library-category-list');
         if (!staticWrap || !categoryWrap) return;
@@ -618,6 +643,7 @@
     }
 
     function renderLoading() {
+        if (!isPromptArea()) return;
         const content = document.getElementById('library-content');
         if (!content) return;
         content.innerHTML = '<div class="library-empty"><div class="library-empty-icon"><i class="fa-solid fa-circle-notch fa-spin"></i></div><div>Bibliothek wird geladen …</div></div>';
@@ -625,6 +651,7 @@
     }
 
     function renderSignedOut() {
+        if (!isPromptArea()) return;
         const content = document.getElementById('library-content');
         if (!content) return;
         content.innerHTML = '<div class="library-empty"><div class="library-empty-icon"><i class="fa-solid fa-lock"></i></div><strong style="color:#e2e8f0;margin-bottom:.35rem">Deine Bibliothek wartet auf dich</strong><div>Melde dich an, um gespeicherte Prompts zu sehen.</div><button id="library-login" class="library-load-more" type="button">Jetzt anmelden</button></div>';
@@ -632,6 +659,7 @@
     }
 
     function renderError() {
+        if (!isPromptArea()) return;
         const content = document.getElementById('library-content');
         if (!content) return;
         content.innerHTML = '<div class="library-empty"><div class="library-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><strong style="color:#e2e8f0;margin-bottom:.35rem">Bibliothek konnte nicht geladen werden</strong><div>Bitte versuche es erneut.</div><button id="library-retry" class="library-load-more" type="button">Erneut laden</button></div>';
@@ -646,6 +674,7 @@
     }
 
     function renderItems() {
+        if (!isPromptArea()) return;
         const content = document.getElementById('library-content');
         const count = document.getElementById('library-result-count');
         const more = document.getElementById('library-load-more');
@@ -811,6 +840,7 @@
     }
 
     function renderSelectionButton() {
+        if (!isPromptArea()) return;
         const button = document.getElementById('library-selection-toggle');
         if (!button) return;
         button.classList.toggle('is-active', state.selectionMode);
@@ -1151,9 +1181,49 @@
         });
     }
 
-    async function openLibrary() {
-        track('library_open');
+    function setPromptShell() {
+        const view = document.getElementById('view-library');
+        if (!view) return;
+        view.dataset.contentType = 'prompts';
+        document.getElementById('library-content-prompts')?.classList.add('is-active');
+        document.getElementById('library-content-snippets')?.classList.remove('is-active');
+        document.getElementById('library-create-snippet')?.classList.add('hidden');
+        const kicker = view.querySelector('.library-kicker');
+        const title = view.querySelector('.library-title');
+        const subtitle = view.querySelector('.library-subtitle');
+        if (kicker) kicker.textContent = 'Dein Prompt-Bestand';
+        if (title) title.textContent = 'Prompt-Bibliothek';
+        if (subtitle) subtitle.textContent = 'Finde bewährte Prompts wieder, nutze sie als Ausgangspunkt und halte deinen Bestand übersichtlich.';
+        const search = document.getElementById('library-search');
+        if (search) { search.placeholder = 'Prompts durchsuchen …'; search.value = state.search; }
+        const type = document.getElementById('library-type');
+        if (type) {
+            type.classList.remove('hidden');
+            type.innerHTML = '<option value="">Alle Prompt-Typen</option><option value="structured">Strukturiert</option><option value="free">Frei</option>';
+            type.value = state.promptType;
+        }
+        const sort = document.getElementById('library-sort');
+        if (sort) sort.value = state.sort;
+        document.getElementById('library-add-category')?.classList.remove('hidden');
+        const sideLabels = view.querySelectorAll('.library-categories .library-side-label');
+        if (sideLabels[1]) sideLabels[1].textContent = 'Kategorien';
+        renderViewToggle();
+        renderSelectionButton();
+    }
+
+    async function openPrompts() {
+        localStorage.setItem(CONTENT_KEY, 'prompts');
+        setPromptShell();
+        track('library_open', { content_type: 'prompts' });
         await reloadItems();
+    }
+
+    async function openLibrary() {
+        if (localStorage.getItem(CONTENT_KEY) === 'snippets' && window.SnippetLibrary?.open) {
+            await window.SnippetLibrary.open();
+            return;
+        }
+        await openPrompts();
     }
 
     function init() {
@@ -1168,14 +1238,17 @@
         renderViewToggle();
         renderSelectionButton();
         window.addEventListener('auth-state-changed', () => {
-            if (!document.getElementById('view-library')?.classList.contains('hidden')) reloadItems();
-            else loadContext();
+            if (!document.getElementById('view-library')?.classList.contains('hidden')) {
+                if (isPromptArea()) reloadItems();
+                else window.SnippetLibrary?.refreshAll();
+            } else loadContext();
         });
         loadContext();
     }
 
     window.PromptLibrary = {
         open: openLibrary,
+        openPrompts,
         refreshAll: reloadItems,
         renderEditDetails
     };

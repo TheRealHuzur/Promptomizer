@@ -346,7 +346,7 @@ window.db = {
 
     // --- SNIPPETS (Bausteine) ---
     async saveSnippet(snippet) {
-        if (!window.currentUser) return false;
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
 
         const { error } = await supabaseClient
             .from('snippets')
@@ -355,15 +355,17 @@ window.db = {
                 name: snippet.name,
                 content: snippet.content,
                 mode: snippet.mode,
-                field_id: snippet.field_id,
-                created_at: new Date().toISOString()
+                field_id: snippet.field_id
             });
 
         if (error) {
             console.error("Snippet Save Error:", error);
-            return false;
+            if (error.message?.includes('FREE_LIMIT_REACHED')) {
+                return { success: false, reason: 'FREE_LIMIT_REACHED' };
+            }
+            return { success: false, reason: 'ERROR' };
         }
-        return true;
+        return { success: true };
     },
 
     async getSnippets(params) {
@@ -372,7 +374,8 @@ window.db = {
         let query = supabaseClient
             .from('snippets')
             .select('*')
-            .eq('user_id', window.currentUser.id);
+            .eq('user_id', window.currentUser.id)
+            .is('archived_at', null);
 
         if (params.mode === 'structured') {
             query = query.in('mode', ['structured', 'both']).eq('field_id', params.fieldId);
@@ -415,6 +418,130 @@ window.db = {
             return false;
         }
         return true;
+    },
+
+    async getSnippetById(id) {
+        if (!window.currentUser) return null;
+        const { data, error } = await supabaseClient
+            .from('snippets')
+            .select('id, user_id, name, content, mode, field_id, created_at, updated_at, is_favorite, last_used_at, archived_at')
+            .eq('id', id)
+            .eq('user_id', window.currentUser.id)
+            .maybeSingle();
+        if (error) console.error('Snippet Fetch Error:', error);
+        return error ? null : data;
+    },
+
+    async getLibrarySnippets(options = {}) {
+        if (!window.currentUser) {
+            return { success: false, reason: 'NOT_LOGGED_IN', items: [], total: 0, hasMore: false };
+        }
+        const offset = Math.max(0, Number(options.offset) || 0);
+        const limit = Math.min(50, Math.max(1, Number(options.limit) || 24));
+        let query = supabaseClient
+            .from('snippets')
+            .select('id, user_id, name, content, mode, field_id, created_at, updated_at, is_favorite, last_used_at, archived_at', { count: 'exact' })
+            .eq('user_id', window.currentUser.id);
+
+        query = options.archived
+            ? query.not('archived_at', 'is', null)
+            : query.is('archived_at', null);
+
+        const search = String(options.search || '').trim();
+        if (search) query = query.textSearch('search_vector', search, { config: 'simple', type: 'websearch' });
+        if (options.fieldId) query = query.eq('field_id', options.fieldId);
+        if (options.favoriteOnly) query = query.eq('is_favorite', true);
+
+        if (options.sort === 'name') query = query.order('name').order('id');
+        else if (options.sort === 'created') query = query.order('created_at', { ascending: false }).order('id', { ascending: false });
+        else if (options.sort === 'updated') query = query.order('updated_at', { ascending: false }).order('id', { ascending: false });
+        else if (options.sort === 'used') {
+            query = query.order('last_used_at', { ascending: false, nullsFirst: false })
+                .order('updated_at', { ascending: false })
+                .order('id', { ascending: false });
+        } else {
+            query = query.order('is_favorite', { ascending: false })
+                .order('last_used_at', { ascending: false, nullsFirst: false })
+                .order('updated_at', { ascending: false })
+                .order('id', { ascending: false });
+        }
+
+        const { data, error, count } = await query.range(offset, offset + limit - 1);
+        if (error) {
+            console.error('Snippet Library Query Error:', error);
+            return { success: false, reason: 'ERROR', items: [], total: 0, hasMore: false };
+        }
+        const items = data || [];
+        return { success: true, items, total: count || 0, hasMore: offset + items.length < (count || 0) };
+    },
+
+    async getSnippetLibraryCounts() {
+        if (!window.currentUser) return { fields: {}, archived: 0, favorites: 0 };
+        const [fieldResult, archiveResult, favoriteResult] = await Promise.all([
+            supabaseClient.rpc('get_snippet_counts'),
+            supabaseClient.from('snippets').select('*', { count: 'exact', head: true })
+                .eq('user_id', window.currentUser.id).not('archived_at', 'is', null),
+            supabaseClient.from('snippets').select('*', { count: 'exact', head: true })
+                .eq('user_id', window.currentUser.id).is('archived_at', null).eq('is_favorite', true)
+        ]);
+        if (fieldResult.error || archiveResult.error || favoriteResult.error) {
+            console.error('Snippet Counts Error:', fieldResult.error || archiveResult.error || favoriteResult.error);
+            return { fields: {}, archived: 0, favorites: 0 };
+        }
+        const fields = {};
+        (fieldResult.data || []).forEach(row => { fields[row.field_id] = Number(row.snippet_count) || 0; });
+        return { fields, archived: archiveResult.count || 0, favorites: favoriteResult.count || 0 };
+    },
+
+    async updateSnippetMetadata(id, patch = {}) {
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
+        const values = {};
+        if (Object.prototype.hasOwnProperty.call(patch, 'isFavorite')) values.is_favorite = Boolean(patch.isFavorite);
+        if (Object.prototype.hasOwnProperty.call(patch, 'archivedAt')) values.archived_at = patch.archivedAt || null;
+        if (!Object.keys(values).length) return { success: false, reason: 'EMPTY_PATCH' };
+        const { data, error } = await supabaseClient.from('snippets').update(values)
+            .eq('id', id).eq('user_id', window.currentUser.id)
+            .select('id, user_id, name, content, mode, field_id, created_at, updated_at, is_favorite, last_used_at, archived_at');
+        if (error || !data || data.length !== 1) {
+            console.error('Snippet Metadata Update Error:', error || { id });
+            return { success: false, reason: 'ERROR' };
+        }
+        return { success: true, snippet: data[0] };
+    },
+
+    async markSnippetUsed(id) {
+        if (!window.currentUser) return false;
+        const { error } = await supabaseClient.from('snippets')
+            .update({ last_used_at: new Date().toISOString() })
+            .eq('id', id).eq('user_id', window.currentUser.id);
+        if (error) console.error('Snippet Last Used Error:', error);
+        return !error;
+    },
+
+    async duplicateSnippet(id) {
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
+        const { data, error } = await supabaseClient.rpc('duplicate_snippet', { p_snippet_id: id });
+        if (error) {
+            console.error('Snippet Duplicate Error:', error);
+            if (error.message?.includes('FREE_LIMIT_REACHED')) return { success: false, reason: 'FREE_LIMIT_REACHED' };
+            return { success: false, reason: 'ERROR' };
+        }
+        return { success: true, snippet: Array.isArray(data) ? data[0] : data };
+    },
+
+    async bulkManageSnippets(ids, action, fieldId = null) {
+        if (!window.currentUser) return { success: false, reason: 'NOT_LOGGED_IN' };
+        const snippetIds = [...new Set((ids || []).map(Number).filter(Number.isFinite))];
+        const { data, error } = await supabaseClient.rpc('bulk_manage_snippets', {
+            p_snippet_ids: snippetIds,
+            p_action: action,
+            p_field_id: fieldId || null
+        });
+        if (error) {
+            console.error('Snippet Bulk Action Error:', error);
+            return { success: false, reason: error.message?.includes('PRO_REQUIRED') ? 'PRO_REQUIRED' : 'ERROR' };
+        }
+        return { success: true, count: Number(data) || 0 };
     },
 
     // --- BIBLIOTHEK (Szenarien) ---
@@ -680,15 +807,17 @@ window.db = {
 
     async getPromptCount() {
         if (!window.currentUser) return 0;
-        const { count, error } = await supabaseClient
-            .from('library')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', window.currentUser.id);
-        if (error) {
-            console.error('Prompt Count Error:', error);
+        const [promptResult, snippetResult] = await Promise.all([
+            supabaseClient.from('library').select('*', { count: 'exact', head: true })
+                .eq('user_id', window.currentUser.id),
+            supabaseClient.from('snippets').select('*', { count: 'exact', head: true })
+                .eq('user_id', window.currentUser.id)
+        ]);
+        if (promptResult.error || snippetResult.error) {
+            console.error('Library Content Count Error:', promptResult.error || snippetResult.error);
             return 0;
         }
-        return count ?? 0;
+        return (promptResult.count ?? 0) + (snippetResult.count ?? 0);
     },
 
     async getCategoryCount() {

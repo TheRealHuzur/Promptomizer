@@ -73,6 +73,7 @@
 
     <link rel="stylesheet" href="styles.css" data-cookieconsent="ignore">
     <link rel="stylesheet" href="library.css" data-cookieconsent="ignore">
+    <link rel="stylesheet" href="snippet-library.css" data-cookieconsent="ignore">
 
     <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
         data-exclude-hash="true" data-cookieconsent="ignore"></script>
@@ -193,7 +194,7 @@
                     <div id="prompt-counter-wrap"
                         class="hidden mx-4 mb-3 px-2 py-2 text-xs text-slate-400 bg-black/10 rounded-md border border-navy-border/50">
                         <div class="flex items-center justify-between mb-1.5">
-                            <span id="prompt-counter-text" class="font-medium tracking-wide">0 von 10 Prompts</span>
+                            <span id="prompt-counter-text" class="font-medium tracking-wide">0 von 10 Inhalten</span>
                         </div>
                         <div class="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
                             <div id="prompt-counter-bar"
@@ -395,7 +396,7 @@
                                 <div id="konto-prompt-counter" class="hidden mt-6 pt-4 border-t border-navy-border">
                                     <div class="flex items-center justify-between mb-2">
                                         <span id="konto-prompt-counter-text"
-                                            class="text-sm text-slate-300 font-medium">0 von 10 Prompts
+                                            class="text-sm text-slate-300 font-medium">0 von 10 Inhalten
                                             gespeichert</span>
                                         <button id="konto-btn-upgrade" onclick="openUpgradeModal()"
                                             class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm font-bold">
@@ -2015,6 +2016,7 @@
         let isPromptsOpen = true;
         let isSnippetsOpen = true;
         let activeFieldId = null;
+        let lastStructuredFieldId = 'context';
         let fieldFullscreenState = {};
         let snippetOpenState = { role: false, context: false, task: false, format: false, free: false };
         let snippetMenuOpen = false;
@@ -4728,11 +4730,11 @@
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
-                if (!editor) { showToast('Freies Textfeld nicht gefunden.', 'error'); return; }
+                if (!editor) { showToast('Freies Textfeld nicht gefunden.', 'error'); return false; }
                 const range = getFreeInsertionRange(editor);
                 insertTextAtCursor(editor, text, range);
                 freeSyncHtmlToMarkdown();
-                return;
+                return true;
             }
 
             let target = targetFieldId;
@@ -4746,17 +4748,19 @@
             }
 
             const ta = document.getElementById(`input-${target}`);
-            if (!ta) { showToast('Zielfeld nicht gefunden: ' + target, 'error'); return; }
+            if (!ta) { showToast('Zielfeld nicht gefunden: ' + target, 'error'); return false; }
             ta.focus();
             const start = (ta.selectionStart ?? ta.value.length);
             const end = (ta.selectionEnd ?? ta.value.length);
             ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
             const pos = start + text.length;
             ta.setSelectionRange(pos, pos);
+            return true;
         }
 
         function setActiveField(fieldId) {
             activeFieldId = fieldId;
+            if (['role', 'context', 'task', 'format'].includes(fieldId)) lastStructuredFieldId = fieldId;
         }
 
         function normalizeCategoryName(v) {
@@ -5901,7 +5905,7 @@
                 // encodeURIComponent lässt ' unkodiert — muss raus, sonst bricht es den Inline-Handler-String auf
                 const encoded = encodeURIComponent(snippet.content || '').replace(/'/g, '%27');
                 return `
-                            <div id="snippet-item-${snippet.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}')">
+                            <div id="snippet-item-${snippet.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="insertSnippetEncoded('${encoded}','${cat.id}', ${snippet.id})">
                                 <div class="flex items-center justify-between w-full">
                                     <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title="${escapeHtml(snippet.name || '')}">${escapeHtml(snippet.name)}</div>
                                     <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openSnippetItemMenu(event, '${cat.id}', ${snippet.id})">
@@ -5916,9 +5920,10 @@
             body.dataset.loaded = 'true';
         }
 
-        function insertSnippetEncoded(encoded, targetFieldId) {
+        async function insertSnippetEncoded(encoded, targetFieldId, snippetId) {
             const text = decodeURIComponent(encoded || '');
-            insertSnippetText(text, targetFieldId);
+            const inserted = insertSnippetText(text, targetFieldId);
+            if (inserted && snippetId) await window.db?.markSnippetUsed?.(snippetId);
         }
 
         function openSnippetItemMenu(ev, categoryId, snippetId) {
@@ -6276,14 +6281,15 @@
                 field_id = 'free';
             }
 
-            let success = false;
+            let result = { success: false, reason: 'ERROR' };
             if (editingSnippetId && window.db && window.db.updateSnippet) {
-                success = await window.db.updateSnippet(editingSnippetId, { name, content, mode, field_id });
+                const success = await window.db.updateSnippet(editingSnippetId, { name, content, mode, field_id });
+                result = { success, reason: success ? null : 'ERROR' };
             } else if (window.db && window.db.saveSnippet) {
-                success = await window.db.saveSnippet({ name, content, mode, field_id });
+                result = await window.db.saveSnippet({ name, content, mode, field_id });
             }
 
-            if (success) {
+            if (result.success) {
                 closeSnippetModal();
                 const oldCategory = editingSnippetOriginalCategoryId;
                 editingSnippetOriginalCategoryId = null;
@@ -6300,6 +6306,8 @@
                 if (settingsCurrentPage === 'snippets') {
                     await loadManageSnippetsPage();
                 }
+            } else if (result.reason === 'FREE_LIMIT_REACHED') {
+                openUpgradeModal('library_full');
             } else {
                 showToast("Speichern fehlgeschlagen. Bitte erneut versuchen.", "error");
             }
@@ -6506,6 +6514,30 @@
             openSnippetCategory(id);
         };
 
+        window.insertSnippetFromLibrary = async (snippet, targetFieldId = null) => {
+            if (!snippet || !String(snippet.content || '').trim()) return { success: false, reason: 'EMPTY' };
+            if (currentMode === 'structured' && snippet.field_id === 'free' && !targetFieldId) {
+                return { success: false, reason: 'TARGET_REQUIRED', suggestedTarget: lastStructuredFieldId || 'context' };
+            }
+            const target = currentMode === 'structured'
+                ? (snippet.field_id === 'free' ? targetFieldId : snippet.field_id)
+                : null;
+            const success = insertSnippetText(snippet.content, target);
+            if (!success) return { success: false, reason: 'INSERT_FAILED' };
+            const marked = await window.db?.markSnippetUsed?.(snippet.id);
+            if (!marked) console.error('Baustein wurde eingefügt, last_used_at konnte aber nicht aktualisiert werden.', { id: snippet.id });
+            return { success: true };
+        };
+
+        window.refreshSnippetSurfaces = async () => {
+            renderSnippetsAccordion();
+            for (const category of SNIPPET_CATEGORIES) {
+                if (snippetOpenState[category.id]) await loadSnippetSection(category.id);
+            }
+            if (settingsCurrentPage === 'snippets') await loadManageSnippetsPage();
+            await updatePromptCounter();
+        };
+
         // --- ONBOARDING MODAL & DRIVER.JS LOGIC ---
         let onboardingCurrentStep = 1;
 
@@ -6592,13 +6624,13 @@
             if (isLastStep) {
                 if (window.currentUser) {
                     titleEl.innerText = "Du startest mit dem Free-Plan";
-                    textEl.innerHTML = "<p>Du kannst bis zu <b>10 Prompts</b> kostenlos speichern. Voller Zugriff auf Editor, Bausteine und Kategorien ist inklusive.</p><p>Für unbegrenzte Prompts: <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
+                    textEl.innerHTML = "<p>Du kannst bis zu <b>10 Inhalte aus Prompts und Bausteinen zusammen</b> kostenlos speichern. Voller Zugriff auf Editor und Kategorien ist inklusive.</p><p>Für unbegrenzte Inhalte: <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
                     secondaryBtn.classList.remove('hidden');
                     secondaryBtn.innerText = "Pro-Plan ansehen";
                     nextBtn.innerHTML = `Loslegen <i class="fa-solid fa-check ml-2 text-xs"></i>`;
                 } else {
                     titleEl.innerText = "Einfach ausprobieren — kostenlos";
-                    textEl.innerHTML = "<p>Du kannst den Editor, Bausteine und Kategorien sofort nutzen — ohne Account.</p><p>Wenn du Prompts speichern möchtest, brauchst du einen kostenlosen Account. Der Free-Plan gibt dir bis zu <b>10 gespeicherte Prompts</b>. Für unbegrenzte Prompts gibt es den <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
+                    textEl.innerHTML = "<p>Den Editor kannst du sofort ohne Account nutzen.</p><p>Zum Speichern brauchst du ein kostenloses Konto. Der Free-Plan umfasst bis zu <b>10 Inhalte aus Prompts und Bausteinen zusammen</b>. Für unbegrenzte Inhalte gibt es den <b>Pro-Plan für 3,99 € pro Monat</b>.</p>";
                     secondaryBtn.classList.remove('hidden');
                     secondaryBtn.innerText = "Erst mal ausprobieren";
                     nextBtn.innerHTML = `Jetzt kostenlos registrieren <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>`;
@@ -6910,7 +6942,7 @@
 
             wrap.classList.remove('hidden');
             document.getElementById('prompt-counter-text').textContent =
-                `${count} von ${max} Prompts`;
+                `${count} von ${max} Inhalten`;
             document.getElementById('prompt-counter-bar').style.width = `${pct}%`;
 
             // Warnung ab 8/10
@@ -6935,7 +6967,7 @@
             const accountCounterText = document.getElementById('konto-prompt-counter-text');
             if (accountCounterText) {
                 document.getElementById('konto-prompt-counter').classList.remove('hidden');
-                accountCounterText.textContent = `${count} von ${max} Prompts gespeichert`;
+                accountCounterText.textContent = `${count} von ${max} Inhalten gespeichert`;
 
                 const accountBar = document.getElementById('konto-prompt-counter-bar');
                 accountBar.style.width = `${pct}%`;
@@ -6968,6 +7000,7 @@
     <script src="vendor/supabase/supabase.js" data-cookieconsent="ignore"></script>
     <script src="db.js" data-cookieconsent="ignore"></script>
     <script src="library.js" data-cookieconsent="ignore"></script>
+    <script src="snippet-library.js" data-cookieconsent="ignore"></script>
 </body>
 
 </html>
