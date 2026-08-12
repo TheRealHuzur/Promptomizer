@@ -448,7 +448,11 @@ window.db = {
             : query.is('archived_at', null);
 
         const search = String(options.search || '').trim();
-        if (search) query = query.textSearch('search_vector', search, { config: 'simple', type: 'websearch' });
+        const prefixSearch = search
+            .match(/[\p{L}\p{N}]+/gu)
+            ?.map(term => `${term.toLocaleLowerCase('de-DE')}:*`)
+            .join(' & ');
+        if (prefixSearch) query = query.textSearch('search_vector', prefixSearch, { config: 'simple' });
         if (options.fieldId) query = query.eq('field_id', options.fieldId);
         if (options.favoriteOnly) query = query.eq('is_favorite', true);
 
@@ -869,5 +873,4 @@ window.db = {
 
 // Bibliotheks-Erweiterungen bleiben in einer eigenen Datei, nutzen aber denselben Auth-Client.
 window.db.getClient = () => supabaseClient;
-
 

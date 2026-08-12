@@ -1277,7 +1277,7 @@
                         </button>
                     </div>
                     <div class="ml-auto flex items-center gap-4">
-                        <button onclick="resetCurrentView()"
+                        <button id="btn-reset" onclick="resetCurrentView()"
                             class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
                             Reset
                         </button>
@@ -1285,6 +1285,10 @@
                             class="bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
                             <i class="fa-solid fa-copy"></i>
                             <span>Kopieren</span>
+                        </button>
+                        <button id="library-create-content" type="button"
+                            class="hidden bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all">
+                            <span>Neuer Prompt</span>
                         </button>
                     </div>
                 </div>

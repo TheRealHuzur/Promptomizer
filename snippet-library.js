@@ -129,13 +129,9 @@
         view.dataset.contentType = 'snippets';
         document.getElementById('library-content-prompts')?.classList.remove('is-active');
         document.getElementById('library-content-snippets')?.classList.add('is-active');
-        document.getElementById('library-create-snippet')?.classList.remove('hidden');
-        const kicker = view.querySelector('.library-kicker');
         const title = view.querySelector('.library-title');
-        const subtitle = view.querySelector('.library-subtitle');
-        if (kicker) kicker.textContent = 'Deine wiederverwendbaren Inhalte';
         if (title) title.textContent = 'Baustein-Bibliothek';
-        if (subtitle) subtitle.textContent = 'Finde Textbausteine schnell wieder, füge sie in deinen Entwurf ein und verwalte alle Einsatzbereiche an einem Ort.';
+        window.PromptLibrary?.setFooterContentType?.('snippets');
         const search = document.getElementById('library-search');
         if (search) { search.placeholder = 'Bausteine durchsuchen …'; search.value = state.search; }
         const type = document.getElementById('library-type');
@@ -188,11 +184,6 @@
         document.getElementById('library-view-list')?.addEventListener('click', () => { if (isActive()) setViewMode('list'); });
         document.getElementById('library-load-more')?.addEventListener('click', () => { if (isActive()) loadItems(false); });
         document.getElementById('library-selection-toggle')?.addEventListener('click', () => { if (isActive()) toggleSelectionMode(); });
-        document.getElementById('library-create-snippet')?.addEventListener('click', () => {
-            if (!isActive()) return;
-            if (!window.currentUser) return window.openAuthModal?.();
-            renderEditor(null);
-        });
     }
 
     function setViewMode(mode) {
@@ -863,5 +854,5 @@
         await reloadItems();
     }
 
-    window.SnippetLibrary = { open, refreshAll };
+    window.SnippetLibrary = { open, refreshAll, openCreate: () => renderEditor(null) };
 })();

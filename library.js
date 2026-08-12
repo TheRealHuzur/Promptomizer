@@ -33,6 +33,13 @@
     const db = window.db;
     const client = () => db?.getClient?.();
 
+    function prefixSearchQuery(value) {
+        return String(value || '')
+            .match(/[\p{L}\p{N}]+/gu)
+            ?.map(term => `${term.toLocaleLowerCase('de-DE')}:*`)
+            .join(' & ') || '';
+    }
+
     function isPromptArea() {
         return document.getElementById('view-library')?.dataset.contentType !== 'snippets';
     }
@@ -224,8 +231,8 @@
                 ? query.not('archived_at', 'is', null)
                 : query.is('archived_at', null);
 
-            const search = String(options.search || '').trim();
-            if (search) query = query.textSearch('search_vector', search, { config: 'simple', type: 'websearch' });
+            const search = prefixSearchQuery(options.search);
+            if (search) query = query.textSearch('search_vector', search, { config: 'simple' });
             if (options.uncategorized) query = query.is('category_id', null);
             else if (options.categoryId !== null && options.categoryId !== undefined && options.categoryId !== '') {
                 query = query.eq('category_id', Number(options.categoryId));
@@ -368,17 +375,12 @@
         view.className = 'hidden library-view fade-in';
         view.innerHTML = `
             <div class="library-hero">
-                <div>
-                    <div class="library-kicker">Dein Prompt-Bestand</div>
-                    <h2 class="library-title">Prompt-Bibliothek</h2>
-                    <p class="library-subtitle">Finde bewährte Prompts wieder, nutze sie als Ausgangspunkt und halte deinen Bestand übersichtlich.</p>
-                </div>
+                <h2 class="library-title">Prompt-Bibliothek</h2>
                 <div class="library-hero-actions">
                     <div class="library-content-toggle" aria-label="Bibliotheksbereich wählen">
                         <button id="library-content-prompts" type="button">Prompts</button>
                         <button id="library-content-snippets" type="button">Bausteine</button>
                     </div>
-                    <button id="library-create-snippet" class="library-primary-action hidden" type="button"><i class="fa-solid fa-plus"></i> Neuer Baustein</button>
                     <div class="library-view-toggle" aria-label="Darstellung wählen">
                         <button id="library-view-cards" type="button" title="Kartenansicht" aria-label="Kartenansicht"><i class="fa-solid fa-table-cells-large"></i></button>
                         <button id="library-view-list" type="button" title="Listenansicht" aria-label="Listenansicht"><i class="fa-solid fa-list"></i></button>
@@ -437,6 +439,26 @@
         }
     }
 
+    function setFooterContentType(contentType) {
+        const action = document.getElementById('library-create-content');
+        if (!action) return;
+        action.dataset.contentType = contentType === 'snippets' ? 'snippets' : 'prompts';
+        const label = action.querySelector('span');
+        if (label) label.textContent = contentType === 'snippets' ? 'Neuer Baustein' : 'Neuer Prompt';
+    }
+
+    function configureFooter(viewId) {
+        const isLibrary = viewId === 'library';
+        document.getElementById('footer-save-wrap')?.classList.toggle('hidden', viewId !== 'editor');
+        document.getElementById('btn-reset')?.classList.toggle('hidden', isLibrary);
+        document.getElementById('btn-copy')?.classList.toggle('hidden', isLibrary);
+        document.getElementById('library-create-content')?.classList.toggle('hidden', !isLibrary);
+        if (isLibrary) {
+            const type = document.getElementById('view-library')?.dataset.contentType || 'prompts';
+            setFooterContentType(type);
+        }
+    }
+
     function patchViewSwitching() {
         if (!window.switchView || window.switchView.__libraryPatched) return;
         const original = window.switchView;
@@ -446,7 +468,8 @@
             const modeToggle = document.getElementById('mode-toggle-container');
             const editorFooter = document.getElementById('editor-footer');
             if (modeToggle) modeToggle.classList.toggle('hidden', viewId === 'library');
-            if (editorFooter) editorFooter.classList.toggle('hidden', viewId === 'library');
+            if (editorFooter) editorFooter.classList.toggle('hidden', viewId !== 'editor' && viewId !== 'library');
+            configureFooter(viewId);
             setActiveNavigation(viewId);
             if (viewId === 'library') openLibrary();
         };
@@ -492,6 +515,12 @@
         document.getElementById('library-content-snippets')?.addEventListener('click', () => {
             localStorage.setItem(CONTENT_KEY, 'snippets');
             window.SnippetLibrary?.open();
+        });
+        document.getElementById('library-create-content')?.addEventListener('click', () => {
+            if (document.getElementById('view-library')?.classList.contains('hidden')) return;
+            if (!window.currentUser) return window.openAuthModal?.();
+            if (isPromptArea()) renderCreatePrompt();
+            else window.SnippetLibrary?.openCreate?.();
         });
     }
 
@@ -837,6 +866,160 @@
         window.switchView?.('editor');
         await window.startPromptEditSession?.(prompt.id);
         await renderEditDetails(prompt.id);
+    }
+
+    function renderCreatePrompt() {
+        if (!isPromptArea()) return;
+        document.getElementById('library-bulk-bar')?.replaceChildren();
+        document.getElementById('library-load-more')?.classList.add('hidden');
+        const content = document.getElementById('library-content');
+        const count = document.getElementById('library-result-count');
+        if (!content || !count) return;
+
+        count.textContent = 'Neuer Prompt';
+        content.replaceChildren();
+        const editor = document.createElement('div');
+        editor.className = 'snippet-editor prompt-create-editor';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'snippet-editor-back';
+        back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Zur Prompt-Bibliothek';
+        back.addEventListener('click', renderItems);
+        const title = document.createElement('h3');
+        title.className = 'snippet-editor-title';
+        title.textContent = 'Neuen Prompt anlegen';
+        const form = document.createElement('div');
+        form.className = 'snippet-editor-grid';
+        const main = document.createElement('div');
+        const nameLabel = document.createElement('label');
+        nameLabel.className = 'ui-label';
+        nameLabel.textContent = 'Name';
+        const name = document.createElement('input');
+        name.className = 'library-input snippet-editor-input';
+        name.maxLength = 200;
+        name.placeholder = 'Name des Prompts';
+        const fields = document.createElement('div');
+        fields.className = 'prompt-create-fields';
+        main.append(nameLabel, name, fields);
+
+        const side = document.createElement('div');
+        const typeLabel = document.createElement('label');
+        typeLabel.className = 'ui-label';
+        typeLabel.textContent = 'Prompt-Typ';
+        const type = document.createElement('select');
+        type.className = 'library-edit-category';
+        type.innerHTML = '<option value="structured">Strukturiert</option><option value="free">Frei</option>';
+        const categoryLabel = document.createElement('label');
+        categoryLabel.className = 'ui-label prompt-create-category-label';
+        categoryLabel.textContent = 'Kategorie';
+        const category = document.createElement('select');
+        category.className = 'library-edit-category';
+        category.innerHTML = '<option value="">Ohne Kategorie</option>';
+        state.categories.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.name;
+            option.textContent = item.name;
+            category.append(option);
+        });
+        side.append(typeLabel, type, categoryLabel, category);
+        form.append(main, side);
+
+        const drafts = {
+            free: '',
+            structured: { role: '', context: '', task: '', format: '' }
+        };
+        let activeType = 'structured';
+        const definitions = [
+            ['role', 'Rolle & Funktion'],
+            ['context', 'Kontext'],
+            ['task', 'Aufgabe'],
+            ['format', 'Ausgabeformat']
+        ];
+        const captureDraft = () => {
+            if (activeType === 'free') {
+                drafts.free = fields.querySelector('[data-prompt-field="free"]')?.value || '';
+                return;
+            }
+            definitions.forEach(([key]) => {
+                drafts.structured[key] = fields.querySelector(`[data-prompt-field="${key}"]`)?.value || '';
+            });
+        };
+        const renderFields = () => {
+            fields.replaceChildren();
+            if (activeType === 'free') {
+                const label = document.createElement('label');
+                label.className = 'ui-label snippet-editor-content-label';
+                label.textContent = 'Prompt-Text';
+                const input = document.createElement('textarea');
+                input.className = 'snippet-editor-textarea';
+                input.dataset.promptField = 'free';
+                input.maxLength = 50000;
+                input.placeholder = 'Prompt eingeben …';
+                input.value = drafts.free;
+                fields.append(label, input);
+                return;
+            }
+            definitions.forEach(([key, labelText]) => {
+                const label = document.createElement('label');
+                label.className = 'ui-label snippet-editor-content-label';
+                label.textContent = labelText;
+                const input = document.createElement('textarea');
+                input.className = 'snippet-editor-textarea prompt-create-textarea';
+                input.dataset.promptField = key;
+                input.maxLength = 50000;
+                input.value = drafts.structured[key];
+                fields.append(label, input);
+            });
+        };
+        type.addEventListener('change', () => {
+            captureDraft();
+            activeType = type.value === 'free' ? 'free' : 'structured';
+            renderFields();
+            fields.querySelector('textarea')?.focus();
+        });
+        renderFields();
+
+        const actions = document.createElement('div');
+        actions.className = 'library-edit-actions';
+        const save = editAction('Prompt anlegen', 'fa-floppy-disk', async () => {
+            const promptName = name.value.trim();
+            captureDraft();
+            const hasContent = activeType === 'free'
+                ? Boolean(drafts.free.trim())
+                : Object.values(drafts.structured).some(value => value.trim());
+            if (!promptName || !hasContent) {
+                window.showToast?.('Name und Prompt-Inhalt sind Pflichtfelder.', 'info');
+                return;
+            }
+            save.disabled = true;
+            const promptFields = activeType === 'free'
+                ? { mode: 'free', text: drafts.free.trim() }
+                : [drafts.structured.role, drafts.structured.context, drafts.structured.task, '', drafts.structured.format];
+            const result = await db.saveScenario({
+                name: promptName,
+                category: category.value || null,
+                fields: promptFields
+            });
+            if (!result.success) {
+                save.disabled = false;
+                if (result.reason === 'FREE_LIMIT_REACHED') window.openUpgradeModal?.('library_full');
+                else window.showToast?.('Prompt konnte nicht angelegt werden.', 'error');
+                return;
+            }
+            track('library_prompt_create', { prompt_type: activeType });
+            window.showToast?.('Prompt wurde angelegt.', 'success');
+            await Promise.all([
+                reloadItems(),
+                window.refreshPromptLibraryAndCategories?.(),
+                window.updatePromptCounter?.()
+            ]);
+        });
+        save.classList.add('snippet-editor-save');
+        actions.append(save);
+        editor.append(back, title, form, actions);
+        content.append(editor);
+        requestAnimationFrame(() => name.focus());
+        track('library_prompt_edit', { creating: true });
     }
 
     function renderSelectionButton() {
@@ -1187,13 +1370,9 @@
         view.dataset.contentType = 'prompts';
         document.getElementById('library-content-prompts')?.classList.add('is-active');
         document.getElementById('library-content-snippets')?.classList.remove('is-active');
-        document.getElementById('library-create-snippet')?.classList.add('hidden');
-        const kicker = view.querySelector('.library-kicker');
         const title = view.querySelector('.library-title');
-        const subtitle = view.querySelector('.library-subtitle');
-        if (kicker) kicker.textContent = 'Dein Prompt-Bestand';
         if (title) title.textContent = 'Prompt-Bibliothek';
-        if (subtitle) subtitle.textContent = 'Finde bewährte Prompts wieder, nutze sie als Ausgangspunkt und halte deinen Bestand übersichtlich.';
+        setFooterContentType('prompts');
         const search = document.getElementById('library-search');
         if (search) { search.placeholder = 'Prompts durchsuchen …'; search.value = state.search; }
         const type = document.getElementById('library-type');
@@ -1250,7 +1429,8 @@
         open: openLibrary,
         openPrompts,
         refreshAll: reloadItems,
-        renderEditDetails
+        renderEditDetails,
+        setFooterContentType
     };
 
     init();

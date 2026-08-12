@@ -8,7 +8,7 @@
 
 .library-hero {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: 2rem;
     margin-bottom: 1.5rem;
@@ -660,6 +660,20 @@
     margin-top: .35rem;
     color: #64748b;
     font-size: .65rem;
+}
+
+.prompt-create-category-label {
+    display: block;
+    margin-top: 1rem;
+}
+
+.prompt-create-textarea {
+    min-height: 8rem;
+}
+
+.prompt-create-editor .library-edit-action:disabled {
+    cursor: wait;
+    opacity: .65;
 }
 
 

@@ -34,6 +34,10 @@ assert(snippets.includes("state.viewMode === 'cards' ? buildCard(snippet) : buil
 assert(snippets.includes("db.getLibrarySnippets(currentQuery())"));
 assert(snippets.includes("db.bulkManageSnippets(ids, action, fieldId)"));
 assert(snippets.includes('renderEditor(null)'));
+assert(snippets.includes("openCreate: () => renderEditor(null)"));
+assert(!snippets.includes('Deine wiederverwendbaren Inhalte'));
+assert(!snippets.includes('Finde Textbausteine schnell wieder'));
+assert(db.includes(".map(term => `${term.toLocaleLowerCase('de-DE')}:*`)"));
 assert(!snippets.includes('fa-ellipsis'));
 assert(!snippets.includes('window.confirm('));
 
