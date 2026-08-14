@@ -4492,6 +4492,33 @@
             await handleCopyAndSave();
         }
 
+        async function copyTextToClipboard(text) {
+            const value = String(text ?? '');
+            if (navigator.clipboard?.writeText) {
+                try {
+                    await navigator.clipboard.writeText(value);
+                    return;
+                } catch (error) {
+                    console.warn('Clipboard API unavailable, using fallback:', error);
+                }
+            }
+
+            const activeElement = document.activeElement;
+            const textarea = document.createElement('textarea');
+            textarea.value = value;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.opacity = '0';
+            document.body.append(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            const copied = document.execCommand('copy');
+            textarea.remove();
+            activeElement?.focus?.();
+            if (!copied) throw new Error('Clipboard fallback failed');
+        }
+
         async function handleCopyAndSave() {
             let finalText = "";
             if (currentMode === 'structured') {
@@ -4515,7 +4542,7 @@
             }
 
             try {
-                await navigator.clipboard.writeText(finalText);
+                await copyTextToClipboard(finalText);
                 if (window.db && window.db.savePrompt) {
                     await window.db.savePrompt({
                         text: finalText,
@@ -4538,6 +4565,7 @@
                 }, 2000);
             } catch (err) {
                 console.error('Copy failed', err);
+                showToast('Prompt konnte nicht kopiert werden.', 'error');
             }
         }
 

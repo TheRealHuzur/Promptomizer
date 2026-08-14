@@ -862,7 +862,7 @@
         }
 
         try {
-            await navigator.clipboard.writeText(text);
+            await window.copyTextToClipboard(text);
             await db.markScenarioUsed(id);
             if (prompt) prompt.last_used_at = new Date().toISOString();
             track('library_prompt_copy');

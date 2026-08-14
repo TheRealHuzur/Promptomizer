@@ -248,6 +248,7 @@
 }
 
 .library-card {
+    display: flex;
     position: relative;
     min-height: 250px;
     overflow: hidden;
@@ -326,6 +327,7 @@
 
 .library-card-body {
     display: flex;
+    flex: 1;
     flex-direction: column;
     min-height: 250px;
     padding: 3.2rem 1.15rem 1rem;
@@ -385,7 +387,7 @@
 .library-card-footer {
     display: flex;
     align-items: flex-end;
-    justify-content: flex-end;
+    justify-content: flex-start;
     margin-top: auto;
     padding-top: 1rem;
 }
@@ -674,12 +676,10 @@
 }
 
 
+#view-editor.prompt-edit-active #editor-structured,
 #view-editor.prompt-edit-active #editor-free {
     flex: 0 0 auto;
-}
-
-#view-editor.prompt-edit-active {
-    padding-bottom: 8rem;
+    margin-bottom: 4rem;
 }
 
 #view-editor.prompt-edit-active #input-free {

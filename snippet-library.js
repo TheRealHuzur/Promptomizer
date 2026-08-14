@@ -386,14 +386,14 @@
         return button;
     }
 
-    function makeInsertButton(snippet) {
+    function makeCopyButton(snippet) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'library-use-button';
-        button.title = 'Im Editor einfügen';
-        button.setAttribute('aria-label', 'Im Editor einfügen');
-        button.innerHTML = '<i class="fa-solid fa-paste"></i>';
-        button.addEventListener('click', event => insertSnippet(event, snippet));
+        button.title = 'In Zwischenablage kopieren';
+        button.setAttribute('aria-label', 'In Zwischenablage kopieren');
+        button.innerHTML = '<i class="fa-solid fa-copy"></i>';
+        button.addEventListener('click', event => copySnippet(event, snippet));
         return button;
     }
 
@@ -432,7 +432,7 @@
         preview.textContent = cleanText(snippet.content) || 'Noch kein Inhalt vorhanden.';
         const footer = document.createElement('div');
         footer.className = 'library-card-footer';
-        footer.append(makeInsertButton(snippet));
+        footer.append(makeCopyButton(snippet));
         badges.append(field);
         body.append(badges, title, preview, footer);
         card.append(makeFavoriteButton(snippet), selection, body);
@@ -464,7 +464,7 @@
         const field = document.createElement('span');
         field.className = 'library-badge library-badge-type';
         field.textContent = fieldLabels[snippet.field_id] || 'Baustein';
-        row.append(first, title, preview, field, makeInsertButton(snippet));
+        row.append(first, title, preview, field, makeCopyButton(snippet));
         attachOpenBehavior(row, snippet);
         return row;
     }
@@ -488,21 +488,33 @@
         await loadContext();
     }
 
-    async function insertSnippet(event, snippet) {
+    async function copySnippet(event, snippet) {
         event.stopPropagation();
         if (state.selectionMode) return toggleSelected(snippet.id);
-        const result = await window.insertSnippetFromLibrary?.(snippet);
-        if (result?.reason === 'TARGET_REQUIRED') {
-            openTargetDialog(snippet, result.suggestedTarget);
+        if (!String(snippet.content || '').trim()) {
+            window.showToast?.('Dieser Baustein enthält noch keinen kopierbaren Inhalt.', 'info');
             return;
         }
-        if (!result?.success) {
-            window.showToast?.('Baustein konnte nicht eingefügt werden.', 'error');
-            return;
+
+        try {
+            await window.copyTextToClipboard(snippet.content);
+            await db.markSnippetUsed(snippet.id);
+            snippet.last_used_at = new Date().toISOString();
+            track('snippet_library_copy');
+
+            const button = event.currentTarget;
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="fa-solid fa-check"></i>';
+            button.classList.add('is-copied');
+            setTimeout(() => {
+                button.innerHTML = originalHtml;
+                button.classList.remove('is-copied');
+            }, 1600);
+            window.showToast?.('Baustein wurde in die Zwischenablage kopiert.', 'success');
+        } catch (error) {
+            console.error('Snippet copy failed:', error);
+            window.showToast?.('Baustein konnte nicht kopiert werden.', 'error');
         }
-        snippet.last_used_at = new Date().toISOString();
-        track('snippet_library_insert', { field_id: snippet.field_id });
-        window.switchView?.('editor');
     }
 
     function ensureTargetDialog() {
@@ -721,7 +733,7 @@
         }
 
         try {
-            await navigator.clipboard.writeText(content);
+            await window.copyTextToClipboard(content);
             if (db.markSnippetUsed) {
                 await db.markSnippetUsed(form.existing.id);
                 form.existing.last_used_at = new Date().toISOString();
