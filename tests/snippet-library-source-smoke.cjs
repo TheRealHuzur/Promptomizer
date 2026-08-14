@@ -35,6 +35,7 @@ assert(snippets.includes("button.setAttribute('aria-label', 'In Zwischenablage k
 assert(snippets.includes("button.innerHTML = '<i class=\"fa-solid fa-copy\"></i>'"));
 assert(snippets.includes('function copySnippet(event, snippet)'));
 assert(snippets.includes('await window.copyTextToClipboard(snippet.content)'));
+assert(snippets.includes("console.warn('Snippet usage update failed:'"));
 assert(snippets.includes("track('snippet_library_copy')"));
 assert(!snippets.includes('makeInsertButton'));
 assert(!snippets.includes("button.setAttribute('aria-label', 'Im Editor einfügen')"));

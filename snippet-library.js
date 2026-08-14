@@ -498,23 +498,29 @@
 
         try {
             await window.copyTextToClipboard(snippet.content);
-            await db.markSnippetUsed(snippet.id);
-            snippet.last_used_at = new Date().toISOString();
-            track('snippet_library_copy');
-
-            const button = event.currentTarget;
-            const originalHtml = button.innerHTML;
-            button.innerHTML = '<i class="fa-solid fa-check"></i>';
-            button.classList.add('is-copied');
-            setTimeout(() => {
-                button.innerHTML = originalHtml;
-                button.classList.remove('is-copied');
-            }, 1600);
-            window.showToast?.('Baustein wurde in die Zwischenablage kopiert.', 'success');
         } catch (error) {
             console.error('Snippet copy failed:', error);
             window.showToast?.('Baustein konnte nicht kopiert werden.', 'error');
+            return;
         }
+
+        try {
+            await db.markSnippetUsed(snippet.id);
+        } catch (error) {
+            console.warn('Snippet usage update failed:', error);
+        }
+        snippet.last_used_at = new Date().toISOString();
+        track('snippet_library_copy');
+
+        const button = event.currentTarget;
+        const originalHtml = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-check"></i>';
+        button.classList.add('is-copied');
+        setTimeout(() => {
+            button.innerHTML = originalHtml;
+            button.classList.remove('is-copied');
+        }, 1600);
+        window.showToast?.('Baustein wurde in die Zwischenablage kopiert.', 'success');
     }
 
     function ensureTargetDialog() {

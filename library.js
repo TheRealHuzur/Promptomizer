@@ -863,23 +863,29 @@
 
         try {
             await window.copyTextToClipboard(text);
-            await db.markScenarioUsed(id);
-            if (prompt) prompt.last_used_at = new Date().toISOString();
-            track('library_prompt_copy');
-
-            const button = event.currentTarget;
-            const originalHtml = button.innerHTML;
-            button.innerHTML = '<i class="fa-solid fa-check"></i>';
-            button.classList.add('is-copied');
-            setTimeout(() => {
-                button.innerHTML = originalHtml;
-                button.classList.remove('is-copied');
-            }, 1600);
-            window.showToast?.('Prompt wurde in die Zwischenablage kopiert.', 'success');
         } catch (error) {
             console.error('Prompt copy failed:', error);
             window.showToast?.('Prompt konnte nicht kopiert werden.', 'error');
+            return;
         }
+
+        try {
+            await db.markScenarioUsed(id);
+        } catch (error) {
+            console.warn('Library usage update failed:', error);
+        }
+        if (prompt) prompt.last_used_at = new Date().toISOString();
+        track('library_prompt_copy');
+
+        const button = event.currentTarget;
+        const originalHtml = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-check"></i>';
+        button.classList.add('is-copied');
+        setTimeout(() => {
+            button.innerHTML = originalHtml;
+            button.classList.remove('is-copied');
+        }, 1600);
+        window.showToast?.('Prompt wurde in die Zwischenablage kopiert.', 'success');
     }
 
     async function openEdit(prompt) {

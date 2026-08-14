@@ -387,7 +387,7 @@
 .library-card-footer {
     display: flex;
     align-items: flex-end;
-    justify-content: flex-start;
+    justify-content: flex-end;
     margin-top: auto;
     padding-top: 1rem;
 }
@@ -676,10 +676,19 @@
 }
 
 
+#prompt-edit-footer-spacer {
+    display: none;
+}
+
 #view-editor.prompt-edit-active #editor-structured,
 #view-editor.prompt-edit-active #editor-free {
     flex: 0 0 auto;
-    margin-bottom: 4rem;
+}
+
+#view-editor.prompt-edit-active #prompt-edit-footer-spacer {
+    display: block;
+    flex: 0 0 3rem;
+    min-height: 3rem;
 }
 
 #view-editor.prompt-edit-active #input-free {
