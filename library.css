@@ -114,7 +114,7 @@
 .library-input:focus,
 .library-select:focus {
     border-color: #38bdf8;
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, .1);
+    box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, .1);
 }
 
 .library-layout {
@@ -270,7 +270,7 @@
 .library-card.is-selected,
 .library-list-row.is-selected {
     border-color: #38bdf8;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, .15), 0 20px 55px rgba(0, 0, 0, .25);
+    box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, .1);
 }
 
 .library-card-selection {
@@ -573,6 +573,7 @@
 
 .library-edit-description:focus {
     border-color: #38bdf8;
+    box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, .1);
 }
 
 .library-edit-meta {
@@ -647,11 +648,7 @@
 }
 
 .library-view button:focus-visible,
-.library-view input:focus-visible,
-.library-view select:focus-visible,
-.library-edit-details button:focus-visible,
-.library-edit-details textarea:focus-visible,
-.library-edit-details select:focus-visible {
+.library-edit-details button:focus-visible {
     outline: 2px solid #7dd3fc;
     outline-offset: 2px;
 }
@@ -679,6 +676,10 @@
 
 #view-editor.prompt-edit-active #editor-free {
     flex: 0 0 auto;
+}
+
+#view-editor.prompt-edit-active {
+    padding-bottom: 8rem;
 }
 
 #view-editor.prompt-edit-active #input-free {

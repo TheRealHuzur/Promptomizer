@@ -449,8 +449,9 @@
 
     function configureFooter(viewId) {
         const isLibrary = viewId === 'library';
+        const isPromptEdit = viewId === 'editor' && document.getElementById('view-editor')?.classList.contains('prompt-edit-active');
         document.getElementById('footer-save-wrap')?.classList.toggle('hidden', viewId !== 'editor');
-        document.getElementById('btn-reset')?.classList.toggle('hidden', isLibrary);
+        document.getElementById('btn-reset')?.classList.toggle('hidden', isLibrary || isPromptEdit);
         document.getElementById('btn-copy')?.classList.toggle('hidden', isLibrary);
         document.getElementById('library-create-content')?.classList.toggle('hidden', !isLibrary);
         if (isLibrary) {
@@ -463,6 +464,7 @@
         if (!window.switchView || window.switchView.__libraryPatched) return;
         const original = window.switchView;
         const wrapped = function (viewId) {
+            if (viewId !== 'library') window.SnippetLibrary?.closeEditor?.();
             if (viewId !== 'library') document.getElementById('view-library')?.classList.add('hidden');
             original(viewId);
             const modeToggle = document.getElementById('mode-toggle-container');
@@ -740,14 +742,14 @@
         return button;
     }
 
-    function makeUseButton(prompt) {
+    function makeCopyButton(prompt) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'library-use-button';
-        button.title = 'Im Editor verwenden';
-        button.setAttribute('aria-label', 'Im Editor verwenden');
+        button.title = 'In Zwischenablage kopieren';
+        button.setAttribute('aria-label', 'In Zwischenablage kopieren');
         button.innerHTML = '<i class="fa-solid fa-copy"></i>';
-        button.addEventListener('click', event => usePrompt(event, prompt.id));
+        button.addEventListener('click', event => copyPrompt(event, prompt.id));
         return button;
     }
 
@@ -789,7 +791,7 @@
         preview.textContent = previewFor(prompt);
         const footer = document.createElement('div');
         footer.className = 'library-card-footer';
-        footer.append(makeUseButton(prompt));
+        footer.append(makeCopyButton(prompt));
         badges.append(category, type);
         body.append(badges, title, preview, footer);
         card.append(makeFavoriteButton(prompt, 'library-card-star'), selection, body);
@@ -825,7 +827,7 @@
         const type = document.createElement('span');
         type.className = 'library-badge library-badge-type';
         type.textContent = prompt.prompt_type === 'free' ? 'Frei' : 'Strukturiert';
-        row.append(first, title, preview, category, type, makeUseButton(prompt));
+        row.append(first, title, preview, category, type, makeCopyButton(prompt));
         attachOpenBehavior(row, prompt);
         return row;
     }
@@ -849,15 +851,35 @@
         await loadContext();
     }
 
-    async function usePrompt(event, id) {
+    async function copyPrompt(event, id) {
         event.stopPropagation();
         if (state.selectionMode) return toggleSelected(id);
-        window.switchView?.('editor');
-        await window.handlePromptClick?.(id);
-        await db.markScenarioUsed(id);
         const prompt = state.items.find(item => Number(item.id) === Number(id));
-        if (prompt) prompt.last_used_at = new Date().toISOString();
-        track('library_prompt_use');
+        const text = promptToText(prompt);
+        if (!text.trim()) {
+            window.showToast?.('Dieser Prompt enthält noch keinen kopierbaren Inhalt.', 'info');
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(text);
+            await db.markScenarioUsed(id);
+            if (prompt) prompt.last_used_at = new Date().toISOString();
+            track('library_prompt_copy');
+
+            const button = event.currentTarget;
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="fa-solid fa-check"></i>';
+            button.classList.add('is-copied');
+            setTimeout(() => {
+                button.innerHTML = originalHtml;
+                button.classList.remove('is-copied');
+            }, 1600);
+            window.showToast?.('Prompt wurde in die Zwischenablage kopiert.', 'success');
+        } catch (error) {
+            console.error('Prompt copy failed:', error);
+            window.showToast?.('Prompt konnte nicht kopiert werden.', 'error');
+        }
     }
 
     async function openEdit(prompt) {
@@ -1391,6 +1413,7 @@
     }
 
     async function openPrompts() {
+        window.SnippetLibrary?.closeEditor?.();
         localStorage.setItem(CONTENT_KEY, 'prompts');
         setPromptShell();
         track('library_open', { content_type: 'prompts' });
@@ -1430,7 +1453,8 @@
         openPrompts,
         refreshAll: reloadItems,
         renderEditDetails,
-        setFooterContentType
+        setFooterContentType,
+        configureFooter
     };
 
     init();

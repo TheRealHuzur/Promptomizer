@@ -10,11 +10,13 @@ const db = read('db.js');
 const promptLibrary = read('library.js');
 const snippets = read('snippet-library.js');
 const css = read('snippet-library.css');
+const tailwind = read('vendor/tailwind/tailwind.css');
 const migration = read('supabase/migrations/20260812125402_snippet_library_integration.sql');
 
 assert(app.includes('href="snippet-library.css"'));
 assert(app.includes('src="snippet-library.js"'));
 assert(app.indexOf('src="library.js"') < app.indexOf('src="snippet-library.js"'));
+assert(app.includes('onclick="handleFooterCopy()"'));
 assert(app.includes('window.insertSnippetFromLibrary'));
 assert(app.includes("reason: 'TARGET_REQUIRED'"));
 assert(app.includes("suggestedTarget: lastStructuredFieldId || 'context'"));
@@ -35,12 +37,22 @@ assert(snippets.includes("db.getLibrarySnippets(currentQuery())"));
 assert(snippets.includes("db.bulkManageSnippets(ids, action, fieldId)"));
 assert(snippets.includes('renderEditor(null)'));
 assert(snippets.includes("openCreate: () => renderEditor(null)"));
+assert(snippets.includes("save.id = 'btn-save-snippet-version'"));
+assert(snippets.includes('<span>Neue Version speichern</span>'));
+assert(snippets.includes('configureEditorFooter(snippet, name, text, field)'));
+assert(snippets.includes('await navigator.clipboard.writeText(content)'));
+assert(snippets.includes('function restoreLibraryFooter()'));
+assert(snippets.includes("window.showToast?.('Baustein wurde gelöscht.', 'success')"));
+assert(!snippets.includes("editAction(isNew ? 'Baustein anlegen' : 'Änderungen speichern'"));
 assert(!snippets.includes('Deine wiederverwendbaren Inhalte'));
 assert(!snippets.includes('Finde Textbausteine schnell wieder'));
 assert(db.includes(".map(term => `${term.toLocaleLowerCase('de-DE')}:*`)"));
 assert(!snippets.includes('fa-ellipsis'));
 assert(!snippets.includes('window.confirm('));
+assert(snippets.includes("modal.className = 'ui-backdrop z-[150] hidden'"));
+assert(!snippets.includes('z-[145]'));
 
+assert(tailwind.includes('.z-\\[150\\]'));
 for (const method of [
     'getLibrarySnippets',
     'getSnippetLibraryCounts',
@@ -64,6 +76,8 @@ assert(migration.includes('grant update ('));
 
 assert(css.includes('.library-content-toggle'));
 assert(css.includes('.snippet-editor'));
+assert(css.includes('box-shadow: 0 0 0 1px #38bdf8'));
+assert(!css.includes('.snippet-editor input:focus-visible'));
 assert(css.includes('.snippet-target-button.is-suggested'));
 assert(!css.includes('linear-gradient'));
 assert(!css.includes('radial-gradient'));

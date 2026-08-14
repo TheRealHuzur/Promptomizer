@@ -38,6 +38,7 @@
         selectionMode: false,
         selected: new Set(),
         editingId: null,
+        editorForm: null,
         targetSnippet: null
     };
     const db = window.db;
@@ -93,7 +94,7 @@
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'snippet-library-confirm';
-            modal.className = 'ui-backdrop z-[145] hidden';
+            modal.className = 'ui-backdrop z-[150] hidden';
             modal.setAttribute('role', 'dialog');
             modal.setAttribute('aria-modal', 'true');
             modal.innerHTML = `
@@ -348,6 +349,7 @@
     function renderItems() {
         if (!isActive()) return;
         state.editingId = null;
+        restoreLibraryFooter();
         const content = document.getElementById('library-content');
         const count = document.getElementById('library-result-count');
         const more = document.getElementById('library-load-more');
@@ -508,7 +510,7 @@
         if (modal) return modal;
         modal = document.createElement('div');
         modal.id = 'snippet-target-modal';
-        modal.className = 'ui-backdrop z-[145] hidden';
+        modal.className = 'ui-backdrop z-[150] hidden';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
         modal.innerHTML = `
@@ -683,6 +685,74 @@
         return button;
     }
 
+    function restoreLibraryFooter() {
+        state.editorForm = null;
+        window.renderPromptEditFooter?.();
+        window.PromptLibrary?.configureFooter?.('library');
+    }
+
+    function configureEditorFooter(existing, nameInput, contentInput, fieldSelect) {
+        state.editorForm = { existing, nameInput, contentInput, fieldSelect };
+        const saveWrap = document.getElementById('footer-save-wrap');
+        const save = document.createElement('button');
+        save.type = 'button';
+        save.id = 'btn-save-snippet-version';
+        save.className = 'bg-brand-sky hover:bg-brand-hover text-navy-deep font-bold py-3 px-8 rounded-md shadow-glow flex items-center gap-3 transform active:scale-95 transition-all';
+        save.innerHTML = '<i class="fa-solid fa-code-branch"></i><span>Neue Version speichern</span>';
+        save.addEventListener('click', () => saveEditor(existing, nameInput, contentInput, fieldSelect));
+        saveWrap?.replaceChildren(save);
+        saveWrap?.classList.remove('hidden');
+        document.getElementById('btn-reset')?.classList.add('hidden');
+        document.getElementById('btn-copy')?.classList.remove('hidden');
+        document.getElementById('library-create-content')?.classList.add('hidden');
+    }
+
+    function isEditing() {
+        return isActive() && Boolean(state.editorForm?.existing);
+    }
+
+    async function copyEditing() {
+        const form = state.editorForm;
+        if (!form?.existing) return;
+        const content = form.contentInput.value;
+        if (!content.trim()) {
+            window.showToast?.('Dieser Baustein enthält noch keinen kopierbaren Inhalt.', 'info');
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(content);
+            if (db.markSnippetUsed) {
+                await db.markSnippetUsed(form.existing.id);
+                form.existing.last_used_at = new Date().toISOString();
+            }
+            track('snippet_library_copy');
+
+            const button = document.getElementById('btn-copy');
+            if (button) {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i><span>COPIED!</span>';
+                button.classList.replace('bg-brand-sky', 'bg-green-500');
+                setTimeout(() => {
+                    button.innerHTML = originalHtml;
+                    button.classList.replace('bg-green-500', 'bg-brand-sky');
+                }, 1600);
+            }
+            window.showToast?.('Baustein wurde in die Zwischenablage kopiert.', 'success');
+        } catch (error) {
+            console.error('Snippet copy failed:', error);
+            window.showToast?.('Baustein konnte nicht kopiert werden.', 'error');
+        }
+    }
+
+    function closeEditor() {
+        state.editingId = null;
+        state.editorForm = null;
+        state.active = false;
+        window.renderPromptEditFooter?.();
+        window.PromptLibrary?.configureFooter?.('library');
+    }
+
     function renderEditor(snippet) {
         if (!isActive()) return;
         const isNew = !snippet;
@@ -745,10 +815,13 @@
         form.append(main, side);
         const actions = document.createElement('div');
         actions.className = 'library-edit-actions';
-        const save = editAction(isNew ? 'Baustein anlegen' : 'Änderungen speichern', 'fa-floppy-disk', () => saveEditor(snippet, name, text, field));
-        save.classList.add('snippet-editor-save');
-        actions.append(save);
+        if (isNew) {
+            const save = editAction('Baustein anlegen', 'fa-floppy-disk', () => saveEditor(snippet, name, text, field));
+            save.classList.add('snippet-editor-save');
+            actions.append(save);
+        }
         if (!isNew) {
+            configureEditorFooter(snippet, name, text, field);
             actions.append(
                 editAction('Duplizieren', 'fa-clone', () => duplicateSnippet(snippet.id)),
                 editAction(snippet.archived_at ? 'Wiederherstellen' : 'Archivieren', snippet.archived_at ? 'fa-rotate-left' : 'fa-box-archive', () => archiveSnippet(snippet.id, Boolean(snippet.archived_at))),
@@ -814,8 +887,14 @@
         const success = await db.deleteSnippet(id);
         if (!success) return window.showToast?.('Baustein konnte nicht gelöscht werden.', 'error');
         track('snippet_library_delete');
-        await refreshAll();
-        window.refreshSnippetSurfaces?.();
+        state.editingId = null;
+        restoreLibraryFooter();
+        await Promise.all([
+            reloadItems(),
+            window.refreshSnippetSurfaces?.(),
+            window.updatePromptCounter?.()
+        ]);
+        window.showToast?.('Baustein wurde gelöscht.', 'success');
     }
 
     function exportSnippet(snippet, format) {
@@ -854,5 +933,12 @@
         await reloadItems();
     }
 
-    window.SnippetLibrary = { open, refreshAll, openCreate: () => renderEditor(null) };
+    window.SnippetLibrary = {
+        open,
+        refreshAll,
+        openCreate: () => renderEditor(null),
+        isEditing,
+        copyEditing,
+        closeEditor
+    };
 })();

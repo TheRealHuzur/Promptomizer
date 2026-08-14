@@ -116,7 +116,7 @@
 
 .snippet-editor-textarea:focus {
     border-color: #38bdf8;
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, .1);
+    box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, .1);
 }
 
 .snippet-editor-meta {
@@ -180,9 +180,6 @@
 
 #view-library[data-content-type="snippets"] .library-card-star:focus-visible,
 .snippet-editor button:focus-visible,
-.snippet-editor input:focus-visible,
-.snippet-editor select:focus-visible,
-.snippet-editor textarea:focus-visible,
 .snippet-target-button:focus-visible {
     outline: 2px solid #7dd3fc;
     outline-offset: 2px;
