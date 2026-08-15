@@ -1,5 +1,5 @@
 module.exports = {
-  content: ["./index.html", "./app.html", "./preise.html", "./impressum.html", "./datenschutz.html", "./agb.html", "./prompt-bibliothek.html", "./prompt-erstellen.html", "./prompt-vorlagen.html"],
+  content: ["./index.html", "./app.html", "./preise.html", "./impressum.html", "./datenschutz.html", "./agb.html", "./prompt-bibliothek.html", "./prompt-erstellen.html", "./prompt-vorlagen.html", "./prompt-vorlagen/buero.html", "./prompt-vorlagen/verwaltung.html", "./prompt-vorlagen/marketing.html"],
   darkMode: 'class',
   theme: {
     extend: {

@@ -1,458 +1,84 @@
 <!DOCTYPE html>
 <html lang="de" class="dark antialiased">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt-Bibliothek: KI-Prompts speichern & wiederfinden</title>
-    <meta name="description" content="Speichere ChatGPT- und KI-Prompts an einem Ort, statt sie in Notizen und Chats zu verlieren. Server in Deutschland, kein KI-Modell im Hintergrund.">
-    <meta name="theme-color" content="#020617">
-    <link rel="canonical" href="https://www.promptomizer.de/prompt-bibliothek">
-
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Promptomizer">
-    <meta property="og:locale" content="de_DE">
-    <meta property="og:url" content="https://www.promptomizer.de/prompt-bibliothek">
-    <meta property="og:title" content="Prompt-Bibliothek: KI-Prompts speichern & wiederfinden">
-    <meta property="og:description" content="Speichere ChatGPT- und KI-Prompts an einem Ort, statt sie in Notizen und Chats zu verlieren. Server in Deutschland, kein KI-Modell im Hintergrund.">
-    <meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Prompt-Bibliothek: KI-Prompts speichern & wiederfinden">
-    <meta name="twitter:description" content="Speichere ChatGPT- und KI-Prompts an einem Ort, statt sie in Notizen und Chats zu verlieren. Server in Deutschland, kein KI-Modell im Hintergrund.">
-    <meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
-
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
-    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
-    <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-
-    <style>
-        /* prompt-bibliothek.html ist eine normale scrollende Seite, kein App-Shell wie app.html */
-        body {
-            overflow: auto;
-        }
-    </style>
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@graph": [
-            {
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Promptomizer", "item": "https://www.promptomizer.de/" },
-                    { "@type": "ListItem", "position": 2, "name": "Prompt-Bibliothek", "item": "https://www.promptomizer.de/prompt-bibliothek" }
-                ]
-            },
-            {
-                "@type": "SoftwareApplication",
-                "name": "Promptomizer",
-                "url": "https://www.promptomizer.de/prompt-bibliothek",
-                "applicationCategory": "BusinessApplication",
-                "operatingSystem": "Web",
-                "description": "Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.",
-                "offers": [
-                    {
-                        "@type": "Offer",
-                        "name": "Free",
-                        "price": "0",
-                        "priceCurrency": "EUR"
-                    },
-                    {
-                        "@type": "Offer",
-                        "name": "Pro (monatlich)",
-                        "price": "3.99",
-                        "priceCurrency": "EUR"
-                    },
-                    {
-                        "@type": "Offer",
-                        "name": "Pro (jährlich)",
-                        "price": "39.99",
-                        "priceCurrency": "EUR"
-                    }
-                ]
-            },
-            {
-                "@type": "FAQPage",
-                "mainEntity": [
-                    {
-                        "@type": "Question",
-                        "name": "Kann ich Promptomizer auch ohne Registrierung testen?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Ja, den Editor kannst du ohne Konto nutzen und Prompts bauen. Um einen Prompt dauerhaft in deiner Bibliothek zu speichern, brauchst du ein kostenloses Konto."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Funktioniert die Bibliothek mit ChatGPT, Claude und Gemini gleichzeitig?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Ja. Prompts werden als reiner Text gespeichert und lassen sich in jedem KI-Tool einsetzen."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Wo werden meine Prompts gespeichert?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Auf Servern in Frankfurt. Es ist kein KI-Modell eingebunden, das deine Inhalte verarbeitet."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Was kostet die Prompt-Bibliothek?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Der Free-Plan ist kostenlos (bis zu 10 gespeicherte Inhalte). Details zu Promptomizer Pro auf der Preisseite."
-                        }
-                    }
-                ]
-            }
-        ]
-    }
-    </script>
-    <!-- FAQPage-Schema dient hier nicht einem SERP-Rich-Snippet (Google hat FAQ-Rich-Results 2023
-         auf Behoerden-/Gesundheitsseiten beschraenkt), sondern der Extrahierbarkeit durch Sprachmodelle. -->
-
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
-        data-exclude-hash="true"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt-Bibliothek für KI-Prompts &amp; Bausteine | Promptomizer</title>
+  <meta name="description" content="Speichere, finde und verwalte KI-Prompts und wiederverwendbare Bausteine an einem Ort. Für ChatGPT, Claude, Gemini und andere KI-Tools.">
+  <meta name="theme-color" content="#020617"><link rel="canonical" href="https://www.promptomizer.de/prompt-bibliothek">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Promptomizer"><meta property="og:locale" content="de_DE">
+  <meta property="og:url" content="https://www.promptomizer.de/prompt-bibliothek"><meta property="og:title" content="Prompt-Bibliothek für KI-Prompts &amp; Bausteine">
+  <meta property="og:description" content="Speichere, finde und verwalte KI-Prompts und wiederverwendbare Bausteine an einem Ort."><meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Prompt-Bibliothek für KI-Prompts &amp; Bausteine"><meta name="twitter:description" content="Speichere, finde und verwalte KI-Prompts und wiederverwendbare Bausteine an einem Ort."><meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+  <link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content-pages.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Promptomizer","item":"https://www.promptomizer.de/"},{"@type":"ListItem","position":2,"name":"Prompt-Bibliothek","item":"https://www.promptomizer.de/prompt-bibliothek"}]},
+    {"@type":"SoftwareApplication","name":"Promptomizer","url":"https://www.promptomizer.de/prompt-bibliothek","applicationCategory":"BusinessApplication","operatingSystem":"Web","description":"Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR"},{"@type":"Offer","name":"Pro monatlich","price":"3.99","priceCurrency":"EUR"},{"@type":"Offer","name":"Pro jährlich","price":"39.99","priceCurrency":"EUR"}]},
+    {"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"Was ist eine Prompt-Bibliothek?","acceptedAnswer":{"@type":"Answer","text":"Eine Prompt-Bibliothek ist ein zentraler Ort, an dem du bewährte KI-Prompts speicherst, organisierst und wiederfindest."}},
+      {"@type":"Question","name":"Was ist der Unterschied zwischen Prompts und Bausteinen?","acceptedAnswer":{"@type":"Answer","text":"Ein Prompt ist ein vollständiger Arbeitsauftrag. Ein Baustein ist ein wiederverwendbarer Bestandteil wie Rolle, Persona, Vorgabe oder Ausgabeformat."}},
+      {"@type":"Question","name":"Kann ich meine Prompts durchsuchen?","acceptedAnswer":{"@type":"Answer","text":"Ja. Du kannst deine Bibliothek durchsuchen, filtern und sortieren sowie Kategorien, Favoriten, Zuletzt verwendet und das Archiv nutzen."}},
+      {"@type":"Question","name":"Kann ich gespeicherte Prompts weiterbearbeiten?","acceptedAnswer":{"@type":"Answer","text":"Ja. Gespeicherte Prompts lassen sich im Editor weiterentwickeln. Pro bietet zusätzlich eine Versionshistorie."}},
+      {"@type":"Question","name":"Kann ich Bausteine direkt einsetzen?","acceptedAnswer":{"@type":"Answer","text":"Ja. Bausteine können aus der Bibliothek direkt in einen bestehenden Editorentwurf eingefügt werden."}},
+      {"@type":"Question","name":"Werden meine gespeicherten Prompts an eine KI geschickt?","acceptedAnswer":{"@type":"Answer","text":"Nein. Promptomizer übermittelt gespeicherte Prompts und Bausteine nicht automatisch an generative KI-Anbieter."}},
+      {"@type":"Question","name":"Was kostet die Prompt-Bibliothek?","acceptedAnswer":{"@type":"Answer","text":"Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro bietet einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen."}}
+    ]}
+  ]}</script>
+  <!-- FAQPage dient der Extrahierbarkeit; ein Google-Rich-Result wird nicht erwartet. -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c" data-exclude-hash="true"></script>
 </head>
+<body class="content-shell bg-navy-deep text-slate-400 min-h-screen">
+<header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
+<main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
+  <nav class="content-breadcrumb mb-8" aria-label="Breadcrumb"><a href="/">Startseite</a><span>›</span><span aria-current="page">Prompt-Bibliothek</span></nav>
+  <section class="text-center max-w-3xl mx-auto mb-12">
+    <h1 class="text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">Deine Prompt-Bibliothek für Prompts und Bausteine</h1>
+    <p class="text-slate-300 text-base md:text-lg mb-4">Speichere gute Prompts, finde sie in Sekunden wieder und kombiniere sie mit wiederverwendbaren Bausteinen für ChatGPT, Claude, Gemini und andere KI-Tools.</p>
+    <p class="mb-7">Promptomizer macht aus einzelnen Prompts einen persönlichen Bestand, den du organisieren, weiterentwickeln und immer wieder verwenden kannst.</p>
+    <p class="text-sm text-slate-300 mb-7">Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.</p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3"><a href="/app?intent=register" class="ui-btn ui-btn-primary px-6">Kostenlos registrieren</a><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-6">Promptomizer öffnen</a></div>
+  </section>
+  <figure class="screenshot-placeholder mb-20" data-screenshot-slot="library-hero"><div><i class="fa-solid fa-image text-3xl text-brand-sky mb-3" aria-hidden="true"></i><strong>Platzhalter: aktuelle zentrale Bibliothek</strong><span>Später durch den freigegebenen Screenshot mit „Prompts | Bausteine“, Suche, Kategorien, Favoriten und Ansichtsumschalter ersetzen.</span><code>assets/screenshot-bibliothek-v2.webp</code></div></figure>
 
-<body class="bg-navy-deep text-slate-400 min-h-screen">
-
-    <!-- Kopfzeile -->
-    <header class="border-b border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="flex items-center select-none leading-none">
-                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-            </a>
-            <a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">
-                Kostenlos registrieren
-            </a>
-        </div>
-    </header>
-
-    <main class="max-w-3xl mx-auto px-6 py-12 md:py-16">
-
-        <!-- Hero -->
-        <section class="text-center mb-16">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                Deine Prompt-Bibliothek: nie wieder einen guten Prompt verlieren
-            </h1>
-            <p class="text-slate-300 text-base mb-2">
-                Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.
-            </p>
-            <p class="text-slate-300 text-base md:text-lg mb-8">
-                Speichere jeden guten Prompt einmal und finde ihn in Sekunden wieder, egal ob für ChatGPT, Claude
-                oder Gemini.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-                <a href="/app?intent=register" class="ui-btn ui-btn-primary px-6">
-                    Kostenlos registrieren
-                </a>
-                <a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-6">
-                    Prompt jetzt bauen
-                </a>
-            </div>
-
-            <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow">
-                <picture>
-                    <source srcset="assets/screenshot-prompt-bibliothek-kategorien.webp" type="image/webp">
-                    <img src="assets/screenshot-prompt-bibliothek-kategorien.png"
-                        alt="Prompt-Bibliothek in Promptomizer: Seitenleiste mit echten, gewachsenen Kategorien wie 2. Brain, Beratungsprojekte, DESK-Suite, Kreativ Prompts, Marketing-Maschine, n8n Prompts, Notion, Programmierung, Prozessflüsterer, Vibe Coding, Vorlagen und Workshops"
-                        width="1600" height="766" class="rounded-lg w-full h-auto" loading="eager" fetchpriority="high">
-                </picture>
-            </div>
-        </section>
-
-        <!-- Problemaufriss -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">
-                Deine besten Prompts, verstreut in Notizen, Chats und Screenshots
-            </h2>
-            <p>
-                Der gute Prompt von letzter Woche steckt irgendwo zwischen ChatGPT-Verlauf, einer Notiz-App und
-                einem Screenshot auf dem Handy. Beim nächsten Mal schreibst du ihn neu, oder er ist einfach weg.
-                Das passiert nicht, weil du unorganisiert bist, sondern weil keines der großen KI-Tools dafür
-                gebaut ist, einzelne Prompts zu sammeln, zu durchsuchen und wieder herauszugeben.
-            </p>
-        </section>
-
-        <!-- Kurzübersicht -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">
-                Eine Bibliothek, die für deine Prompts gemacht ist
-            </h2>
-            <ul class="space-y-3 mb-4">
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-check text-brand-sky mt-1"></i>
-                    <span>Jeder Prompt ein eigener Eintrag, mit einem Klick kopierfertig für ChatGPT, Claude oder Gemini</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-check text-brand-sky mt-1"></i>
-                    <span>Kategorien für jeden Anwendungsfall, frei erweiterbar</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fa-solid fa-check text-brand-sky mt-1"></i>
-                    <span>Cloud-basiert auf Servern in Frankfurt, von jedem Gerät mit Browser erreichbar (mobile Ansicht wird laufend verbessert)</span>
-                </li>
-            </ul>
-            <p class="text-slate-300">
-                Noch keinen guten Prompt zum Speichern? Im <a href="/prompt-erstellen" class="text-brand-sky hover:underline">Prompt-Generator</a>
-                baust du einen, ganz ohne Anmeldung.
-            </p>
-        </section>
-
-        <!-- Baustein A: Kriterienliste -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">
-                Was eine Prompt-Bibliothek leisten muss
-            </h2>
-            <p class="mb-6">
-                „Prompt-Bibliothek" ist kein geschützter Begriff. Fast jedes Tool, in dem man Text ablegen kann,
-                nennt sich so. Deshalb hier die Anforderungen, an denen sich eine echte Prompt-Bibliothek messen
-                lassen muss, und wie Promptomizer sie erfüllt.
-            </p>
-            <ol class="space-y-5">
-                <li>
-                    <p class="font-bold text-white mb-1">1. Einzeln speichern und einzeln wieder herauslösen</p>
-                    <p class="mb-1">
-                        Ein Prompt muss ein eigenständiges Objekt sein, nicht ein Absatz in einem längeren Dokument
-                        und nicht eine Einstellung, die an einem Chat hängt. Nur dann lässt er sich kopieren,
-                        weitergeben und woanders einsetzen.
-                    </p>
-                    <p>In Promptomizer ist jeder Prompt ein einzelner Eintrag, den du mit einem Klick kopierst.</p>
-                </li>
-                <li>
-                    <p class="font-bold text-white mb-1">2. Nach Anwendungsfall geordnet</p>
-                    <p class="mb-1">
-                        Prompts sammeln sich nach Aufgabe, nicht nach Datum: Marketing, Code, Support, Recherche.
-                        Eine Bibliothek muss diese Ordnung abbilden, ohne dass du dir vorher ein System ausdenken
-                        musst.
-                    </p>
-                    <p>Promptomizer bringt Kategorien mit, die du frei erweitern kannst.</p>
-                </li>
-                <li>
-                    <p class="font-bold text-white mb-1">3. Nachvollziehbar, was sich geändert hat</p>
-                    <p class="mb-1">
-                        Gute Prompts entstehen selten beim ersten Versuch. Wer die dritte Fassung speichert und die
-                        zweite verliert, hat den besseren Prompt oft schon weggeworfen.
-                    </p>
-                    <p>
-                        Promptomizer legt bei jeder Änderung eine neue Version an, ältere Fassungen bleiben
-                        erhalten. Die Versionshistorie ansehen ist ein Pro-Feature.
-                    </p>
-                </li>
-                <li>
-                    <p class="font-bold text-white mb-1">4. Unabhängig vom KI-Anbieter</p>
-                    <p class="mb-1">
-                        Ein Prompt, der nur in einem Tool funktioniert, ist an dieses Tool gebunden. Eine Bibliothek
-                        liegt außerhalb und funktioniert mit ChatGPT, Claude, Gemini und allem, was danach kommt.
-                    </p>
-                    <p>Promptomizer speichert Prompts als reinen Text, einsetzbar in jedem KI-Tool.</p>
-                </li>
-                <li>
-                    <p class="font-bold text-white mb-1">5. An einem Ort, der deine Inhalte nicht weiterverwendet</p>
-                    <p class="mb-1">
-                        Prompts enthalten oft mehr über die eigene Arbeit, als einem im Moment des Schreibens
-                        bewusst ist: Kundennamen, Prozesse, Formulierungen.
-                    </p>
-                    <p>
-                        Promptomizer speichert deine Prompts auf Servern in Frankfurt. Es ist kein KI-Modell
-                        eingebunden, das deine Inhalte verarbeitet oder daraus lernt. Für die technische
-                        Fehlererkennung ist ein europäischer Dienstleister im Einsatz, dessen Zugriff auf Inhalte
-                        durch Filterregeln eingeschränkt ist.
-                    </p>
-                </li>
-            </ol>
-        </section>
-
-        <!-- Baustein B: Alltagsszenario mit Screenshots -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">So sieht das im Alltag aus</h2>
-            <p class="mb-4">
-                Angenommen, du schreibst an einem Dienstag einen Prompt, der endlich brauchbare Produkttexte
-                liefert. Du speicherst ihn unter der Kategorie „Marketing" und gibst ihm einen Titel, den du in
-                drei Monaten nicht mehr lesen wirst.
-            </p>
-            <p class="mb-4">
-                Sechs Wochen später brauchst du ihn wieder. Du findest ihn in der Kategorie „Marketing", kopierst
-                ihn und setzt ihn in Claude ein statt wie damals in ChatGPT. Er funktioniert genauso.
-            </p>
-            <p class="mb-8">
-                Beim dritten Mal fällt dir eine Verbesserung ein. Du speicherst die neue Fassung als neue Version.
-                Die alte bleibt erhalten.
-            </p>
-
-            <figure class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow mb-3">
-                <picture>
-                    <source srcset="assets/screenshot-prompt-bibliothek-kategorien.webp" type="image/webp">
-                    <img src="assets/screenshot-prompt-bibliothek-kategorien.png"
-                        alt="Kategorien-Übersicht einer echten, seit Monaten genutzten Prompt-Bibliothek in Promptomizer mit 13 Kategorien, unter anderem 2. Brain, Beratungsprojekte, DESK-Suite, Kreativ Prompts, Marketing-Maschine und Vorlagen"
-                        width="1600" height="766" class="rounded-lg w-full h-auto" loading="lazy">
-                </picture>
-                <figcaption class="text-xs text-slate-500 px-2 pt-2">
-                    Die Kategorien-Übersicht einer gefüllten Bibliothek: jede Kategorie bündelt Prompts zu einem
-                    Themenfeld, frei erweiterbar.
-                </figcaption>
-            </figure>
-
-            <figure class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow">
-                <picture>
-                    <source srcset="assets/screenshot-prompt-bibliothek-2-brain.webp" type="image/webp">
-                    <img src="assets/screenshot-prompt-bibliothek-2-brain.png"
-                        alt="Aufgeklappte Kategorie „2. Brain" in der Promptomizer-Bibliothek mit vier gespeicherten Prompt-Einträgen: Handbuch aus Notebook, 2. Brain Infografik, 2. Brain Einträge ergänzen und 2. Brain CustomGPT-Prompt"
-                        width="1600" height="766" class="rounded-lg w-full h-auto" loading="lazy">
-                </picture>
-                <figcaption class="text-xs text-slate-500 px-2 pt-2">
-                    Innerhalb einer Kategorie liegt jeder Prompt als eigener, einzeln aufrufbarer Eintrag.
-                </figcaption>
-            </figure>
-        </section>
-
-        <!-- Baustein C: Abgrenzung -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">
-                Warum ChatGPT-Projekte, Gems und Custom GPTs ein anderes Problem lösen
-            </h2>
-            <p class="text-xs text-slate-500 mb-4">Stand: August 2026</p>
-            <p class="mb-4">
-                Alle großen KI-Tools bieten inzwischen etwas, das nach Prompt-Verwaltung aussieht. ChatGPT hat
-                Projekte und Custom GPTs, Claude hat Projekte, Gemini hat Gems. Diese Funktionen sind gut, aber sie
-                sind für etwas anderes gebaut.
-            </p>
-            <p class="mb-4">
-                Sie sorgen dafür, dass ein festgelegter Prompt bei jedem Chat automatisch mitläuft. Der Prompt wird
-                also immer wieder ausgeführt, ohne dass du ihn erneut eingibst. Das ist praktisch, wenn du eine
-                wiederkehrende Aufgabe hast.
-            </p>
-            <p class="mb-4">
-                Was sie nicht sind: eine Sammlung. Du kannst einen einzelnen Prompt dort nicht durchsuchen,
-                nicht nebeneinanderlegen, nicht ohne Umweg herauslösen und nicht in einem anderen KI-Tool
-                weiterverwenden. Er liegt in der Konfiguration eines bestimmten Projekts in einem bestimmten Tool.
-            </p>
-            <p>
-                Eine Bibliothek liegt daneben statt darin. Sie sammelt, ordnet und gibt wieder heraus. Beides
-                zusammen ergibt Sinn: den Prompt in der Bibliothek pflegen und ihn dort einsetzen, wo du gerade
-                arbeitest.
-            </p>
-        </section>
-
-        <!-- FAQ -->
-        <section class="mb-16">
-            <h2 class="text-xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
-            <div class="space-y-2" id="bibliothek-faq">
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="bibliothek-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleBibliothekFaq(this)">
-                        <span class="text-slate-200 font-medium">Kann ich Promptomizer auch ohne Registrierung testen?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="bibliothek-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Ja, den Editor kannst du ohne Konto nutzen und Prompts bauen. Um einen Prompt dauerhaft in
-                        deiner Bibliothek zu speichern, brauchst du ein kostenloses Konto.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="bibliothek-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleBibliothekFaq(this)">
-                        <span class="text-slate-200 font-medium">Funktioniert die Bibliothek mit ChatGPT, Claude und Gemini gleichzeitig?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="bibliothek-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Ja. Prompts werden als reiner Text gespeichert und lassen sich in jedem KI-Tool einsetzen.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="bibliothek-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleBibliothekFaq(this)">
-                        <span class="text-slate-200 font-medium">Wo werden meine Prompts gespeichert?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="bibliothek-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Auf Servern in Frankfurt. Es ist kein KI-Modell eingebunden, das deine Inhalte verarbeitet.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="bibliothek-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleBibliothekFaq(this)">
-                        <span class="text-slate-200 font-medium">Was kostet die Prompt-Bibliothek?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="bibliothek-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Der Free-Plan ist kostenlos (bis zu 10 gespeicherte Inhalte). Details zu Promptomizer Pro
-                        auf der <a href="/preise" class="text-brand-sky hover:underline">Preisseite</a>.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Preisanker -->
-        <section class="rounded-xl border-2 border-brand-sky bg-slate-800/40 p-6 md:p-8 shadow-glow mb-16 text-center">
-            <h2 class="text-lg font-bold text-white mb-2">Kostenlos starten, jederzeit upgraden</h2>
-            <p class="text-sm">
-                Der Free-Plan kostet 0 € und speichert bis zu 10 Inhalte, Prompts und Bausteine zusammen, ganz ohne
-                Angabe von Zahlungsmitteln. Wer mehr braucht, wechselt für 3,99 € im Monat (Einführungspreis) zu
-                Promptomizer Pro. <a href="/preise" class="text-brand-sky hover:underline">Alle Details zu den Plänen</a>.
-            </p>
-        </section>
-
-        <!-- Abschluss-CTA -->
-        <section class="text-center rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow">
-            <h2 class="text-2xl font-bold text-white mb-3">Starte in unter einer Minute</h2>
-            <p class="mb-6">
-                Registriere dich kostenlos und leg deine erste Kategorie an, ganz ohne Angabe von Zahlungsmitteln.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="/app?intent=register" class="ui-btn ui-btn-primary px-8">Kostenlos registrieren</a>
-                <a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-8">Prompt jetzt bauen</a>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Vertrauensleiste -->
-    <div class="border-t border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
-            <span><i class="fa-solid fa-flag mr-1.5"></i>Deutschland</span>
-            <span><i class="fa-solid fa-shield-halved mr-1.5"></i>DSGVO</span>
-            <span><i class="fa-solid fa-robot mr-1.5"></i>Kein KI-Training</span>
-            <span><i class="fa-solid fa-rotate-left mr-1.5"></i>Jederzeit kündbar</span>
-        </div>
+  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Nicht nur speichern. Wiederfinden und weiterarbeiten.</h2><p class="max-w-3xl mx-auto text-center mb-8">Eine Prompt-Bibliothek ist dann hilfreich, wenn du auch nach Monaten noch findest, was du suchst und direkt damit weiterarbeiten kannst.</p>
+    <div class="content-grid-3">
+      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Finden</h3><p>Durchsuche deinen Bestand und filtere ihn nach Kategorien, Favoriten, Prompt-Typ oder Einsatzbereich. Häufig verwendete Inhalte findest du über „Zuletzt verwendet“.</p></article>
+      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Organisieren</h3><p>Ordne Prompts und Bausteine, markiere wichtige Inhalte als Favoriten oder verschiebe Dinge ins Archiv.</p></article>
+      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Weiterverwenden</h3><p>Öffne einen gespeicherten Prompt direkt im Editor oder füge einen Baustein in deinen aktuellen Entwurf ein.</p></article>
     </div>
+  </section>
 
-    <footer class="border-t border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
-            <span>&copy; 2026 Promptomizer</span>
-            <div class="flex items-center gap-4">
-                <a href="/preise" class="hover:text-slate-400">Preise</a>
-                <a href="/app" class="hover:text-slate-400">Zur App</a>
-                <a href="/impressum" class="hover:text-slate-400">Impressum</a>
-                <a href="/datenschutz" class="hover:text-slate-400">Datenschutz</a>
-                <a href="/agb" class="hover:text-slate-400">AGB</a>
-            </div>
-        </div>
-    </footer>
+  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Eine Bibliothek. Zwei Bereiche: Prompts und Bausteine.</h2><p class="max-w-3xl mb-8">Prompts und Bausteine erfüllen unterschiedliche Aufgaben. Deshalb bleiben sie im Promptomizer getrennt, liegen aber an einem gemeinsamen Ort.</p>
+    <div class="content-flow mb-8" aria-label="Bereichsumschalter"><span class="content-flow-step border-brand-sky">Prompts</span><span class="text-slate-600">|</span><span class="content-flow-step">Bausteine</span></div>
+    <div class="content-grid-2 mb-8"><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Prompts</h3><p class="mb-4">Ein gespeicherter Prompt ist ein vollständiges Arbeitsmittel. Du kannst ihn öffnen, bearbeiten, duplizieren, einer Kategorie zuordnen, favorisieren, archivieren und erneut verwenden.</p><p class="text-sm">Beispiele: Wettbewerbsanalyse, LinkedIn-Beitrag, Diskussionsrunde</p></article><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Bausteine</h3><p class="mb-4">Bausteine sind wiederverwendbare Bestandteile. Sie bleiben nach Rolle und Funktion, Kontext, Aufgabe, Format und freien Bausteinen getrennt.</p><p class="text-sm">Beispiele: Persona, Arbeitsweise, Markdown-Ausgabe</p></article></div>
+    <div class="content-flow"><span class="content-flow-step">Prompt öffnen</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Baustein einsetzen</span><span class="content-flow-arrow">→</span><span class="content-flow-step">anpassen</span><span class="content-flow-arrow">→</span><span class="content-flow-step">verwenden</span></div>
+  </section>
 
-    <script>
-        function toggleBibliothekFaq(button) {
-            const body = button.nextElementSibling;
-            const icon = button.querySelector('i');
-            const isOpen = !body.classList.contains('hidden');
-            body.classList.toggle('hidden', isOpen);
-            icon.classList.toggle('rotate-180', !isOpen);
-        }
-    </script>
-</body>
+  <section class="content-grid-2 items-center mb-20"><div><h2 class="text-2xl font-bold text-white mb-4">Wiederkehrende Teile einmal speichern</h2><p class="mb-4">Viele gute Prompts enthalten eine Rolle, Arbeitsweise, feste Vorgaben oder ein Ausgabeformat, die du immer wieder brauchst.</p><p>Im strukturierten Editor landet ein Baustein im passenden Feld. Im freien Editor wird er dort eingefügt, wo du gerade arbeitest. Dein bestehender Prompt bleibt erhalten.</p></div><div class="content-card content-card-accent"><div class="content-flow"><span class="content-flow-step">Persona speichern</span><span class="content-flow-arrow">→</span><span class="content-flow-step">im Editor einsetzen</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Prompt ergänzen</span></div></div></section>
 
-</html>
+  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Finde auch in einer großen Prompt-Sammlung schnell das Richtige</h2><p class="max-w-3xl mb-8">Suche, Kategorien, Favoriten, Archiv, Sortierungen sowie Karten- und Listenansicht halten deinen Bestand übersichtlich. Du kannst nach zuletzt verwendeten oder zuletzt geänderten Inhalten sortieren.</p><figure class="screenshot-placeholder" data-screenshot-slot="library-overview"><div><i class="fa-solid fa-image text-3xl text-brand-sky mb-3" aria-hidden="true"></i><strong>Platzhalter: Bibliotheksübersicht mit Callouts</strong><span>Später durch den aktuellen Screenshot mit Suche, Favoriten, „Zuletzt verwendet“, Kategorien, Archiv, Sortierung und Ansichtsumschalter ersetzen.</span><code>assets/screenshot-bibliothek-v2-uebersicht.webp</code></div></figure></section>
+
+  <section class="content-grid-2 items-center mb-20"><div><h2 class="text-2xl font-bold text-white mb-4">Deine Prompts entwickeln sich weiter</h2><p>Beim Bearbeiten kannst du neue Versionen anlegen. Mit Pro kannst du frühere Fassungen vergleichen und wiederherstellen. Die Wiederherstellung wird als neue Version gespeichert. Versionierung gilt für Prompts, nicht für Bausteine.</p></div><div class="content-card"><div class="content-flow"><span class="content-flow-step">Version 1</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Version 2</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Version 3</span><span class="content-flow-arrow">↩</span><span class="content-flow-step border-brand-sky">Version 4</span></div></div></section>
+
+  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Eine kleine Bibliothek kostenlos aufbauen</h2><p class="max-w-3xl mx-auto text-center mb-8">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro erweitert die Bibliothek um einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</p><div class="content-grid-2 max-w-3xl mx-auto"><article class="content-card"><h3 class="text-xl font-bold text-white mb-2">Free</h3><p class="text-brand-sky font-bold mb-3">Bis zu 10 Inhalte</p><p>Suche, Kategorien, Favoriten, Archiv und direkte Wiederverwendung.</p></article><article class="content-card content-card-accent"><h3 class="text-xl font-bold text-white mb-2">Pro</h3><p class="text-brand-sky font-bold mb-3">Unbegrenzter Bestand</p><p>Versionshistorie, Wiederherstellung, Einzel- und Mehrfachexport sowie Mehrfachverwaltung.</p></article></div><p class="text-center mt-6"><a href="/preise" class="text-brand-sky hover:underline">Pläne und Preise vergleichen</a></p></section>
+
+  <section class="content-card content-card-accent text-center max-w-3xl mx-auto mb-20"><h2 class="text-2xl font-bold text-white mb-4">Für ChatGPT, Claude, Gemini und andere KI-Tools</h2><p class="mb-6">Promptomizer sendet gespeicherte Inhalte nicht automatisch an generative KI-Dienste. Du entscheidest selbst, welchen Prompt du in welchem KI-Tool verwendest.</p><div class="content-flow"><span class="content-flow-step">Promptomizer</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Prompt vorbereiten</span><span class="content-flow-arrow">→</span><span class="content-flow-step">dein KI-Tool</span></div></section>
+
+  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-6 text-center">Noch keinen Prompt für deine Bibliothek?</h2><div class="content-grid-2"><a href="/prompt-erstellen" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Prompt erstellen</h3><p>Baue deinen Prompt aus Rolle, Kontext, Aufgabe und Format auf oder schreibe frei.</p></a><a href="/prompt-vorlagen" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Prompt-Vorlagen</h3><p>Öffne eine Vorlage und passe sie mit deinen eigenen Bausteinen an.</p></a></div></section>
+
+  <section class="mb-16 max-w-3xl mx-auto"><h2 class="text-xl font-bold text-white mb-6">Häufige Fragen</h2><div class="space-y-3">
+    <details class="content-details"><summary>Was ist eine Prompt-Bibliothek?</summary><div class="content-details-body">Ein zentraler Ort, an dem du bewährte KI-Prompts speicherst, organisierst und wiederfindest. Im Promptomizer verwaltest du zusätzlich wiederverwendbare Bausteine.</div></details>
+    <details class="content-details"><summary>Was ist der Unterschied zwischen Prompts und Bausteinen?</summary><div class="content-details-body">Ein Prompt ist ein vollständiger Arbeitsauftrag. Ein Baustein ist ein wiederverwendbarer Bestandteil wie Rolle, Persona, Vorgabe oder Ausgabeformat.</div></details>
+    <details class="content-details"><summary>Kann ich meine Prompts durchsuchen?</summary><div class="content-details-body">Ja. Suche, Filter, Sortierung, Kategorien, Favoriten, „Zuletzt verwendet“ und Archiv helfen beim Wiederfinden.</div></details>
+    <details class="content-details"><summary>Kann ich gespeicherte Prompts weiterbearbeiten?</summary><div class="content-details-body">Ja. Mit Pro kannst du zusätzlich frühere Fassungen vergleichen und wiederherstellen.</div></details>
+    <details class="content-details"><summary>Kann ich Bausteine direkt einsetzen?</summary><div class="content-details-body">Ja. Im strukturierten Modus landen sie im passenden Feld, im freien Modus in deinem vorhandenen Text.</div></details>
+    <details class="content-details"><summary>Werden meine gespeicherten Prompts an eine KI geschickt?</summary><div class="content-details-body">Nein. Promptomizer übermittelt gespeicherte Inhalte nicht automatisch an generative KI-Anbieter.</div></details>
+    <details class="content-details"><summary>Was kostet die Prompt-Bibliothek?</summary><div class="content-details-body">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro bietet einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</div></details>
+  </div></section>
+  <section class="text-center max-w-3xl mx-auto rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow"><h2 class="text-2xl font-bold text-white mb-3">Bau dir eine Prompt-Bibliothek, die mit deiner Arbeit wächst</h2><p class="mb-6">Speichere deine besten Prompts, verwende Bausteine erneut und finde beides genau dann wieder, wenn du es brauchst.</p><div class="flex flex-col sm:flex-row items-center justify-center gap-3"><a href="/app?intent=register" class="ui-btn ui-btn-primary px-8">Kostenlos registrieren</a><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-8">Promptomizer öffnen</a></div></section>
+</main>
+<div class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500"><span>Deutschland</span><span>DSGVO</span><span>Kein KI-Training</span><span>Jederzeit kündbar</span></div></div>
+<footer class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600"><span>&copy; 2026 Promptomizer</span><div class="flex items-center gap-4"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></div></div></footer>
+<script src="/content-pages.js"></script>
+</body></html>

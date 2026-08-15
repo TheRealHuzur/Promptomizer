@@ -1,503 +1,62 @@
-<!DOCTYPE html>
-<html lang="de" class="dark antialiased">
+<!DOCTYPE html><html lang="de" class="dark antialiased"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt erstellen: strukturiert und klar | Promptomizer</title>
+<meta name="description" content="Erstelle deinen Prompt strukturiert aus Rolle, Kontext, Aufgabe und Format. Kostenlos kopieren, ohne Konto und ohne automatische KI-Verarbeitung.">
+<meta name="theme-color" content="#020617"><link rel="canonical" href="https://www.promptomizer.de/prompt-erstellen">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Promptomizer"><meta property="og:locale" content="de_DE"><meta property="og:url" content="https://www.promptomizer.de/prompt-erstellen"><meta property="og:title" content="Prompt erstellen: strukturiert und klar"><meta property="og:description" content="Erstelle deinen Prompt aus Rolle, Kontext, Aufgabe und Format."><meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Prompt erstellen: strukturiert und klar"><meta name="twitter:description" content="Erstelle deinen Prompt aus Rolle, Kontext, Aufgabe und Format."><meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content-pages.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Promptomizer","item":"https://www.promptomizer.de/"},{"@type":"ListItem","position":2,"name":"Prompt erstellen","item":"https://www.promptomizer.de/prompt-erstellen"}]},{"@type":"SoftwareApplication","name":"Promptomizer","url":"https://www.promptomizer.de/prompt-erstellen","applicationCategory":"BusinessApplication","operatingSystem":"Web","description":"Promptomizer hilft dabei, KI-Prompts strukturiert aus Rolle, Kontext, Aufgabe und Format zu erstellen.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR"},{"@type":"Offer","name":"Pro monatlich","price":"3.99","priceCurrency":"EUR"},{"@type":"Offer","name":"Pro jährlich","price":"39.99","priceCurrency":"EUR"}]}]}</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c" data-exclude-hash="true"></script>
+</head><body class="content-shell bg-navy-deep text-slate-400 min-h-screen">
+<header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
+<main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
+<nav class="content-breadcrumb mb-8" aria-label="Breadcrumb"><a href="/">Startseite</a><span>›</span><span aria-current="page">Prompt erstellen</span></nav>
+<section class="text-center max-w-3xl mx-auto mb-8"><h1 class="text-3xl md:text-5xl font-bold text-white mb-5">Prompt erstellen: strukturiert, klar und wiederverwendbar</h1><p class="text-slate-300 text-base md:text-lg">Erstelle deinen Prompt in vier klaren Feldern. Beim Kopieren werden Rolle, Kontext, Aufgabe und Format strukturiert in die Zwischenablage übernommen, bereit für ChatGPT, Claude, Gemini und andere KI-Tools.</p></section>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt-Generator: strukturiert Prompts erstellen</title>
-    <meta name="description" content="Prompts in vier Feldern zusammensetzen und sofort kopieren: Rolle, Aufgabe, Kontext, Format. Kostenlos, ohne Konto, kein KI-Modell im Hintergrund.">
-    <meta name="theme-color" content="#020617">
-    <link rel="canonical" href="https://www.promptomizer.de/prompt-erstellen">
+<section class="max-w-3xl mx-auto rounded-xl border-2 border-navy-border bg-navy-sidebar p-4 md:p-6 shadow-glow mb-16">
+  <noscript><p class="content-placeholder-copy mb-4">Zum Kopieren der vier Felder ist JavaScript nötig. Alle Eingaben bleiben auch ohne JavaScript sichtbar und manuell kopierbar.</p></noscript>
+  <div class="content-grid-2">
+    <div><label for="gen-role" class="ui-label">Rolle &amp; Funktion</label><textarea id="gen-role" class="ui-textarea" style="min-height:80px" placeholder="Aus welcher fachlichen Perspektive soll die KI arbeiten?"></textarea></div>
+    <div><label for="gen-context" class="ui-label">Kontext</label><textarea id="gen-context" class="ui-textarea" style="min-height:80px" placeholder="Was muss die KI über Ausgangslage, Zielgruppe und Grenzen wissen?"></textarea></div>
+    <div><label for="gen-task" class="ui-label">Aufgabe</label><textarea id="gen-task" class="ui-textarea" style="min-height:80px" placeholder="Was soll die KI konkret tun?"></textarea></div>
+    <div><label for="gen-format" class="ui-label">Format</label><textarea id="gen-format" class="ui-textarea" style="min-height:80px" placeholder="Wie soll das Ergebnis aufgebaut sein?"></textarea></div>
+  </div>
+  <p class="text-sm text-slate-300 mt-5">Fülle die vier Felder aus. Mit „Kopieren“ werden deine Eingaben als klar strukturierter Prompt in die Zwischenablage übernommen. Kein Konto nötig.</p>
+  <div class="ui-actions flex-wrap !justify-start mt-4"><button type="button" class="ui-btn ui-btn-ghost border border-navy-border" id="example-btn"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Beispiel einfügen</button><button type="button" class="ui-btn ui-btn-primary" id="copy-prompt-btn"><i class="fa-solid fa-copy" aria-hidden="true"></i> Kopieren</button></div>
+  <p id="prompt-copy-status" class="copy-status mt-2" aria-live="polite"></p>
+</section>
 
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Promptomizer">
-    <meta property="og:locale" content="de_DE">
-    <meta property="og:url" content="https://www.promptomizer.de/prompt-erstellen">
-    <meta property="og:title" content="Prompt-Generator: strukturiert Prompts erstellen">
-    <meta property="og:description" content="Prompts in vier Feldern zusammensetzen und sofort kopieren: Rolle, Aufgabe, Kontext, Format. Kostenlos, ohne Konto, kein KI-Modell im Hintergrund.">
-    <meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Prompt-Generator: strukturiert Prompts erstellen">
-    <meta name="twitter:description" content="Prompts in vier Feldern zusammensetzen und sofort kopieren: Rolle, Aufgabe, Kontext, Format. Kostenlos, ohne Konto, kein KI-Modell im Hintergrund.">
-    <meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+<section class="content-grid-2 items-center mb-20"><div><h2 class="text-2xl font-bold text-white mb-4">Warum Promptomizer kein Prompt-Generator ist</h2><p class="mb-4">Ein klassischer Prompt-Generator versucht, aus wenigen Stichworten automatisch einen Prompt für dich zu erzeugen. Promptomizer verfolgt einen anderen Ansatz: <strong class="text-white">Du bestimmst selbst, was die KI wissen und tun soll.</strong></p><p class="mb-4">Im strukturierten Modus helfen dir vier Felder dabei, Rolle, Kontext, Aufgabe und gewünschtes Format bewusst festzulegen. Promptomizer ergänzt dabei keine Inhalte und schreibt deinen Prompt nicht per KI um. Beim Kopieren werden deine Angaben lediglich klar strukturiert übertragen.</p><p><strong class="text-white">Erst denken, dann prompten.</strong> Je klarer dein Ziel und deine Anforderungen sind, desto weniger muss das Sprachmodell interpretieren oder erraten.</p></div><div class="content-card"><div class="content-grid-2 text-sm"><div><h3 class="font-bold text-slate-300 mb-3">Prompt-Generator</h3><p>erzeugt automatisch</p><p>KI ergänzt Inhalte</p><p>weniger direkte Kontrolle</p></div><div><h3 class="font-bold text-brand-sky mb-3">Promptomizer</h3><p>du formulierst</p><p>keine KI ergänzt Angaben</p><p>du behältst die Kontrolle</p></div></div></div></section>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
+<section class="text-center max-w-3xl mx-auto mb-20"><h2 class="text-2xl font-bold text-white mb-4">Erst das Ziel, dann der Prompt</h2><p class="mb-6">Bevor du einen guten Prompt schreiben kannst, solltest du wissen, was du eigentlich erreichen willst: <strong class="text-white">Was soll entstehen? Für wen? Wozu? Und woran erkennst du ein gutes Ergebnis?</strong></p><div class="content-flow"><span class="content-flow-step border-brand-sky">Ziel klären</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Rolle</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Kontext</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Aufgabe</span><span class="content-flow-arrow">→</span><span class="content-flow-step">Format</span></div></section>
 
-    <link rel="stylesheet" href="vendor/tailwind/tailwind.css">
-    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
-    <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-8 text-center">Die vier Bausteine eines strukturierten Prompts</h2><div class="content-grid-4 mb-8"><article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Rolle</h3><p>Aus welcher fachlichen Perspektive soll die KI arbeiten? Beschreibe Funktion, Blickwinkel und Arbeitsweise.</p></article><article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Kontext</h3><p>Was muss die KI wissen? Dazu gehören Ausgangslage, Zielgruppe, Material oder Grenzen.</p></article><article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Aufgabe</h3><p>Was soll die KI konkret tun? Ein klarer Arbeitsauftrag verhindert unnötigen Interpretationsspielraum.</p></article><article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Format</h3><p>Wie soll das Ergebnis aussehen? Lege Struktur, Darstellung, Länge oder Ausgabeformat fest.</p></article></div>
+<div class="content-grid-2"><article class="content-card"><p class="ui-label mb-2">Vorher</p><p>Schreibe einen Produkttext über Bausteine.</p></article><article class="content-card content-card-accent"><p class="ui-label mb-2">Nachher</p><p><strong class="text-white">Rolle:</strong> erfahrene Software-Texterin<br><strong class="text-white">Kontext:</strong> Feature, Zielgruppe und Problem<br><strong class="text-white">Aufgabe:</strong> Abschnitt für eine Produktseite<br><strong class="text-white">Format:</strong> Überschrift und zwei kurze Absätze</p></article></div></section>
 
-    <style>
-        /* prompt-erstellen.html ist eine normale scrollende Seite, kein App-Shell wie app.html */
-        body {
-            overflow: auto;
-        }
-    </style>
+<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-8 text-center">Strukturiert oder frei, du entscheidest</h2><div class="content-grid-2"><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Strukturierter Modus</h3><figure class="screenshot-placeholder mb-5" data-screenshot-slot="editor-structured"><div><strong>Platzhalter: strukturierter Editor</strong><code>assets/screenshot-editor-strukturiert.webp</code></div></figure><p>Du arbeitest getrennt mit Rolle, Kontext, Aufgabe und Format. Das hilft dabei, Prompts systematisch aufzubauen und keine wichtigen Angaben zu vergessen.</p></article><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Freier Modus</h3><figure class="screenshot-placeholder mb-5" data-screenshot-slot="editor-free"><div><strong>Platzhalter: freier Editor</strong><code>assets/screenshot-editor-frei.webp</code></div></figure><p>Du schreibst ohne festes Schema. Gespeicherte Bausteine kannst du flexibel einsetzen und miteinander kombinieren, etwa Vorgaben, Arbeitsweisen oder Personas.</p></article></div></section>
 
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@graph": [
-            {
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Promptomizer", "item": "https://www.promptomizer.de/" },
-                    { "@type": "ListItem", "position": 2, "name": "Prompt-Generator", "item": "https://www.promptomizer.de/prompt-erstellen" }
-                ]
-            },
-            {
-                "@type": "SoftwareApplication",
-                "name": "Promptomizer",
-                "url": "https://www.promptomizer.de/prompt-erstellen",
-                "applicationCategory": "BusinessApplication",
-                "operatingSystem": "Web",
-                "description": "Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.",
-                "offers": [
-                    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR" },
-                    { "@type": "Offer", "name": "Pro (monatlich)", "price": "3.99", "priceCurrency": "EUR" },
-                    { "@type": "Offer", "name": "Pro (jährlich)", "price": "39.99", "priceCurrency": "EUR" }
-                ]
-            },
-            {
-                "@type": "FAQPage",
-                "mainEntity": [
-                    {
-                        "@type": "Question",
-                        "name": "Ist der Prompt-Generator kostenlos?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Ja. Der Generator auf dieser Seite ist ohne Konto und ohne Zeitbegrenzung nutzbar. Ein Konto wird erst gebraucht, um Prompts dauerhaft zu speichern."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Wird mein Prompt an eine KI geschickt?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Nein. Der Prompt wird aus deinen Eingaben zusammengesetzt. Es ist kein KI-Modell eingebunden, an das dein Text übergeben wird."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Für welche KI-Tools funktionieren die Prompts?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Für alle, die Texteingaben entgegennehmen, darunter ChatGPT, Claude, Gemini und Copilot. Der Generator erzeugt reinen Text ohne toolspezifische Formatierung."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Was ist der Unterschied zwischen dem strukturierten und dem freien Modus?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Im strukturierten Modus füllst du vier getrennte Felder aus und der Prompt wird daraus zusammengesetzt. Im freien Modus schreibst du den Prompt direkt als zusammenhängenden Text. Gespeichert wird in beiden Fällen dasselbe."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Kann ich meine Prompts speichern?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Ja, mit einem kostenlosen Konto. Im kostenlosen Zugang sind bis zu zehn gespeicherte Inhalte und fünf Kategorien enthalten."
-                        }
-                    }
-                ]
-            }
-        ]
-    }
-    </script>
-    <!-- FAQPage-Schema dient hier nicht einem SERP-Rich-Snippet (Google hat FAQ-Rich-Results 2023
-         auf Behoerden-/Gesundheitsseiten beschraenkt), sondern der Extrahierbarkeit durch Sprachmodelle. -->
+<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Ganze Prompts speichern. Einzelne Bausteine wiederverwenden.</h2><p class="max-w-3xl mb-8">Vollständige Prompts speicherst du in deiner <a href="/prompt-bibliothek" class="text-brand-sky hover:underline">Prompt-Bibliothek</a>. Wiederkehrende Rollen, Arbeitsweisen oder Vorgaben legst du als Bausteine ab und setzt sie in unterschiedlichen Prompts erneut ein.</p><div class="content-grid-2"><article class="content-card"><h3 class="text-lg font-bold text-white mb-3">Prompt-Bibliothek</h3><p>Marketing › LinkedIn-Post</p><p>Analyse › Wettbewerbsanalyse</p></article><article class="content-card"><h3 class="text-lg font-bold text-white mb-3">Bausteine</h3><p>Rolle · Kontext · Aufgabe · Format</p><p>freie Bausteine · Personas · Arbeitsweisen</p></article></div><p class="mt-5">Ausgangspunkte findest du außerdem unter <a href="/prompt-vorlagen" class="text-brand-sky hover:underline">Prompt-Vorlagen</a>.</p></section>
 
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
-        data-exclude-hash="true"></script>
-</head>
-
-<body class="bg-navy-deep text-slate-400 min-h-screen">
-
-    <!-- Kopfzeile -->
-    <header class="border-b border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="flex items-center select-none leading-none">
-                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-            </a>
-            <a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">
-                Kostenlos registrieren
-            </a>
-        </div>
-    </header>
-
-    <main class="max-w-3xl mx-auto px-6 py-12 md:py-16">
-
-        <!-- Hero + Einleitung -->
-        <section class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                Prompt-Generator: in vier Feldern zum fertigen Prompt
-            </h1>
-            <p class="text-slate-300 text-base md:text-lg">
-                Fülle aus, was die KI wissen muss. Der fertige Prompt entsteht darunter und lässt sich mit einem
-                Klick kopieren. Kein Konto nötig.
-            </p>
-        </section>
-
-        <!-- Das Werkzeug -->
-        <section class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-4 md:p-6 shadow-glow mb-4">
-            <noscript>
-                <p class="text-sm text-amber-400 mb-4">
-                    Dieses Werkzeug setzt deinen Prompt per JavaScript zusammen. Mit deaktiviertem JavaScript
-                    kannst du die vier Felder unten trotzdem lesen und verstehen, was hineingehört, aber der
-                    fertige Prompt wird nicht automatisch zusammengesetzt.
-                </p>
-            </noscript>
-
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label for="gen-role" class="ui-label">Rolle & Funktion</label>
-                    <textarea id="gen-role" class="ui-textarea" style="min-height:70px"
-                        placeholder="Wer soll die KI sein? (z.B. Senior SEO Experte)" oninput="composeGeneratedPrompt()"></textarea>
-                </div>
-                <div>
-                    <label for="gen-context" class="ui-label">Kontext</label>
-                    <textarea id="gen-context" class="ui-textarea" style="min-height:70px"
-                        placeholder="Hintergrundinfos (Zielgruppe, Kanal, Produkt...)" oninput="composeGeneratedPrompt()"></textarea>
-                </div>
-                <div>
-                    <label for="gen-task" class="ui-label">Aufgabe</label>
-                    <textarea id="gen-task" class="ui-textarea" style="min-height:70px"
-                        placeholder="Was soll getan werden? (Schreibe 3 Headlines...)" oninput="composeGeneratedPrompt()"></textarea>
-                </div>
-                <div>
-                    <label for="gen-format" class="ui-label">Format</label>
-                    <textarea id="gen-format" class="ui-textarea" style="min-height:70px"
-                        placeholder="Ausgabeformat (Tabelle, Markdown, Liste...)" oninput="composeGeneratedPrompt()"></textarea>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <label for="gen-output" class="ui-label">Fertiger Prompt</label>
-                <textarea id="gen-output" class="ui-textarea" style="min-height:140px" readonly
-                    placeholder="Erscheint hier, sobald du oben etwas einträgst."></textarea>
-            </div>
-
-            <div class="ui-actions flex-wrap !justify-start mt-4">
-                <button type="button" class="ui-btn ui-btn-ghost border border-navy-border" onclick="fillGeneratorExample()">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Beispiel einfügen
-                </button>
-                <button type="button" id="gen-copy-btn" class="ui-btn ui-btn-primary" onclick="copyGeneratedPrompt()">
-                    <i class="fa-solid fa-copy"></i> Kopieren
-                </button>
-            </div>
-        </section>
-
-        <div class="text-center mb-16">
-            <a href="/app?intent=register" class="ui-btn ui-btn-ghost border border-navy-border text-sm">
-                Prompt fertig? Kostenloses Konto anlegen und dauerhaft speichern
-            </a>
-            <p class="text-xs text-slate-500 mt-2">
-                Kopiere deinen Prompt oben, bevor du weitergehst. Die App übernimmt ihn nicht automatisch, du fügst
-                ihn nach der Anmeldung selbst ein.
-            </p>
-        </div>
-
-        <!-- Entitätssatz -->
-        <p class="text-slate-300 text-center mb-16">
-            Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.
-        </p>
-
-        <!-- Was der Generator macht und was nicht -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">Was der Generator macht und was er nicht macht</h2>
-            <p class="mb-4">
-                Dieser Generator schreibt deinen Prompt nicht um. Er setzt zusammen, was du in die vier Felder
-                einträgst, und zwar in der Reihenfolge und der Form, die sich in der Praxis bewährt hat.
-            </p>
-            <p class="mb-4">
-                Das klingt nach weniger, als andere Werkzeuge versprechen, und ist an einer Stelle deutlich mehr
-                wert.
-            </p>
-            <p class="mb-4">
-                Ein Prompt ist die Beschreibung dessen, was du willst. Wer ihn selbst schreibt, muss sich
-                festlegen: auf das Ziel, die Zielgruppe, den Ton, das Format, die Grenzen. Dieses Festlegen ist die
-                eigentliche Arbeit. Wer sie abgibt, bekommt einen Prompt, den er nicht beurteilen kann, weil er nie
-                entschieden hat, wie ein gutes Ergebnis überhaupt aussieht.
-            </p>
-            <p class="mb-4">
-                Dazu kommt ein technisches Problem. Wenn dasselbe Modell einen Prompt erzeugt und ihn anschließend
-                bewertet, fehlt der Maßstab von außen. Es verstärkt die Muster, die es selbst bevorzugt. Nach ein
-                paar Runden ist der Prompt länger, gegliederter und beeindruckender, aber nicht treffender. In der
-                Forschung wird dieser Effekt als Model Drift oder Self-Reinforcing Error Loop beschrieben. Das
-                etablierte Gegenmittel heißt Human in the Loop: Ein Mensch entscheidet, welche Fassung wirklich
-                besser ist.
-            </p>
-            <p class="mb-4">
-                Genau diese Entscheidung nimmt Promptomizer dir nicht ab. Das Werkzeug hilft dir, den Prompt
-                strukturiert aufzubauen, und durch die Möglichkeit der Versionierung verfeinerst du ihn gezielt.
-                Ausgeführt wird der fertige Prompt danach dort, wo du arbeitest: in ChatGPT, Claude, Gemini oder
-                einem anderen Tool. Geschrieben wird er von dir.
-            </p>
-            <p>
-                Was das Ergebnis besser macht, ist deshalb nicht ein Modell im Hintergrund, sondern die Struktur:
-                Wer Rolle, Aufgabe, Kontext und Format getrennt beantwortet, vergisst keinen der vier Teile. Genau
-                das ist der häufigste Grund für unbrauchbare Antworten.
-            </p>
-        </section>
-
-        <!-- Wofür die vier Felder da sind -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">Wofür die vier Felder da sind</h2>
-            <p class="mb-2"><strong class="text-white">Rolle.</strong> Wer soll antworten. „Du bist eine erfahrene
-                Texterin für B2B-Software" führt zu anderen Antworten als gar keine Angabe, weil das Modell damit
-                Wortwahl und Detailtiefe festlegen kann.</p>
-            <p class="mb-2"><strong class="text-white">Aufgabe.</strong> Was getan werden soll, als ein Satz im
-                Imperativ. Wenn hier zwei Dinge stehen, kommen zwei halbe Antworten zurück.</p>
-            <p class="mb-2"><strong class="text-white">Kontext.</strong> Was die KI wissen muss und nicht erraten
-                kann. Zielgruppe, Produkt, Vorgeschichte, Einschränkungen. Dieses Feld ist bei den meisten
-                misslungenen Prompts das leere.</p>
-            <p class="mb-8"><strong class="text-white">Format.</strong> Wie das Ergebnis aussehen soll. Länge,
-                Aufbau, was ausdrücklich nicht vorkommen soll. Der Teil, den man am ehesten vergisst und am
-                meisten vermisst.</p>
-
-            <div class="grid md:grid-cols-2 gap-4 mb-4">
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar p-4">
-                    <p class="ui-label mb-2">Vorher</p>
-                    <p class="text-sm">Schreib mir einen Text über unser neues Feature.</p>
-                </div>
-                <div class="rounded-lg border border-brand-sky bg-slate-800/40 p-4">
-                    <p class="ui-label mb-2">Nachher</p>
-                    <p class="text-sm">
-                        <strong class="text-white">Rolle:</strong> Du bist eine erfahrene Texterin für
-                        erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative.<br>
-                        <strong class="text-white">Aufgabe:</strong> Schreibe einen Abschnitt für eine
-                        Produktseite.<br>
-                        <strong class="text-white">Kontext:</strong> Das Feature heißt Bausteine. Es speichert
-                        wiederkehrende Textteile, damit man sie nicht jedes Mal neu tippt. Zielgruppe sind
-                        Menschen, die täglich mit KI arbeiten.<br>
-                        <strong class="text-white">Format:</strong> Eine Überschrift und zwei Absätze zu je
-                        höchstens 60 Wörtern, keine Aufzählung.
-                    </p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500">
-                Beide Eingaben dauern zusammen weniger als eine Minute. Der Unterschied liegt nicht im Aufwand,
-                sondern darin, dass die zweite Fassung nichts dem Zufall überlässt.
-            </p>
-        </section>
-
-        <!-- Vom Generator in die Bibliothek -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-white mb-4">Vom Generator in die Bibliothek</h2>
-            <p class="mb-4">
-                Ein Prompt, der funktioniert, wird nicht einmal gebraucht, sondern regelmäßig. Genau deshalb ist
-                der Generator in Promptomizer kein eigenes Werkzeug, sondern der erste Schritt.
-            </p>
-            <p class="mb-8">
-                Der fertige Prompt bekommt einen Namen und eine Kategorie und liegt danach in deiner
-                <a href="/prompt-bibliothek" class="text-brand-sky hover:underline">Prompt-Bibliothek</a>. Teile,
-                die in vielen Prompts gleich bleiben, etwa die Rollenbeschreibung oben, legst du einmal als
-                <a href="/prompt-vorlagen" class="text-brand-sky hover:underline">Baustein</a> ab und setzt sie
-                danach ein, statt sie zu tippen.
-            </p>
-
-            <figure class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow">
-                <picture>
-                    <source srcset="assets/screenshot-prompt-bibliothek-kategorien.webp" type="image/webp">
-                    <img src="assets/screenshot-prompt-bibliothek-kategorien.png"
-                        alt="Prompt-Bibliothek in Promptomizer: Seitenleiste mit echten, gewachsenen Kategorien, in denen ein im Generator erstellter Prompt landet"
-                        width="1600" height="766" class="rounded-lg w-full h-auto" loading="lazy">
-                </picture>
-                <figcaption class="text-xs text-slate-500 px-2 pt-2">
-                    Aus dem Generator wird ein gespeicherter, kategorisierter Eintrag in genau dieser
-                    Kategorien-Übersicht.
-                </figcaption>
-            </figure>
-        </section>
-
-        <!-- FAQ -->
-        <section class="mb-16">
-            <h2 class="text-xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
-            <div class="space-y-2" id="erstellen-faq">
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="erstellen-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleErstellenFaq(this)">
-                        <span class="text-slate-200 font-medium">Ist der Prompt-Generator kostenlos?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="erstellen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Ja. Der Generator auf dieser Seite ist ohne Konto und ohne Zeitbegrenzung nutzbar. Ein
-                        Konto wird erst gebraucht, um Prompts dauerhaft zu speichern.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="erstellen-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleErstellenFaq(this)">
-                        <span class="text-slate-200 font-medium">Wird mein Prompt an eine KI geschickt?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="erstellen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Nein. Der Prompt wird aus deinen Eingaben zusammengesetzt. Es ist kein KI-Modell
-                        eingebunden, an das dein Text übergeben wird.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="erstellen-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleErstellenFaq(this)">
-                        <span class="text-slate-200 font-medium">Für welche KI-Tools funktionieren die Prompts?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="erstellen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Für alle, die Texteingaben entgegennehmen, darunter ChatGPT, Claude, Gemini und Copilot.
-                        Der Generator erzeugt reinen Text ohne toolspezifische Formatierung.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="erstellen-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleErstellenFaq(this)">
-                        <span class="text-slate-200 font-medium">Was ist der Unterschied zwischen dem strukturierten und dem freien Modus?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="erstellen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Im strukturierten Modus füllst du vier getrennte Felder aus und der Prompt wird daraus
-                        zusammengesetzt. Im freien Modus schreibst du den Prompt direkt als zusammenhängenden
-                        Text. Gespeichert wird in beiden Fällen dasselbe.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="erstellen-faq-toggle w-full flex items-center justify-between p-4 text-left"
-                        onclick="toggleErstellenFaq(this)">
-                        <span class="text-slate-200 font-medium">Kann ich meine Prompts speichern?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="erstellen-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Ja, mit einem kostenlosen Konto. Im kostenlosen Zugang sind bis zu zehn gespeicherte
-                        Inhalte und fünf Kategorien enthalten. Details auf der
-                        <a href="/preise" class="text-brand-sky hover:underline">Preisseite</a>.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Preisanker -->
-        <section class="rounded-xl border-2 border-brand-sky bg-slate-800/40 p-6 md:p-8 shadow-glow mb-16 text-center">
-            <h2 class="text-lg font-bold text-white mb-2">Der Generator ist kostenlos</h2>
-            <p class="text-sm">
-                Wer seine Prompts dauerhaft ablegen will, startet mit dem kostenlosen Zugang und wechselt bei
-                Bedarf für 3,99 € im Monat (Einführungspreis) zu Pro.
-                <a href="/preise" class="text-brand-sky hover:underline">Alle Details zu den Plänen</a>.
-            </p>
-        </section>
-
-        <!-- Abschluss-CTA -->
-        <section class="text-center rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow">
-            <h2 class="text-2xl font-bold text-white mb-3">Prompt fertig?</h2>
-            <p class="mb-6">Mit einem kostenlosen Konto bleibt er dir erhalten.</p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="/app?intent=register" class="ui-btn ui-btn-primary px-8">Kostenlos registrieren</a>
-                <a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-8">Ohne Konto weiter im Editor</a>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Vertrauensleiste -->
-    <div class="border-t border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
-            <span><i class="fa-solid fa-flag mr-1.5"></i>Deutschland</span>
-            <span><i class="fa-solid fa-shield-halved mr-1.5"></i>DSGVO</span>
-            <span><i class="fa-solid fa-robot mr-1.5"></i>Kein KI-Training</span>
-            <span><i class="fa-solid fa-rotate-left mr-1.5"></i>Jederzeit kündbar</span>
-        </div>
-    </div>
-
-    <footer class="border-t border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
-            <span>&copy; 2026 Promptomizer</span>
-            <div class="flex items-center gap-4">
-                <a href="/preise" class="hover:text-slate-400">Preise</a>
-                <a href="/app" class="hover:text-slate-400">Zur App</a>
-                <a href="/impressum" class="hover:text-slate-400">Impressum</a>
-                <a href="/datenschutz" class="hover:text-slate-400">Datenschutz</a>
-                <a href="/agb" class="hover:text-slate-400">AGB</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        const GEN_FIELD_IDS = ['role', 'context', 'task', 'format'];
-        const GEN_LABELS = { role: 'Rolle', context: 'Kontext', task: 'Aufgabe', format: 'Format' };
-        const GEN_EXAMPLE = {
-            role: 'Du bist eine erfahrene Texterin für erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative.',
-            task: 'Schreibe einen Abschnitt für eine Produktseite.',
-            context: 'Das Feature heißt Bausteine. Es speichert wiederkehrende Textteile, damit man sie nicht jedes Mal neu tippt. Zielgruppe sind Menschen, die täglich mit KI arbeiten.',
-            format: 'Eine Überschrift und zwei Absätze zu je höchstens 60 Wörtern, keine Aufzählung.'
-        };
-
-        // Optionales Prefill über URL-Parameter (z.B. von /prompt-vorlagen aus), rein clientseitig.
-        function prefillGeneratorFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            let filled = false;
-            GEN_FIELD_IDS.forEach(id => {
-                const val = params.get(id);
-                if (val) {
-                    document.getElementById(`gen-${id}`).value = val;
-                    filled = true;
-                }
-            });
-            return filled;
-        }
-
-        function composeGeneratedPrompt() {
-            let text = '';
-            GEN_FIELD_IDS.forEach(id => {
-                const val = document.getElementById(`gen-${id}`).value.trim();
-                if (val) text += `${GEN_LABELS[id]}: ${val}\n`;
-            });
-            document.getElementById('gen-output').value = text.trim();
-        }
-
-        function fillGeneratorExample() {
-            GEN_FIELD_IDS.forEach(id => {
-                document.getElementById(`gen-${id}`).value = GEN_EXAMPLE[id];
-            });
-            composeGeneratedPrompt();
-        }
-
-        async function copyGeneratedPrompt() {
-            const output = document.getElementById('gen-output');
-            if (!output.value.trim()) {
-                output.focus();
-                return;
-            }
-            try {
-                await navigator.clipboard.writeText(output.value);
-                const btn = document.getElementById('gen-copy-btn');
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Kopiert!';
-                setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
-            } catch (err) {
-                output.select();
-            }
-        }
-
-        function toggleErstellenFaq(button) {
-            const body = button.nextElementSibling;
-            const icon = button.querySelector('i');
-            const isOpen = !body.classList.contains('hidden');
-            body.classList.toggle('hidden', isOpen);
-            icon.classList.toggle('rotate-180', !isOpen);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (prefillGeneratorFromUrl()) composeGeneratedPrompt();
-        });
-    </script>
-</body>
-
-</html>
+<section class="mb-16 max-w-3xl mx-auto"><h2 class="text-xl font-bold text-white mb-6">Häufige Fragen</h2><div class="space-y-3">
+<details class="content-details"><summary>Ist Promptomizer ein Prompt-Generator?</summary><div class="content-details-body content-placeholder-copy">Platzhaltertext: Die endgültige redaktionelle Antwort wird nachgeliefert.</div></details>
+<details class="content-details"><summary>Wird mein Prompt an eine KI geschickt?</summary><div class="content-details-body content-placeholder-copy">Platzhaltertext: Die endgültige redaktionelle Antwort wird nachgeliefert.</div></details>
+<details class="content-details"><summary>Für welche KI-Tools funktionieren die Prompts?</summary><div class="content-details-body content-placeholder-copy">Platzhaltertext: Die endgültige redaktionelle Antwort wird nachgeliefert.</div></details>
+<details class="content-details"><summary>Was ist der Unterschied zwischen dem strukturierten und dem freien Modus?</summary><div class="content-details-body content-placeholder-copy">Platzhaltertext: Die endgültige redaktionelle Antwort wird nachgeliefert.</div></details>
+<details class="content-details"><summary>Kann ich meine Prompts speichern?</summary><div class="content-details-body content-placeholder-copy">Platzhaltertext: Die endgültige redaktionelle Antwort wird nachgeliefert.</div></details>
+</div></section>
+<section class="content-placeholder-copy text-center max-w-3xl mx-auto"><h2 class="text-2xl font-bold mb-3">Platzhalter: finaler Abschluss-CTA</h2><p>Überschrift, Begleittext und endgültige Buttonbeschriftung werden nachgeliefert. Ziel des primären Buttons bleibt die kostenlose Registrierung.</p><a href="/app?intent=register" class="ui-btn ui-btn-primary px-8 mt-6">Kostenlos registrieren</a></section>
+</main>
+<div class="border-t border-navy-border mt-16"><div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500"><span>Deutschland</span><span>DSGVO</span><span>Kein KI-Training</span><span>Jederzeit kündbar</span></div></div>
+<footer class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600"><span>&copy; 2026 Promptomizer</span><div class="flex items-center gap-4"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></div></div></footer>
+<script>
+const ids=['role','context','task','format'];
+const labels={role:'🎭 ROLLE',context:'🌍 KONTEXT',task:'🎯 AUFGABE',format:'🧪 VARIANTEN'};
+const example={role:'Du bist eine erfahrene Texterin für erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative.',context:'Das Feature heißt Bausteine. Zielgruppe sind Menschen, die täglich mit KI arbeiten.',task:'Schreibe einen Abschnitt für eine Produktseite.',format:'Eine Überschrift und zwei Absätze zu je höchstens 60 Wörtern, keine Aufzählung.'};
+function fillFromUrl(){const p=new URLSearchParams(location.search);ids.forEach(id=>{const v=p.get(id);if(v)document.getElementById('gen-'+id).value=v;});}
+document.getElementById('example-btn').addEventListener('click',()=>ids.forEach(id=>document.getElementById('gen-'+id).value=example[id]));
+document.getElementById('copy-prompt-btn').addEventListener('click',async()=>{const text=ids.map(id=>{const v=document.getElementById('gen-'+id).value.trim();return v?'**'+labels[id]+'**\n'+v:'';}).filter(Boolean).join('\n\n');const status=document.getElementById('prompt-copy-status');if(!text){status.textContent='Fülle zuerst mindestens ein Feld aus.';document.getElementById('gen-role').focus();return;}try{await navigator.clipboard.writeText(text);status.textContent='Prompt kopiert.';}catch(e){status.textContent='Automatisches Kopieren war nicht möglich. Bitte markiere und kopiere die Felder manuell.';}});
+fillFromUrl();
+</script><script src="/content-pages.js"></script>
+</body></html>
