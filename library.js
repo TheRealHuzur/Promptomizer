@@ -98,10 +98,10 @@
         }
         const values = structuredValues(prompt);
         const labels = {
-            role: 'ROLLE & FUNKTION',
-            context: 'KONTEXT',
-            task: 'AUFGABE',
-            format: 'AUSGABEFORMAT'
+            role: '🎭 ROLLE',
+            context: '🌍 KONTEXT',
+            task: '🎯 AUFGABE',
+            format: '📋 FORMAT'
         };
         return Object.keys(labels)
             .filter(key => String(values[key] || '').trim())
@@ -753,6 +753,17 @@
         return button;
     }
 
+    function makeEditorButton(prompt) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'library-use-button library-editor-button';
+        button.title = 'Im Editor öffnen';
+        button.setAttribute('aria-label', 'Im Editor öffnen');
+        button.innerHTML = '<i class="fa-solid fa-file-import"></i>';
+        button.addEventListener('click', event => openPromptInEditor(event, prompt.id));
+        return button;
+    }
+
     function attachOpenBehavior(element, prompt) {
         element.addEventListener('click', () => state.selectionMode ? toggleSelected(prompt.id) : openEdit(prompt));
         element.addEventListener('keydown', event => {
@@ -791,7 +802,7 @@
         preview.textContent = previewFor(prompt);
         const footer = document.createElement('div');
         footer.className = 'library-card-footer';
-        footer.append(makeCopyButton(prompt));
+        footer.append(makeEditorButton(prompt), makeCopyButton(prompt));
         badges.append(category, type);
         body.append(badges, title, preview, footer);
         card.append(makeFavoriteButton(prompt, 'library-card-star'), selection, body);
@@ -851,6 +862,16 @@
         await loadContext();
     }
 
+    async function openPromptInEditor(event, id) {
+        event.stopPropagation();
+        if (state.selectionMode) return toggleSelected(id);
+        const opened = await window.handlePromptClick?.(id, { openEditor: true, markUsed: true });
+        if (!opened) return;
+        const prompt = state.items.find(item => Number(item.id) === Number(id));
+        if (prompt) prompt.last_used_at = new Date().toISOString();
+        track('library_prompt_open_editor');
+    }
+
     async function copyPrompt(event, id) {
         event.stopPropagation();
         if (state.selectionMode) return toggleSelected(id);
@@ -885,7 +906,7 @@
             button.innerHTML = originalHtml;
             button.classList.remove('is-copied');
         }, 1600);
-        window.showToast?.('Prompt wurde in die Zwischenablage kopiert.', 'success');
+        window.showToast?.('Prompt kopiert', 'success');
     }
 
     async function openEdit(prompt) {

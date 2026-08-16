@@ -4532,7 +4532,7 @@
         async function handleCopyAndSave() {
             let finalText = "";
             if (currentMode === 'structured') {
-                const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'format': '🧪 VARIANTEN' };
+                const headerMap = { 'role': '🎭 ROLLE', 'context': '🌍 KONTEXT', 'task': '🎯 AUFGABE', 'format': '📋 FORMAT' };
                 FIELDS.forEach(f => {
                     const val = document.getElementById(`input-${f.id}`).value.trim();
                     if (val) finalText += `**${headerMap[f.id]}**\n${val}\n\n`;
@@ -4720,7 +4720,7 @@
         }
 
         function structuredPromptToText(s) {
-            const headerMap = { role: 'ðŸŽ­ ROLLE', context: 'ðŸŒ KONTEXT', task: 'ðŸŽ¯ AUFGABE', format: 'ðŸ§ª VARIANTEN' };
+            const headerMap = { role: '🎭 ROLLE', context: '🌍 KONTEXT', task: '🎯 AUFGABE', format: '📋 FORMAT' };
             const data = extractStructuredFields(s);
             let finalText = '';
             FIELDS.forEach(f => {
@@ -4730,17 +4730,29 @@
             return finalText.trim();
         }
 
-        async function handlePromptClick(id) {
+        async function finishPromptLoad(id, options = {}) {
+            if (options.markUsed && window.db?.markScenarioUsed) {
+                try {
+                    await window.db.markScenarioUsed(id);
+                } catch (error) {
+                    console.warn('Prompt usage update failed:', error);
+                }
+            }
+            if (options.openEditor) switchView('editor');
+            return true;
+        }
+
+        async function handlePromptClick(id, options = {}) {
             if (promptEditSession) {
                 if (promptEditSession.id == id) {
                     switchView('editor');
-                    return;
+                    return true;
                 }
                 requestPromptEditAction(() => {
                     exitPromptEditSession(true);
-                    handlePromptClick(id);
+                    handlePromptClick(id, options);
                 });
-                return;
+                return false;
             }
 
             let scenarios = [];
@@ -4752,29 +4764,30 @@
             }
 
             const s = scenarios.find(x => x.id == id);
-            if (!s) return;
+            if (!s) return false;
 
             const freePrompt = isFreePrompt(s);
 
             if (currentMode === 'structured') {
                 if (!freePrompt) {
                     applyStructuredToEditor(s);
-                    return;
+                    return finishPromptLoad(id, options);
                 }
                 setEditorMode('free');
                 freeSetMarkdown(s.fields.text || '');
                 setActiveField('free');
-                return;
+                return finishPromptLoad(id, options);
             }
 
             if (freePrompt) {
                 freeSetMarkdown(s.fields.text || '');
                 setActiveField('free');
-                return;
+                return finishPromptLoad(id, options);
             }
 
             freeSetMarkdown(structuredPromptToText(s));
             setActiveField('free');
+            return finishPromptLoad(id, options);
         }
 
         function insertSnippetText(text, targetFieldId = null) {

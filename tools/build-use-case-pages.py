@@ -113,7 +113,7 @@ def structured_prompt_text(value: str) -> str:
         ("Rolle", "🎭 ROLLE"),
         ("Kontext", "🌍 KONTEXT"),
         ("Aufgabe", "🎯 AUFGABE"),
-        ("Format", "🧪 VARIANTEN"),
+        ("Format", "📋 FORMAT"),
     )
     return "\n\n".join(
         f"**{label}**\n{fields[key]}"

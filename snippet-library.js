@@ -397,6 +397,17 @@
         return button;
     }
 
+    function makeEditorButton(snippet) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'library-use-button library-editor-button';
+        button.title = 'Im Editor öffnen';
+        button.setAttribute('aria-label', 'Im Editor öffnen');
+        button.innerHTML = '<i class="fa-solid fa-file-import"></i>';
+        button.addEventListener('click', event => openSnippetInEditor(event, snippet));
+        return button;
+    }
+
     function attachOpenBehavior(element, snippet) {
         element.addEventListener('click', () => state.selectionMode ? toggleSelected(snippet.id) : renderEditor(snippet));
         element.addEventListener('keydown', event => {
@@ -432,7 +443,7 @@
         preview.textContent = cleanText(snippet.content) || 'Noch kein Inhalt vorhanden.';
         const footer = document.createElement('div');
         footer.className = 'library-card-footer';
-        footer.append(makeCopyButton(snippet));
+        footer.append(makeEditorButton(snippet), makeCopyButton(snippet));
         badges.append(field);
         body.append(badges, title, preview, footer);
         card.append(makeFavoriteButton(snippet), selection, body);
@@ -488,6 +499,23 @@
         await loadContext();
     }
 
+    async function openSnippetInEditor(event, snippet) {
+        event.stopPropagation();
+        if (state.selectionMode) return toggleSelected(snippet.id);
+        const result = await window.insertSnippetFromLibrary?.(snippet);
+        if (result?.reason === 'TARGET_REQUIRED') {
+            openTargetDialog(snippet, result.suggestedTarget);
+            return;
+        }
+        if (!result?.success) {
+            window.showToast?.('Baustein konnte nicht im Editor geöffnet werden.', 'error');
+            return;
+        }
+        snippet.last_used_at = new Date().toISOString();
+        track('snippet_library_open_editor', { field_id: snippet.field_id });
+        window.switchView?.('editor');
+    }
+
     async function copySnippet(event, snippet) {
         event.stopPropagation();
         if (state.selectionMode) return toggleSelected(snippet.id);
@@ -520,7 +548,7 @@
             button.innerHTML = originalHtml;
             button.classList.remove('is-copied');
         }, 1600);
-        window.showToast?.('Baustein wurde in die Zwischenablage kopiert.', 'success');
+        window.showToast?.('Baustein kopiert', 'success');
     }
 
     function ensureTargetDialog() {

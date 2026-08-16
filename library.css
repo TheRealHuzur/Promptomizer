@@ -389,6 +389,7 @@
     align-items: flex-end;
     justify-content: flex-end;
     margin-top: auto;
+    gap: .5rem;
     padding-top: 1rem;
 }
 
@@ -406,6 +407,17 @@
 
 .library-use-button:hover {
     background: #38bdf8;
+}
+
+.library-editor-button {
+    border: 1px solid rgba(56, 189, 248, .45);
+    color: #7dd3fc;
+    background: rgba(14, 165, 233, .08);
+}
+
+.library-editor-button:hover {
+    color: #e0f2fe;
+    background: rgba(14, 165, 233, .18);
 }
 
 .library-use-button:active {
