@@ -102,6 +102,26 @@ def prompt_text(raw: str) -> str:
     return quoted.strip()
 
 
+def structured_prompt_text(value: str) -> str:
+    matches = list(re.finditer(r"^(Rolle|Kontext|Aufgabe|Format):\s*", value, re.M))
+    fields: dict[str, str] = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(value)
+        fields[match.group(1)] = value[match.end():end].strip()
+
+    labels = (
+        ("Rolle", "🎭 ROLLE"),
+        ("Kontext", "🌍 KONTEXT"),
+        ("Aufgabe", "🎯 AUFGABE"),
+        ("Format", "🧪 VARIANTEN"),
+    )
+    return "\n\n".join(
+        f"**{label}**\n{fields[key]}"
+        for key, label in labels
+        if fields.get(key)
+    )
+
+
 def parse_prompts(raw: str, blocks: list[dict[str, str]]) -> list[dict[str, str]]:
     result = []
     pattern = r"^#### (\d+)\.\s*(.+?)\n(.*?)(?=^---$|^#### |^### |\Z)"
@@ -205,11 +225,32 @@ def render(page: dict) -> str:
     faq = parse_faq(section(markdown, "2.7"))
     cta = quote_text(section(markdown, "2.9"))
     slug = page["key"]
+    if slug == "buero":
+        prompts = [
+            {**item, "text": structured_prompt_text(item["text"])}
+            for item in prompts
+        ]
+
+    block_button_class = (
+        "ui-btn ui-btn-primary text-sm mt-4"
+        if slug == "buero"
+        else "ui-btn ui-btn-ghost border border-navy-border text-sm mt-4"
+    )
+    block_success_attr = (
+        " data-copy-success=\"Baustein kopiert\""
+        if slug == "buero"
+        else ""
+    )
+    prompt_success_attr = (
+        " data-copy-success=\"Prompt kopiert\""
+        if slug == "buero"
+        else ""
+    )
 
     block_cards = "".join(
         f'''<article class="content-card"><h3 class="text-lg font-bold text-white mb-3">Baustein {item["number"]}: {html.escape(item["name"])}</h3>
         <div id="{slug}-block-{item["number"]}" class="prompt-block reusable-part">{html.escape(item["text"])}</div>
-        <button type="button" class="ui-btn ui-btn-ghost border border-navy-border text-sm mt-4" data-copy-target="{slug}-block-{item["number"]}" aria-describedby="{slug}-block-status-{item["number"]}">Baustein kopieren</button>
+        <button type="button" class="{block_button_class}" data-copy-target="{slug}-block-{item["number"]}"{block_success_attr} aria-describedby="{slug}-block-status-{item["number"]}">Baustein kopieren</button>
         <p id="{slug}-block-status-{item["number"]}" class="copy-status" aria-live="polite"></p></article>'''
         for item in blocks
     )
@@ -217,7 +258,7 @@ def render(page: dict) -> str:
         f'''<details class="content-details"><summary>{item["number"]}. {html.escape(item["name"])}</summary><div class="content-details-body">
         <p class="mb-4">{html.escape(item["description"])}</p><pre id="{slug}-prompt-{item["number"]}" class="prompt-block">{html.escape(item["text"])}</pre>
         <p class="text-xs text-slate-500 mt-3">Als Baustein: {html.escape(item["reusable"])}</p>
-        <button type="button" class="ui-btn ui-btn-primary text-sm mt-4" data-copy-target="{slug}-prompt-{item["number"]}" aria-describedby="{slug}-prompt-status-{item["number"]}">Prompt kopieren</button>
+        <button type="button" class="ui-btn ui-btn-primary text-sm mt-4" data-copy-target="{slug}-prompt-{item["number"]}"{prompt_success_attr} aria-describedby="{slug}-prompt-status-{item["number"]}">Prompt kopieren</button>
         <p id="{slug}-prompt-status-{item["number"]}" class="copy-status" aria-live="polite"></p></div></details>'''
         for item in prompts
     )
@@ -231,6 +272,22 @@ def render(page: dict) -> str:
         block_note = '''<p class="mt-5 text-sm">Praktischer Hinweis: Ersetze Namen vor dem Einfügen durch Platzhalter wie [Person A], [Person B] und [Firma X]. Ob und in welchem Umfang du dienstliche Inhalte in ein KI-Tool geben darfst, steht in der Regelung deines Arbeitgebers.</p>'''
     if slug == "verwaltung":
         extra = '''<p class="mt-5">Wenn es dir weniger um das Werkzeug und mehr um das Vorgehen geht: Auf <a href="https://wissen-und-werkzeug.de/" class="text-brand-sky hover:underline">Wissen und Werkzeug</a> schreibe ich über Prozessmanagement und KI in der Verwaltung, aus der Verwaltung heraus. Beide Angebote stammen von mir.</p>'''
+
+    entity_sentence = (
+        ""
+        if slug == "buero"
+        else """<p class="text-slate-300 font-medium mt-6">Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.</p>"""
+    )
+    block_reuse_sentence = (
+        "Diese Blöcke stehen in den Prompts unten immer wieder. Lege sie einmal als Bausteine ab und setze sie danach immer wieder ein."
+        if slug == "buero"
+        else "Diese Blöcke stehen in den Prompts unten immer wieder. Lege sie einmal als Bausteine ab und setze sie danach erneut ein."
+    )
+    bridge_section = (
+        ""
+        if slug == "buero"
+        else f"""<section class="mb-16"><h2 class="text-2xl font-bold text-white mb-4">{html.escape(page["bridge_heading"])}</h2>{p_tags(bridge)}{extra}<p class="mt-5">Mehr dazu: <a href="/prompt-vorlagen" class="text-brand-sky hover:underline">Prompt-Vorlagen</a>, <a href="/prompt-bibliothek" class="text-brand-sky hover:underline">Prompt-Bibliothek</a> und <a href="/prompt-erstellen" class="text-brand-sky hover:underline">Prompt strukturiert erstellen</a>.</p></section>"""
+    )
 
     return f'''<!DOCTYPE html><html lang="de" class="dark antialiased"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -247,11 +304,11 @@ def render(page: dict) -> str:
 <header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
 <main class="max-w-3xl mx-auto px-6 py-12 md:py-16">
 <nav class="content-breadcrumb mb-8" aria-label="Breadcrumb"><a href="/">Startseite</a><span>›</span><a href="/prompt-vorlagen">Prompt-Vorlagen</a><span>›</span><span aria-current="page">{html.escape(page["name"])}</span></nav>
-<section class="mb-14"><h1 class="text-3xl md:text-4xl font-bold text-white mb-5">{html.escape(page["h1"])}</h1>{p_tags(intro)}<p class="text-slate-300 font-medium mt-6">Promptomizer ist ein deutsches Web-Tool zum Erstellen, Optimieren und Verwalten von KI-Prompts.</p></section>
+<section class="mb-14"><h1 class="text-3xl md:text-4xl font-bold text-white mb-5">{html.escape(page["h1"])}</h1>{p_tags(intro)}{entity_sentence}</section>
 <section class="mb-16"><h2 class="text-2xl font-bold text-white mb-4">{html.escape(page["same_heading"])}</h2>{p_tags(same)}</section>
-<section class="mb-16"><h2 class="text-2xl font-bold text-white mb-6">{html.escape(page["blocks_heading"])}</h2><div class="content-grid-2">{block_cards}</div>{block_note}<p class="mt-5">Diese Blöcke stehen in den Prompts unten immer wieder. Lege sie einmal als Bausteine ab und setze sie danach erneut ein.</p></section>
+<section class="mb-16"><h2 class="text-2xl font-bold text-white mb-6">{html.escape(page["blocks_heading"])}</h2><div class="content-grid-2">{block_cards}</div>{block_note}<p class="mt-5">{block_reuse_sentence}</p></section>
 <section class="mb-16"><h2 class="text-2xl font-bold text-white mb-6">{html.escape(page["prompts_heading"])}</h2><div class="space-y-4">{prompt_cards}</div></section>
-<section class="mb-16"><h2 class="text-2xl font-bold text-white mb-4">{html.escape(page["bridge_heading"])}</h2>{p_tags(bridge)}{extra}<p class="mt-5">Mehr dazu: <a href="/prompt-vorlagen" class="text-brand-sky hover:underline">Prompt-Vorlagen</a>, <a href="/prompt-bibliothek" class="text-brand-sky hover:underline">Prompt-Bibliothek</a> und <a href="/prompt-erstellen" class="text-brand-sky hover:underline">Prompt strukturiert erstellen</a>.</p></section>
+{bridge_section}
 <section class="content-card content-card-accent mb-16"><h2 class="text-lg font-bold text-white mb-3">Kostenlos anfangen</h2><p>Mit Free kannst du bis zu zehn Prompts und Bausteine insgesamt speichern. Die produktive Datenbank für gespeicherte Inhalte liegt in Frankfurt. Promptomizer übermittelt gespeicherte Prompts nicht automatisch an generative KI-Anbieter.</p><p class="mt-3"><a href="/preise" class="text-brand-sky hover:underline">Pläne und Preise vergleichen</a></p></section>
 <section class="mb-16"><h2 class="text-xl font-bold text-white mb-6">Häufige Fragen</h2><div class="space-y-3">{faq_cards}</div></section>
 <section class="text-center rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow"><h2 class="text-2xl font-bold text-white mb-3">{html.escape(cta or "Bausteine dauerhaft griffbereit haben")}</h2><p class="mb-6">Lege die wiederkehrenden Teile einmal an und verwende sie bei der nächsten Aufgabe erneut.</p><a href="/app?intent=register" class="ui-btn ui-btn-primary px-8">Kostenlos registrieren</a></section>

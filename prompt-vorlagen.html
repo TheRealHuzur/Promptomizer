@@ -24,36 +24,71 @@
 <header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
 <main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
 <nav class="content-breadcrumb mb-8" aria-label="Breadcrumb"><a href="/">Startseite</a><span>›</span><span aria-current="page">Prompt-Vorlagen</span></nav>
-<section class="text-center max-w-3xl mx-auto mb-20"><h1 class="text-3xl md:text-5xl font-bold text-white mb-5">Prompt-Vorlagen, die du einmal anlegst und immer wieder einsetzt</h1><p class="text-slate-300 text-base md:text-lg mb-4">Eine gute Prompt-Vorlage enthält die Teile eines Prompts, die sich bei einer Aufgabe wiederholen. Was sich von Fall zu Fall ändert, ergänzt du erst bei der Verwendung.</p><p>Im Promptomizer kannst du Vorlagen speichern, anpassen und mit wiederverwendbaren Bausteinen kombinieren.</p><div class="content-flow mt-8"><span class="content-flow-step">Vorlage</span><span class="content-flow-arrow">→</span><span class="content-flow-step">anpassen</span><span class="content-flow-arrow">→</span><span class="content-flow-step">wiederverwenden</span></div></section>
+<section class="text-center max-w-3xl mx-auto mb-20"><h1 class="text-3xl md:text-5xl font-bold text-white mb-5">Prompt-Vorlagen, die du einmal anlegst und immer wieder einsetzt</h1><p class="text-slate-300 text-base md:text-lg">Eine gute Prompt-Vorlage enthält die Teile eines Prompts, die sich bei einer Aufgabe wiederholen. Was sich von Fall zu Fall ändert, ergänzt du erst bei der Verwendung.</p></section>
 
-<section class="content-grid-2 items-center mb-20"><div><h2 class="text-2xl font-bold text-white mb-4">Was gehört in eine Prompt-Vorlage?</h2><p class="mb-4">Eine Prompt-Vorlage enthält die Teile einer Aufgabe, die sich bei wiederkehrenden Anwendungen nicht oder nur wenig verändern. Andere Informationen ergänzt du erst bei der konkreten Verwendung.</p><p>Eine Vorlage ist deshalb kein fertiger Prompt für jede Situation. Sie ist ein wiederverwendbares Gerüst.</p></div><div class="content-card"><table class="w-full text-sm"><thead><tr class="text-left text-white"><th class="pb-3">Teil</th><th class="pb-3">Typische Verwendung</th></tr></thead><tbody><tr><td class="py-2">Rolle</td><td>häufig wiederverwendbar</td></tr><tr><td class="py-2">Format</td><td>häufig wiederverwendbar</td></tr><tr><td class="py-2">Aufgabe</td><td>fest oder variabel</td></tr><tr><td class="py-2">Kontext</td><td>häufig individuell</td></tr></tbody></table></div></section>
+<section class="content-grid-2 items-center mb-20"><div><h2 class="text-2xl font-bold text-white mb-4">Was gehört in eine Prompt-Vorlage?</h2><p class="mb-4">Eine Prompt-Vorlage enthält die Teile einer Aufgabe, die sich bei wiederkehrenden Anwendungen nicht oder nur wenig verändern. Andere Informationen ergänzt du erst bei der konkreten Verwendung.</p><p>Eine Vorlage ist deshalb kein fertiger Prompt für jede Situation. Sie ist ein wiederverwendbares Gerüst.</p></div><div class="content-card"><table class="w-full text-sm"><thead><tr class="text-left text-white"><th class="pb-3">Teil</th><th class="pb-3">Typische Verwendung</th></tr></thead><tbody><tr><td class="py-2">Rolle</td><td>häufig wiederverwendbar</td></tr><tr><td class="py-2">Kontext</td><td>häufig individuell</td></tr><tr><td class="py-2">Aufgabe</td><td>fest oder variabel</td></tr><tr><td class="py-2">Format</td><td>häufig wiederverwendbar</td></tr></tbody></table></div></section>
 
-<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Vorlagen geben die Struktur. Bausteine machen sie flexibel.</h2><p class="max-w-3xl mb-8">Du musst nicht für jede Variante einer Aufgabe eine neue Vorlage speichern. Öffne eine Vorlage und setze Rollen, Arbeitsweisen, Vorgaben, Personas oder andere gespeicherte Bausteine ein.</p><div class="content-flow"><span class="content-flow-step">Vorlage öffnen<br><strong>Diskussionsrunde</strong></span><span class="content-flow-arrow">→</span><span class="content-flow-step">Bausteine einsetzen<br><strong>Personas</strong></span><span class="content-flow-arrow">→</span><span class="content-flow-step">Prompt anpassen</span><span class="content-flow-arrow">→</span><span class="content-flow-step border-brand-sky">verwenden</span></div></section>
+<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Vorlagen geben die Struktur. Bausteine machen sie flexibel.</h2><p class="max-w-3xl mx-auto text-center">Du musst nicht für jede Variante einer Aufgabe eine neue Vorlage speichern. Öffne eine Vorlage und setze Rollen, Arbeitsweisen, Vorgaben, Personas oder andere gespeicherte Bausteine ein.</p></section>
 
 <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Prompt-Vorlagen zum Ausprobieren</h2><p class="max-w-3xl mb-8">Du kannst die folgenden Vorlagen direkt kopieren oder im Promptomizer öffnen und für deinen Anwendungsfall anpassen.</p><div class="space-y-4">
-<details class="content-details"><summary>1. Produkttext für eine Website</summary><div class="content-details-body"><p class="mb-4">Erstellt einen strukturierten Produkttext aus Produktinformationen und Zielgruppe.</p><pre id="vorlage-1" class="prompt-block">Rolle: Du bist eine erfahrene Texterin für erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative und ohne Werbefloskeln.
-Aufgabe: Schreibe einen Abschnitt für eine Produktseite über die unten beschriebene Funktion.
-Kontext: Produkt: [Name]. Funktion: [was sie tut]. Zielgruppe: [wer sie nutzt]. Das größte Problem der Zielgruppe: [Problem].
-Format: Eine Überschrift und zwei Absätze zu je höchstens 60 Wörtern. Keine Aufzählung. Kein Einleitungssatz über das Thema.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-1" aria-describedby="status-1">Kopieren</button><button class="ui-btn ui-btn-ghost border border-navy-border text-sm" data-open-template-target="vorlage-1">Im Promptomizer öffnen</button></div><p id="status-1" class="copy-status" aria-live="polite"></p></div></details>
-<details class="content-details"><summary>2. Antwort auf eine schwierige Kundenanfrage</summary><div class="content-details-body"><p class="mb-4">Formuliert eine sachliche Antwort mit einem klaren nächsten Schritt.</p><pre id="vorlage-2" class="prompt-block">Rolle: Du bist erfahrene Mitarbeiterin im Kundenservice. Du bleibst sachlich, nimmst Kritik ernst und versprichst nichts, was nicht ausdrücklich im Kontext steht.
-Aufgabe: Formuliere eine Antwort auf die unten stehende Anfrage.
-Kontext: Anfrage: [Text einfügen]. Was tatsächlich passiert ist: [Sachverhalt]. Was wir anbieten können: [Angebot]. Was wir nicht anbieten können: [Grenze].
-Format: E-Mail mit Anrede und Grußformel, höchstens 150 Wörter, ein konkreter nächster Schritt am Ende.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-2" aria-describedby="status-2">Kopieren</button><button class="ui-btn ui-btn-ghost border border-navy-border text-sm" data-open-template-target="vorlage-2">Im Promptomizer öffnen</button></div><p id="status-2" class="copy-status" aria-live="polite"></p></div></details>
-<details class="content-details"><summary>3. Langes Dokument zusammenfassen</summary><div class="content-details-body"><p class="mb-4">Verdichtet einen Fachtext für eine konkrete Entscheidung.</p><pre id="vorlage-3" class="prompt-block">Rolle: Du bist Analystin und fasst Fachtexte für Menschen zusammen, die den Text nicht lesen werden, aber Entscheidungen daraus ableiten müssen.
-Aufgabe: Fasse das unten stehende Dokument zusammen.
-Kontext: Dokument: [Text einfügen]. Wer die Zusammenfassung liest: [Rolle]. Wofür sie gebraucht wird: [Entscheidung].
-Format: Erst drei Sätze Kernaussage, dann höchstens fünf Stichpunkte mit Details, zuletzt eine Zeile „Offene Fragen“. Keine Wiederholung der Kernaussage in den Stichpunkten.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-3" aria-describedby="status-3">Kopieren</button><button class="ui-btn ui-btn-ghost border border-navy-border text-sm" data-open-template-target="vorlage-3">Im Promptomizer öffnen</button></div><p id="status-3" class="copy-status" aria-live="polite"></p></div></details>
-<details class="content-details"><summary>4. Code-Review</summary><div class="content-details-body"><p class="mb-4">Ordnet Hinweise eines Code-Reviews nach Schweregrad.</p><pre id="vorlage-4" class="prompt-block">Rolle: Du bist erfahrene Entwicklerin und führst ein Review durch. Du benennst Probleme, ohne den Code neu zu schreiben, solange nicht ausdrücklich danach gefragt wird.
-Aufgabe: Prüfe den unten stehenden Code.
-Kontext: Sprache und Version: [Angabe]. Was der Code tun soll: [Zweck]. Bekannte Einschränkungen: [Angabe]. Code: [einfügen].
-Format: Gruppiert nach Schweregrad in drei Blöcken: blockierend, sollte geändert werden, Anmerkung. Je Punkt eine Zeile Begründung. Keine allgemeinen Ratschläge zu Codequalität.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-4" aria-describedby="status-4">Kopieren</button><button class="ui-btn ui-btn-ghost border border-navy-border text-sm" data-open-template-target="vorlage-4">Im Promptomizer öffnen</button></div><p id="status-4" class="copy-status" aria-live="polite"></p></div></details>
-<details class="content-details"><summary>5. Aus einem Fachtext einen LinkedIn-Beitrag machen</summary><div class="content-details-body"><p class="mb-4">Überträgt einen Fachtext in einen knappen Beitrag für ein Fachpublikum.</p><pre id="vorlage-5" class="prompt-block">Rolle: Du schreibst Beiträge für ein Fachpublikum. Du verzichtest auf Aufmerksamkeitshaken, rhetorische Fragen am Anfang und Emojis.
-Aufgabe: Mache aus dem unten stehenden Text einen Beitrag.
-Kontext: Text: [einfügen]. Was die Leserin danach wissen soll: [eine Aussage]. Was sie danach tun soll: [Handlung oder „nichts“].
-Format: Höchstens 120 Wörter. Erster Satz enthält die Aussage, nicht die Ankündigung der Aussage. Kein Hashtag-Block.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-5" aria-describedby="status-5">Kopieren</button><button class="ui-btn ui-btn-ghost border border-navy-border text-sm" data-open-template-target="vorlage-5">Im Promptomizer öffnen</button></div><p id="status-5" class="copy-status" aria-live="polite"></p></div></details>
+<details class="content-details"><summary>1. Produkttext für eine Website</summary><div class="content-details-body"><p class="mb-4">Erstellt einen strukturierten Produkttext aus Produktinformationen und Zielgruppe.</p><pre id="vorlage-1" class="prompt-block">**🎭 ROLLE**
+Du bist eine erfahrene Texterin für erklärungsbedürftige Software. Du schreibst nüchtern, ohne Superlative und ohne Werbefloskeln.
+
+**🌍 KONTEXT**
+Produkt: [Name]. Funktion: [was sie tut]. Zielgruppe: [wer sie nutzt]. Das größte Problem der Zielgruppe: [Problem].
+
+**🎯 AUFGABE**
+Schreibe einen Abschnitt für eine Produktseite über die unten beschriebene Funktion.
+
+**🧪 VARIANTEN**
+Eine Überschrift und zwei Absätze zu je höchstens 60 Wörtern. Keine Aufzählung. Kein Einleitungssatz über das Thema.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-1" aria-describedby="status-1">Kopieren</button><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border text-sm">Im Promptomizer öffnen</a></div><p id="status-1" class="copy-status" aria-live="polite"></p></div></details>
+<details class="content-details"><summary>2. Antwort auf eine schwierige Kundenanfrage</summary><div class="content-details-body"><p class="mb-4">Formuliert eine sachliche Antwort mit einem klaren nächsten Schritt.</p><pre id="vorlage-2" class="prompt-block">**🎭 ROLLE**
+Du bist erfahrene Mitarbeiterin im Kundenservice. Du bleibst sachlich, nimmst Kritik ernst und versprichst nichts, was nicht ausdrücklich im Kontext steht.
+
+**🌍 KONTEXT**
+Anfrage: [Text einfügen]. Was tatsächlich passiert ist: [Sachverhalt]. Was wir anbieten können: [Angebot]. Was wir nicht anbieten können: [Grenze].
+
+**🎯 AUFGABE**
+Formuliere eine Antwort auf die unten stehende Anfrage.
+
+**🧪 VARIANTEN**
+E-Mail mit Anrede und Grußformel, höchstens 150 Wörter, ein konkreter nächster Schritt am Ende.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-2" aria-describedby="status-2">Kopieren</button><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border text-sm">Im Promptomizer öffnen</a></div><p id="status-2" class="copy-status" aria-live="polite"></p></div></details>
+<details class="content-details"><summary>3. Langes Dokument zusammenfassen</summary><div class="content-details-body"><p class="mb-4">Verdichtet einen Fachtext für eine konkrete Entscheidung.</p><pre id="vorlage-3" class="prompt-block">**🎭 ROLLE**
+Du bist Analystin und fasst Fachtexte für Menschen zusammen, die den Text nicht lesen werden, aber Entscheidungen daraus ableiten müssen.
+
+**🌍 KONTEXT**
+Dokument: [Text einfügen]. Wer die Zusammenfassung liest: [Rolle]. Wofür sie gebraucht wird: [Entscheidung].
+
+**🎯 AUFGABE**
+Fasse das unten stehende Dokument zusammen.
+
+**🧪 VARIANTEN**
+Erst drei Sätze Kernaussage, dann höchstens fünf Stichpunkte mit Details, zuletzt eine Zeile „Offene Fragen“. Keine Wiederholung der Kernaussage in den Stichpunkten.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-3" aria-describedby="status-3">Kopieren</button><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border text-sm">Im Promptomizer öffnen</a></div><p id="status-3" class="copy-status" aria-live="polite"></p></div></details>
+<details class="content-details"><summary>4. Code-Review</summary><div class="content-details-body"><p class="mb-4">Ordnet Hinweise eines Code-Reviews nach Schweregrad.</p><pre id="vorlage-4" class="prompt-block">**🎭 ROLLE**
+Du bist erfahrene Entwicklerin und führst ein Review durch. Du benennst Probleme, ohne den Code neu zu schreiben, solange nicht ausdrücklich danach gefragt wird.
+
+**🌍 KONTEXT**
+Sprache und Version: [Angabe]. Was der Code tun soll: [Zweck]. Bekannte Einschränkungen: [Angabe]. Code: [einfügen].
+
+**🎯 AUFGABE**
+Prüfe den unten stehenden Code.
+
+**🧪 VARIANTEN**
+Gruppiert nach Schweregrad in drei Blöcken: blockierend, sollte geändert werden, Anmerkung. Je Punkt eine Zeile Begründung. Keine allgemeinen Ratschläge zu Codequalität.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-4" aria-describedby="status-4">Kopieren</button><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border text-sm">Im Promptomizer öffnen</a></div><p id="status-4" class="copy-status" aria-live="polite"></p></div></details>
+<details class="content-details"><summary>5. Aus einem Fachtext einen LinkedIn-Beitrag machen</summary><div class="content-details-body"><p class="mb-4">Überträgt einen Fachtext in einen knappen Beitrag für ein Fachpublikum.</p><pre id="vorlage-5" class="prompt-block">**🎭 ROLLE**
+Du schreibst Beiträge für ein Fachpublikum. Du verzichtest auf Aufmerksamkeitshaken, rhetorische Fragen am Anfang und Emojis.
+
+**🌍 KONTEXT**
+Text: [einfügen]. Was die Leserin danach wissen soll: [eine Aussage]. Was sie danach tun soll: [Handlung oder „nichts“].
+
+**🎯 AUFGABE**
+Mache aus dem unten stehenden Text einen Beitrag.
+
+**🧪 VARIANTEN**
+Höchstens 120 Wörter. Erster Satz enthält die Aussage, nicht die Ankündigung der Aussage. Kein Hashtag-Block.</pre><div class="flex flex-wrap gap-2 mt-4"><button class="ui-btn ui-btn-primary text-sm" data-copy-target="vorlage-5" aria-describedby="status-5">Kopieren</button><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border text-sm">Im Promptomizer öffnen</a></div><p id="status-5" class="copy-status" aria-live="polite"></p></div></details>
 </div><p class="text-xs text-slate-500 mt-5">Alle Vorlagen auf dieser Seite sind frei verwendbar, auch geschäftlich, ohne Namensnennung.</p></section>
 
-<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4">Prompt-Vorlagen nach Anwendungsfall</h2><p class="max-w-3xl mb-8">Wähle den Bereich, für den du einen wiederverwendbaren Prompt erstellen oder anpassen möchtest.</p><div class="content-grid-3"><a href="/prompt-vorlagen/buero" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Büroalltag</h3><p>Vorlagen für Protokolle, Mailketten, Präsentationen und wiederkehrende Büroaufgaben.</p></a><a href="/prompt-vorlagen/verwaltung" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Öffentliche Verwaltung</h3><p>Vorlagen für Vermerke, Bürgeranschreiben, Vorlagen und Arbeitsanleitungen.</p></a><a href="/prompt-vorlagen/marketing" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Marketing</h3><p>Vorlagen für Blog, Newsletter, Social Media, Anzeigen und Content-Aufbereitung.</p></a></div></section>
+<section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Prompt-Vorlagen nach Anwendungsfall</h2><p class="max-w-3xl mx-auto text-center mb-8">Wähle den Bereich, für den du einen wiederverwendbaren Prompt erstellen oder anpassen möchtest.</p><div class="content-grid-3"><a href="/prompt-vorlagen/buero" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Büroalltag</h3><p>Vorlagen für Protokolle, Mailketten, Präsentationen und wiederkehrende Büroaufgaben.</p></a><a href="/prompt-vorlagen/verwaltung" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Öffentliche Verwaltung</h3><p>Vorlagen für Vermerke, Bürgeranschreiben, Vorlagen und Arbeitsanleitungen.</p></a><a href="/prompt-vorlagen/marketing" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Marketing</h3><p>Vorlagen für Blog, Newsletter, Social Media, Anzeigen und Content-Aufbereitung.</p></a></div></section>
 
 <section class="mb-16 max-w-3xl mx-auto"><h2 class="text-xl font-bold text-white mb-6">Häufige Fragen</h2><div class="space-y-3">
 <details class="content-details"><summary>Was ist eine Prompt-Vorlage?</summary><div class="content-details-body">Eine Prompt-Vorlage ist ein wiederverwendbares Grundgerüst. Gleichbleibende Teile bleiben bestehen, variable Angaben ergänzt du für den jeweiligen Anwendungsfall.</div></details>
