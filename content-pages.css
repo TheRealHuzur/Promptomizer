@@ -75,6 +75,19 @@
     color: #38bdf8;
 }
 
+.content-screenshot {
+    overflow: hidden;
+    border: 1px solid #1e293b;
+    border-radius: 0.85rem;
+    background: #0f172a;
+}
+
+.content-screenshot img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .content-details {
     border: 1px solid #1e293b;
     border-radius: 0.75rem;
