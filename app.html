@@ -4942,7 +4942,7 @@
             body.innerHTML = `
                 <div class="space-y-0.5">
                     ${filtered.map(s => `
-                        <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${s.id})">
+                        <div id="prompt-item-${s.id}" class="group w-full py-1 px-2 rounded hover:bg-slate-800/50 cursor-pointer transition-colors" onclick="handlePromptClick(${s.id}, { openEditor: true })">
                             <div class="flex items-center justify-between w-full">
                                 <div class="text-sm text-slate-300 group-hover:text-white truncate leading-tight min-w-0 flex-1" title="${escapeHtml(s.name || '')}">${escapeHtml(s.name)}</div>
                                 <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none" onclick="openPromptItemMenu(event, '${catKey}', ${s.id})">

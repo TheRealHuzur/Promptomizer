@@ -75,6 +75,7 @@ assert(!promptTemplatesPage.includes('🧪 VARIANTEN'));
 assert(!officeUseCasePage.includes('🧪 VARIANTEN'));
 assert(app.includes("classList.toggle('hidden', Boolean(promptEditSession))"));
 assert(app.includes('onclick="openEditorFromNavigation()"'));
+assert(app.includes("onclick=\"handlePromptClick(${s.id}, { openEditor: true })\""));
 assert(app.includes("switchView('library')"));
 assert(!app.includes('>Bearbeitung beenden</button>'));
 assert(css.includes('grid-template-columns: repeat(3, minmax(0, 1fr))'));
