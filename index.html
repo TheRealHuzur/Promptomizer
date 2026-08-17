@@ -97,6 +97,14 @@
                             "@type": "Answer",
                             "text": "Ja. Gespeicherte Prompts, Kategorien und Bausteine sind an dein Konto gebunden und für niemand anderen sichtbar."
                         }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Wie kann ich ChatGPT-Prompts speichern und organisieren?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Gute ChatGPT-Prompts kannst du in einer zentralen Prompt-Bibliothek speichern und nach Kategorien organisieren. So musst du bewährte Formulierungen nicht in alten Chatverläufen suchen oder jedes Mal neu schreiben. Mit Promptomizer kannst du Prompts speichern, strukturieren und jederzeit für ChatGPT, Claude, Gemini und andere KI-Tools wiederverwenden."
+                        }
                     }
                 ]
             }
@@ -108,6 +116,25 @@
         /* index.html ist jetzt die Marketing-Startseite, eine normale scrollende Seite, kein App-Shell mehr */
         body {
             overflow: auto;
+        }
+
+        .home-card-link {
+            display: flex;
+            flex-direction: column;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .home-card-link:focus-visible {
+            border-color: #0ea5e9;
+            outline: 3px solid #0ea5e9;
+            outline-offset: 3px;
+        }
+
+        .home-card-cta {
+            display: block;
+            margin-top: auto;
+            padding-top: 1.5rem;
         }
     </style>
 
@@ -139,22 +166,22 @@
         <!-- Hero -->
         <section class="text-center max-w-3xl mx-auto mb-20">
             <p class="hero-kicker text-xs md:text-sm font-semibold uppercase tracking-wider text-brand-sky mb-4">
-                Die deutsche Prompt-Bibliothek für alle, die mit KI arbeiten
+                Promptomizer – Die Prompt-Bibliothek für alle, die mit KI arbeiten
             </p>
             <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                Prompts erstellen, optimieren und verwalten
+                Prompts erstellen, speichern und verwalten
             </h1>
-            <p class="text-slate-300 text-base md:text-lg mb-8">
-                Prompts strukturiert bauen, unter Namen und Kategorie ablegen, beim nächsten Mal in Sekunden
-                wiederfinden – statt sie im Chatverlauf zu suchen oder neu zu tippen. Kein Account nötig zum
-                Ausprobieren.
+            <p class="text-slate-300 text-base md:text-lg mb-4">
+                Baue Prompts strukturiert, speichere sie in deiner persönlichen Prompt-Bibliothek und verwende sie
+                in ChatGPT, Claude, Gemini &amp; Co. jederzeit wieder.
+            </p>
+            <p class="text-sm text-slate-400 mb-8">
+                Ohne Account testen · Für ChatGPT, Claude, Gemini &amp; Co. · Gespeicherte Prompts werden nicht
+                automatisch an KI-Anbieter übertragen
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a href="/app" class="ui-btn ui-btn-primary px-6">
                     Jetzt kostenlos ausprobieren
-                </a>
-                <a href="/preise" class="ui-btn ui-btn-ghost border border-navy-border px-6">
-                    Preise ansehen
                 </a>
             </div>
 
@@ -168,26 +195,35 @@
             </div>
         </section>
 
+        <!-- Einordnung -->
+        <section class="max-w-3xl mx-auto mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">Was ist Promptomizer?</h2>
+            <p>
+                Promptomizer ist ein KI-Prompt-Tool zum Erstellen, Speichern und Verwalten von Prompts. Prompts
+                lassen sich strukturiert oder frei erstellen, in einer persönlichen Bibliothek organisieren und
+                unabhängig von ChatGPT, Claude, Gemini oder anderen KI-Tools wiederverwenden.
+            </p>
+        </section>
+
         <!-- Warum -->
         <section class="max-w-3xl mx-auto mb-20">
             <h2 class="text-2xl font-bold text-white mb-4">Warum Prompts einen festen Ort brauchen</h2>
-            <p class="mb-4">
-                Ein guter Prompt entsteht selten beim ersten Versuch. Man probiert Formulierungen aus, verfeinert
-                Rollenbeschreibungen, ergänzt Kontext – und wenn das Ergebnis endlich passt, ist es meist irgendwo in
-                einem Chatverlauf vergraben. Beim nächsten Mal beginnt die Suche von vorn, oder man tippt den Prompt
-                aus dem Gedächtnis neu und verliert dabei genau die Details, die ihn gut gemacht haben.
+            <p class="font-semibold text-slate-200 mb-4">
+                Gute Prompts entstehen durch Arbeit. Deshalb sollten sie nicht im Chatverlauf verschwinden.
             </p>
             <p class="mb-4">
-                Promptomizer löst dieses Problem, indem Prompts nicht mehr im Chat, sondern in einem eigenen
-                Werkzeug entstehen und dort auch bleiben. Fertige Prompts landen mit einem Klick in der
-                Zwischenablage – einsetzbar in ChatGPT, Claude oder jedem anderen KI-Tool. Die eigentliche Arbeit,
-                das Formulieren und Organisieren, findet unabhängig vom jeweiligen Chat-Tool statt.
+                Ein guter Prompt wird ausprobiert, angepasst und verbessert. Liegt er anschließend nur in ChatGPT,
+                Claude oder Gemini, ist er beim nächsten Mal oft schwer wiederzufinden – oder wird erneut von vorne
+                geschrieben.
+            </p>
+            <p class="mb-4">
+                Mit einer <strong class="text-slate-200">zentralen Prompt-Bibliothek</strong> speicherst und
+                organisierst du deine Prompts unabhängig vom verwendeten KI-Tool. Namen und Kategorien sorgen
+                dafür, dass bewährte Formulierungen schnell wieder auffindbar und sofort einsatzbereit sind.
             </p>
             <p>
-                Das hat einen praktischen Nebeneffekt: Wechselst du das KI-Tool – etwa weil ein Anbieter ein neues
-                Modell veröffentlicht oder dein Arbeitgeber einen anderen Dienst vorschreibt – bleibt deine
-                Prompt-Bibliothek unberührt. Sie ist nicht an einen einzelnen Chat-Anbieter gebunden, sondern an
-                dich.
+                So entsteht mit der Zeit deine persönliche Sammlung guter Prompts – statt einer unstrukturierten
+                Mischung aus Chatverläufen, Notizen und Textdateien.
             </p>
         </section>
 
@@ -200,7 +236,7 @@
             </p>
 
             <div class="grid md:grid-cols-2 gap-6">
-                <a href="/prompt-bibliothek" class="block rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                <a href="/prompt-bibliothek" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
                     <i class="fa-solid fa-book text-brand-sky text-xl mb-3"></i>
                     <h3 class="text-lg font-bold text-white mb-2">Deine persönliche Prompt-Bibliothek</h3>
                     <p class="text-sm">
@@ -208,9 +244,10 @@
                         Chatverläufe zu scrollen, findest du bewährte Prompts in Sekunden wieder – sortiert nach
                         Thema, nicht nach Uhrzeit der Unterhaltung.
                     </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zur Prompt-Bibliothek →</span>
                 </a>
 
-                <a href="/prompt-erstellen" class="block rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                <a href="/prompt-erstellen" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
                     <i class="fa-solid fa-table-columns text-brand-sky text-xl mb-3"></i>
                     <h3 class="text-lg font-bold text-white mb-2">Strukturierter und freier Modus</h3>
                     <p class="text-sm">
@@ -219,9 +256,10 @@
                         zusammen. Wer lieber direkt schreibt, wechselt in den freien Modus. Beide Wege führen zum
                         selben Ziel: ein Prompt, der sofort einsatzbereit ist.
                     </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zu Prompt erstellen →</span>
                 </a>
 
-                <a href="/prompt-vorlagen" class="block rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                <a href="/prompt-vorlagen" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
                     <i class="fa-solid fa-puzzle-piece text-brand-sky text-xl mb-3"></i>
                     <h3 class="text-lg font-bold text-white mb-2">Bausteine für wiederkehrende Textteile</h3>
                     <p class="text-sm">
@@ -229,6 +267,7 @@
                         wiederkehren, schreibst du einmal als Baustein und setzt sie danach immer wieder ein –
                         statt sie jedes Mal neu zu tippen.
                     </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zu Prompt-Vorlagen →</span>
                 </a>
 
                 <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8">
@@ -244,19 +283,46 @@
         </section>
 
         <!-- Zielgruppen -->
-        <section class="max-w-3xl mx-auto mb-20">
-            <h2 class="text-2xl font-bold text-white mb-4">Für wen ist Promptomizer gemacht?</h2>
-            <p class="mb-4">
-                Promptomizer richtet sich an alle, die KI-Tools nicht nur gelegentlich, sondern regelmäßig als
-                Arbeitswerkzeug nutzen: Content- und Marketing-Verantwortliche, die wiederkehrende Textformate
-                erstellen, Beraterinnen und Berater, die Analysen und Zusammenfassungen strukturiert anfragen,
-                Entwicklerinnen und Entwickler, die Prompts für Code-Reviews oder Dokumentation wiederverwenden,
-                sowie Studierende und alle, die ihre besten Formulierungen einfach nicht mehr verlieren wollen.
-            </p>
-            <p>
-                Gemeinsam ist allen ein Punkt: Der Prompt selbst ist die eigentliche Arbeit – und die verdient
-                einen festen Platz, nicht nur eine Zeile im Chatverlauf.
-            </p>
+        <section class="mb-20">
+            <div class="max-w-3xl mx-auto mb-10">
+                <h2 class="text-2xl font-bold text-white mb-4">Für wen ist Promptomizer gemacht?</h2>
+                <p>
+                    Promptomizer ist für alle, die KI regelmäßig im Arbeitsalltag einsetzen und gute Prompts nicht
+                    jedes Mal neu schreiben wollen. Entdecke passende Prompt-Vorlagen für deinen Einsatzbereich.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="/prompt-vorlagen/buero" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">Büro &amp; Arbeitsalltag</h3>
+                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für typische Aufgaben im Büro</p>
+                    <p class="text-sm">
+                        E-Mails formulieren, Besprechungen zusammenfassen, Texte überarbeiten oder Informationen
+                        strukturieren – mit passenden Prompts erledigst du wiederkehrende Aufgaben schneller.
+                    </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen fürs Büro →</span>
+                </a>
+
+                <a href="/prompt-vorlagen/verwaltung" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">Öffentliche Verwaltung</h3>
+                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für Verwaltung, Behörden und Kommunen</p>
+                    <p class="text-sm">
+                        Vorlagen für typische Verwaltungsaufgaben – von verständlichen Texten über Zusammenfassungen
+                        bis zur strukturierten Aufbereitung von Informationen.
+                    </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen für die Verwaltung →</span>
+                </a>
+
+                <a href="/prompt-vorlagen/marketing" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">Marketing</h3>
+                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für Content und Marketing</p>
+                    <p class="text-sm">
+                        Erstelle mit wiederverwendbaren Prompts Texte und Ideen für Blogartikel, Social Media,
+                        Kampagnen und weitere Marketingaufgaben.
+                    </p>
+                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen fürs Marketing →</span>
+                </a>
+            </div>
         </section>
 
         <!-- So funktionierts -->
@@ -267,8 +333,7 @@
                     <div class="w-10 h-10 rounded-full bg-brand-sky text-navy-deep font-bold flex items-center justify-center mx-auto mb-4">1</div>
                     <h3 class="text-white font-bold mb-2">Prompt bauen</h3>
                     <p class="text-sm">
-                        Felder ausfüllen oder frei schreiben – ganz ohne Registrierung, zum Beispiel im
-                        <a href="/prompt-erstellen" class="text-brand-sky hover:underline">Prompt-Generator</a>.
+                        Felder ausfüllen oder frei schreiben – ganz ohne Registrierung.
                     </p>
                 </div>
                 <div class="text-center">
@@ -326,6 +391,19 @@
                     <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
                         Ja. Gespeicherte Prompts, Kategorien und Bausteine sind an dein Konto gebunden und für
                         niemand anderen sichtbar.
+                    </div>
+                </div>
+                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
+                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
+                        <span class="text-slate-200 font-medium">Wie kann ich ChatGPT-Prompts speichern und organisieren?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
+                    </button>
+                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
+                        Gute ChatGPT-Prompts kannst du in einer zentralen Prompt-Bibliothek speichern und nach
+                        Kategorien organisieren. So musst du bewährte Formulierungen nicht in alten Chatverläufen
+                        suchen oder jedes Mal neu schreiben. Mit Promptomizer kannst du Prompts speichern,
+                        strukturieren und jederzeit für ChatGPT, Claude, Gemini und andere KI-Tools
+                        wiederverwenden.
                     </div>
                 </div>
             </div>
