@@ -1,4 +1,4 @@
-/* Promptomizer Bibliothek V2 – Desktop-first, bewusst ohne appweites Responsive-Redesign. */
+/* Promptomizer Bibliothek V2 – Desktop-first mit lokal begrenzten Mobile-Overrides. */
 
 .library-view {
     width: min(1400px, 100%);
@@ -710,4 +710,281 @@
     min-height: 20rem;
     max-height: 70vh;
     resize: vertical;
+}
+
+/* Mobile-Masterplan Phase 5: Bibliotheksübersicht bis einschließlich 1023 px. */
+@media (max-width: 1023px) {
+    .library-view {
+        min-width: 0;
+        padding-bottom: 1rem;
+    }
+
+    .library-hero {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .library-title {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+        overflow-wrap: anywhere;
+    }
+
+    .library-hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .65rem;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .library-view-toggle button,
+    .library-selection-button,
+    .library-category-button,
+    .library-add-category,
+    .library-load-more,
+    .library-bulk-action,
+    .library-use-button {
+        min-height: 2.75rem;
+    }
+
+    .library-view-toggle button,
+    .library-use-button {
+        width: 2.75rem;
+    }
+
+    .library-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .library-control,
+    .library-selection-button {
+        grid-column: 1 / -1;
+    }
+
+    .library-input,
+    .library-select {
+        height: 2.75rem;
+        font-size: 1rem;
+    }
+
+    .library-selection-button {
+        justify-content: center;
+    }
+
+    .library-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+        min-width: 0;
+    }
+
+    .library-categories {
+        display: flex;
+        align-items: stretch;
+        gap: .5rem;
+        width: 100%;
+        min-width: 0;
+        padding: .5rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+    }
+
+    .library-side-label {
+        display: none;
+    }
+
+    #library-static-filters,
+    #library-category-list {
+        display: flex;
+        flex: 0 0 auto;
+        gap: .5rem;
+    }
+
+    .library-category-button,
+    .library-add-category {
+        flex: 0 0 auto;
+        width: auto;
+        margin-top: 0;
+        padding: .55rem .7rem;
+        white-space: nowrap;
+    }
+
+    .library-category-button .library-category-name {
+        max-width: 12rem;
+    }
+
+    .library-side-divider {
+        flex: 0 0 1px;
+        width: 1px;
+        height: auto;
+        min-height: 2.75rem;
+        margin: 0 .1rem;
+    }
+
+    #library-results,
+    #library-content {
+        min-width: 0;
+    }
+
+    .library-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .library-card,
+    .library-card-body {
+        min-height: 230px;
+    }
+
+    .library-list-row {
+        grid-template-columns: 2rem minmax(0, 1fr) 2.75rem;
+        grid-template-rows: auto auto auto auto;
+        align-items: start;
+        gap: .45rem .65rem;
+        min-width: 0;
+        min-height: 0;
+        padding: .75rem;
+    }
+
+    .library-list-row > :first-child {
+        grid-column: 1;
+        grid-row: 1 / -1;
+    }
+
+    .library-list-row > :nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: center;
+    }
+
+    .library-list-row > :nth-child(3) {
+        grid-column: 2 / 4;
+        grid-row: 2;
+    }
+
+    .library-list-row > :nth-child(4) {
+        grid-column: 2 / 4;
+        grid-row: 3;
+        justify-self: start;
+    }
+
+    .library-list-row > :nth-child(5) {
+        grid-column: 2 / 4;
+        grid-row: 4;
+        justify-self: start;
+    }
+
+    .library-list-row > :last-child {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    .library-list-title {
+        min-width: 0;
+    }
+
+    .library-list-preview {
+        display: -webkit-box;
+        min-width: 0;
+        overflow: hidden;
+        line-height: 1.45;
+        white-space: normal;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .library-results-head {
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .library-bulk-bar {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .library-bulk-count {
+        flex: 1 0 100%;
+        margin-right: 0;
+    }
+
+    .library-bulk-action {
+        flex: 1 1 auto;
+    }
+
+    .library-empty {
+        min-height: 240px;
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 639px) {
+    .library-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .library-control,
+    .library-selection-button {
+        grid-column: 1;
+    }
+
+    .library-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Mobile-Masterplan Phase 6: Prompt-Metadaten und Bearbeitungsaktionen. */
+@media (max-width: 1023px) {
+    .library-edit-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .library-edit-description,
+    .library-edit-category {
+        font-size: 1rem;
+    }
+
+    .library-edit-description {
+        min-height: clamp(7rem, 24dvh, 12rem);
+        max-height: 50dvh;
+    }
+
+    .library-edit-category {
+        min-height: 2.75rem;
+    }
+
+    .library-edit-meta {
+        grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+    }
+
+    .library-meta-value {
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .library-edit-action {
+        flex: 1 1 10rem;
+        justify-content: center;
+        min-height: 2.75rem;
+    }
+
+    .prompt-create-fields {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 479px) {
+    .library-edit-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .library-edit-action {
+        flex-basis: auto;
+        width: 100%;
+    }
 }

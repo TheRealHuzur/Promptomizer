@@ -96,5 +96,14 @@ assert(!css.includes('.snippet-editor input:focus-visible'));
 assert(css.includes('.snippet-target-button.is-suggested'));
 assert(!css.includes('linear-gradient'));
 assert(!css.includes('radial-gradient'));
+assert(css.includes('@media (max-width: 1023px)'));
+assert(css.includes('.library-content-toggle button,\n    .library-primary-action'));
+assert(css.includes('.snippet-library-row > :nth-child(5)'));
+assert(css.includes('/* Mobile-Masterplan Phase 6: einspaltige Bibliothekseditoren und Zielauswahl. */'));
+assert(css.includes('.snippet-editor-grid {\n        grid-template-columns: minmax(0, 1fr);'));
+assert(css.includes('.snippet-editor-input,\n    .snippet-editor-textarea {\n        font-size: 1rem;'));
+assert(css.includes('.prompt-create-textarea {\n        min-height: clamp(7rem, 24dvh, 11rem);'));
+assert(css.includes('.snippet-target-options {\n        grid-template-columns: minmax(0, 1fr);'));
+assert(snippets.includes("if (event.key === 'Escape') {\n                event.preventDefault();\n                closeTargetDialog();"));
 
 console.log('snippet library source smoke: ok');

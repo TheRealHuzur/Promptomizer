@@ -553,3 +553,558 @@ body.sidebar-collapsed #sidebar-left .sidebar-user-text {
 .toast-error { border-color: rgba(248, 113, 113, 0.5); }
 .toast-success { border-color: rgba(74, 222, 128, 0.5); }
 .toast-info { border-color: rgba(56, 189, 248, 0.5); }
+
+.mobile-nav-toggle,
+.mobile-nav-backdrop {
+    display: none;
+}
+
+/* Mobile Phase 1: App-Shell und Scrollmodell, ohne Desktop-Regeln zu verändern. */
+@media (max-width: 1023px) {
+    :root {
+        --safe-area-top: env(safe-area-inset-top, 0px);
+        --safe-area-right: env(safe-area-inset-right, 0px);
+        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-area-left: env(safe-area-inset-left, 0px);
+    }
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    #app-header {
+        box-sizing: border-box;
+        height: calc(3.5rem + var(--safe-area-top));
+        padding-top: var(--safe-area-top);
+    }
+
+    #header-main-controls {
+        padding-right: .75rem;
+        padding-left: 4rem;
+    }
+
+    #header-content {
+        gap: .5rem;
+    }
+
+    #app-logo {
+        min-width: 0;
+        flex: 0 1 auto;
+    }
+
+    #app-logo span {
+        font-size: 1rem;
+    }
+
+    #mode-toggle-container {
+        flex: 0 0 auto;
+        padding: .1875rem;
+    }
+
+    #mode-toggle-container button {
+        min-height: 2.75rem;
+        padding-right: .625rem;
+        padding-left: .625rem;
+    }
+
+    .mobile-nav-toggle {
+        position: absolute;
+        top: calc(var(--safe-area-top) + .375rem);
+        left: calc(var(--safe-area-left) + .75rem);
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        pointer-events: auto;
+    }
+
+    .mobile-nav-backdrop:not(.hidden) {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: block;
+        border: 0;
+        background: rgba(2, 6, 23, .72);
+        backdrop-filter: blur(2px);
+    }
+
+    #header-bg {
+        left: 0 !important;
+    }
+
+    #header-spacer-left {
+        width: 0;
+    }
+
+    #app-body {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        margin-left: 0;
+        overflow: hidden;
+    }
+
+    #sidebar-left {
+        box-sizing: border-box;
+        width: min(var(--sidebar-w), calc(100vw - 3rem));
+        max-width: calc(100vw - 3rem);
+        padding-top: var(--safe-area-top);
+        z-index: 60;
+        transform: translateX(-100%);
+        transition: transform .24s ease;
+        box-shadow: 1.5rem 0 3rem rgba(0, 0, 0, .35);
+    }
+
+    body.mobile-nav-open #sidebar-left {
+        transform: translateX(0);
+    }
+
+    body.sidebar-collapsed #sidebar-topbar {
+        justify-content: flex-end;
+    }
+
+    body.sidebar-collapsed #sidebar-left .nav-label {
+        display: inline;
+    }
+
+    body.sidebar-collapsed #sidebar-left .sidebar-nav-title,
+    body.sidebar-collapsed #sidebar-library,
+    body.sidebar-collapsed #sidebar-left .sidebar-user-text {
+        display: block;
+    }
+
+    body.sidebar-collapsed #sidebar-left .nav-item {
+        justify-content: flex-start;
+        gap: .75rem;
+    }
+
+    body.sidebar-collapsed #sidebar-left .nav-item i {
+        margin: 0;
+    }
+
+    #app-body > main,
+    #main-scroll-area {
+        min-width: 0;
+        min-height: 0;
+    }
+
+    #main-scroll-area {
+        padding: clamp(1rem, 3vw, 1.5rem);
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #editor-structured,
+    #editor-free {
+        padding-top: .75rem;
+    }
+
+    #editor-structured {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    #editor-structured > * {
+        margin-top: 0 !important;
+    }
+
+    .editor-field-heading {
+        min-height: 2.75rem;
+        margin-bottom: .5rem;
+        padding-right: 6rem;
+    }
+
+    .editor-field-heading label {
+        font-size: 1rem;
+        line-height: 1.25;
+    }
+
+    .editor-field textarea {
+        width: 100%;
+        height: 7rem;
+        min-height: 7rem;
+        padding: .75rem;
+        font-size: 1rem;
+        scroll-margin-block: 1rem;
+    }
+
+    .editor-field-action,
+    #btn-free-save-snippet,
+    .free-format-btn {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+    }
+
+    #free-format-toolbar {
+        gap: .5rem;
+        min-width: 0;
+        padding: .25rem 0;
+        overflow: hidden;
+    }
+
+    #free-format-actions {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #btn-free-save-snippet {
+        flex: 0 0 2.75rem;
+    }
+
+    #input-free {
+        min-height: 12rem;
+        padding: 1rem;
+        font-size: 1rem;
+        scroll-margin-block: 1rem;
+    }
+
+    #editor-footer {
+        box-sizing: border-box;
+        height: auto;
+        min-height: 5rem;
+        align-items: stretch;
+        padding: .625rem max(1rem, var(--safe-area-right))
+            calc(.625rem + var(--safe-area-bottom))
+            max(1rem, var(--safe-area-left));
+    }
+
+    #editor-actions-container {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: .5rem;
+        align-items: stretch;
+    }
+
+    #footer-primary-actions {
+        display: contents;
+    }
+
+    #footer-save-wrap {
+        grid-column: 1;
+        grid-row: 1;
+        min-width: 0;
+    }
+
+    #footer-save-wrap > button,
+    #btn-copy,
+    #library-create-content {
+        width: 100%;
+        min-width: 0;
+        min-height: 2.75rem;
+        justify-content: center;
+        padding: .65rem .75rem;
+        line-height: 1.2;
+        text-align: center;
+        white-space: normal;
+    }
+
+    #btn-copy {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #btn-reset {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        min-height: 2.75rem;
+        padding: .5rem;
+    }
+
+    #library-create-content {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+}
+
+@media (max-width: 359px) {
+    #app-logo {
+        display: none;
+    }
+
+    #header-content {
+        justify-content: flex-end;
+    }
+}
+
+/* Mobile Phase 7: Dialoge, Menüs, Versionsverlauf und Nebenansichten. */
+@media (max-width: 1023px) {
+    .ui-backdrop,
+    #modal-auth,
+    #modal-register,
+    #modal-register-success,
+    #modal-password-reset,
+    #modal-password-new,
+    #modal-onboarding,
+    #modal-save-prompt,
+    #modal-reset {
+        box-sizing: border-box;
+        align-items: flex-end;
+        padding: max(.5rem, var(--safe-area-top))
+            max(.5rem, var(--safe-area-right))
+            max(.5rem, var(--safe-area-bottom))
+            max(.5rem, var(--safe-area-left));
+    }
+
+    .ui-modal,
+    #modal-auth > div,
+    #modal-register > div,
+    #modal-register-success > div,
+    #modal-password-reset > div,
+    #modal-password-new > div,
+    #modal-onboarding > div,
+    #modal-save-prompt > div,
+    #modal-reset > div {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100% !important;
+        max-height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom) - 1rem) !important;
+        padding: 1rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border-radius: 1rem 1rem .25rem .25rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ui-modal-header {
+        gap: .75rem;
+    }
+
+    .ui-icon-btn,
+    .ui-btn,
+    .ui-actions button,
+    #modal-auth button,
+    #modal-register button,
+    #modal-register-success button,
+    #modal-password-reset button,
+    #modal-password-new button,
+    #modal-onboarding button,
+    #modal-save-prompt button,
+    #modal-reset button {
+        min-height: 2.75rem;
+    }
+
+    .ui-input,
+    .ui-select,
+    .ui-textarea,
+    #modal-auth input,
+    #modal-register input,
+    #modal-password-reset input,
+    #modal-password-new input,
+    #modal-save-prompt input {
+        font-size: 1rem;
+    }
+
+    .ui-actions {
+        align-items: stretch;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .ui-actions .ui-btn {
+        flex: 1 1 9rem;
+    }
+
+    #modal-prompt-versions > .ui-modal {
+        height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom) - 1rem) !important;
+        overflow: hidden;
+    }
+
+    #prompt-versions-content > .grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: minmax(7rem, .7fr) minmax(0, 1.3fr);
+    }
+
+    #prompt-version-comparison .grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    #prompt-version-restore-confirm .flex {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    #snippet-item-menu,
+    #prompt-item-menu,
+    #manage-category-menu,
+    #manage-snippet-menu,
+    #manage-snippet-target-submenu,
+    #settings-nav-menu {
+        box-sizing: border-box;
+        top: auto !important;
+        right: max(.5rem, var(--safe-area-right));
+        bottom: max(.5rem, var(--safe-area-bottom));
+        left: max(.5rem, var(--safe-area-left)) !important;
+        width: auto !important;
+        max-height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom) - 1rem);
+        overflow-x: hidden;
+        overflow-y: auto;
+        border-radius: .85rem;
+        overscroll-behavior: contain;
+    }
+
+    #snippet-item-menu button,
+    #prompt-item-menu button,
+    #manage-category-menu button,
+    #manage-snippet-menu button,
+    #manage-snippet-target-submenu button,
+    #settings-nav-menu button,
+    #save-prompt-category-menu button {
+        min-height: 2.75rem;
+    }
+
+    #prompt-category-submenu {
+        position: static !important;
+        width: 100% !important;
+        max-height: 40dvh;
+        margin: .25rem 0;
+        overflow-y: auto;
+        box-shadow: none;
+    }
+
+    #save-prompt-category-menu {
+        max-height: min(50dvh, 20rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .driver-popover {
+        box-sizing: border-box !important;
+        width: calc(100vw - var(--safe-area-left) - var(--safe-area-right) - 1rem) !important;
+        max-width: 28rem !important;
+        max-height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom) - 1rem) !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+    }
+
+    .driver-popover-footer {
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .driver-popover-footer button,
+    .driver-popover-close-btn {
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+    }
+
+    #onboarding-primary-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    #modal-onboarding > div > div:nth-child(3) {
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    #view-history,
+    #view-settings,
+    #view-konto,
+    #view-impressum,
+    #view-datenschutz,
+    #view-agb,
+    #view-cookies {
+        width: 100%;
+        min-width: 0;
+        padding-top: .5rem;
+        overflow-wrap: anywhere;
+    }
+
+    #view-settings > :first-child {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    #settings-header-action {
+        max-width: 100%;
+    }
+
+    #history-list > *,
+    #settings-content > *,
+    #view-konto section,
+    #view-impressum section,
+    #view-datenschutz section,
+    #view-agb section,
+    #view-cookies section {
+        min-width: 0;
+    }
+
+    #history-list button,
+    #settings-content button,
+    #view-konto button,
+    #view-impressum button,
+    #view-datenschutz button,
+    #view-agb button,
+    #view-cookies button {
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+    }
+
+    #settings-content input,
+    #settings-content select,
+    #settings-content textarea,
+    #view-konto input,
+    #view-konto select,
+    #view-konto textarea {
+        max-width: 100%;
+        font-size: 1rem;
+    }
+
+    #view-konto .p-6 {
+        padding: 1rem;
+    }
+
+    #toast-container {
+        bottom: calc(1rem + var(--safe-area-bottom));
+        width: calc(100% - var(--safe-area-left) - var(--safe-area-right) - 1rem);
+    }
+}
+
+@media (max-width: 479px) {
+    .ui-actions {
+        flex-direction: column;
+    }
+
+    .ui-actions .ui-btn {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    #modal-onboarding > div > div:nth-child(3) {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #onboarding-primary-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    #onboarding-primary-actions button {
+        width: 100%;
+    }
+}

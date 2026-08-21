@@ -44,7 +44,7 @@
     </script>
     <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="c148d6c1-5eba-43b1-8f11-3d8c0fcfa82e"
         data-blockingmode="auto" type="text/javascript"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Promptomizer</title>
     <meta name="theme-color" content="#020617">
 
@@ -89,14 +89,21 @@
 
         <!-- Inhalt -->
         <div class="relative z-10 w-full h-full flex items-center justify-center">
+            <button id="mobile-nav-toggle" type="button" class="mobile-nav-toggle ui-icon-btn"
+                onclick="toggleMobileNav()" aria-controls="sidebar-left" aria-expanded="false"
+                aria-label="Navigation öffnen">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
             <!-- Spacer bleibt, damit Logo/Controls weiterhin korrekt zentriert sind; klickt sich durch (pointer-events-none) -->
             <div id="header-spacer-left"
                 class="sidebar-transition flex-shrink-0 border-r border-transparent pointer-events-none"></div>
 
             <!-- Interaktiver Bereich (Buttons etc.) wieder klickbar -->
-            <div class="flex-1 flex justify-center px-6 md:px-10 min-w-0 pointer-events-auto">
-                <div class="w-full max-w-4xl flex items-center justify-between">
-                    <div class="flex items-center select-none leading-none">
+            <div id="header-main-controls"
+                class="flex-1 flex justify-center px-6 md:px-10 min-w-0 pointer-events-auto">
+                <div id="header-content" class="w-full max-w-4xl flex items-center justify-between">
+                    <div id="app-logo" class="flex items-center select-none leading-none" aria-label="Promptomizer">
                         <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
                         <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
                     </div>
@@ -116,14 +123,17 @@
         </div>
     </header>
 
+    <button id="mobile-nav-backdrop" type="button" class="mobile-nav-backdrop hidden"
+        onclick="closeMobileNav()" aria-label="Navigation schließen" aria-hidden="true" tabindex="-1"></button>
+
     <div id="app-body" class="flex-1 flex overflow-hidden relative">
 
-        <aside id="sidebar-left"
+        <aside id="sidebar-left" aria-label="Hauptnavigation"
             class="w-64 bg-navy-sidebar border-r border-navy-border flex flex-col sidebar-transition overflow-hidden relative flex-shrink-0 z-20">
             <div id="sidebar-topbar" class="h-14 flex items-center justify-end px-3 border-r border-transparent">
                 <button id="btn-sidebar-collapse"
                     class="ui-icon-btn w-9 h-9 flex items-center justify-center leading-none"
-                    onclick="toggleSidebar('left')" title="Sidebar umschalten">
+                    onclick="toggleSidebar('left')" title="Sidebar umschalten" aria-label="Sidebar umschalten">
                     <i class="fa-solid fa-table-columns leading-none relative top-px"></i>
                 </button>
             </div>
@@ -271,8 +281,9 @@
                     </div>
 
                     <div id="editor-free" class="hidden flex-1 min-h-0 flex flex-col pt-4">
-                        <div class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
-                            <div class="flex gap-1">
+                        <div id="free-format-toolbar"
+                            class="sticky top-0 z-20 bg-navy-deep p-2 flex items-center justify-between">
+                            <div id="free-format-actions" class="flex gap-1">
                                 <button id="btn-free-h1" type="button" data-format="h1"
                                     class="free-format-btn px-2 py-1 rounded text-xs font-bold"
                                     onmousedown="event.preventDefault()" onclick="toggleFreeFormat('h1')">H1</button>
@@ -299,7 +310,7 @@
                                     onclick="toggleFreeFormat('code')" title="Code/Monospaced"><i
                                         class="fa-solid fa-code"></i></button>
                             </div>
-                            <button type="button"
+                            <button id="btn-free-save-snippet" type="button"
                                 class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors"
                                 onclick="openFreeSnippetSaveModal()" title="Als Baustein speichern">
                                 <i
@@ -1278,7 +1289,7 @@
                             <span>In Bibliothek speichern</span>
                         </button>
                     </div>
-                    <div class="ml-auto flex items-center gap-4">
+                    <div id="footer-primary-actions" class="ml-auto flex items-center gap-4">
                         <button id="btn-reset" onclick="resetCurrentView()"
                             class="px-6 py-3 text-slate-500 hover:text-red-400 font-medium transition-colors text-xs uppercase tracking-wider font-bold">
                             Reset
@@ -1652,7 +1663,7 @@
         <div id="prompt-menu-category" class="relative group" onmouseleave="closePromptCategorySubmenu()">
             <button
                 class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
-                onmouseenter="openPromptCategorySubmenu()" onclick="return false;">
+                onmouseenter="openPromptCategorySubmenu()" onclick="openPromptCategorySubmenu(); return false;">
                 <span>Kategorie</span>
                 <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
             </button>
@@ -1686,7 +1697,7 @@
             class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/60">Bearbeiten</button>
         <button id="manage-snippet-target-trigger"
             class="w-full flex items-center justify-between px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800/60"
-            onmouseenter="openManageSnippetTargetSubmenu()" onclick="return false;">
+            onmouseenter="openManageSnippetTargetSubmenu()" onclick="openManageSnippetTargetSubmenu(); return false;">
             <span>Baustein</span>
             <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
         </button>
@@ -2019,6 +2030,8 @@
 
         let currentMode = 'structured';
         let isLeftOpen = true;
+        const mobileNavMedia = window.matchMedia('(max-width: 1023px)');
+        let mobileNavReturnFocus = null;
         let isPromptsOpen = true;
         let isSnippetsOpen = true;
         let activeFieldId = null;
@@ -2087,8 +2100,170 @@
         let accountSettingsDraft = null;
         let editorPreferenceAppliedForUserId = null;
 
+        const appModalCloseHandlers = Object.freeze({
+            'modal-snippet': 'closeSnippetModal',
+            'modal-upgrade': 'closeUpgradeModal',
+            'modal-auth': 'closeAuthModal',
+            'modal-register': 'closeRegisterModal',
+            'modal-register-success': 'closeRegisterSuccessModal',
+            'modal-password-reset': 'closePasswordResetModal',
+            'modal-password-new': 'closePasswordNewModal',
+            'modal-onboarding': 'closeOnboardingModal',
+            'modal-snippet-delete': 'closeDeleteSnippetModal',
+            'modal-cancel-subscription': 'closeCancelSubscriptionModal',
+            'modal-withdrawal': 'closeWithdrawalModal',
+            'modal-prompt-delete': 'closeDeletePromptModal',
+            'modal-prompt-versions': 'closePromptVersionsModal',
+            'modal-prompt-edit-discard': 'closePromptEditDiscardModal',
+            'modal-prompt-category': 'closePromptCategoryModal',
+            'modal-category-rename': 'closeRenameCategoryModal',
+            'modal-category-delete': 'closeDeleteCategoryModal',
+            'modal-save-prompt': 'closeSavePromptModal',
+            'modal-reset': 'closeResetModal'
+        });
+        const appModalPreviousFocus = new WeakMap();
+        const appPopupPreviousFocus = new WeakMap();
+        const appPopupIds = [
+            'snippet-item-menu',
+            'prompt-item-menu',
+            'manage-category-menu',
+            'manage-snippet-menu',
+            'settings-nav-menu',
+            'save-prompt-category-menu'
+        ];
+
+        function appDialogFocusableElements(container) {
+            return Array.from(container.querySelectorAll(
+                'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+            )).filter(element => !element.closest('.hidden'));
+        }
+
+        function getTopOpenAppModal() {
+            return Object.keys(appModalCloseHandlers)
+                .map(id => document.getElementById(id))
+                .filter(modal => modal && !modal.classList.contains('hidden'))
+                .sort((a, b) => {
+                    const aIndex = Number.parseInt(getComputedStyle(a).zIndex, 10) || 0;
+                    const bIndex = Number.parseInt(getComputedStyle(b).zIndex, 10) || 0;
+                    return aIndex - bIndex;
+                })
+                .at(-1) || null;
+        }
+
+        function syncAppModalBackground() {
+            const hasOpenModal = Boolean(getTopOpenAppModal());
+            ['app-header', 'app-body', 'sidebar-left'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.inert = hasOpenModal;
+            });
+        }
+
+        function closeAppModal(modal) {
+            const handler = appModalCloseHandlers[modal?.id];
+            if (handler && typeof window[handler] === 'function') window[handler]();
+        }
+
+        function syncAppModalState(modal) {
+            const isOpen = !modal.classList.contains('hidden');
+            if (isOpen) {
+                if (!appModalPreviousFocus.has(modal)) {
+                    appModalPreviousFocus.set(modal, document.activeElement);
+                }
+                requestAnimationFrame(() => {
+                    if (modal.classList.contains('hidden')) return;
+                    const focusables = appDialogFocusableElements(modal);
+                    (focusables[0] || modal).focus({ preventScroll: true });
+                });
+            } else if (appModalPreviousFocus.has(modal)) {
+                const previous = appModalPreviousFocus.get(modal);
+                appModalPreviousFocus.delete(modal);
+                requestAnimationFrame(() => {
+                    if (!getTopOpenAppModal() && previous?.isConnected) previous.focus({ preventScroll: true });
+                });
+            }
+            syncAppModalBackground();
+        }
+
+        function initAppModalAccessibility() {
+            Object.keys(appModalCloseHandlers).forEach(id => {
+                const modal = document.getElementById(id);
+                if (!modal) return;
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.tabIndex = -1;
+                modal.addEventListener('click', event => {
+                    if (event.target === modal) closeAppModal(modal);
+                });
+                new MutationObserver(() => syncAppModalState(modal))
+                    .observe(modal, { attributes: true, attributeFilter: ['class'] });
+            });
+
+            document.addEventListener('keydown', event => {
+                const modal = getTopOpenAppModal();
+                if (!modal) return;
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    closeAppModal(modal);
+                    return;
+                }
+                if (event.key !== 'Tab') return;
+                const focusables = appDialogFocusableElements(modal);
+                if (!focusables.length) {
+                    event.preventDefault();
+                    modal.focus();
+                    return;
+                }
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }, true);
+        }
+
+        function focusMobilePopup(popup) {
+            if (!isMobileNavViewport() || !popup || popup.classList.contains('hidden')) return;
+            requestAnimationFrame(() => popup.querySelector('button:not([disabled])')?.focus({ preventScroll: true }));
+        }
+
+        function initAppPopupAccessibility() {
+            appPopupIds.forEach(id => {
+                const popup = document.getElementById(id);
+                if (!popup) return;
+                popup.setAttribute('role', 'menu');
+                popup.querySelectorAll('button').forEach(button => button.setAttribute('role', 'menuitem'));
+                new MutationObserver(() => {
+                    const isOpen = !popup.classList.contains('hidden');
+                    if (isOpen) {
+                        if (!appPopupPreviousFocus.has(popup)) appPopupPreviousFocus.set(popup, document.activeElement);
+                        popup.querySelectorAll('button').forEach(button => button.setAttribute('role', 'menuitem'));
+                        focusMobilePopup(popup);
+                    } else if (appPopupPreviousFocus.has(popup)) {
+                        const previous = appPopupPreviousFocus.get(popup);
+                        appPopupPreviousFocus.delete(popup);
+                        if (previous?.isConnected && popup.contains(document.activeElement)) {
+                            requestAnimationFrame(() => previous.focus({ preventScroll: true }));
+                        }
+                    }
+                }).observe(popup, { attributes: true, attributeFilter: ['class'] });
+            });
+        }
+
 
         document.addEventListener('DOMContentLoaded', () => {
+            initAppModalAccessibility();
+            initAppPopupAccessibility();
+            syncMobileNavState();
+            if (typeof mobileNavMedia.addEventListener === 'function') {
+                mobileNavMedia.addEventListener('change', handleMobileNavBreakpointChange);
+            } else {
+                mobileNavMedia.addListener(handleMobileNavBreakpointChange);
+            }
             const sidebarScroll = document.getElementById('sidebar-library');
             if (sidebarScroll) {
                 sidebarScroll.addEventListener('scroll', scheduleSidebarMenuReposition, { passive: true });
@@ -2121,7 +2296,13 @@
                 if (settingsMenuOpen) closeSettingsMenu();
             });
             document.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Escape' && document.body.classList.contains('mobile-nav-open')) {
+                    ev.preventDefault();
+                    closeMobileNav();
+                }
                 if (ev.key === 'Escape' && savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+                if (ev.key === 'Escape' && snippetMenuOpen) closeSnippetItemMenu();
+                if (ev.key === 'Escape' && promptMenuOpen) closePromptItemMenu();
                 if (ev.key === 'Escape' && manageSnippetMenuOpen) closeManageSnippetMenu();
                 if (ev.key === 'Escape' && manageCategoryMenuOpen) closeManageCategoryMenu();
                 if (ev.key === 'Escape' && settingsMenuOpen) closeSettingsMenu();
@@ -2600,8 +2781,8 @@
         function renderStructuredFields() {
             const container = document.getElementById('editor-structured');
             container.innerHTML = FIELDS.map(f => `
-                <div class="group relative">
-                    <div class="flex items-center gap-2 mb-2">
+                <div class="editor-field group relative">
+                    <div class="editor-field-heading flex items-center gap-2 mb-2">
                         <i class="fa-solid ${f.icon} text-brand-sky"></i>
                         <label class="font-bold text-brand-sky text-xl">${f.label}</label>
                     </div>
@@ -2609,11 +2790,11 @@
                         class="w-full h-32 rounded-md p-4 text-slate-200 placeholder-slate-600 text-base leading-relaxed"
                         placeholder="${f.placeholder}"
                         onfocus="setActiveField('${f.id}')"></textarea>
-                    <div class="absolute top-0 right-0 flex items-center gap-1">
-                        <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); toggleFieldFullscreen('${f.id}')" title="Feld vergrößern">
+                    <div class="editor-field-actions absolute top-0 right-0 flex items-center gap-1">
+                        <button class="editor-field-action group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); toggleFieldFullscreen('${f.id}')" title="Feld vergrößern" aria-label="${f.label} vergrößern">
                             <i id="field-fullscreen-icon-${f.id}" class="fa-solid fa-up-right-and-down-left-from-center text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                         </button>
-                        <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); openSnippetModalFromField('${f.id}')" title="Als Baustein speichern">
+                        <button class="editor-field-action group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors" onclick="event.stopPropagation(); openSnippetModalFromField('${f.id}')" title="Als Baustein speichern" aria-label="${f.label} als Baustein speichern">
                             <i class="fa-solid fa-floppy-disk text-brand-sky group-hover:text-brand-hover transition-colors"></i>
                         </button>
                     </div>
@@ -2629,8 +2810,12 @@
             const isExpanded = !!fieldFullscreenState[fieldId];
             if (!isExpanded) {
                 const baseHeight = ta.offsetHeight;
+                const viewportHeight = window.visualViewport?.height || window.innerHeight;
+                const expandedHeight = isMobileNavViewport()
+                    ? Math.min(baseHeight * 3, Math.max(baseHeight, viewportHeight - 160))
+                    : baseHeight * 3;
                 ta.dataset.baseHeightPx = baseHeight;
-                ta.style.height = (baseHeight * 3) + 'px';
+                ta.style.height = expandedHeight + 'px';
                 fieldFullscreenState[fieldId] = true;
                 icon.classList.remove('fa-up-right-and-down-left-from-center');
                 icon.classList.add('fa-down-left-and-up-right-to-center');
@@ -2643,10 +2828,103 @@
             }
         }
         // --- LAYOUT LOGIC ---
+        function isMobileNavViewport() {
+            return mobileNavMedia.matches;
+        }
+
+        function closeSidebarOverlays() {
+            if (snippetMenuOpen) closeSnippetItemMenu();
+            if (promptMenuOpen) closePromptItemMenu();
+            closePromptCategorySubmenu();
+            if (manageSnippetMenuOpen) closeManageSnippetMenu();
+            if (savePromptCategoryMenuOpen) closeSavePromptCategoryMenu();
+            if (manageCategoryMenuOpen) closeManageCategoryMenu();
+            if (settingsMenuOpen) closeSettingsMenu();
+        }
+
+        function syncMobileNavState() {
+            const isMobile = isMobileNavViewport();
+            const isOpen = isMobile && document.body.classList.contains('mobile-nav-open');
+            const toggle = document.getElementById('mobile-nav-toggle');
+            const backdrop = document.getElementById('mobile-nav-backdrop');
+            const sidebar = document.getElementById('sidebar-left');
+            const desktopToggle = document.getElementById('btn-sidebar-collapse');
+            const main = document.querySelector('#app-body > main');
+
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', String(isOpen));
+                toggle.setAttribute('aria-label', isOpen ? 'Navigation schließen' : 'Navigation öffnen');
+            }
+            if (backdrop) {
+                backdrop.classList.toggle('hidden', !isOpen);
+                backdrop.setAttribute('aria-hidden', String(!isOpen));
+            }
+            if (desktopToggle) {
+                desktopToggle.setAttribute(
+                    'aria-label',
+                    isMobile ? 'Navigation schließen' : 'Sidebar umschalten'
+                );
+                desktopToggle.title = isMobile ? 'Navigation schließen' : 'Sidebar umschalten';
+            }
+            if (sidebar) {
+                if (isMobile) {
+                    sidebar.setAttribute('aria-hidden', String(!isOpen));
+                    sidebar.inert = !isOpen;
+                } else {
+                    sidebar.removeAttribute('aria-hidden');
+                    sidebar.inert = false;
+                }
+            }
+            if (main) main.inert = isOpen;
+        }
+
+        function openMobileNav() {
+            if (!isMobileNavViewport()) return;
+            closeSidebarOverlays();
+            mobileNavReturnFocus = document.activeElement;
+            document.body.classList.add('mobile-nav-open');
+            syncMobileNavState();
+            requestAnimationFrame(() => document.getElementById('btn-sidebar-collapse')?.focus());
+        }
+
+        function closeMobileNav(options = {}) {
+            const restoreFocus = options.restoreFocus !== false;
+            const wasOpen = document.body.classList.contains('mobile-nav-open');
+            if (wasOpen) closeSidebarOverlays();
+            document.body.classList.remove('mobile-nav-open');
+            syncMobileNavState();
+            if (wasOpen && restoreFocus) {
+                const target = mobileNavReturnFocus?.isConnected
+                    ? mobileNavReturnFocus
+                    : document.getElementById('mobile-nav-toggle');
+                requestAnimationFrame(() => target?.focus());
+            }
+            mobileNavReturnFocus = null;
+        }
+
+        function toggleMobileNav() {
+            if (!isMobileNavViewport()) return;
+            if (document.body.classList.contains('mobile-nav-open')) {
+                closeMobileNav();
+            } else {
+                openMobileNav();
+            }
+        }
+
+        function handleMobileNavBreakpointChange() {
+            closeMobileNav({ restoreFocus: false });
+            syncMobileNavState();
+            scheduleSidebarMenuReposition();
+        }
+
         function toggleSidebar(side) {
             if (side === 'right') return;
 
             if (side === 'left') {
+                if (isMobileNavViewport()) {
+                    toggleMobileNav();
+                    return;
+                }
                 if (isLeftOpen) {
                     document.body.classList.add('sidebar-collapsed');
                 } else {
@@ -3251,6 +3529,7 @@
 
                 menu.style.left = left + 'px';
                 menu.style.top = top + 'px';
+                focusMobilePopup(menu);
             });
         }
 
@@ -3912,6 +4191,7 @@
         }
 
         function switchView(viewId) {
+            if (isMobileNavViewport()) closeMobileNav();
 
             const views = ['editor', 'history', 'settings', 'konto', 'impressum', 'datenschutz', 'agb', 'cookies'];
             views.forEach(v => {
@@ -4739,6 +5019,7 @@
                 }
             }
             if (options.openEditor) switchView('editor');
+            if (isMobileNavViewport()) closeMobileNav();
             return true;
         }
 
@@ -5770,6 +6051,7 @@
             if (!all.length) {
                 items.push('<div class="px-3 py-2 text-xs text-slate-500 italic">Keine Kategorien.</div>');
                 list.innerHTML = items.join('');
+                focusMobilePopup(menu);
                 return;
             }
 
@@ -5782,6 +6064,7 @@
             `).join(''));
 
             list.innerHTML = items.join('');
+            focusMobilePopup(menu);
         }
 
         function closePromptCategorySubmenu() {
@@ -5989,6 +6272,7 @@
             const text = decodeURIComponent(encoded || '');
             const inserted = insertSnippetText(text, targetFieldId);
             if (inserted && snippetId) await window.db?.markSnippetUsed?.(snippetId);
+            if (inserted && isMobileNavViewport()) closeMobileNav();
         }
 
         function openSnippetItemMenu(ev, categoryId, snippetId) {
@@ -6102,7 +6386,11 @@
         }
 
         async function openSnippetCategory(id) {
-            if (!isLeftOpen) toggleSidebar('left');
+            if (isMobileNavViewport()) {
+                openMobileNav();
+            } else if (!isLeftOpen) {
+                toggleSidebar('left');
+            }
             activeFieldId = id;
             snippetOpenState[id] = true;
             renderSnippetsAccordion();
@@ -6240,10 +6528,10 @@
                 const text = escapeHtml((item.text ?? '').toString());
 
                 return `
-                    <div class="bg-navy-sidebar rounded-md border border-navy-border p-4 hover:border-slate-500 transition-colors">
-                        <div class="flex justify-between items-start mb-2">
+                    <div class="history-card bg-navy-sidebar rounded-md border border-navy-border p-4 hover:border-slate-500 transition-colors">
+                        <div class="history-card-header flex justify-between items-start mb-2">
                             <span class="text-xs font-bold text-slate-500">${dateStr}</span>
-                            <div class="flex items-center gap-1">
+                            <div class="history-card-actions flex items-center gap-1">
                                 <button class="group p-1.5 bg-transparent rounded-md hover:bg-slate-800/60 transition-colors"
                                         onclick="toggleHistoryItemFullscreen('${id}')"
                                         title="Box vergrößern">
@@ -6744,6 +7032,46 @@
 
         function startDriverTour(startIndex = 0) {
             const driver = window.driver.js.driver;
+            const mobileTour = isMobileNavViewport();
+            if (mobileTour) closeMobileNav(false);
+
+            const tourSteps = [
+                {
+                    element: '#mode-toggle-container',
+                    popover: {
+                        title: 'Zwei Modi, ein Ziel',
+                        description: 'Im <b>Strukturierten Modus</b> füllst du einzelne Felder aus — Promptomizer baut daraus automatisch einen vollständigen Prompt. Im <b>Freien Modus</b> schreibst du direkt drauflos.',
+                        side: 'bottom',
+                        align: 'center'
+                    }
+                },
+                {
+                    element: '#editor-actions-container',
+                    popover: {
+                        title: 'Prompt fertig? Zwei Klicks genügen',
+                        description: 'Mit <b>Kopieren</b> landet dein Prompt sofort in der Zwischenablage — bereit zum Einfügen in ChatGPT, Claude oder jedes andere KI-Tool.<br><br>Mit <b>Prompt speichern</b> legst du ihn in deiner persönlichen Bibliothek ab — mit Namen und Kategorie, jederzeit wieder abrufbar.',
+                        side: 'top',
+                        align: 'center'
+                    }
+                },
+                mobileTour ? {
+                    element: '#mobile-nav-toggle',
+                    popover: {
+                        title: 'Alles über das Menü erreichbar',
+                        description: 'Öffne hier die Navigation. Dort findest du deine <b>Bibliothek</b>, die <b>Historie</b>, Einstellungen sowie deine Prompt-Kategorien und Bausteine.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                } : {
+                    element: '#sidebar-prompts-btn',
+                    popover: {
+                        title: 'Organisiere deine Prompts',
+                        description: 'Alle gespeicherten Prompts findest du hier in der Sidebar — das ist <b>deine persönliche Prompt-Bibliothek</b>. Lege eigene <b>Kategorien</b> an, um alles übersichtlich zu halten. <b>Bausteine</b> sind wiederverwendbare Textbausteine — einmal anlegen, immer wieder einsetzen.',
+                        side: 'right',
+                        align: 'start'
+                    }
+                }
+            ];
 
             window._driverObj = driver({
                 showProgress: false,
@@ -6761,35 +7089,7 @@
                         openOnboardingModal(4);
                     }
                 },
-                steps: [
-                    {
-                        element: '#mode-toggle-container',
-                        popover: {
-                            title: 'Zwei Modi, ein Ziel',
-                            description: 'Im <b>Strukturierten Modus</b> füllst du einzelne Felder aus — Promptomizer baut daraus automatisch einen vollständigen Prompt. Im <b>Freien Modus</b> schreibst du direkt drauflos.',
-                            side: "bottom",
-                            align: 'center'
-                        }
-                    },
-                    {
-                        element: '#editor-actions-container',
-                        popover: {
-                            title: 'Prompt fertig? Zwei Klicks genügen',
-                            description: 'Mit <b>Kopieren</b> landet dein Prompt sofort in der Zwischenablage — bereit zum Einfügen in ChatGPT, Claude oder jedes andere KI-Tool.<br><br>Mit <b>Prompt speichern</b> legst du ihn in deiner persönlichen Bibliothek ab — mit Namen und Kategorie, jederzeit wieder abrufbar.',
-                            side: "top",
-                            align: 'center'
-                        }
-                    },
-                    {
-                        element: '#sidebar-prompts-btn',
-                        popover: {
-                            title: 'Organisiere deine Prompts',
-                            description: 'Alle gespeicherten Prompts findest du hier in der Sidebar — das ist <b>deine persönliche Prompt-Bibliothek</b>. Lege eigene <b>Kategorien</b> an, um alles übersichtlich zu halten. <b>Bausteine</b> sind wiederverwendbare Textbausteine — einmal anlegen, immer wieder einsetzen.',
-                            side: "right",
-                            align: 'start'
-                        }
-                    }
-                ]
+                steps: tourSteps
             });
 
             // Allow driving to a specific index (e.g. going "Back" from modal step 4)

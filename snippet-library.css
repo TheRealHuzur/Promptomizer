@@ -184,3 +184,70 @@
     outline: 2px solid #7dd3fc;
     outline-offset: 2px;
 }
+
+/* Mobile-Masterplan Phase 5: gemeinsame Übersicht für Prompt- und Bausteinbibliothek. */
+@media (max-width: 1023px) {
+    .library-content-toggle {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .library-content-toggle button,
+    .library-primary-action {
+        min-height: 2.75rem;
+    }
+
+    .snippet-library-row > :nth-child(4) {
+        grid-column: 2 / 4;
+        grid-row: 3;
+        justify-self: start;
+    }
+
+    .snippet-library-row > :nth-child(5) {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+    }
+}
+
+/* Mobile-Masterplan Phase 6: einspaltige Bibliothekseditoren und Zielauswahl. */
+@media (max-width: 1023px) {
+    .snippet-editor {
+        min-width: 0;
+        padding: .85rem;
+    }
+
+    .snippet-editor-back {
+        min-height: 2.75rem;
+    }
+
+    .snippet-editor-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    .snippet-editor-input,
+    .snippet-editor-textarea {
+        font-size: 1rem;
+    }
+
+    .snippet-editor-textarea {
+        min-height: clamp(10rem, 38dvh, 22rem);
+        max-height: 55dvh;
+    }
+
+    .prompt-create-textarea {
+        min-height: clamp(7rem, 24dvh, 11rem);
+    }
+
+    .snippet-target-button {
+        min-height: 2.75rem;
+        font-size: .875rem;
+    }
+}
+
+@media (max-width: 479px) {
+    .snippet-target-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

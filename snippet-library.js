@@ -568,6 +568,12 @@
             </div>`;
         modal.querySelector('[data-target-cancel]').addEventListener('click', closeTargetDialog);
         modal.addEventListener('click', event => { if (event.target === modal) closeTargetDialog(); });
+        modal.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeTargetDialog();
+            }
+        });
         document.body.append(modal);
         return modal;
     }

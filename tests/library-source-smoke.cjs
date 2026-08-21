@@ -93,7 +93,18 @@ assert(css.includes('#view-editor.prompt-edit-active #input-free'));
 assert(css.includes('resize: vertical'));
 assert(!css.includes('radial-gradient'));
 assert(!css.includes('linear-gradient'));
-assert(!css.includes('@media'));
+assert(css.includes('@media (max-width: 1023px)'));
+assert(css.includes('@media (max-width: 639px)'));
+assert(css.includes('.library-categories {\n        display: flex;'));
+assert(css.includes('overflow-x: auto;'));
+assert(css.includes('.library-grid {\n        grid-template-columns: minmax(0, 1fr);'));
+assert(css.includes('.library-list-row > :nth-child(5)'));
+assert(css.includes('.library-bulk-bar {\n        align-items: stretch;'));
+assert(css.includes('/* Mobile-Masterplan Phase 6: Prompt-Metadaten und Bearbeitungsaktionen. */'));
+assert(css.includes('.library-edit-grid {\n        grid-template-columns: minmax(0, 1fr);'));
+assert(css.includes('grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));'));
+assert(css.includes('.library-edit-description,\n    .library-edit-category {\n        font-size: 1rem;'));
+assert(css.includes('@media (max-width: 479px)'));
 
 for (const column of ['category_id', 'description', 'is_favorite', 'last_used_at', 'archived_at', 'search_vector']) {
   assert(migration.includes(column), `migration misses ${column}`);
