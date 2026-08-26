@@ -4309,7 +4309,29 @@
             return match ? Number(match[1]) : 0;
         }
 
+        function getFreeHeadingText(heading) {
+            return Array.from(heading?.childNodes || [])
+                .filter(node => !(node.nodeType === 1 && node.classList.contains('free-heading-toggle')))
+                .map(node => node.nodeType === 3 ? node.nodeValue : (node.textContent || ''))
+                .join('');
+        }
+
+        function ensureFreeHeadingEditableContent(heading) {
+            const contentNodes = Array.from(heading.childNodes)
+                .filter(node => !(node.nodeType === 1 && node.classList.contains('free-heading-toggle')));
+            const hasCaretHost = contentNodes.some(node => {
+                if (node.nodeType === 3) return Boolean(node.nodeValue);
+                if (node.nodeType !== 1) return false;
+                return node.tagName === 'BR' || Boolean(node.textContent);
+            });
+            if (hasCaretHost) return;
+
+            contentNodes.forEach(node => node.remove());
+            heading.appendChild(document.createElement('br'));
+        }
+
         function ensureFreeHeadingToggle(heading) {
+            ensureFreeHeadingEditableContent(heading);
             let toggle = heading.firstElementChild;
             if (!toggle || !toggle.classList.contains('free-heading-toggle')) {
                 toggle = document.createElement('button');
@@ -4554,7 +4576,7 @@
 
             const heading = document.createElement(`h${level}`);
             while (block.firstChild) heading.appendChild(block.firstChild);
-            if (!heading.childNodes.length) heading.appendChild(document.createElement('br'));
+            ensureFreeHeadingEditableContent(heading);
             block.replaceWith(heading);
 
             freeActiveFormat = `h${level}`;
@@ -4579,6 +4601,19 @@
 
             const sel = window.getSelection();
             const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
+
+            const emptyHeading = getClosestTag(anchor, ['H1', 'H2', 'H3']);
+            if (emptyHeading && !getFreeHeadingText(emptyHeading).trim()) {
+                ev.preventDefault();
+                const nextBlock = document.createElement('div');
+                nextBlock.appendChild(document.createElement('br'));
+                emptyHeading.parentNode.insertBefore(nextBlock, emptyHeading.nextSibling);
+                placeCaretAtStart(nextBlock);
+                freeActiveFormat = null;
+                updateFreeToolbarUI();
+                getFreeEditorEl()?.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
+            }
 
             // PRE handling:
             // Shift + Enter -> Insert newline

@@ -33,6 +33,8 @@ assert(app.includes("const match = /^H([1-3])$/.exec(element?.tagName || '');"))
 assert(app.includes("const headings = Array.from(editor.querySelectorAll('h1, h2, h3'));"));
 assert(app.includes('if (siblingLevel && siblingLevel <= level) break;'));
 assert(app.includes("editor.querySelectorAll('.free-heading-toggle').forEach(toggle => {"));
+assert(app.includes('function ensureFreeHeadingEditableContent(heading)'));
+assert(app.includes("heading.appendChild(document.createElement('br'));"));
 assert(app.includes("heading.classList.toggle('free-heading-collapsed');"));
 assert(app.includes("toggle.setAttribute('contenteditable', 'false');"));
 assert(app.includes("toggle.setAttribute('aria-expanded', String(!collapsed));"));
@@ -46,13 +48,20 @@ assert(shortcut.includes("ev.key !== ' '"));
 assert(shortcut.includes("!['DIV', 'P'].includes(block.tagName)"));
 assert(shortcut.includes('getFreeHeadingShortcutLevel(prefixRange.toString())'));
 assert(shortcut.includes('document.createElement(`h${level}`)'));
+assert(shortcut.includes('ensureFreeHeadingEditableContent(heading)'));
 assert(shortcut.includes("editor.dispatchEvent(new Event('input', { bubbles: true }))"));
+
+const keydown = functionSource('handleFreeEditorKeydown');
+assert(keydown.includes("const emptyHeading = getClosestTag(anchor, ['H1', 'H2', 'H3']);"));
+assert(keydown.includes('!getFreeHeadingText(emptyHeading).trim()'));
+assert(keydown.includes('emptyHeading.parentNode.insertBefore(nextBlock, emptyHeading.nextSibling);'));
 
 const paste = functionSource('handleFreePaste');
 assert(paste.includes('insertFreeMarkdownAtCursor(editor, text, range);'));
 assert(!paste.includes('insertTextAtCursor('));
 
 assert(styles.includes('#input-free .free-collapsible-heading {'));
+assert(styles.includes('min-height: 1.5em;'));
 assert(styles.includes('#input-free .free-heading-toggle:focus-visible {'));
 assert(styles.includes('#input-free .free-heading-hidden {\n    display: none !important;'));
 
