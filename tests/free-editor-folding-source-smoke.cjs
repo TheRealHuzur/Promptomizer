@@ -43,6 +43,7 @@ assert(app.includes("editor.querySelectorAll('.free-heading-toggle').forEach(tog
 assert(app.includes('function ensureFreeHeadingEditableContent(heading)'));
 assert(app.includes("heading.appendChild(document.createElement('br'));"));
 assert(app.includes("heading.classList.toggle('free-heading-collapsed');"));
+assert(app.includes("if (wasCollapsed) clearFreeHeadingFoldEscapes(heading);"));
 assert(app.includes("toggle.setAttribute('contenteditable', 'false');"));
 assert(app.includes("toggle.setAttribute('aria-expanded', String(!collapsed));"));
 assert(app.includes("if (node.classList.contains('free-heading-toggle')) return '';"));
@@ -60,15 +61,23 @@ assert(shortcut.includes("editor.dispatchEvent(new Event('input', { bubbles: tru
 
 const keydown = functionSource('handleFreeEditorKeydown');
 assert(keydown.includes("collapsedHeading?.classList.contains('free-heading-collapsed') && !ev.shiftKey"));
-assert(keydown.includes("collapsedHeading.classList.remove('free-heading-collapsed');"));
-assert(keydown.includes('insertFreeParagraphAfterHeading(collapsedHeading);'));
+assert(!keydown.includes("collapsedHeading.classList.remove('free-heading-collapsed');"));
+assert(keydown.includes('insertFreeParagraphAfterHeading(collapsedHeading, true);'));
 assert(keydown.includes("const emptyHeading = getClosestTag(anchor, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']);"));
 assert(keydown.includes('!getFreeHeadingText(emptyHeading).trim()'));
 assert(keydown.includes('insertFreeParagraphAfterHeading(emptyHeading);'));
 
 const paragraphAfterHeading = functionSource('insertFreeParagraphAfterHeading');
+assert(paragraphAfterHeading.includes('keepVisibleWhileCollapsed = false'));
+assert(paragraphAfterHeading.includes("nextBlock.classList.add('free-heading-fold-escape');"));
 assert(paragraphAfterHeading.includes('heading.parentNode.insertBefore(nextBlock, heading.nextSibling);'));
 assert(paragraphAfterHeading.includes('placeCaretAtStart(nextBlock);'));
+
+const refreshFolding = functionSource('refreshFreeHeadingFolding');
+assert(refreshFolding.includes("!sibling.classList.contains('free-heading-fold-escape')"));
+
+const clearFoldEscapes = functionSource('clearFreeHeadingFoldEscapes');
+assert(clearFoldEscapes.includes("sibling.classList.remove('free-heading-fold-escape');"));
 
 const paste = functionSource('handleFreePaste');
 assert(paste.includes('insertFreeMarkdownAtCursor(editor, text, range);'));

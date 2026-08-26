@@ -4379,10 +4379,23 @@
                 while (sibling) {
                     const siblingLevel = getFreeHeadingLevel(sibling);
                     if (siblingLevel && siblingLevel <= level) break;
-                    sibling.classList.add('free-heading-hidden');
+                    if (!sibling.classList.contains('free-heading-fold-escape')) {
+                        sibling.classList.add('free-heading-hidden');
+                    }
                     sibling = sibling.nextElementSibling;
                 }
             });
+        }
+
+        function clearFreeHeadingFoldEscapes(heading) {
+            const level = getFreeHeadingLevel(heading);
+            let sibling = heading.nextElementSibling;
+            while (sibling) {
+                const siblingLevel = getFreeHeadingLevel(sibling);
+                if (siblingLevel && siblingLevel <= level) break;
+                sibling.classList.remove('free-heading-fold-escape');
+                sibling = sibling.nextElementSibling;
+            }
         }
 
         function handleFreeHeadingToggle(event) {
@@ -4394,7 +4407,9 @@
 
             event.preventDefault();
             event.stopPropagation();
+            const wasCollapsed = heading.classList.contains('free-heading-collapsed');
             heading.classList.toggle('free-heading-collapsed');
+            if (wasCollapsed) clearFreeHeadingFoldEscapes(heading);
             refreshFreeHeadingFolding();
         }
 
@@ -4593,9 +4608,12 @@
             return true;
         }
 
-        function insertFreeParagraphAfterHeading(heading) {
+        function insertFreeParagraphAfterHeading(heading, keepVisibleWhileCollapsed = false) {
             const nextBlock = document.createElement('div');
             nextBlock.appendChild(document.createElement('br'));
+            if (keepVisibleWhileCollapsed) {
+                nextBlock.classList.add('free-heading-fold-escape');
+            }
             heading.parentNode.insertBefore(nextBlock, heading.nextSibling);
             placeCaretAtStart(nextBlock);
             freeActiveFormat = null;
@@ -4614,9 +4632,7 @@
             const collapsedHeading = getClosestTag(anchor, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']);
             if (collapsedHeading?.classList.contains('free-heading-collapsed') && !ev.shiftKey) {
                 ev.preventDefault();
-                collapsedHeading.classList.remove('free-heading-collapsed');
-                refreshFreeHeadingFolding();
-                insertFreeParagraphAfterHeading(collapsedHeading);
+                insertFreeParagraphAfterHeading(collapsedHeading, true);
                 return;
             }
 
