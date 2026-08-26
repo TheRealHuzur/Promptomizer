@@ -4305,7 +4305,7 @@
         }
 
         function getFreeHeadingLevel(element) {
-            const match = /^H([1-3])$/.exec(element?.tagName || '');
+            const match = /^H([1-6])$/.exec(element?.tagName || '');
             return match ? Number(match[1]) : 0;
         }
 
@@ -4367,7 +4367,7 @@
                 parent?.classList.remove('free-collapsible-heading', 'free-heading-collapsed');
             });
 
-            const headings = Array.from(editor.querySelectorAll('h1, h2, h3'));
+            const headings = Array.from(editor.querySelectorAll('h1, h2, h3, h4, h5, h6'));
             headings.forEach(heading => {
                 heading.classList.add('free-collapsible-heading');
                 ensureFreeHeadingToggle(heading);
@@ -4389,7 +4389,7 @@
             const editor = getFreeEditorEl();
             const toggle = event.target.closest('.free-heading-toggle');
             if (!editor || !toggle || !editor.contains(toggle)) return;
-            const heading = toggle.closest('h1, h2, h3');
+            const heading = toggle.closest('h1, h2, h3, h4, h5, h6');
             if (!heading) return;
 
             event.preventDefault();
@@ -4452,9 +4452,8 @@
             if (node.nodeType === 3) node = node.parentNode;
 
             let format = null;
-            if (getClosestTag(node, ['H1'])) format = 'h1';
-            else if (getClosestTag(node, ['H2'])) format = 'h2';
-            else if (getClosestTag(node, ['H3'])) format = 'h3';
+            const heading = getClosestTag(node, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']);
+            if (heading) format = heading.tagName.toLowerCase();
             else if (getClosestTag(node, ['BLOCKQUOTE'])) format = 'quote';
             else if (getClosestTag(node, ['UL'])) format = 'ul';
             else if (getClosestTag(node, ['OL'])) format = 'ol';
@@ -4594,6 +4593,16 @@
             return true;
         }
 
+        function insertFreeParagraphAfterHeading(heading) {
+            const nextBlock = document.createElement('div');
+            nextBlock.appendChild(document.createElement('br'));
+            heading.parentNode.insertBefore(nextBlock, heading.nextSibling);
+            placeCaretAtStart(nextBlock);
+            freeActiveFormat = null;
+            updateFreeToolbarUI();
+            getFreeEditorEl()?.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
         function handleFreeEditorKeydown(ev) {
             if (ev.target.closest?.('.free-heading-toggle')) return;
             if (handleFreeHeadingMarkdownShortcut(ev)) return;
@@ -4602,16 +4611,19 @@
             const sel = window.getSelection();
             const anchor = sel && sel.anchorNode ? sel.anchorNode : null;
 
-            const emptyHeading = getClosestTag(anchor, ['H1', 'H2', 'H3']);
+            const collapsedHeading = getClosestTag(anchor, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']);
+            if (collapsedHeading?.classList.contains('free-heading-collapsed') && !ev.shiftKey) {
+                ev.preventDefault();
+                collapsedHeading.classList.remove('free-heading-collapsed');
+                refreshFreeHeadingFolding();
+                insertFreeParagraphAfterHeading(collapsedHeading);
+                return;
+            }
+
+            const emptyHeading = getClosestTag(anchor, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']);
             if (emptyHeading && !getFreeHeadingText(emptyHeading).trim()) {
                 ev.preventDefault();
-                const nextBlock = document.createElement('div');
-                nextBlock.appendChild(document.createElement('br'));
-                emptyHeading.parentNode.insertBefore(nextBlock, emptyHeading.nextSibling);
-                placeCaretAtStart(nextBlock);
-                freeActiveFormat = null;
-                updateFreeToolbarUI();
-                getFreeEditorEl()?.dispatchEvent(new Event('input', { bubbles: true }));
+                insertFreeParagraphAfterHeading(emptyHeading);
                 return;
             }
 
@@ -4667,7 +4679,7 @@
                 return;
             }
 
-            if (freeActiveFormat === 'h1' || freeActiveFormat === 'h2' || freeActiveFormat === 'h3') {
+            if (/^h[1-6]$/.test(freeActiveFormat || '')) {
                 requestAnimationFrame(() => {
                     freeActiveFormat = null;
                     updateFreeToolbarUI();
@@ -4779,7 +4791,7 @@
         }
 
         function freeHtmlToMarkdown(root) {
-            const blockTags = ['H1', 'H2', 'H3', 'P', 'DIV', 'BLOCKQUOTE', 'UL', 'OL'];
+            const blockTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'DIV', 'BLOCKQUOTE', 'UL', 'OL'];
 
             const inlineToMd = (node) => {
                 if (node.nodeType === 3) return node.nodeValue;
@@ -4821,9 +4833,8 @@
                 if (node.nodeType !== 1) return '';
                 const tag = node.tagName;
                 if ((tag === 'DIV' || tag === 'P') && isEmptyBlock(node)) return '\n\n';
-                if (tag === 'H1') return `# ${inlineToMd(node).trim()}\n\n`;
-                if (tag === 'H2') return `## ${inlineToMd(node).trim()}\n\n`;
-                if (tag === 'H3') return `### ${inlineToMd(node).trim()}\n\n`;
+                const headingLevel = getFreeHeadingLevel(node);
+                if (headingLevel) return `${'#'.repeat(headingLevel)} ${inlineToMd(node).trim()}\n\n`;
                 if (tag === 'PRE' || tag === 'CODE') return `\`\`\`\n${inlineToMd(node).trim()}\n\`\`\`\n\n`;
                 if (tag === 'BLOCKQUOTE') {
                     const text = inlineToMd(node).trimEnd();
@@ -4888,9 +4899,9 @@
                     }
                     continue;
                 }
-                if (/^#{1,3}\s+/.test(line)) {
-                    const level = line.match(/^#{1,3}/)[0].length;
-                    const content = line.replace(/^#{1,3}\s+/, '');
+                if (/^#{1,6}\s+/.test(line)) {
+                    const level = line.match(/^#{1,6}/)[0].length;
+                    const content = line.replace(/^#{1,6}\s+/, '');
                     blocks.push(`<h${level}>${parseInline(content)}</h${level}>`);
                     i += 1;
                     continue;
@@ -4935,7 +4946,7 @@
                     continue;
                 }
                 const para = [];
-                while (i < lines.length && lines[i].trim() && !/^#{1,3}\s+/.test(lines[i]) && !/^>\s?/.test(lines[i]) && !/^-\s+/.test(lines[i]) && !/^\d+\.\s+/.test(lines[i])) {
+                while (i < lines.length && lines[i].trim() && !/^#{1,6}\s+/.test(lines[i]) && !/^>\s?/.test(lines[i]) && !/^-\s+/.test(lines[i]) && !/^\d+\.\s+/.test(lines[i])) {
                     para.push(lines[i]);
                     i += 1;
                 }
@@ -5252,15 +5263,82 @@
             return finishPromptLoad(id, options);
         }
 
+        function getFreeInsertionContextHeadingLevel(editor, range) {
+            if (!editor || !range || !editor.contains(range.startContainer)) return 0;
+
+            let anchor = null;
+            if (range.startContainer === editor) {
+                let index = Math.min(range.startOffset, editor.childNodes.length) - 1;
+                while (index >= 0 && editor.childNodes[index].nodeType !== 1) index -= 1;
+                anchor = index >= 0 ? editor.childNodes[index] : null;
+            } else {
+                anchor = range.startContainer.nodeType === 1
+                    ? range.startContainer
+                    : range.startContainer.parentElement;
+                while (anchor && anchor.parentElement !== editor) anchor = anchor.parentElement;
+            }
+
+            if (!anchor) return 0;
+            const ownLevel = getFreeHeadingLevel(anchor);
+            if (ownLevel) return ownLevel;
+
+            let sibling = anchor.previousElementSibling;
+            while (sibling) {
+                const level = getFreeHeadingLevel(sibling);
+                if (level) return level;
+                sibling = sibling.previousElementSibling;
+            }
+            return 0;
+        }
+
+        function normalizeFreeSnippetHeadings(markdown, contextLevel) {
+            const original = markdown || '';
+            const source = original.replace(/\r\n/g, '\n');
+            if (!contextLevel) return original;
+
+            const lines = source.split('\n');
+            const headingLevels = [];
+            let inCodeFence = false;
+            lines.forEach(line => {
+                if (/^```/.test(line)) {
+                    inCodeFence = !inCodeFence;
+                    return;
+                }
+                if (inCodeFence) return;
+                const match = /^(#{1,6})\s+/.exec(line);
+                if (match) headingLevels.push(match[1].length);
+            });
+            if (!headingLevels.length) return original;
+
+            const shift = Math.min(contextLevel + 1, 6) - Math.min(...headingLevels);
+            inCodeFence = false;
+            return lines.map(line => {
+                if (/^```/.test(line)) {
+                    inCodeFence = !inCodeFence;
+                    return line;
+                }
+                if (inCodeFence) return line;
+                return line.replace(/^(#{1,6})(?=\s+)/, hashes => {
+                    const level = Math.max(1, Math.min(6, hashes.length + shift));
+                    return '#'.repeat(level);
+                });
+            }).join('\n');
+        }
+
         function insertSnippetText(text, targetFieldId = null) {
             if (currentMode === 'free') {
                 const editor = getFreeEditorEl();
                 if (!editor) { showToast('Freies Textfeld nicht gefunden.', 'error'); return false; }
                 const range = getFreeInsertionRange(editor);
-                if (/^#{1,3}\s+/m.test(text)) {
-                    insertFreeMarkdownAtCursor(editor, text, range);
+                const contextLevel = getFreeInsertionContextHeadingLevel(editor, range);
+                const normalizedText = normalizeFreeSnippetHeadings(text, contextLevel);
+                if (normalizedText !== text.replace(/\r\n/g, '\n')) {
+                    showToast('Bausteinüberschriften wurden an die Gliederung angepasst.', 'info', 2500);
+                }
+                if (/^#{1,6}\s+/m.test(normalizedText)) {
+                    insertFreeMarkdownAtCursor(editor, normalizedText, range);
                 } else {
-                    insertTextAtCursor(editor, text, range);
+                    insertTextAtCursor(editor, normalizedText, range);
                     freeSyncHtmlToMarkdown();
                 }
                 return true;
