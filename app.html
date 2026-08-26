@@ -5415,11 +5415,39 @@
             return true;
         }
 
+        function markFreeCollapsedHeadings(editor) {
+            const stamp = Date.now() + '-' + Math.random().toString(36).slice(2);
+            return Array.from(editor.querySelectorAll('h1.free-heading-collapsed, h2.free-heading-collapsed, h3.free-heading-collapsed, h4.free-heading-collapsed, h5.free-heading-collapsed, h6.free-heading-collapsed')).map((heading, index) => {
+                const marker = String.fromCharCode(0xE100) + 'promptomizer-fold-' + stamp + '-' + index + String.fromCharCode(0xE101);
+                heading.appendChild(document.createTextNode(marker));
+                return marker;
+            });
+        }
+
+        function restoreFreeCollapsedHeadings(editor, markers) {
+            markers.forEach(marker => {
+                const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+                while (walker.nextNode()) {
+                    const markerNode = walker.currentNode;
+                    if (!markerNode.nodeValue.includes(marker)) continue;
+                    markerNode.nodeValue = markerNode.nodeValue.replace(marker, '');
+                    const heading = markerNode.parentElement?.closest('h1, h2, h3, h4, h5, h6');
+                    if (heading && editor.contains(heading)) {
+                        heading.classList.add('free-heading-collapsed');
+                        ensureFreeHeadingEditableContent(heading);
+                    }
+                    break;
+                }
+            });
+        }
+
         function insertFreeMarkdownAtCursor(editor, markdown, range) {
             const marker = `\uE000promptomizer-caret-${Date.now()}-${Math.random().toString(36).slice(2)}\uE001`;
             insertTextAtCursor(editor, `${markdown}${marker}`, range);
+            const collapsedHeadingMarkers = markFreeCollapsedHeadings(editor);
             const markdownWithMarker = getFreeMarkdownFromEditor();
             setFreeEditorFromMarkdown(markdownWithMarker);
+            restoreFreeCollapsedHeadings(editor, collapsedHeadingMarkers);
 
             const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
             let markerNode = null;
@@ -5444,6 +5472,7 @@
                 freeLastSelectionRange = caret.cloneRange();
             } else {
                 freeSetMarkdown(markdownWithMarker.replace(marker, ''));
+                restoreFreeCollapsedHeadings(editor, collapsedHeadingMarkers);
                 const caret = document.createRange();
                 caret.selectNodeContents(editor);
                 caret.collapse(false);

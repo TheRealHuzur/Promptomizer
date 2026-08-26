@@ -118,6 +118,52 @@ const escapeBlock = {
 };
 assert.equal(insertionContext(editor, { startContainer: escapeBlock }), 2);
 
+const markCollapsedHeadings = vm.runInNewContext('(' + functionSource('markFreeCollapsedHeadings') + ')', {
+    document: { createTextNode: nodeValue => ({ nodeValue }) }
+});
+const markedHeadings = [0, 1].map(() => ({
+    appendChild(node) { this.markerNode = node; }
+}));
+const foldMarkers = markCollapsedHeadings({ querySelectorAll: () => markedHeadings });
+assert.equal(foldMarkers.length, 2);
+assert.notEqual(foldMarkers[0], foldMarkers[1]);
+assert.equal(foldMarkers[0].charCodeAt(0), 0xE100);
+assert.equal(foldMarkers[0].charCodeAt(foldMarkers[0].length - 1), 0xE101);
+
+const restoredClasses = new Set();
+markedHeadings.forEach((heading, index) => {
+    heading.classList = { add: className => restoredClasses.add(index + ':' + className) };
+});
+const foldMarkerNodes = foldMarkers.map((marker, index) => ({
+    nodeValue: 'Überschrift ' + index + marker,
+    parentElement: { closest: () => markedHeadings[index] }
+}));
+const restoreCollapsedHeadings = vm.runInNewContext('(' + functionSource('restoreFreeCollapsedHeadings') + ')', {
+    document: {
+        createTreeWalker: () => {
+            let index = -1;
+            return {
+                currentNode: null,
+                nextNode() {
+                    index += 1;
+                    this.currentNode = foldMarkerNodes[index] || null;
+                    return Boolean(this.currentNode);
+                }
+            };
+        }
+    },
+    NodeFilter: { SHOW_TEXT: 4 },
+    ensureFreeHeadingEditableContent: () => {}
+});
+restoreCollapsedHeadings({ contains: () => true }, foldMarkers);
+assert.equal(restoredClasses.size, 2);
+foldMarkerNodes.forEach(node => assert(!foldMarkers.some(marker => node.nodeValue.includes(marker))));
+
+const markdownInsert = functionSource('insertFreeMarkdownAtCursor');
+assert(markdownInsert.indexOf('insertTextAtCursor') < markdownInsert.indexOf('markFreeCollapsedHeadings(editor)'));
+assert(markdownInsert.indexOf('markFreeCollapsedHeadings(editor)') < markdownInsert.indexOf('getFreeMarkdownFromEditor()'));
+assert.equal(markdownInsert.split('restoreFreeCollapsedHeadings(editor, collapsedHeadingMarkers);').length - 1, 2);
+
 const paste = functionSource('handleFreePaste');
 assert(paste.includes('insertFreeMarkdownAtCursor(editor, text, range);'));
 assert(!paste.includes('insertTextAtCursor('));
