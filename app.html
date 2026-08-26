@@ -4290,6 +4290,7 @@
             freeMarkdownCache = value;
             freeActiveFormat = null;
             updateFreeToolbarUI();
+            refreshFreeHeadingFolding();
         }
 
         function freeGetMarkdown() {
@@ -4303,13 +4304,92 @@
             setFreeEditorFromMarkdown(freeMarkdownCache);
         }
 
+        function getFreeHeadingLevel(element) {
+            const match = /^H([1-3])$/.exec(element?.tagName || '');
+            return match ? Number(match[1]) : 0;
+        }
+
+        function ensureFreeHeadingToggle(heading) {
+            let toggle = heading.firstElementChild;
+            if (!toggle || !toggle.classList.contains('free-heading-toggle')) {
+                toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'free-heading-toggle';
+                toggle.setAttribute('contenteditable', 'false');
+                toggle.innerHTML = '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i>';
+                heading.insertBefore(toggle, heading.firstChild);
+            }
+
+            const collapsed = heading.classList.contains('free-heading-collapsed');
+            toggle.setAttribute('aria-expanded', String(!collapsed));
+            toggle.setAttribute('aria-label', collapsed ? 'Abschnitt ausklappen' : 'Abschnitt einklappen');
+            toggle.title = collapsed ? 'Abschnitt ausklappen' : 'Abschnitt einklappen';
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-chevron-down', !collapsed);
+                icon.classList.toggle('fa-chevron-right', collapsed);
+            }
+        }
+
+        function refreshFreeHeadingFolding() {
+            const editor = getFreeEditorEl();
+            if (!editor) return;
+
+            editor.querySelectorAll('.free-heading-hidden').forEach(element => {
+                element.classList.remove('free-heading-hidden');
+            });
+            editor.querySelectorAll('.free-heading-toggle').forEach(toggle => {
+                const parent = toggle.parentElement;
+                if (getFreeHeadingLevel(parent)) return;
+                toggle.remove();
+                parent?.classList.remove('free-collapsible-heading', 'free-heading-collapsed');
+            });
+
+            const headings = Array.from(editor.querySelectorAll('h1, h2, h3'));
+            headings.forEach(heading => {
+                heading.classList.add('free-collapsible-heading');
+                ensureFreeHeadingToggle(heading);
+            });
+
+            headings.filter(heading => heading.classList.contains('free-heading-collapsed')).forEach(heading => {
+                const level = getFreeHeadingLevel(heading);
+                let sibling = heading.nextElementSibling;
+                while (sibling) {
+                    const siblingLevel = getFreeHeadingLevel(sibling);
+                    if (siblingLevel && siblingLevel <= level) break;
+                    sibling.classList.add('free-heading-hidden');
+                    sibling = sibling.nextElementSibling;
+                }
+            });
+        }
+
+        function handleFreeHeadingToggle(event) {
+            const editor = getFreeEditorEl();
+            const toggle = event.target.closest('.free-heading-toggle');
+            if (!editor || !toggle || !editor.contains(toggle)) return;
+            const heading = toggle.closest('h1, h2, h3');
+            if (!heading) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            heading.classList.toggle('free-heading-collapsed');
+            refreshFreeHeadingFolding();
+        }
+
         function initFreeEditor() {
             const editor = getFreeEditorEl();
             if (!editor) return;
-            editor.addEventListener('input', () => freeSyncHtmlToMarkdown());
+            editor.addEventListener('input', () => {
+                freeSyncHtmlToMarkdown();
+                refreshFreeHeadingFolding();
+            });
             editor.addEventListener('keydown', (ev) => handleFreeEditorKeydown(ev));
             editor.addEventListener('blur', () => freeSyncHtmlToMarkdown());
             editor.addEventListener('paste', (ev) => handleFreePaste(ev));
+            editor.addEventListener('mousedown', (event) => {
+                if (event.target.closest('.free-heading-toggle')) event.preventDefault();
+            });
+            editor.addEventListener('click', (event) => handleFreeHeadingToggle(event));
             const updateSelection = () => updateFreeSelection();
             editor.addEventListener('keyup', updateSelection);
             editor.addEventListener('mouseup', updateSelection);
@@ -4325,10 +4405,10 @@
             ev.preventDefault();
             const text = (ev.clipboardData || window.clipboardData).getData('text/plain');
             const editor = getFreeEditorEl();
-            if (!editor) return;
+            if (!editor || !text) return;
 
-            // Inserts plain text at cursor
-            insertTextAtCursor(editor, text, freeLastSelectionRange);
+            const range = getFreeInsertionRange(editor);
+            insertFreeMarkdownAtCursor(editor, text, range);
         }
 
         function updateFreeSelection() {
@@ -4401,6 +4481,8 @@
                 deactivateFormat(format);
                 freeActiveFormat = null;
                 updateFreeToolbarUI();
+                freeSyncHtmlToMarkdown();
+                refreshFreeHeadingFolding();
                 return;
             }
 
@@ -4408,6 +4490,8 @@
             activateFormat(format);
             freeActiveFormat = format;
             updateFreeToolbarUI();
+            freeSyncHtmlToMarkdown();
+            refreshFreeHeadingFolding();
         }
 
         function deactivateFormat(format) {
@@ -4436,7 +4520,61 @@
             editor.focus();
         }
 
+        function getFreeHeadingShortcutLevel(value) {
+            const match = /^(#{1,3})$/.exec(value);
+            return match ? match[1].length : 0;
+        }
+
+        function handleFreeHeadingMarkdownShortcut(ev) {
+            if (ev.key !== ' ' || ev.isComposing || ev.ctrlKey || ev.metaKey || ev.altKey) return false;
+
+            const editor = getFreeEditorEl();
+            const selection = window.getSelection();
+            if (!editor || !selection || !selection.rangeCount || !selection.isCollapsed) return false;
+
+            const activeRange = selection.getRangeAt(0);
+            if (!editor.contains(activeRange.startContainer)) return false;
+
+            let block = activeRange.startContainer.nodeType === 1
+                ? activeRange.startContainer
+                : activeRange.startContainer.parentElement;
+            while (block && block !== editor && block.parentElement !== editor) {
+                block = block.parentElement;
+            }
+            if (!block || block === editor || !['DIV', 'P'].includes(block.tagName)) return false;
+
+            const prefixRange = document.createRange();
+            prefixRange.selectNodeContents(block);
+            prefixRange.setEnd(activeRange.startContainer, activeRange.startOffset);
+            const level = getFreeHeadingShortcutLevel(prefixRange.toString());
+            if (!level) return false;
+
+            ev.preventDefault();
+            prefixRange.deleteContents();
+
+            const heading = document.createElement(`h${level}`);
+            while (block.firstChild) heading.appendChild(block.firstChild);
+            if (!heading.childNodes.length) heading.appendChild(document.createElement('br'));
+            block.replaceWith(heading);
+
+            freeActiveFormat = `h${level}`;
+            updateFreeToolbarUI();
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+            refreshFreeHeadingFolding();
+
+            const caret = document.createRange();
+            const toggleOffset = heading.firstElementChild?.classList.contains('free-heading-toggle') ? 1 : 0;
+            caret.setStart(heading, toggleOffset);
+            caret.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(caret);
+            freeLastSelectionRange = caret.cloneRange();
+            return true;
+        }
+
         function handleFreeEditorKeydown(ev) {
+            if (ev.target.closest?.('.free-heading-toggle')) return;
+            if (handleFreeHeadingMarkdownShortcut(ev)) return;
             if (ev.key !== 'Enter') return;
 
             const sel = window.getSelection();
@@ -4611,6 +4749,7 @@
             const inlineToMd = (node) => {
                 if (node.nodeType === 3) return node.nodeValue;
                 if (node.nodeType !== 1) return '';
+                if (node.classList.contains('free-heading-toggle')) return '';
                 const tag = node.tagName;
                 if (tag === 'BR') return '\n';
                 const inner = Array.from(node.childNodes).map(inlineToMd).join('');
@@ -5083,8 +5222,12 @@
                 const editor = getFreeEditorEl();
                 if (!editor) { showToast('Freies Textfeld nicht gefunden.', 'error'); return false; }
                 const range = getFreeInsertionRange(editor);
-                insertTextAtCursor(editor, text, range);
-                freeSyncHtmlToMarkdown();
+                if (/^#{1,3}\s+/m.test(text)) {
+                    insertFreeMarkdownAtCursor(editor, text, range);
+                } else {
+                    insertTextAtCursor(editor, text, range);
+                    freeSyncHtmlToMarkdown();
+                }
                 return true;
             }
 
@@ -5107,6 +5250,48 @@
             const pos = start + text.length;
             ta.setSelectionRange(pos, pos);
             return true;
+        }
+
+        function insertFreeMarkdownAtCursor(editor, markdown, range) {
+            const marker = `\uE000promptomizer-caret-${Date.now()}-${Math.random().toString(36).slice(2)}\uE001`;
+            insertTextAtCursor(editor, `${markdown}${marker}`, range);
+            const markdownWithMarker = getFreeMarkdownFromEditor();
+            setFreeEditorFromMarkdown(markdownWithMarker);
+
+            const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+            let markerNode = null;
+            let markerOffset = -1;
+            while (walker.nextNode()) {
+                const offset = walker.currentNode.nodeValue.indexOf(marker);
+                if (offset !== -1) {
+                    markerNode = walker.currentNode;
+                    markerOffset = offset;
+                    break;
+                }
+            }
+
+            if (markerNode) {
+                markerNode.nodeValue = markerNode.nodeValue.replace(marker, '');
+                const caret = document.createRange();
+                caret.setStart(markerNode, markerOffset);
+                caret.collapse(true);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(caret);
+                freeLastSelectionRange = caret.cloneRange();
+            } else {
+                freeSetMarkdown(markdownWithMarker.replace(marker, ''));
+                const caret = document.createRange();
+                caret.selectNodeContents(editor);
+                caret.collapse(false);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(caret);
+                freeLastSelectionRange = caret.cloneRange();
+            }
+
+            freeSyncHtmlToMarkdown();
+            refreshFreeHeadingFolding();
         }
 
         function setActiveField(fieldId) {

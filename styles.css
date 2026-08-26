@@ -465,6 +465,42 @@ body.sidebar-collapsed #sidebar-left .sidebar-user-text {
     color: #fff;
 }
 
+#input-free .free-collapsible-heading {
+    position: relative;
+    padding-left: 1.75rem;
+}
+
+#input-free .free-heading-toggle {
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    display: inline-flex;
+    width: 1.5rem;
+    height: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+#input-free .free-heading-toggle:hover {
+    background: rgba(51, 65, 85, 0.7);
+    color: #fff;
+}
+
+#input-free .free-heading-toggle:focus-visible {
+    outline: 2px solid var(--brand-sky);
+    outline-offset: 2px;
+}
+
+#input-free .free-heading-hidden {
+    display: none !important;
+}
+
 #input-free ul {
     list-style: disc;
     padding-left: 1.5rem;
