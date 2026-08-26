@@ -4394,6 +4394,7 @@
                 const siblingLevel = getFreeHeadingLevel(sibling);
                 if (siblingLevel && siblingLevel <= level) break;
                 sibling.classList.remove('free-heading-fold-escape');
+                delete sibling.dataset.freeHeadingContextLevel;
                 sibling = sibling.nextElementSibling;
             }
         }
@@ -4608,13 +4609,38 @@
             return true;
         }
 
+        function getFreeHeadingParentLevel(heading) {
+            const headingLevel = getFreeHeadingLevel(heading);
+            let sibling = heading.previousElementSibling;
+            while (sibling) {
+                const siblingLevel = getFreeHeadingLevel(sibling);
+                if (siblingLevel && siblingLevel < headingLevel) return siblingLevel;
+                sibling = sibling.previousElementSibling;
+            }
+            return 0;
+        }
+
+        function getFreeHeadingSectionBoundary(heading) {
+            const headingLevel = getFreeHeadingLevel(heading);
+            let sibling = heading.nextElementSibling;
+            while (sibling) {
+                const siblingLevel = getFreeHeadingLevel(sibling);
+                if (siblingLevel && siblingLevel <= headingLevel) return sibling;
+                sibling = sibling.nextElementSibling;
+            }
+            return null;
+        }
+
         function insertFreeParagraphAfterHeading(heading, keepVisibleWhileCollapsed = false) {
             const nextBlock = document.createElement('div');
             nextBlock.appendChild(document.createElement('br'));
+            let insertionPoint = heading.nextSibling;
             if (keepVisibleWhileCollapsed) {
                 nextBlock.classList.add('free-heading-fold-escape');
+                nextBlock.dataset.freeHeadingContextLevel = String(getFreeHeadingParentLevel(heading));
+                insertionPoint = getFreeHeadingSectionBoundary(heading);
             }
-            heading.parentNode.insertBefore(nextBlock, heading.nextSibling);
+            heading.parentNode.insertBefore(nextBlock, insertionPoint);
             placeCaretAtStart(nextBlock);
             freeActiveFormat = null;
             updateFreeToolbarUI();
@@ -5295,6 +5321,14 @@
             }
 
             if (!anchor) return 0;
+            const contextOverride = anchor.dataset?.freeHeadingContextLevel;
+            if (contextOverride !== undefined) {
+                const contextLevel = Number.parseInt(contextOverride, 10);
+                if (Number.isInteger(contextLevel) && contextLevel >= 0 && contextLevel <= 6) {
+                    return contextLevel;
+                }
+            }
+
             const ownLevel = getFreeHeadingLevel(anchor);
             if (ownLevel) return ownLevel;
 

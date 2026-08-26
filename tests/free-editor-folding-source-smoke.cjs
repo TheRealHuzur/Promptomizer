@@ -70,7 +70,9 @@ assert(keydown.includes('insertFreeParagraphAfterHeading(emptyHeading);'));
 const paragraphAfterHeading = functionSource('insertFreeParagraphAfterHeading');
 assert(paragraphAfterHeading.includes('keepVisibleWhileCollapsed = false'));
 assert(paragraphAfterHeading.includes("nextBlock.classList.add('free-heading-fold-escape');"));
-assert(paragraphAfterHeading.includes('heading.parentNode.insertBefore(nextBlock, heading.nextSibling);'));
+assert(paragraphAfterHeading.includes('nextBlock.dataset.freeHeadingContextLevel = String(getFreeHeadingParentLevel(heading));'));
+assert(paragraphAfterHeading.includes('insertionPoint = getFreeHeadingSectionBoundary(heading);'));
+assert(paragraphAfterHeading.includes('heading.parentNode.insertBefore(nextBlock, insertionPoint);'));
 assert(paragraphAfterHeading.includes('placeCaretAtStart(nextBlock);'));
 
 const refreshFolding = functionSource('refreshFreeHeadingFolding');
@@ -78,6 +80,43 @@ assert(refreshFolding.includes("!sibling.classList.contains('free-heading-fold-e
 
 const clearFoldEscapes = functionSource('clearFreeHeadingFoldEscapes');
 assert(clearFoldEscapes.includes("sibling.classList.remove('free-heading-fold-escape');"));
+assert(clearFoldEscapes.includes('delete sibling.dataset.freeHeadingContextLevel;'));
+
+const getHeadingLevel = element => {
+    const match = /^H([1-6])$/.exec(element?.tagName || '');
+    return match ? Number(match[1]) : 0;
+};
+const parentLevel = vm.runInNewContext('(' + functionSource('getFreeHeadingParentLevel') + ')', {
+    getFreeHeadingLevel: getHeadingLevel
+});
+const h2 = { tagName: 'H2', previousElementSibling: null };
+const paragraph = { tagName: 'DIV', previousElementSibling: h2 };
+const h3 = { tagName: 'H3', previousElementSibling: paragraph };
+assert.equal(parentLevel(h3), 2);
+
+const sectionBoundary = vm.runInNewContext('(' + functionSource('getFreeHeadingSectionBoundary') + ')', {
+    getFreeHeadingLevel: getHeadingLevel
+});
+const childParagraph = { tagName: 'DIV' };
+const childHeading = { tagName: 'H4' };
+const siblingHeading = { tagName: 'H3' };
+h3.nextElementSibling = childParagraph;
+childParagraph.nextElementSibling = childHeading;
+childHeading.nextElementSibling = siblingHeading;
+siblingHeading.nextElementSibling = null;
+assert.equal(sectionBoundary(h3), siblingHeading);
+
+const insertionContext = vm.runInNewContext('(' + functionSource('getFreeInsertionContextHeadingLevel') + ')', {
+    getFreeHeadingLevel: getHeadingLevel
+});
+const editor = { contains: () => true, childNodes: [] };
+const escapeBlock = {
+    nodeType: 1,
+    parentElement: editor,
+    previousElementSibling: h3,
+    dataset: { freeHeadingContextLevel: '2' }
+};
+assert.equal(insertionContext(editor, { startContainer: escapeBlock }), 2);
 
 const paste = functionSource('handleFreePaste');
 assert(paste.includes('insertFreeMarkdownAtCursor(editor, text, range);'));
