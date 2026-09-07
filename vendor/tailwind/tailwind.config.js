@@ -1,5 +1,5 @@
 module.exports = {
-  content: ["./index.html", "./app.html", "./preise.html", "./impressum.html", "./datenschutz.html", "./agb.html", "./prompt-bibliothek.html", "./prompt-erstellen.html", "./prompt-vorlagen.html", "./prompt-vorlagen/buero.html", "./prompt-vorlagen/verwaltung.html", "./prompt-vorlagen/marketing.html", "./autor/patrick-rosskothen.html"],
+  content: ["./index.html", "./app.html", "./preise.html", "./impressum.html", "./datenschutz.html", "./agb.html", "./prompt-bibliothek.html", "./prompt-erstellen.html", "./prompt-vorlagen.html", "./prompt-vorlagen/buero.html", "./prompt-vorlagen/verwaltung.html", "./prompt-vorlagen/marketing.html", "./autor/patrick-rosskothen.html", "./wissen/prompt-engineering.html", "./wissen/prompt-techniken.html", "./wissen/prompt-optimieren.html"],
   darkMode: 'class',
   theme: {
     extend: {

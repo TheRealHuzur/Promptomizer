@@ -1,0 +1,837 @@
+/*
+    Cornerstone-Wissensseiten unter /wissen/<slug>.
+    Eigenes Stylesheet, damit die typografische Vorlage aus dem Design-Bundle
+    1:1 umgesetzt werden kann, ohne neue Tailwind-Utilities zu erzeugen
+    (tailwind.css ist gepurged und versioniert, siehe CLAUDE.md §2).
+    Header und Footer nutzen weiterhin die Utility-Klassen der uebrigen
+    Content-Seiten.
+
+    Der Aussencontainer .mp-sec folgt max-w-5xl/px-6 aus Header und Footer,
+    damit Logo, Fliesstext und Footer buendig stehen; alle inneren
+    max-width-Werte entsprechen exakt der Designvorgabe.
+
+    Klassennamen sind bewusst identisch mit dem Design-Bundle (mp-*), damit
+    sich Vorlage und Produktivcode direkt vergleichen lassen. Die Datei wird
+    nur von den Wissensseiten geladen.
+*/
+
+/* ---------- Grundraster ---------- */
+
+.mp-sec {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.mp-rule {
+    height: 1px;
+    margin: 0;
+    border: 0;
+    background: #1e293b;
+}
+
+/* Ankersprünge aus dem Inhaltsverzeichnis nicht auf die Kante setzen */
+.mp-anchor {
+    scroll-margin-top: 2rem;
+}
+
+/* ---------- Typografie ---------- */
+
+.mp-h {
+    margin: 0;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: 1.05;
+}
+
+.mp-h1 {
+    max-width: 42rem;
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    text-wrap: balance;
+}
+
+.mp-h2 {
+    max-width: 38rem;
+    font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+}
+
+.mp-h2-wide {
+    max-width: 42rem;
+}
+
+.mp-h2-cta {
+    max-width: 34rem;
+    font-size: clamp(1.875rem, 4vw, 3rem);
+}
+
+.mp-h3 {
+    max-width: 34rem;
+    margin: 0;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    line-height: 1.05;
+}
+
+.mp-h3-lg {
+    font-size: 1.5rem;
+}
+
+.mp-sky {
+    color: #0ea5e9;
+}
+
+.mp-sky-block {
+    display: block;
+}
+
+.mp-ct {
+    margin: 0 0 .5rem;
+    color: #fff;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+
+.mp-lead {
+    max-width: 36rem;
+    margin: 0;
+    color: #94a3b8;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+}
+
+.mp-p {
+    max-width: 38rem;
+    margin: 0;
+    color: #94a3b8;
+    font-size: .925rem;
+    line-height: 1.75;
+}
+
+.mp-p a,
+.mp-a a,
+.mp-cap a {
+    color: #38bdf8;
+    transition: color .15s ease;
+}
+
+.mp-p a:hover,
+.mp-a a:hover,
+.mp-cap a:hover {
+    color: #7dd3fc;
+}
+
+.mp-p strong,
+.mp-a strong {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+/* Kicker und Mikro-Label */
+
+.mp-num {
+    color: #38bdf8;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mp-kick {
+    color: #0ea5e9;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mp-kick-muted {
+    color: #64748b;
+}
+
+/* Hervorgehobene Ablaufzeile */
+
+.mp-flow {
+    max-width: 44rem;
+    margin: 0;
+    color: #f8fafc;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    line-height: 1.6;
+}
+
+/* Meta-Zeile unter dem Lead */
+
+.mp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    color: #64748b;
+    font-size: .8125rem;
+}
+
+.mp-meta a {
+    color: #94a3b8;
+    transition: color .15s ease;
+}
+
+.mp-meta a:hover {
+    color: #38bdf8;
+}
+
+/* ---------- Listen und Inhaltsverzeichnis ---------- */
+
+.mp-ul {
+    max-width: 38rem;
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #94a3b8;
+    font-size: .925rem;
+    line-height: 1.9;
+    list-style: revert;
+}
+
+.mp-ul li {
+    padding-left: .35rem;
+}
+
+.mp-ul li::marker {
+    color: #334155;
+}
+
+.mp-toc {
+    display: grid;
+    gap: .65rem;
+    max-width: 34rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mp-toc a {
+    color: #94a3b8;
+    font-size: .925rem;
+    transition: color .15s ease;
+}
+
+.mp-toc a:hover {
+    color: #38bdf8;
+}
+
+/* ---------- Code- und Promptblöcke ---------- */
+
+.mp-code {
+    max-width: 44rem;
+    margin: 0;
+    padding: 1.15rem;
+    overflow-x: auto;
+    border: 1px solid #334155;
+    border-radius: .65rem;
+    background: #020617;
+    color: #cbd5e1;
+    /* JetBrains Mono liegt nicht im vendor-Ordner; Fallback ist der im Projekt
+       bereits verwendete Monospace-Stack aus content-pages.css. */
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: .8125rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+/* Modellausgaben heben sich vom Promptblock ab */
+.mp-out {
+    border-color: #223049;
+    background: #0f172a;
+}
+
+/* Hervorhebung der Ergaenzungen im optimierten Prompt */
+.mp-mark {
+    color: #7dd3fc;
+}
+
+.mp-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-height: 2.75rem;
+    margin-top: 1rem;
+    padding: .5rem .75rem;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    background: none;
+    color: #64748b;
+    font-family: 'Inter', sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.mp-copy:hover {
+    border-color: #0ea5e9;
+    background: rgba(30, 41, 59, .4);
+    color: #fff;
+}
+
+.mp-copy:active {
+    transform: scale(.98);
+}
+
+/* ---------- Grafiken ---------- */
+
+.mp-fig {
+    margin: 0;
+}
+
+.mp-cap {
+    max-width: 38rem;
+    margin: 1.25rem 0 0;
+    color: #64748b;
+    font-size: .8125rem;
+    line-height: 1.6;
+}
+
+/* Spaltengrafik mit senkrechten Haarlinien */
+
+.mp-cols {
+    display: grid;
+    gap: 0;
+}
+
+.mp-cols > div {
+    position: relative;
+    padding: 0 2.5rem;
+}
+
+.mp-cols > div::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #1e293b;
+}
+
+.mp-cols > div:first-child {
+    padding-left: 0;
+}
+
+.mp-cols > div:last-child {
+    padding-right: 0;
+}
+
+.mp-cols > div:first-child::before {
+    display: none;
+}
+
+.mp-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Zielklaerungsblock (gestrichelt, erhoehte Flaeche) */
+
+.mp-goal {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.15rem;
+    max-width: 44rem;
+    padding: 1.5rem 1.35rem;
+    border: 1px dashed #334155;
+    border-radius: .85rem;
+    background: #0f172a;
+}
+
+.mp-goal-t {
+    margin-top: .35rem;
+    color: #fff;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+
+.mp-goal-d {
+    margin-top: .4rem;
+    color: #94a3b8;
+    font-size: .875rem;
+    line-height: 1.6;
+}
+
+/* Uebergangszeile zwischen Zielklaerung und Prompt */
+
+.mp-bridge {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    margin: 1.5rem 0;
+}
+
+.mp-bridge-line {
+    flex: 1;
+    height: 1px;
+    background: #1e293b;
+}
+
+/* Zweispaltige Entscheidungshilfe */
+
+.mp-dec-head,
+.mp-dec {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 2.5rem;
+}
+
+.mp-dec-head {
+    padding-bottom: 1rem;
+}
+
+.mp-dec {
+    align-items: baseline;
+    padding: 1.5rem 0;
+}
+
+.mp-dec-r {
+    color: #f8fafc;
+    font-size: .875rem;
+    font-weight: 700;
+}
+
+.mp-dec-r i {
+    margin-right: .6rem;
+    color: #0ea5e9;
+    font-size: .8rem;
+}
+
+.mp-dec-l {
+    font-size: .925rem;
+}
+
+/* Rasterflaechen mit Haarlinien ueber gap (Werkzeugkasten, Stationen) */
+
+.mp-grid {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid #1e293b;
+    border-radius: .85rem;
+    background: #1e293b;
+}
+
+.mp-grid > div {
+    background: #020617;
+    padding: 1.35rem 1.25rem;
+}
+
+.mp-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mp-grid-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mp-cell-t {
+    margin: .85rem 0 0;
+    color: #fff;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+
+.mp-cell-d {
+    margin: .35rem 0 0;
+    color: #94a3b8;
+    font-size: .8125rem;
+    line-height: 1.6;
+}
+
+.mp-grid i {
+    color: #0ea5e9;
+    font-size: 1rem;
+}
+
+/* Ruecklaufzeile unter dem Stationenraster */
+
+.mp-loop {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-top: 1rem;
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.mp-loop i {
+    color: #0ea5e9;
+    font-size: .8rem;
+}
+
+/* ---------- Tabellen (mobil als Kartenfolge) ---------- */
+
+.mp-table {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid #1e293b;
+    border-radius: .85rem;
+    background: #1e293b;
+}
+
+.mp-table > div {
+    background: #020617;
+    padding: 1.1rem 1.15rem;
+    font-size: .85rem;
+    line-height: 1.6;
+    color: #94a3b8;
+}
+
+.mp-table > .mp-th {
+    background: #0f172a;
+    color: #64748b;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.mp-table .mp-td-1 {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.mp-table-4 {
+    grid-template-columns: .9fr 1fr 1.1fr 1fr;
+}
+
+.mp-table-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ---------- FAQ ---------- */
+
+.mp-q {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.65rem 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.mp-q::-webkit-details-marker {
+    display: none;
+}
+
+.mp-q::after {
+    content: "+";
+    color: #0ea5e9;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+details[open] > .mp-q::after {
+    content: "–";
+}
+
+.mp-a {
+    max-width: 44rem;
+    margin: 0 0 1.75rem;
+    color: #94a3b8;
+    font-size: .9rem;
+    line-height: 1.7;
+}
+
+/* ---------- Verweiszeilen ---------- */
+
+.mp-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    min-height: 2.75rem;
+    padding: 1.35rem 0;
+}
+
+.mp-row a {
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: color .15s ease;
+}
+
+.mp-row a:hover {
+    color: #38bdf8;
+}
+
+/* ---------- Merksatz ---------- */
+
+.mp-quote {
+    max-width: 38rem;
+    margin: 0;
+    padding-left: 1.5rem;
+    border-left: 1px solid #0ea5e9;
+    color: #f8fafc;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* ---------- Toast fuer die Kopierbestaetigung ---------- */
+
+.mp-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 2rem;
+    z-index: 50;
+    transform: translateX(-50%);
+    padding: .75rem 1.15rem;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    background: #0f172a;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    color: #f8fafc;
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+/* ---------- Abstandshilfen ---------- */
+
+.mp-mt-1 { margin-top: 1rem; }
+.mp-mt-175 { margin-top: 1.75rem; }
+.mp-mt-25 { margin-top: 2.5rem; }
+.mp-mt-275 { margin-top: 2.75rem; }
+.mp-mt-35 { margin-top: 3.5rem; }
+.mp-mt-5 { margin-top: 5rem; }
+.mp-block { padding-top: 8.5rem; }
+.mp-hero { padding-top: 7rem; padding-bottom: 6rem; }
+.mp-after-rule { padding-top: 4.5rem; }
+
+/* ---------- Responsive: ein Breakpoint ---------- */
+
+@media (max-width: 900px) {
+    .mp-4,
+    .mp-grid-4,
+    .mp-grid-5 {
+        grid-template-columns: 1fr;
+    }
+
+    .mp-cols > div {
+        padding: 1.5rem 0;
+        border-top: 1px solid #1e293b;
+    }
+
+    .mp-cols > div::before {
+        display: none;
+    }
+
+    .mp-cols > div:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .mp-dec-head {
+        display: none;
+    }
+
+    .mp-dec {
+        grid-template-columns: 1fr;
+        gap: .5rem;
+    }
+
+    .mp-block {
+        padding-top: 6rem;
+    }
+
+    .mp-hero {
+        padding-top: 4rem;
+        padding-bottom: 4.5rem;
+    }
+
+    /* Tabellen werden zur Kartenfolge: Kopfzeile aus, Mikro-Label je Zelle */
+    .mp-table {
+        grid-template-columns: 1fr;
+    }
+
+    .mp-table > .mp-th {
+        display: none;
+    }
+
+    .mp-table > div::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: .4rem;
+        color: #64748b;
+        font-size: .62rem;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    .mp-table .mp-td-1 {
+        padding-top: 1.35rem;
+    }
+}
+
+/* ---------- Autorenbox ---------- */
+
+.mp-author-link {
+    color: #38bdf8;
+    font-size: .925rem;
+    transition: color .15s ease;
+}
+
+.mp-author-link:hover {
+    color: #7dd3fc;
+}
+
+/* ---------- Auswahltest (/wissen/prompt-techniken) ---------- */
+
+.mp-test {
+    max-width: 44rem;
+    padding: 1.75rem;
+    border: 1px solid #1e293b;
+    border-radius: .85rem;
+    background: #0f172a;
+}
+
+.mp-test-card {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #1e293b;
+}
+
+.mp-test-name {
+    margin: .5rem 0 0;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+
+.mp-test-why {
+    margin-top: .65rem;
+    max-width: 34rem;
+}
+
+.mp-test-block {
+    margin-top: 1.35rem;
+}
+
+.mp-test-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mp-test-jump {
+    color: #38bdf8;
+    font-size: .875rem;
+    font-weight: 600;
+    transition: color .15s ease;
+}
+
+.mp-test-jump:hover {
+    color: #7dd3fc;
+}
+
+.mp-test-q {
+    max-width: 34rem;
+    margin: .65rem 0 0;
+    color: #f8fafc;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.mp-test-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-top: 1.35rem;
+}
+
+.mp-tbtn {
+    min-height: 2.75rem;
+    padding: .65rem 1.5rem;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: transparent;
+    color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    font-size: .875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.mp-tbtn:hover {
+    border-color: #38bdf8;
+    background: rgba(30, 41, 59, .5);
+}
+
+.mp-tbtn:active {
+    transform: scale(.98);
+}
+
+.mp-tbtn:focus-visible,
+.mp-test-ctl button:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.mp-test-ctl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.mp-test-ctl button {
+    min-height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: 'Inter', sans-serif;
+    font-size: .875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+
+.mp-test-more {
+    color: #38bdf8;
+}
+
+.mp-test-more:hover {
+    color: #7dd3fc;
+}
+
+.mp-test-reset {
+    color: #64748b;
+}
+
+.mp-test-reset:hover {
+    color: #94a3b8;
+}
+
+/* Inline-Code im Fliesstext */
+
+.mp-ic {
+    padding: .1rem .35rem;
+    border-radius: 4px;
+    background: #0f172a;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: .85em;
+}

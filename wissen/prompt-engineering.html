@@ -1,0 +1,391 @@
+<!DOCTYPE html><html lang="de" class="dark antialiased"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering: Der 5-Schritte-Bauplan | Promptomizer</title><meta name="description" content="Prompt Engineering einfach erklärt: Lerne den 5-Schritte-Bauplan aus Ziel, Rolle, Kontext, Aufgabe und Format – mit Beispiel und Vorlage."><meta name="theme-color" content="#020617">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Patrick Roßkothen">
+<link rel="canonical" href="https://www.promptomizer.de/wissen/prompt-engineering">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Promptomizer"><meta property="og:locale" content="de_DE"><meta property="og:url" content="https://www.promptomizer.de/wissen/prompt-engineering"><meta property="og:title" content="Prompt Engineering: Der 5-Schritte-Bauplan | Promptomizer"><meta property="og:description" content="Prompt Engineering einfach erklärt: Lerne den 5-Schritte-Bauplan aus Ziel, Rolle, Kontext, Aufgabe und Format – mit Beispiel und Vorlage."><meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Prompt Engineering: Der 5-Schritte-Bauplan | Promptomizer"><meta name="twitter:description" content="Prompt Engineering einfach erklärt: Lerne den 5-Schritte-Bauplan aus Ziel, Rolle, Kontext, Aufgabe und Format – mit Beispiel und Vorlage."><meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content-pages.css"><link rel="stylesheet" href="/wissen-page.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://www.promptomizer.de/wissen/prompt-engineering#article","headline":"Prompt Engineering: Mit 5 Schritten zu besseren KI-Ergebnissen","description":"Prompt Engineering einfach erklärt: Lerne den 5-Schritte-Bauplan aus Ziel, Rolle, Kontext, Aufgabe und Format – mit Beispiel und Vorlage.","inLanguage":"de-DE","datePublished":"2026-08-03","dateModified":"2026-08-03","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.promptomizer.de/wissen/prompt-engineering"},"author":{"@id":"https://www.promptomizer.de/autor/patrick-rosskothen#person"},"publisher":{"@type":"Organization","name":"Promptomizer","url":"https://www.promptomizer.de/"}},{"@type":"Person","@id":"https://www.promptomizer.de/autor/patrick-rosskothen#person","name":"Patrick Roßkothen","url":"https://www.promptomizer.de/autor/patrick-rosskothen","jobTitle":"Berater und Dozent","description":"Diplom-Verwaltungswirt, selbstständiger Berater und Entwickler von Promptomizer."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist Prompt Engineering einfach erklärt?","acceptedAnswer":{"@type":"Answer","text":"Prompt Engineering ist das bewusste Planen, Formulieren, Testen und Verbessern von Eingaben für KI-Systeme. Ziel ist ein klarer Arbeitsauftrag, der relevante Informationen enthält und das gewünschte Ergebnis beschreibt."}},{"@type":"Question","name":"Was ist der Unterschied zwischen einem Prompt und Prompt Engineering?","acceptedAnswer":{"@type":"Answer","text":"Ein Prompt ist die konkrete Eingabe an eine KI. Prompt Engineering ist der Prozess, mit dem diese Eingabe passend zur Aufgabe entwickelt, geprüft und verbessert wird."}},{"@type":"Question","name":"Wie ist ein guter Prompt aufgebaut?","acceptedAnswer":{"@type":"Answer","text":"Je nach Aufgabe können Rolle, Kontext, eine eindeutige Aufgabe und das gewünschte Format sinnvoll sein. Vorher sollte das Ziel geklärt werden. Nicht jeder Prompt benötigt alle Bestandteile."}},{"@type":"Question","name":"Muss ein guter Prompt lang sein?","acceptedAnswer":{"@type":"Answer","text":"Nein. Ein guter Prompt enthält so wenig wie möglich und so viel wie nötig. Entscheidend ist nicht die Länge, sondern ob die relevanten Informationen und Anweisungen enthalten sind."}},{"@type":"Question","name":"Braucht jeder Prompt eine Rolle?","acceptedAnswer":{"@type":"Answer","text":"Nein. Eine Rolle ist sinnvoll, wenn eine bestimmte fachliche Perspektive oder Arbeitsweise das Ergebnis verbessert. Bei einfachen Aufgaben kann sie weggelassen werden."}},{"@type":"Question","name":"Funktioniert der Bauplan mit ChatGPT, Claude und Gemini?","acceptedAnswer":{"@type":"Answer","text":"Die grundlegenden Prinzipien lassen sich modellübergreifend nutzen. Wie stark einzelne Vorgaben oder Techniken wirken, hängt jedoch von Modell, Version und Aufgabe ab. Prüfe wichtige Prompts deshalb mit dem System, in dem du sie tatsächlich einsetzen möchtest."}}]}]}</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c" data-exclude-hash="true"></script></head>
+<body class="content-shell bg-navy-deep text-slate-400 min-h-screen">
+<header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
+<main>
+<article>
+
+<section class="mp-sec mp-hero">
+<p class="mp-num" style="margin:0 0 2.5rem">Prompt Engineering</p>
+<h1 class="mp-h mp-h1">Prompt Engineering: <span class="mp-sky mp-sky-block">Mit 5 Schritten zu besseren KI-Ergebnissen</span></h1>
+<p class="mp-lead mp-mt-25">Prompt Engineering bedeutet, Eingaben für KI-Systeme gezielt zu planen, zu formulieren, zu testen und zu verbessern. Gute Prompts geben dem Modell die Informationen und Anweisungen, die für die konkrete Aufgabe wirklich relevant sind. Der Promptomizer-Bauplan führt dafür in fünf Schritten vom geklärten Ziel über Rolle, Kontext und Aufgabe bis zum gewünschten Format.</p>
+<div class="mp-meta mp-mt-25">
+<span>Von <a href="/autor/patrick-rosskothen">Patrick Roßkothen</a></span>
+<span>Veröffentlicht: <time datetime="2026-08-03">3. August 2026</time></span>
+<span>Zuletzt aktualisiert: <time datetime="2026-08-03">3. August 2026</time></span>
+</div>
+</section>
+
+<div class="mp-sec"><hr class="mp-rule"></div>
+
+<nav class="mp-sec mp-after-rule" aria-label="Inhalt">
+<p class="mp-num" style="margin:0 0 1.75rem">Inhalt</p>
+<ul class="mp-toc">
+<li><a href="#was-ist-prompt-engineering">Was ist Prompt Engineering?</a></li>
+<li><a href="#warum-ist-prompt-engineering-wichtig">Warum ist Prompt Engineering wichtig?</a></li>
+<li><a href="#der-5-schritte-bauplan-fuer-gute-prompts">Der 5-Schritte-Bauplan</a></li>
+<li><a href="#praxisbeispiel">Ein vollständiges Praxisbeispiel</a></li>
+<li><a href="#wie-lang-muss-ein-guter-prompt-sein">Wie lang muss ein guter Prompt sein?</a></li>
+<li><a href="#haeufige-fehler">Häufige Fehler</a></li>
+<li><a href="#iterativer-prozess">Prompts testen und verbessern</a></li>
+<li><a href="#faq">FAQ</a></li>
+</ul>
+</nav>
+
+<section id="was-ist-prompt-engineering" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2">Was ist <span class="mp-sky">Prompt Engineering?</span></h2>
+<p class="mp-p mp-mt-175">Prompt Engineering ist die systematische Gestaltung von Eingaben für generative KI. Dabei geht es nicht nur darum, einen Satz besonders geschickt zu formulieren. Entscheidend ist, dass die KI einen verständlichen Arbeitsauftrag erhält: Was soll sie tun, welche Informationen soll sie berücksichtigen und wie soll das Ergebnis aussehen?</p>
+<p class="mp-p mp-mt-175">Ein Prompt kann eine kurze Frage, eine ausführliche Anweisung, ein Text zur Analyse oder eine Kombination aus Informationen, Beispielen und Regeln sein. Prompt Engineering beginnt dort, wo diese Eingabe bewusst gestaltet und anhand des Ergebnisses weiterentwickelt wird.</p>
+<p class="mp-p mp-mt-175">Das klingt technischer, als es im Alltag ist. Im Kern ist ein Prompt ein Briefing. Wer einen Menschen mit einer Aufgabe beauftragt, sollte ebenfalls erklären, worum es geht, was gebraucht wird und wie das Ergebnis verwendet werden soll. Eine KI braucht keinen höflich verpackten Wunschzettel. Sie braucht Klarheit.</p>
+<p class="mp-p mp-mt-175">Prompt Engineering ist deshalb keine Sammlung geheimer Befehle. Es gibt keine Zauberformel, die aus jeder Anfrage automatisch ein perfektes Ergebnis macht. Gute Promptgestaltung ist ein Qualitätshebel – aber kein Garantieschein.</p>
+</section>
+
+<section id="warum-ist-prompt-engineering-wichtig" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2">Warum ist Prompt Engineering <span class="mp-sky">wichtig?</span></h2>
+<p class="mp-p mp-mt-175">Sprachmodelle erzeugen Antworten auf Grundlage der Informationen und Anweisungen, die ihnen zur Verfügung stehen. Fehlen wichtige Angaben, muss das Modell Lücken füllen. Das Ergebnis kann flüssig formuliert sein und trotzdem am eigentlichen Bedarf vorbeigehen.</p>
+<p class="mp-p mp-mt-175">Ein sorgfältig formulierter Prompt kann helfen, diese unnötigen Annahmen zu reduzieren. Je nach Aufgabe lassen sich damit insbesondere folgende Eigenschaften beeinflussen:</p>
+<ul class="mp-ul mp-mt-275">
+<li>fachliche Passung und Relevanz,</li>
+<li>Verständlichkeit und Detaillierungsgrad,</li>
+<li>Struktur, Stil und Ton,</li>
+<li>Umfang und Ausgabeformat,</li>
+<li>Nutzbarkeit für den vorgesehenen Zweck.</li>
+</ul>
+<p class="mp-p mp-mt-275">Prompt Engineering macht KI-Ergebnisse damit besser steuerbar. Es macht sie jedoch nicht automatisch wahr. Fakten, Berechnungen und wichtige Entscheidungen müssen weiterhin geprüft werden. Auch ein hervorragend formulierter Prompt kann ein Modell nicht in eine unfehlbare Wissensquelle verwandeln.</p>
+<p class="mp-p mp-mt-175">Der größte praktische Unterschied entsteht oft schon vor dem Schreiben: Wer selbst nicht weiß, welches Ergebnis gebraucht wird, kann diese Unklarheit nicht an die KI delegieren. Man bekommt dann womöglich eine elegante Antwort auf eine Frage, die man gar nicht stellen wollte.</p>
+</section>
+
+<section id="der-5-schritte-bauplan-fuer-gute-prompts" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Prompt-Aufbau: Der <span class="mp-sky">5-Schritte-Bauplan</span> für gute Prompts</h2>
+<p class="mp-p mp-mt-175">Der Promptomizer-Bauplan trennt die Zielklärung vom eigentlichen Prompt. Das ist Absicht: Das Ziel dient dir als Maßstab. Rolle, Kontext, Aufgabe und Format bilden anschließend das Briefing für die KI.</p>
+
+<figure class="mp-fig mp-mt-35">
+<div role="img" aria-label="Fünf-Schritte-Bauplan für Prompt Engineering mit Ziel definieren, Rolle, Kontext, Aufgabe und Format.">
+<div class="mp-goal">
+<i class="fa-solid fa-bullseye" style="color:#0ea5e9;font-size:1.25rem;line-height:1.4" aria-hidden="true"></i>
+<div>
+<div class="mp-kick">Schritt 1 · vor dem Prompt</div>
+<div class="mp-goal-t">Ziel definieren</div>
+<div class="mp-goal-d">Was soll entstehen, wofür, und woran erkennst du ein gutes Ergebnis? Das Ziel bleibt bei dir – es ist dein Maßstab, nicht Teil des Briefings.</div>
+</div>
+</div>
+<div class="mp-bridge">
+<i class="fa-solid fa-arrow-down" style="font-size:.8rem;color:#64748b" aria-hidden="true"></i>
+<span class="mp-kick mp-kick-muted">Der Prompt als Briefing für die KI</span>
+<span class="mp-bridge-line"></span>
+</div>
+<div class="mp-cols mp-4">
+<div>
+<i class="fa-solid fa-user-tie" style="color:#0ea5e9;font-size:1rem" aria-hidden="true"></i>
+<div class="mp-kick" style="margin-top:.85rem">Schritt 2</div>
+<h3 class="mp-ct" style="margin-top:.25rem">Rolle</h3>
+<p class="mp-p" style="font-size:.875rem">Aus welcher fachlichen Perspektive und mit welcher Arbeitsweise soll die KI arbeiten?</p>
+</div>
+<div>
+<i class="fa-solid fa-globe" style="color:#0ea5e9;font-size:1rem" aria-hidden="true"></i>
+<div class="mp-kick" style="margin-top:.85rem">Schritt 3</div>
+<h3 class="mp-ct" style="margin-top:.25rem">Kontext</h3>
+<p class="mp-p" style="font-size:.875rem">Ausgangslage, Zielgruppe, Material und Grenzen – relevant statt umfangreich.</p>
+</div>
+<div>
+<i class="fa-solid fa-list-check" style="color:#0ea5e9;font-size:1rem" aria-hidden="true"></i>
+<div class="mp-kick" style="margin-top:.85rem">Schritt 4</div>
+<h3 class="mp-ct" style="margin-top:.25rem">Aufgabe</h3>
+<p class="mp-p" style="font-size:.875rem">Ein eindeutiger Arbeitsauftrag mit konkretem Aktionsverb.</p>
+</div>
+<div>
+<i class="fa-solid fa-table-cells-large" style="color:#0ea5e9;font-size:1rem" aria-hidden="true"></i>
+<div class="mp-kick" style="margin-top:.85rem">Schritt 5</div>
+<h3 class="mp-ct" style="margin-top:.25rem">Format</h3>
+<p class="mp-p" style="font-size:.875rem">Struktur, Länge, Darstellungsform und Reihenfolge der Ausgabe.</p>
+</div>
+</div>
+</div>
+<figcaption class="mp-cap">Der Promptomizer-Bauplan: Erst das Ziel klären, dann den Prompt als Briefing formulieren.</figcaption>
+</figure>
+
+<p class="mp-p mp-mt-35"><strong>Der vollständige Ablauf lautet:</strong></p>
+<p class="mp-flow mp-mt-1">Ziel definieren → Rolle → Kontext → Aufgabe → Format</p>
+<p class="mp-p mp-mt-175">Der Bauplan ist kein starres Formular. Ein einfacher Auftrag benötigt vielleicht nur eine klare Aufgabe und ein Format. Bei anspruchsvolleren Arbeiten werden Kontext oder eine fachliche Rolle wichtiger. Nicht jeder Prompt braucht alles. Er braucht nur das, was der KI bei dieser Aufgabe tatsächlich hilft.</p>
+
+<div class="mp-mt-5">
+<p class="mp-num" style="margin-bottom:1rem">Schritt 1</p>
+<h3 class="mp-h mp-h3 mp-h3-lg">Ziel definieren: Erst denken, dann Prompt erstellen</h3>
+<p class="mp-p mp-mt-175">Bevor du den Prompt formulierst, klärst du das gewünschte Ergebnis. Drei Fragen reichen häufig aus:</p>
+<ol class="mp-ul mp-mt-275">
+<li>Was soll entstehen?</li>
+<li>Wofür wird das Ergebnis benötigt?</li>
+<li>Woran erkenne ich ein gutes Ergebnis?</li>
+</ol>
+<p class="mp-p mp-mt-275">Das Ziel gehört nicht zwingend wörtlich in den Prompt. Es hilft dir, die richtigen Vorgaben auszuwählen und das spätere Ergebnis zu bewerten.</p>
+<p class="mp-p mp-mt-175">Eine einfache Zielvorlage:</p>
+<pre class="mp-code mp-mt-275">Ich will: [gewünschtes Ergebnis]
+Für: [Zielgruppe oder Anwendungsfall]
+Damit: [beabsichtigte Wirkung oder Nutzung]
+Gut ist das Ergebnis, wenn: [zwei bis drei prüfbare Kriterien]</pre>
+<p class="mp-p mp-mt-275">Aus „Ich brauche etwas für LinkedIn“ wird so beispielsweise: „Ich möchte einen verständlichen LinkedIn-Beitrag für selbstständige Wissensarbeiter erstellen, der ein praktisches Prompting-Prinzip vermittelt und eine Diskussion auslöst. Gut ist der Beitrag, wenn er ohne Fachjargon auskommt, ein konkretes Beispiel enthält und unter 1.200 Zeichen bleibt.“</p>
+<p class="mp-p mp-mt-175">Das ist noch nicht der Prompt. Aber nun steht fest, was der Prompt leisten muss.</p>
+</div>
+
+<div class="mp-mt-5">
+<p class="mp-num" style="margin-bottom:1rem">Schritt 2</p>
+<h3 class="mp-h mp-h3 mp-h3-lg">Rolle: Die passende Perspektive festlegen</h3>
+<p class="mp-p mp-mt-175">Eine Rolle beschreibt, aus welcher fachlichen Perspektive oder mit welcher Arbeitsweise die KI eine Aufgabe bearbeiten soll. Sie ist sinnvoll, wenn Fachlichkeit, Blickwinkel oder Vorgehensweise für das Ergebnis relevant sind.</p>
+<p class="mp-p mp-mt-175">Eine brauchbare Rolle ist konkret:</p>
+<pre class="mp-code mp-mt-275">Du bist Redakteur für verständliche KI-Praxis. Du erklärst Fachthemen klar,
+konkret und ohne Hype oder unnötigen Fachjargon.</pre>
+<p class="mp-p mp-mt-275">„Du bist der beste Experte der Welt“ klingt eindrucksvoll, sagt aber wenig darüber aus, wie gearbeitet werden soll. Ein Kostüm ist noch keine Kompetenzbeschreibung. Und bei einfachen Aufgaben wie „Fasse diesen Text in fünf Stichpunkten zusammen“ kann die Rolle vollständig entfallen.</p>
+</div>
+
+<div class="mp-mt-5">
+<p class="mp-num" style="margin-bottom:1rem">Schritt 3</p>
+<h3 class="mp-h mp-h3 mp-h3-lg">Kontext: Relevante Informationen statt Datenhalde</h3>
+<p class="mp-p mp-mt-175">Kontext liefert der KI die Informationen, die sie für die konkrete Aufgabe benötigt. Dazu können die Ausgangslage, die Zielgruppe, vorhandenes Material, wichtige Begriffe oder klare Grenzen gehören.</p>
+<p class="mp-p mp-mt-175">Guter Kontext reduziert unnötiges Raten. Mehr Kontext ist allerdings nicht automatisch besser. Eine halbe Projektablage im Prompt hilft nicht, wenn nur drei Sätze daraus wichtig sind.</p>
+<p class="mp-p mp-mt-175">Hilfreiche Fragen sind:</p>
+<ul class="mp-ul mp-mt-275">
+<li>Was muss die KI über die Ausgangslage wissen?</li>
+<li>Für wen ist das Ergebnis bestimmt?</li>
+<li>Welches Material soll sie verwenden?</li>
+<li>Welche Annahmen darf sie nicht selbst treffen?</li>
+</ul>
+<p class="mp-p mp-mt-275">Ein Beispiel:</p>
+<pre class="mp-code mp-mt-275">Der Beitrag richtet sich an Selbstständige und kleine Unternehmen, die KI bereits
+nutzen, aber häufig zu allgemeine Antworten erhalten. Sie kennen den Begriff
+Prompt Engineering, aber keine systematische Methode. Vermeide technischen Jargon
+und unbelegte Erfolgsversprechen.</pre>
+</div>
+
+<div class="mp-mt-5">
+<p class="mp-num" style="margin-bottom:1rem">Schritt 4</p>
+<h3 class="mp-h mp-h3 mp-h3-lg">Aufgabe: Einen eindeutigen Arbeitsauftrag geben</h3>
+<p class="mp-p mp-mt-175">Die Aufgabe sagt der KI, was sie tun soll. Konkrete Aktionsverben wie „Erstelle“, „Analysiere“, „Vergleiche“, „Überarbeite“ oder „Fasse zusammen“ machen den Auftrag eindeutig.</p>
+<p class="mp-p mp-mt-175">Bei umfangreicheren Aufgaben helfen zusätzliche Qualitätskriterien. Mehrere unterschiedliche Arbeiten sollten jedoch nicht gedankenlos in einen einzigen Prompt gestapelt werden. Wenn die KI gleichzeitig recherchieren, bewerten, schreiben, gestalten und veröffentlichen soll, entsteht leicht ein breites, aber wenig brauchbares Ergebnis.</p>
+<p class="mp-p mp-mt-175">Ein klarer Auftrag für das Beispiel lautet:</p>
+<pre class="mp-code mp-mt-275">Erstelle einen LinkedIn-Beitrag, der erklärt, warum ein klares Ziel vor dem
+eigentlichen Prompt stehen sollte. Nutze ein kurzes Vorher-Nachher-Beispiel und
+ende mit einer offenen Frage, die zu eigenen Erfahrungen einlädt.</pre>
+</div>
+
+<div class="mp-mt-5">
+<p class="mp-num" style="margin-bottom:1rem">Schritt 5</p>
+<h3 class="mp-h mp-h3 mp-h3-lg">Format: Das Ergebnis direkt nutzbar machen</h3>
+<p class="mp-p mp-mt-175">Formatvorgaben beschreiben, wie die Antwort ausgegeben werden soll. Dazu gehören Struktur, Länge, Darstellungsform und Reihenfolge. Das ist keine kosmetische Zugabe. Ein inhaltlich guter Text kann unbrauchbar sein, wenn er zu lang ist, die falsche Form hat oder wichtige Bestandteile irgendwo in einer Textwand versteckt.</p>
+<p class="mp-p mp-mt-175">Mögliche Formatvorgaben sind:</p>
+<ul class="mp-ul mp-mt-275">
+<li>„Gib die Antwort als Tabelle mit drei Spalten aus.“</li>
+<li>„Formuliere maximal fünf Stichpunkte.“</li>
+<li>„Beginne mit einer kurzen These und nenne danach ein Beispiel.“</li>
+<li>„Schreibe zwischen 900 und 1.200 Zeichen.“</li>
+<li>„Liefere zuerst den fertigen Text und danach drei alternative Überschriften.“</li>
+</ul>
+<p class="mp-p mp-mt-275">Für das Beispiel:</p>
+<pre class="mp-code mp-mt-275">Umfang: 900 bis 1.200 Zeichen.
+Aufbau: kurze Hook, drei kurze Absätze, Vorher-Nachher-Beispiel, Abschlussfrage.
+Keine Hashtag-Liste und keine Zwischenüberschriften.</pre>
+</div>
+</section>
+
+<section id="praxisbeispiel" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Praxisbeispiel: <span class="mp-sky">einen guten Prompt schreiben</span></h2>
+<p class="mp-p mp-mt-175">Der Ausgangspunkt ist ein typischer Ein-Satz-Prompt:</p>
+<pre class="mp-code mp-mt-275">Schreib mir einen LinkedIn-Post über bessere Prompts.</pre>
+<p class="mp-p mp-mt-275">Die KI kann damit arbeiten. Sie muss aber Zielgruppe, Schwerpunkt, Ton, Länge und Zweck selbst ergänzen. Das Ergebnis wird wahrscheinlich plausibel – und ziemlich austauschbar.</p>
+<p class="mp-p mp-mt-175">Nach der Zielklärung entsteht mit dem Bauplan dieses Briefing:</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Rolle
+Du bist Redakteur für verständliche KI-Praxis. Du schreibst klar, konkret und
+ohne Hype oder unnötigen Fachjargon.
+
+Kontext
+Der Beitrag richtet sich an Selbstständige und kleine Unternehmen, die KI bereits
+nutzen, aber häufig zu allgemeine Antworten erhalten. Sie kennen den Begriff
+Prompt Engineering, aber keine systematische Methode. Der Beitrag soll ein
+praktisches Prinzip vermitteln und eine Diskussion auslösen. Vermeide unbelegte
+Erfolgsversprechen.
+
+Aufgabe
+Erstelle einen LinkedIn-Beitrag, der erklärt, warum ein klares Ziel vor dem
+eigentlichen Prompt stehen sollte. Nutze ein kurzes Vorher-Nachher-Beispiel und
+ende mit einer offenen Frage, die zu eigenen Erfahrungen einlädt.
+
+Format
+Umfang: 900 bis 1.200 Zeichen.
+Aufbau: kurze Hook, drei kurze Absätze, Vorher-Nachher-Beispiel, Abschlussfrage.
+Keine Hashtag-Liste und keine Zwischenüberschriften.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Der verbesserte Prompt ist nicht besser, weil er länger ist. Er ist besser, weil jede Ergänzung eine erkennbare Funktion erfüllt. Die KI muss weniger über die Absicht raten, und das Ergebnis lässt sich anhand des zuvor definierten Ziels prüfen.</p>
+<p class="mp-p mp-mt-175">Wenn du eigene Prompts nach diesem Prinzip aufbauen möchtest, kannst du den <a href="/app">strukturierten Prompt-Editor ausprobieren</a>. Häufig genutzte Prompts lassen sich anschließend in einer <a href="/prompt-bibliothek">eigenen Prompt-Bibliothek</a> speichern und wiederverwenden.</p>
+
+<div class="mp-mt-5">
+<h3 class="mp-h mp-h3 mp-h3-lg">Prompt-Vorlage zum Kopieren</h3>
+<p class="mp-p mp-mt-175">Dasselbe Muster funktioniert unabhängig vom LinkedIn-Beispiel. Diese Vorlage bildet den Bauplan ab. Lösche alle Zeilen, die für deine Aufgabe keinen Zweck erfüllen.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Zielklärung, nur für mich
+Ich will: [Ergebnis]
+Für: [Zielgruppe oder Anwendungsfall]
+Damit: [Nutzung oder Wirkung]
+Gut ist das Ergebnis, wenn: [Kriterien]
+
+Rolle
+Du bist [konkrete Fachrolle oder Perspektive].
+Du arbeitest [relevante Arbeitsweise].
+
+Kontext
+Ausgangslage: [relevante Informationen]
+Zielgruppe: [für wen das Ergebnis bestimmt ist]
+Material: [Texte, Daten oder Quellen]
+Grenzen: [was nicht angenommen oder verändert werden darf]
+
+Aufgabe
+[Aktionsverb] [eindeutiger Arbeitsauftrag].
+Beachte dabei: [Qualitätskriterien oder Prioritäten]
+
+Format
+Gib das Ergebnis als [Darstellungsform] aus.
+Aufbau: [Reihenfolge oder Abschnitte]
+Umfang: [Länge oder Anzahl]</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Vorlage kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Eine Prompt-Vorlage ist ein Startpunkt, kein Pflichtformular.</p>
+</div>
+</section>
+
+<section id="wie-lang-muss-ein-guter-prompt-sein" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Wie lang muss ein guter <span class="mp-sky">Prompt sein?</span></h2>
+<p class="mp-lead" style="max-width:38rem;margin-top:1.75rem">So kurz wie möglich, so ausführlich wie nötig.</p>
+<p class="mp-p mp-mt-175">Ein kurzer Prompt kann vollkommen ausreichen:</p>
+<pre class="mp-code mp-mt-275">Fasse den folgenden Text in fünf Stichpunkten zusammen. Jeder Stichpunkt darf
+höchstens einen Satz enthalten. Nenne ausschließlich Informationen aus dem Text.</pre>
+<p class="mp-p mp-mt-275">Für eine strategische Analyse, ein anspruchsvolles Textformat oder eine wiederkehrende Aufgabe sind meist mehr Angaben sinnvoll. Die Länge allein ist aber kein Qualitätsmerkmal. Mega-Prompts können ebenso unklar, widersprüchlich oder mit irrelevanten Regeln überladen sein wie ein einzelner Satz.</p>
+<p class="mp-p mp-mt-175">Prüfe deshalb jede Ergänzung mit einer einfachen Frage: <strong>Hilft diese Information der KI, die konkrete Aufgabe besser zu bearbeiten?</strong> Wenn nicht, kann sie weg.</p>
+
+<figure class="mp-fig mp-mt-35">
+<div role="img" aria-label="Entscheidungshilfe zur Auswahl von Rolle, Kontext, Aufgabe und Format für einen KI-Prompt." style="max-width:52rem">
+<div class="mp-dec-head">
+<span class="mp-kick">Frage an die Aufgabe</span>
+<span class="mp-kick">Dann ergänze</span>
+</div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Braucht die Aufgabe eine bestimmte Perspektive?</span><span class="mp-dec-r"><i class="fa-solid fa-user-tie" aria-hidden="true"></i>Rolle</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Fehlen der KI relevante Informationen?</span><span class="mp-dec-r"><i class="fa-solid fa-globe" aria-hidden="true"></i>Kontext</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Ist der Arbeitsauftrag eindeutig?</span><span class="mp-dec-r"><i class="fa-solid fa-list-check" aria-hidden="true"></i>Aufgabe präzisieren</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Muss die Ausgabe direkt weiterverwendet werden?</span><span class="mp-dec-r"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i>Format ergänzen</span></div>
+<hr class="mp-rule">
+</div>
+<figcaption class="mp-cap">Nicht jeder Prompt braucht alles. Ergänze nur, was für die konkrete Aufgabe einen Zweck erfüllt.</figcaption>
+</figure>
+
+<p class="mp-p mp-mt-35">Für wiederkehrende Aufgaben können <a href="/prompt-vorlagen">Prompt-Vorlagen</a> sinnvoll sein. Sie sparen Arbeit, sollten aber an Ziel, Kontext und gewünschtes Ergebnis angepasst werden. Copy-and-paste ersetzt kein Denken. Es beschleunigt nur das Briefing – sofern die Vorlage zur Aufgabe passt.</p>
+</section>
+
+<section id="haeufige-fehler" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Häufige Fehler beim <span class="mp-sky">Prompt Engineering</span></h2>
+<div style="max-width:44rem" class="mp-mt-35">
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Das Ziel bleibt unklar</h3>
+<p class="mp-p">Der Prompt wird optimiert, bevor feststeht, was überhaupt gebraucht wird. Dann verbessert man Formulierungen, aber nicht die Richtung.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Die Rolle bleibt eine leere Behauptung</h3>
+<p class="mp-p">„Sei ein Experte“ enthält weder Fachgebiet noch Perspektive oder Arbeitsweise. Nutze Rollen gezielt – oder lass sie weg.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Zu viel oder zu wenig Kontext</h3>
+<p class="mp-p">Fehlender Kontext zwingt das Modell zu Annahmen. Eine ungefilterte Informationshalde verdeckt dagegen das Wesentliche. Relevant schlägt umfangreich.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Mehrere Aufgaben werden vermischt</h3>
+<p class="mp-p">Ein Prompt verlangt gleichzeitig Analyse, Konzept, Text, Grafikidee und Veröffentlichungsplan. Teile komplexe Vorhaben lieber in aufeinander aufbauende Schritte. Mehr dazu findest du bei den <a href="/wissen/prompt-techniken">Prompt-Techniken</a>.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Das Ausgabeformat fehlt</h3>
+<p class="mp-p">Die Antwort enthält die richtigen Informationen, ist aber für die weitere Verwendung ungeeignet. Gib Struktur und Umfang vor, wenn beides wichtig ist.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Vorgaben widersprechen sich</h3>
+<p class="mp-p">„Sehr ausführlich, aber höchstens 100 Wörter“ oder „kreativ, aber ändere nichts“ lässt offen, welche Regel Vorrang hat. Prüfe den Prompt auf Zielkonflikte.</p>
+</div>
+<hr class="mp-rule">
+<div style="padding:2rem 0">
+<h3 class="mp-ct">Das erste Ergebnis gilt als endgültig</h3>
+<p class="mp-p">Auch ein guter Prompt ist eine Arbeitshypothese. Erst die Ausgabe zeigt, welche Anweisung fehlt, missverständlich ist oder gestrichen werden kann.</p>
+</div>
+<hr class="mp-rule">
+</div>
+</section>
+
+<section id="iterativer-prozess" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Prompt Engineering ist ein <span class="mp-sky">iterativer Prozess</span></h2>
+<p class="mp-p mp-mt-175">Gute Prompts entstehen häufig in mehreren Durchläufen:</p>
+<p class="mp-flow mp-mt-275">Prompt formulieren → Ergebnis prüfen → Ursache erkennen → Prompt gezielt verbessern</p>
+<p class="mp-p mp-mt-275">Bewerte das Ergebnis anhand der Kriterien, die du bei der Zielklärung festgelegt hast. Ist der Inhalt zu allgemein, fehlt möglicherweise Kontext. Ist die Antwort fachlich passend, aber schlecht nutzbar, braucht es wahrscheinlich eine bessere Formatvorgabe. Bearbeitet die KI den falschen Schwerpunkt, sollte die Aufgabe präzisiert werden.</p>
+<p class="mp-p mp-mt-175">Ändere möglichst nicht alles gleichzeitig. Sonst weißt du nicht, welche Anpassung tatsächlich geholfen hat. Für eine systematische Überarbeitung findest du eine eigene Anleitung unter <a href="/wissen/prompt-optimieren">Prompt optimieren</a>. Wer die Grundlagen Schritt für Schritt üben möchte, kann außerdem dem Lernpfad <a href="/wissen/prompt-engineering-lernen">Prompt Engineering lernen</a> folgen.</p>
+<p class="mp-p mp-mt-175">Fortgeschrittene Methoden wie Beispiele im Prompt, Prompt-Chaining oder strukturierte Ausgaben sind Werkzeuge für bestimmte Probleme. Sie sind kein Pflichtprogramm. Eine Technik ist dann gut, wenn sie die konkrete Aufgabe löst – nicht, wenn sie besonders beeindruckend klingt.</p>
+</section>
+
+<div class="mp-sec" style="margin-top:8.5rem"><hr class="mp-rule"></div>
+
+<section id="faq" class="mp-sec mp-anchor" style="padding-top:7rem">
+<h2 class="mp-h mp-h2" style="margin-bottom:2.5rem">Häufige Fragen zu <span class="mp-sky">Prompt Engineering</span></h2>
+<div style="max-width:44rem">
+<details><summary class="mp-q">Was ist Prompt Engineering einfach erklärt?</summary><p class="mp-a">Prompt Engineering ist das bewusste Planen, Formulieren, Testen und Verbessern von Eingaben für KI-Systeme. Ziel ist ein klarer Arbeitsauftrag, der relevante Informationen enthält und das gewünschte Ergebnis beschreibt.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Was ist der Unterschied zwischen einem Prompt und Prompt Engineering?</summary><p class="mp-a">Ein Prompt ist die konkrete Eingabe an eine KI. Prompt Engineering ist der Prozess, mit dem diese Eingabe passend zur Aufgabe entwickelt, geprüft und verbessert wird.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Wie ist ein guter Prompt aufgebaut?</summary><p class="mp-a">Je nach Aufgabe können Rolle, Kontext, eine eindeutige Aufgabe und das gewünschte Format sinnvoll sein. Vorher sollte das Ziel geklärt werden. Nicht jeder Prompt benötigt alle Bestandteile.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Muss ein guter Prompt lang sein?</summary><p class="mp-a">Nein. Ein guter Prompt enthält so wenig wie möglich und so viel wie nötig. Entscheidend ist nicht die Länge, sondern ob die relevanten Informationen und Anweisungen enthalten sind.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Braucht jeder Prompt eine Rolle?</summary><p class="mp-a">Nein. Eine Rolle ist sinnvoll, wenn eine bestimmte fachliche Perspektive oder Arbeitsweise das Ergebnis verbessert. Bei einfachen Aufgaben kann sie weggelassen werden.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Funktioniert der Bauplan mit ChatGPT, Claude und Gemini?</summary><p class="mp-a">Die grundlegenden Prinzipien lassen sich modellübergreifend nutzen. Wie stark einzelne Vorgaben oder Techniken wirken, hängt jedoch von Modell, Version und Aufgabe ab. Prüfe wichtige Prompts deshalb mit dem System, in dem du sie tatsächlich einsetzen möchtest.</p></details>
+<hr class="mp-rule">
+</div>
+</section>
+
+<section class="mp-sec" style="padding-top:8rem">
+<hr class="mp-rule" style="margin-bottom:4rem">
+<h2 class="mp-h mp-h2-cta">Prompts nicht nur schreiben, <span class="mp-sky mp-sky-block">sondern wiederfinden</span></h2>
+<p class="mp-lead mp-mt-175">Ein guter Prompt ist zu schade für die Chat-Historie. Im Promptomizer kannst du Rolle, Kontext, Aufgabe und Format strukturiert ausarbeiten, fertige Prompts in deiner Bibliothek speichern und für den nächsten Einsatz weiterentwickeln.</p>
+<div style="display:flex;align-items:flex-start;margin-top:2.5rem">
+<a href="/app" class="ui-btn ui-btn-primary">Prompt kostenlos erstellen</a>
+</div>
+<p class="mp-p mp-mt-1" style="font-size:.8125rem;color:#64748b">Ohne Registrierung ausprobieren.</p>
+</section>
+
+<section class="mp-sec mp-block">
+<p class="mp-num" style="margin-bottom:1.75rem">Über den Autor</p>
+<div style="max-width:44rem;padding-top:1.5rem;border-top:1px solid #1e293b">
+<h2 class="mp-h mp-h3" style="font-size:1.25rem">Patrick Roßkothen</h2>
+<p class="mp-p mp-mt-1">Patrick Roßkothen ist Diplom-Verwaltungswirt, selbstständiger Berater und Entwickler des Promptomizers. Er beschäftigt sich mit der Frage, wie sich komplexe Arbeit durch klare Strukturen, praxistaugliche Methoden und generative KI besser unterstützen lässt.</p>
+<p style="margin-top:1.25rem"><a href="/autor/patrick-rosskothen" class="mp-author-link">Mehr über Patrick Roßkothen →</a></p>
+</div>
+</section>
+
+</article>
+</main>
+<div class="border-t border-navy-border" style="margin-top:8.5rem"><div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500"><span>Deutschland</span><span>DSGVO</span><span>Kein KI-Training</span><span>Jederzeit kündbar</span></div></div>
+<footer class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600"><span>&copy; 2026 Promptomizer</span><div class="flex items-center gap-4"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></div></div></footer>
+<script src="/wissen-pages.js"></script>
+</body></html>

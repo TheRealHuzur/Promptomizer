@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="de" class="dark antialiased"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt-Techniken: Welche Methode hilft wann? | Promptomizer</title><meta name="description" content="Die wichtigsten Prompt-Techniken einfach erklärt: direkte Anweisung, Rollen, Few-Shot, Prompt-Chaining, Kritik und strukturierte Ausgabe – mit Auswahltest."><meta name="theme-color" content="#020617">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Patrick Roßkothen">
+<link rel="canonical" href="https://www.promptomizer.de/wissen/prompt-techniken">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Promptomizer"><meta property="og:locale" content="de_DE"><meta property="og:url" content="https://www.promptomizer.de/wissen/prompt-techniken"><meta property="og:title" content="Prompt-Techniken: Welche Methode hilft wann? | Promptomizer"><meta property="og:description" content="Die wichtigsten Prompt-Techniken einfach erklärt: direkte Anweisung, Rollen, Few-Shot, Prompt-Chaining, Kritik und strukturierte Ausgabe – mit Auswahltest."><meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Prompt-Techniken: Welche Methode hilft wann? | Promptomizer"><meta name="twitter:description" content="Die wichtigsten Prompt-Techniken einfach erklärt: direkte Anweisung, Rollen, Few-Shot, Prompt-Chaining, Kritik und strukturierte Ausgabe – mit Auswahltest."><meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
+<link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content-pages.css"><link rel="stylesheet" href="/wissen-page.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://www.promptomizer.de/wissen/prompt-techniken#article","headline":"Prompt-Techniken: Welche Methode hilft bei welchem Problem?","description":"Die wichtigsten Prompt-Techniken einfach erklärt: direkte Anweisung, Rollen, Few-Shot, Prompt-Chaining, Kritik und strukturierte Ausgabe – mit Auswahltest.","inLanguage":"de-DE","datePublished":"2026-08-03","dateModified":"2026-08-03","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.promptomizer.de/wissen/prompt-techniken"},"author":{"@id":"https://www.promptomizer.de/autor/patrick-rosskothen#person"},"publisher":{"@type":"Organization","name":"Promptomizer","url":"https://www.promptomizer.de/"}},{"@type":"Person","@id":"https://www.promptomizer.de/autor/patrick-rosskothen#person","name":"Patrick Roßkothen","url":"https://www.promptomizer.de/autor/patrick-rosskothen","jobTitle":"Berater und Dozent","description":"Diplom-Verwaltungswirt, selbstständiger Berater und Entwickler von Promptomizer."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Welche Prompt-Technik ist die beste?","acceptedAnswer":{"@type":"Answer","text":"Es gibt keine allgemein beste Technik. Für einfache Aufgaben reicht häufig eine direkte Anweisung. Beispiele, Prompt-Chaining oder andere Methoden sind dann sinnvoll, wenn sie ein konkretes Problem lösen."}},{"@type":"Question","name":"Was ist Few-Shot-Prompting?","acceptedAnswer":{"@type":"Answer","text":"Beim Few-Shot-Prompting erhält die KI mehrere Beispiele für gewünschte Eingaben und Ausgaben. Daraus kann sie Muster für Klassifikation, Stil, Struktur oder Detaillierungsgrad ableiten."}},{"@type":"Question","name":"Was ist der Unterschied zwischen Prompt-Chaining und Chain of Thought?","acceptedAnswer":{"@type":"Answer","text":"Prompt-Chaining teilt eine Arbeit in mehrere getrennte Prompts und sichtbare Zwischenergebnisse. Chain-of-Thought bezeichnet schrittweises Schlussfolgern innerhalb der Modellbearbeitung, häufig angeregt durch Beispiele oder eine entsprechende Aufgabenformulierung."}},{"@type":"Question","name":"Braucht jeder Prompt eine Rolle?","acceptedAnswer":{"@type":"Answer","text":"Nein. Eine Rolle ist hilfreich, wenn eine bestimmte Fachperspektive oder Arbeitsweise relevant ist. Bei eindeutigen Standardaufgaben kann sie entfallen."}},{"@type":"Question","name":"Wie viele Beispiele sollte ein Few-Shot-Prompt enthalten?","acceptedAnswer":{"@type":"Answer","text":"So wenige wie möglich und so viele wie nötig, um das gewünschte Muster und wichtige Grenzfälle zu zeigen. Qualität und Repräsentativität sind wichtiger als eine feste Zahl."}},{"@type":"Question","name":"Kann ich mehrere Prompt-Techniken kombinieren?","acceptedAnswer":{"@type":"Answer","text":"Ja. Kombiniere Techniken jedoch nur, wenn jede Ergänzung eine klare Funktion hat. Teste die Wirkung möglichst schrittweise, damit der Prompt nicht unnötig kompliziert wird."}}]}]}</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c" data-exclude-hash="true"></script></head>
+<body class="content-shell bg-navy-deep text-slate-400 min-h-screen">
+<header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
+<main>
+<article>
+
+<section class="mp-sec mp-hero">
+<p class="mp-num" style="margin:0 0 2.5rem">Prompt-Techniken</p>
+<h1 class="mp-h mp-h1">Prompt-Techniken: <span class="mp-sky mp-sky-block">Welche Methode hilft bei welchem Problem?</span></h1>
+<p class="mp-lead mp-mt-25">Prompt-Techniken sind Werkzeuge für unterschiedliche Aufgaben. Eine klare direkte Anweisung reicht für viele Fälle aus. Beispiele helfen bei schwer beschreibbarem Stil oder Format, Prompt-Chaining bei komplexen Arbeitsabläufen und eine getrennte Kritik- und Überarbeitungsrunde bei schwachen Entwürfen. Die beste Technik ist nicht die komplizierteste, sondern diejenige, die ein konkretes Problem löst.</p>
+<div class="mp-meta mp-mt-25">
+<span>Von <a href="/autor/patrick-rosskothen">Patrick Roßkothen</a></span>
+<span>Veröffentlicht: <time datetime="2026-08-03">3. August 2026</time></span>
+<span>Zuletzt aktualisiert: <time datetime="2026-08-03">3. August 2026</time></span>
+</div>
+</section>
+
+<div class="mp-sec"><hr class="mp-rule"></div>
+
+<nav class="mp-sec mp-after-rule" aria-label="Inhalt">
+<p class="mp-num" style="margin:0 0 1.75rem">Inhalt</p>
+<ul class="mp-toc">
+<li><a href="#was-sind-prompt-techniken">Was sind Prompt-Techniken?</a></li>
+<li><a href="#auswahltest">Der schnelle Auswahltest</a></li>
+<li><a href="#direkte-anweisung">Direkte Anweisung</a></li>
+<li><a href="#rollen-prompting">Rollen-Prompting</a></li>
+<li><a href="#few-shot">Beispiele und Few-Shot</a></li>
+<li><a href="#strukturierte-ausgabe">Strukturierte Ausgabe</a></li>
+<li><a href="#prompt-chaining">Prompt-Chaining</a></li>
+<li><a href="#kritik">Kritik und Überarbeitung</a></li>
+<li><a href="#schritte">Schrittweise Bearbeitung</a></li>
+<li><a href="#quellengebunden">Quellengebundenes Prompting</a></li>
+<li><a href="#kombinieren">Techniken kombinieren</a></li>
+<li><a href="#faq">FAQ</a></li>
+</ul>
+</nav>
+
+<section id="was-sind-prompt-techniken" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2">Was sind <span class="mp-sky">Prompt-Techniken?</span></h2>
+<p class="mp-p mp-mt-175">Prompt-Techniken sind Vorgehensweisen, mit denen du eine KI gezielter anleitest. Sie ergänzen das grundlegende Briefing aus Rolle, Kontext, Aufgabe und Format. Dazu gehören beispielsweise Beispiele im Prompt, die Zerlegung einer Arbeit in mehrere Schritte oder die Vorgabe eines festen Ausgabeschemas.</p>
+<p class="mp-p mp-mt-175">Techniken sind kein Pflichtprogramm. Ein einfacher Auftrag wie „Fasse diesen Text in fünf Stichpunkten zusammen und verwende nur Informationen aus dem Text“ braucht weder eine Expertenrolle noch eine Kette aus fünf Prompts.</p>
+<p class="mp-p mp-mt-175">Erst wenn ein konkretes Problem auftritt, wird die Auswahl interessant:</p>
+<ul class="mp-ul mp-mt-275">
+<li>Das Format schwankt trotz klarer Beschreibung.</li>
+<li>Ein komplexer Auftrag wird nur oberflächlich bearbeitet.</li>
+<li>Die Antwort nutzt Informationen, die nicht aus den Quellen stammen.</li>
+<li>Ein Text ist inhaltlich brauchbar, aber sprachlich generisch.</li>
+<li>Eine fachliche Perspektive fehlt.</li>
+</ul>
+<p class="mp-p mp-mt-275">Der Promptomizer-Grundsatz lautet deshalb: <strong>Methoden sind Werkzeuge, keine Religion.</strong> Modelle und Versionen reagieren außerdem unterschiedlich. Was bei einem Modell hilfreich ist, kann bei einem anderen wenig bewirken oder bereits standardmäßig gut funktionieren.</p>
+
+<figure class="mp-fig mp-mt-35">
+<div role="img" aria-label="Übersicht über acht Prompt-Techniken und ihre typischen Einsatzbereiche." class="mp-grid mp-grid-4" style="max-width:66rem">
+<div><i class="fa-solid fa-bullseye" aria-hidden="true"></i><h3 class="mp-cell-t">Direkte Anweisung</h3><p class="mp-cell-d">bei klaren Einzelaufgaben</p></div>
+<div><i class="fa-solid fa-user-tie" aria-hidden="true"></i><h3 class="mp-cell-t">Rolle</h3><p class="mp-cell-d">wenn die Perspektive fehlt</p></div>
+<div><i class="fa-solid fa-clone" aria-hidden="true"></i><h3 class="mp-cell-t">Beispiele</h3><p class="mp-cell-d">wenn Stil oder Muster schwankt</p></div>
+<div><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i><h3 class="mp-cell-t">Struktur</h3><p class="mp-cell-d">wenn das Ergebnis weiterverarbeitet wird</p></div>
+<div><i class="fa-solid fa-link" aria-hidden="true"></i><h3 class="mp-cell-t">Chaining</h3><p class="mp-cell-d">bei mehreren Arbeitsschritten</p></div>
+<div><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i><h3 class="mp-cell-t">Kritik</h3><p class="mp-cell-d">bei brauchbaren, aber schwachen Entwürfen</p></div>
+<div><i class="fa-solid fa-list-check" aria-hidden="true"></i><h3 class="mp-cell-t">Schritte</h3><p class="mp-cell-d">bei Analyse, Planung und Prüfung</p></div>
+<div><i class="fa-solid fa-folder-open" aria-hidden="true"></i><h3 class="mp-cell-t">Quellenbindung</h3><p class="mp-cell-d">bei dokumentenbasierten Antworten</p></div>
+</div>
+<figcaption class="mp-cap">Jede Prompt-Technik löst ein anderes Problem. Nicht jede Aufgabe braucht den ganzen Werkzeugkasten.</figcaption>
+</figure>
+</section>
+
+<section id="auswahltest" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Der schnelle Test: <span class="mp-sky">Welche Prompt-Technik brauchst du?</span></h2>
+<p class="mp-p mp-mt-175">Beantworte die erste Frage, die dein aktuelles Problem trifft. Die Auswertung führt zur kleinsten wahrscheinlich hilfreichen Technik.</p>
+
+<div class="mp-test mp-mt-35" data-technique-test>
+<div data-test-results aria-live="polite"></div>
+<div data-test-ask>
+<div class="mp-kick" data-test-progress></div>
+<p class="mp-test-q" data-test-question></p>
+<div class="mp-test-btns">
+<button class="mp-tbtn" type="button" data-test-yes>Ja</button>
+<button class="mp-tbtn" type="button" data-test-no>Nein</button>
+</div>
+</div>
+<div class="mp-test-ctl" data-test-controls hidden>
+<button class="mp-test-more" type="button" data-test-more hidden>Weitere Technik ergänzen</button>
+<button class="mp-test-reset" type="button" data-test-reset>Test zurücksetzen</button>
+</div>
+</div>
+<p class="mp-cap" style="margin-top:1.25rem">Der Test läuft vollständig in deinem Browser. Es wird keine KI-Abfrage ausgelöst.</p>
+
+<figure class="mp-fig mp-mt-5">
+<div role="img" aria-label="Entscheidungsbaum zur Auswahl einer Prompt-Technik anhand des konkreten Problems." style="max-width:52rem">
+<div class="mp-dec-head">
+<span class="mp-kick">Beobachtetes Problem</span><span class="mp-kick">Kleinste passende Technik</span>
+</div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Die fachliche Perspektive fehlt</span><span class="mp-dec-r"><i class="fa-solid fa-user-tie" aria-hidden="true"></i>Rolle</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Das Muster schwankt trotz Beschreibung</span><span class="mp-dec-r"><i class="fa-solid fa-clone" aria-hidden="true"></i>Beispiele</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Die Aufgabe ist komplex und mehrstufig</span><span class="mp-dec-r"><i class="fa-solid fa-link" aria-hidden="true"></i>Chaining</span></div>
+<hr class="mp-rule">
+<div class="mp-dec"><span class="mp-p mp-dec-l">Die Antwort darf nur auf Material beruhen</span><span class="mp-dec-r"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>Quellengebundener Prompt</span></div>
+<hr class="mp-rule">
+</div>
+<figcaption class="mp-cap">Starte beim beobachteten Problem und wähle die kleinste passende Technik.</figcaption>
+</figure>
+</section>
+
+<section id="ueberblick" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2">Prompt-Techniken <span class="mp-sky">im Überblick</span></h2>
+<div class="mp-table mp-table-4 mp-mt-35" style="max-width:66rem">
+<div class="mp-th">Technik</div><div class="mp-th">Hilft besonders bei</div><div class="mp-th">Grundidee</div><div class="mp-th">Typischer Fehler</div>
+<div class="mp-td-1" data-label="Technik">Direkte Anweisung</div><div data-label="Hilft bei">klaren Einzelaufgaben</div><div data-label="Grundidee">Auftrag unmittelbar formulieren</div><div data-label="Typischer Fehler">zu vage wie eine Suchanfrage</div>
+<div class="mp-td-1" data-label="Technik">Rollen-Prompting</div><div data-label="Hilft bei">relevanter Perspektive</div><div data-label="Grundidee">Fachgebiet und Arbeitsweise festlegen</div><div data-label="Typischer Fehler">Rolle als Kostüm ohne Inhalt</div>
+<div class="mp-td-1" data-label="Technik">Few-Shot</div><div data-label="Hilft bei">Stil, Klassifikation, Spezialformat</div><div data-label="Grundidee">gewünschtes Verhalten an Beispielen zeigen</div><div data-label="Typischer Fehler">ungeeignete oder widersprüchliche Beispiele</div>
+<div class="mp-td-1" data-label="Technik">Strukturierte Ausgabe</div><div data-label="Hilft bei">Weiterverarbeitung und Vergleich</div><div data-label="Grundidee">feste Felder, Tabelle oder Schema vorgeben</div><div data-label="Typischer Fehler">Form festlegen, aber nötige Inhalte vergessen</div>
+<div class="mp-td-1" data-label="Technik">Prompt-Chaining</div><div data-label="Hilft bei">komplexen Mehrschrittaufgaben</div><div data-label="Grundidee">Arbeit in abhängige Etappen zerlegen</div><div data-label="Typischer Fehler">Fehler ungeprüft in nächste Stufe übernehmen</div>
+<div class="mp-td-1" data-label="Technik">Kritik und Überarbeitung</div><div data-label="Hilft bei">brauchbaren, aber schwachen Entwürfen</div><div data-label="Grundidee">erst bewerten, dann gezielt überarbeiten</div><div data-label="Typischer Fehler">Kritik ohne konkrete Kriterien</div>
+<div class="mp-td-1" data-label="Technik">Schrittweise Bearbeitung</div><div data-label="Hilft bei">Analyse, Planung und Prüfung</div><div data-label="Grundidee">nachvollziehbare Teilergebnisse anfordern</div><div data-label="Typischer Fehler">unnötige Schritte für triviale Aufgaben</div>
+<div class="mp-td-1" data-label="Technik">Quellengebundenes Prompting</div><div data-label="Hilft bei">dokumentenbasierten Antworten</div><div data-label="Grundidee">Material und erlaubte Aussagen begrenzen</div><div data-label="Typischer Fehler">Quelle bereitstellen, aber nicht priorisieren</div>
+</div>
+</section>
+
+<section id="direkte-anweisung" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 1</p>
+<h2 class="mp-h mp-h2">Direkte Anweisung: <span class="mp-sky">Zero-Shot</span></h2>
+<p class="mp-p mp-mt-175">Beim Zero-Shot-Prompting gibst du keine Beispiele vor. Du stellst eine Frage oder formulierst direkt den Arbeitsauftrag. Das ist der sinnvollste Startpunkt für viele Aufgaben.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Fasse den folgenden Text in fünf Stichpunkten zusammen. Verwende ausschließlich
+Informationen aus dem Text. Jeder Stichpunkt darf höchstens einen Satz enthalten.
+
+[TEXT]</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Die Technik eignet sich für Zusammenfassungen, einfache Umformulierungen, Extraktion, Übersetzungen oder klar abgegrenzte Ideenfindung. Sie funktioniert am besten, wenn Aufgabe und Bewertungskriterien ohne Beispiele eindeutig beschrieben werden können.</p>
+<p class="mp-p mp-mt-175">Ein häufiger Fehler ist, nur ein Thema einzugeben: „Marketingplan Handwerksbetrieb“. Daraus muss die KI Auftrag, Zielgruppe, Umfang und Format selbst ableiten. Aus einer Suchphrase wird ein Prompt, sobald ein Arbeitsauftrag entsteht.</p>
+</section>
+
+<section id="rollen-prompting" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 2</p>
+<h2 class="mp-h mp-h2"><span class="mp-sky">Rollen-Prompting</span></h2>
+<p class="mp-p mp-mt-175">Eine Rolle legt fest, aus welcher Perspektive oder mit welcher Arbeitsweise die KI die Aufgabe bearbeitet.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Du bist Redakteurin für verständliche Verwaltungssprache. Du formulierst fachlich
+korrekt, bürgernah und ohne unnötige Fachbegriffe.
+
+Überarbeite den folgenden Hinweistext, ohne seine rechtliche Aussage zu verändern:
+[TEXT]</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Rollen helfen besonders, wenn Fachlichkeit, Blickwinkel oder Vorgehensweise relevant sind. „Du bist der beste Anwalt der Welt“ liefert dagegen kaum brauchbare Orientierung. Moderne Modelle benötigen bei einfachen Aufgaben oft keine Rolle. Selbstbewusstes Kostümieren ersetzt weder Quellen noch fachliche Prüfung.</p>
+</section>
+
+<section id="few-shot" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 3</p>
+<h2 class="mp-h mp-h2">Beispiele und <span class="mp-sky">Few-Shot-Prompting</span></h2>
+<p class="mp-p mp-mt-175">Beim Few-Shot-Prompting zeigst du der KI einige Eingabe-Ausgabe-Paare. Das Modell erkennt daran Muster für Inhalt, Stil oder Struktur. Ein Beispiel wird häufig als One-Shot, mehrere Beispiele als Few-Shot bezeichnet.</p>
+<h3 class="mp-h mp-h3 mp-mt-35">Beispiel: Supportanfragen klassifizieren</h3>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-175">
+<pre class="mp-code">Ordne jede Anfrage genau einer Kategorie zu.
+
+Eingabe: „Ich komme nicht mehr in mein Konto.“
+Ausgabe: ZUGANG
+
+Eingabe: „Wo finde ich meine Rechnung für Juli?“
+Ausgabe: RECHNUNG
+
+Eingabe: „Beim Export erscheint nur eine leere Datei.“
+Ausgabe: TECHNISCHER FEHLER
+
+Eingabe: „Wie ändere ich meine hinterlegte E-Mail-Adresse?“
+Ausgabe:</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Beispiele sind wertvoll, wenn ein gewünschtes Muster schwer vollständig zu beschreiben ist. Sie können außerdem zeigen, wie ausführlich eine Antwort sein soll.</p>
+<p class="mp-p mp-mt-175">Die Qualität der Beispiele zählt mehr als ihre Menge. Verwende repräsentative Fälle und einheitliche Labels. Zeigst du nur eindeutige Standardfälle, sagt das wenig darüber aus, wie das Modell mit Grenzfällen umgehen soll. Ergänze bei wichtigen Klassifikationen eine Regel für unklare Eingaben, etwa <code class="mp-ic">UNSICHER</code>.</p>
+</section>
+
+<section id="strukturierte-ausgabe" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 4</p>
+<h2 class="mp-h mp-h2">Strukturierte <span class="mp-sky">Ausgabevorgaben</span></h2>
+<p class="mp-p mp-mt-175">Eine Ausgabevorgabe bestimmt, wie das Ergebnis aufgebaut wird. Das kann eine einfache Tabelle sein oder – für technische Weiterverarbeitung – ein festes JSON-Schema.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Vergleiche die drei Angebote anhand von Preis, Leistungsumfang und Risiken.
+Gib das Ergebnis als Tabelle mit diesen Spalten aus:
+
+Anbieter | Preis netto | enthaltene Leistungen | offene Punkte | Hauptrisiko
+
+Nenne unter der Tabelle eine Empfehlung in höchstens drei Sätzen.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Diese Technik hilft, wenn Ergebnisse direkt verglichen, kopiert oder von Software weiterverarbeitet werden. Das Format verbessert jedoch nicht automatisch die fachliche Qualität. Eine sauber gefüllte Tabelle kann weiterhin auf falschen Annahmen beruhen.</p>
+</section>
+
+<section id="prompt-chaining" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 5</p>
+<h2 class="mp-h mp-h2 mp-h2-wide">Prompt-Chaining: <span class="mp-sky">Komplexe Arbeiten zerlegen</span></h2>
+<p class="mp-p mp-mt-175">Prompt-Chaining teilt eine komplexe Arbeit in mehrere aufeinander aufbauende Prompts. Die Ausgabe eines Schritts wird zum Material für den nächsten.</p>
+<p class="mp-p mp-mt-175">Beispiel für einen Fachartikel:</p>
+<ol class="mp-ul mp-mt-275">
+<li>Quellen auswerten und belegte Kernaussagen extrahieren.</li>
+<li>Kernaussagen nach Relevanz für die Zielgruppe ordnen.</li>
+<li>Eine Gliederung mit Argumentationslogik erstellen.</li>
+<li>Abschnitt für Abschnitt schreiben.</li>
+<li>Den vollständigen Entwurf anhand festgelegter Kriterien prüfen.</li>
+</ol>
+<p class="mp-p mp-mt-275">Ein möglicher erster Prompt:</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-175">
+<pre class="mp-code">Analysiere ausschließlich die bereitgestellten Quellen. Extrahiere bis zu zehn
+Kernaussagen, die für Einsteiger praktisch relevant sind. Gib zu jeder Aussage
+die zugehörige Quelle und eine kurze Einschränkung an. Schreibe noch keinen Artikel.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Chaining hilft, wenn eine Aufgabe mehrere unterschiedliche Denk- oder Produktionsschritte enthält. Es macht Zwischenergebnisse sichtbar und korrigierbar. Gleichzeitig kann ein Fehler aus Schritt 1 durch die gesamte Kette wandern. Deshalb sollten wichtige Übergaben geprüft werden.</p>
+<p class="mp-p mp-mt-175">Nicht jede Aufzählung im Prompt ist bereits Prompt-Chaining. Entscheidend ist, dass eigenständige Arbeitsschritte getrennte Ergebnisse erzeugen und bewusst weiterverwendet werden.</p>
+</section>
+
+<section id="kritik" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 6</p>
+<h2 class="mp-h mp-h2 mp-h2-wide">Entwurf → Kritik → <span class="mp-sky">Überarbeitung</span></h2>
+<p class="mp-p mp-mt-175">Diese Technik trennt Erstellen und Bewerten. Statt den ersten Entwurf sofort zu akzeptieren, lässt du ihn anhand konkreter Kriterien prüfen und anschließend gezielt überarbeiten.</p>
+<h3 class="mp-h mp-h3 mp-mt-35">Kritik-Prompt</h3>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-175">
+<pre class="mp-code">Prüfe den Entwurf anhand dieser Kriterien:
+
+1. Ist die Kernaussage im ersten Absatz verständlich?
+2. Welche Behauptungen bleiben ohne Beispiel oder Beleg?
+3. Welche Sätze klingen austauschbar oder enthalten Floskeln?
+4. Wo entstehen unnötige Wiederholungen?
+
+Gib noch keine Neufassung aus. Nenne die fünf wichtigsten Verbesserungen in
+absteigender Bedeutung und zitiere jeweils die betroffene Stelle kurz.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<h3 class="mp-h mp-h3 mp-mt-35">Überarbeitungs-Prompt</h3>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-175">
+<pre class="mp-code">Überarbeite den Entwurf anhand der fünf Kritikpunkte. Behalte funktionierende
+Passagen bei und ändere nur, was zur Behebung der genannten Probleme nötig ist.
+Gib anschließend den vollständigen Text aus.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Die Methode eignet sich für Texte, Konzepte, Analysen und Pläne. Eine Selbstkritik der KI ist kein unabhängiger Qualitätsnachweis. Fachliche Fehler können in Entwurf und Kritik unbemerkt bleiben.</p>
+</section>
+
+<section id="schritte" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 7</p>
+<h2 class="mp-h mp-h2 mp-h2-wide">Schrittweise Bearbeitung <span class="mp-sky">und Prüfung</span></h2>
+<p class="mp-p mp-mt-175">Bei Aufgaben mit mehreren Bedingungen kann es helfen, einen sichtbaren Arbeitsablauf oder überprüfbare Zwischenergebnisse anzufordern.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Vergleiche die beiden Varianten in drei Schritten:
+
+1. Liste die gegebenen Kosten und Annahmen getrennt auf.
+2. Berechne die Gesamtkosten je Variante.
+3. Gib die günstigere Variante an und nenne die Annahme, die das Ergebnis am
+stärksten beeinflusst.
+
+Zeige die verwendeten Zahlen und die kurze Rechnung, nicht nur das Endergebnis.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">In der Forschung wird häufig von Chain-of-Thought-Prompting gesprochen: Beispiele oder Formulierungen regen das Modell zu schrittweisem Schlussfolgern an. Für die praktische Nutzung ist jedoch meist wichtiger, <strong>prüfbare Ergebnisse, verwendete Annahmen und eine knappe Begründung</strong> anzufordern, statt eine vollständige interne Gedankenkette zu verlangen.</p>
+<p class="mp-p mp-mt-175">Diese Technik ist vor allem bei Berechnungen, Vergleichen, Planungen oder regelbasierten Prüfungen sinnvoll. Sie macht ein Ergebnis nicht automatisch korrekt; sie erleichtert aber die Kontrolle.</p>
+</section>
+
+<section id="quellengebunden" class="mp-sec mp-block mp-anchor">
+<p class="mp-num" style="margin-bottom:1rem">Technik 8</p>
+<h2 class="mp-h mp-h2">Quellengebundenes <span class="mp-sky">Prompting</span></h2>
+<p class="mp-p mp-mt-175">Wenn eine Antwort auf Dokumenten, Daten oder einem Protokoll beruhen soll, legst du die erlaubte Wissensgrundlage ausdrücklich fest.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Beantworte die Frage ausschließlich anhand der drei bereitgestellten Dokumente.
+Trenne klar zwischen:
+
+- direkt belegten Aussagen,
+- Schlussfolgerungen aus mehreren Textstellen,
+- und Informationen, die in den Dokumenten fehlen.
+
+Nenne bei jeder belegten Aussage Dokument und Abschnitt. Wenn die Quellen sich
+widersprechen, stelle den Widerspruch dar, statt ihn selbst aufzulösen.
+
+Frage: [FRAGE]</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Quellengebundenes Prompting ist für Zusammenfassungen, Dokumentenvergleiche, Protokollauswertungen oder Recherche-Synthesen nützlich. Es reduziert den Raum für freie Ergänzungen, beseitigt aber nicht jedes Fehlerrisiko. Prüfe Zitate und wichtige Schlussfolgerungen am Original.</p>
+</section>
+
+<section id="kombinieren" class="mp-sec mp-block mp-anchor">
+<h2 class="mp-h mp-h2 mp-h2-wide">Prompt-Techniken <span class="mp-sky">sinnvoll kombinieren</span></h2>
+<p class="mp-p mp-mt-175">Techniken lassen sich kombinieren, wenn jede einen eigenen Zweck erfüllt. Ein Klassifikations-Prompt kann beispielsweise relevanten Kontext, eine direkte Anweisung, drei Beispiele und ein festes Ausgabeformat enthalten.</p>
+<div data-prompt-block style="max-width:44rem" class="mp-mt-275">
+<pre class="mp-code">Kontext: Die folgenden Nachrichten stammen aus dem Kundensupport.
+
+Aufgabe: Ordne jede Nachricht genau einer Kategorie zu. Wenn keine Kategorie
+eindeutig passt, verwende UNSICHER.
+
+Beispiele:
+[drei repräsentative Eingabe-Ausgabe-Paare]
+
+Format: Gib ausschließlich `Nachrichten-ID | Kategorie` aus.</pre>
+<button class="mp-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i>Kopieren</button>
+</div>
+<p class="mp-p mp-mt-275">Kombination ist sinnvoll, wenn eine direkte Anweisung allein ein beobachtetes Problem nicht löst. Sie ist nicht sinnvoll, um vorsorglich jede bekannte Methode in einen Mega-Prompt zu stopfen.</p>
+<p class="mp-p mp-mt-175">Eine gute Reihenfolge für die Praxis:</p>
+<ol class="mp-ul mp-mt-275">
+<li>Mit einem klaren <a href="/wissen/prompt-engineering">Prompt-Bauplan</a> starten.</li>
+<li>Ergebnis anhand des Ziels prüfen.</li>
+<li>Das konkrete Problem benennen.</li>
+<li>Die kleinste passende Technik ergänzen.</li>
+<li>Erneut testen und nur bei Bedarf weiter ausbauen.</li>
+</ol>
+<p class="mp-p mp-mt-275">Wie du Änderungen nachvollziehbar vergleichst, zeigt die Anleitung <a href="/wissen/prompt-optimieren">Prompt optimieren</a>.</p>
+</section>
+
+<div class="mp-sec" style="margin-top:8.5rem"><hr class="mp-rule"></div>
+
+<section id="faq" class="mp-sec mp-anchor" style="padding-top:7rem">
+<h2 class="mp-h mp-h2" style="margin-bottom:2.5rem">Häufige Fragen zu <span class="mp-sky">Prompt-Techniken</span></h2>
+<div style="max-width:44rem">
+<details><summary class="mp-q">Welche Prompt-Technik ist die beste?</summary><p class="mp-a">Es gibt keine allgemein beste Technik. Für einfache Aufgaben reicht häufig eine direkte Anweisung. Beispiele, Prompt-Chaining oder andere Methoden sind dann sinnvoll, wenn sie ein konkretes Problem lösen.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Was ist Few-Shot-Prompting?</summary><p class="mp-a">Beim Few-Shot-Prompting erhält die KI mehrere Beispiele für gewünschte Eingaben und Ausgaben. Daraus kann sie Muster für Klassifikation, Stil, Struktur oder Detaillierungsgrad ableiten.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Was ist der Unterschied zwischen Prompt-Chaining und Chain of Thought?</summary><p class="mp-a">Prompt-Chaining teilt eine Arbeit in mehrere getrennte Prompts und sichtbare Zwischenergebnisse. Chain-of-Thought bezeichnet schrittweises Schlussfolgern innerhalb der Modellbearbeitung, häufig angeregt durch Beispiele oder eine entsprechende Aufgabenformulierung.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Braucht jeder Prompt eine Rolle?</summary><p class="mp-a">Nein. Eine Rolle ist hilfreich, wenn eine bestimmte Fachperspektive oder Arbeitsweise relevant ist. Bei eindeutigen Standardaufgaben kann sie entfallen.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Wie viele Beispiele sollte ein Few-Shot-Prompt enthalten?</summary><p class="mp-a">So wenige wie möglich und so viele wie nötig, um das gewünschte Muster und wichtige Grenzfälle zu zeigen. Qualität und Repräsentativität sind wichtiger als eine feste Zahl.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Kann ich mehrere Prompt-Techniken kombinieren?</summary><p class="mp-a">Ja. Kombiniere Techniken jedoch nur, wenn jede Ergänzung eine klare Funktion hat. Teste die Wirkung möglichst schrittweise, damit der Prompt nicht unnötig kompliziert wird.</p></details>
+<hr class="mp-rule">
+</div>
+</section>
+
+<section class="mp-sec" style="padding-top:8rem">
+<hr class="mp-rule" style="margin-bottom:4rem">
+<h2 class="mp-h mp-h2-cta">Dein Werkzeugkasten <span class="mp-sky mp-sky-block">braucht kein Durcheinander</span></h2>
+<p class="mp-lead mp-mt-175">Im Promptomizer kannst du Rollen, Kontext, Aufgaben und Formate als wiederverwendbare Bausteine organisieren. So ergänzt du eine Technik gezielt, statt den nächsten Mega-Prompt aus alten Chatfragmenten zusammenzukleben.</p>
+<div style="display:flex;align-items:flex-start;margin-top:2.5rem">
+<a href="/app" class="ui-btn ui-btn-primary">Prompt-Technik im Editor ausprobieren</a>
+</div>
+<p class="mp-p mp-mt-1" style="font-size:.8125rem;color:#64748b">Strukturiert erstellen und in deiner Bibliothek speichern.</p>
+</section>
+
+<section class="mp-sec mp-block">
+<p class="mp-num" style="margin-bottom:1.75rem">Weiterführend</p>
+<div style="max-width:44rem">
+<hr class="mp-rule">
+<div class="mp-row"><a href="/wissen/prompt-optimieren">Prompt optimieren →</a></div>
+<hr class="mp-rule">
+<div class="mp-row"><a href="/wissen/prompt-engineering">Prompt Engineering erklärt →</a></div>
+<hr class="mp-rule">
+<div class="mp-row"><a href="/prompt-vorlagen">Prompt-Vorlagen →</a></div>
+<hr class="mp-rule">
+<div class="mp-row"><a href="/prompt-bibliothek">Prompt-Bibliothek →</a></div>
+<hr class="mp-rule">
+</div>
+</section>
+
+<section class="mp-sec mp-block">
+<p class="mp-num" style="margin-bottom:1.75rem">Über den Autor</p>
+<div style="max-width:44rem;padding-top:1.5rem;border-top:1px solid #1e293b">
+<h2 class="mp-h mp-h3" style="font-size:1.25rem">Patrick Roßkothen</h2>
+<p class="mp-p mp-mt-1">Patrick Roßkothen ist Diplom-Verwaltungswirt, selbstständiger Berater und Entwickler des Promptomizers. Er beschäftigt sich mit der Frage, wie sich komplexe Arbeit durch klare Strukturen, praxistaugliche Methoden und generative KI besser unterstützen lässt.</p>
+<p style="margin-top:1.25rem"><a href="/autor/patrick-rosskothen" class="mp-author-link">Mehr über Patrick Roßkothen →</a></p>
+</div>
+</section>
+
+</article>
+</main>
+<div class="border-t border-navy-border" style="margin-top:8.5rem"><div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500"><span>Deutschland</span><span>DSGVO</span><span>Kein KI-Training</span><span>Jederzeit kündbar</span></div></div>
+<footer class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600"><span>&copy; 2026 Promptomizer</span><div class="flex items-center gap-4"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></div></div></footer>
+<script src="/wissen-pages.js"></script>
+</body></html>
