@@ -24,6 +24,7 @@ INDEXABLE_PAGES = [
     "prompt-vorlagen/buero.html",
     "prompt-vorlagen/verwaltung.html",
     "prompt-vorlagen/marketing.html",
+    "autor/patrick-rosskothen.html",
     "impressum.html",
     "datenschutz.html",
     "agb.html",
