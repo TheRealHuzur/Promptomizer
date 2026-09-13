@@ -10,7 +10,7 @@
   <meta property="og:description" content="Speichere, finde und verwalte KI-Prompts und wiederverwendbare Bausteine an einem Ort."><meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
   <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Prompt-Bibliothek für KI-Prompts &amp; Bausteine"><meta name="twitter:description" content="Speichere, finde und verwalte KI-Prompts und wiederverwendbare Bausteine an einem Ort."><meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
   <link rel="icon" href="/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.json">
-  <link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content-pages.css">
+  <link rel="stylesheet" href="/vendor/tailwind/tailwind.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="/vendor/fonts/inter/inter.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/money-page.css">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[
     {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Promptomizer","item":"https://www.promptomizer.de/"},{"@type":"ListItem","position":2,"name":"Prompt-Bibliothek","item":"https://www.promptomizer.de/prompt-bibliothek"}]},
@@ -28,54 +28,196 @@
   <!-- FAQPage dient der Extrahierbarkeit; ein Google-Rich-Result wird nicht erwartet. -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c" data-exclude-hash="true"></script>
 </head>
-<body class="content-shell bg-navy-deep text-slate-400 min-h-screen">
-<header class="border-b border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between"><a href="/" class="flex items-center leading-none" aria-label="Promptomizer Startseite"><span class="text-xl font-bold text-white">Prompt</span><span class="text-xl font-bold text-brand-sky">omizer</span></a><a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">Kostenlos registrieren</a></div></header>
-<main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
-  <nav class="content-breadcrumb mb-8" aria-label="Breadcrumb"><a href="/">Startseite</a><span>›</span><span aria-current="page">Prompt-Bibliothek</span></nav>
-  <section class="text-center max-w-3xl mx-auto mb-12">
-    <h1 class="text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">Deine Prompt-Bibliothek für Prompts und Bausteine</h1>
-    <p class="text-slate-300 text-base md:text-lg mb-4">Speichere gute Prompts, finde sie in Sekunden wieder und kombiniere sie mit wiederverwendbaren Bausteinen für ChatGPT, Claude, Gemini und andere KI-Tools.</p>
-    <p class="mb-7">Promptomizer sendet gespeicherte Inhalte nicht automatisch an generative KI-Dienste. Du entscheidest selbst, welchen Prompt du in welchem KI-Tool verwendest.</p>
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-3"><a href="/app?intent=register" class="ui-btn ui-btn-primary px-6">Kostenlos registrieren</a><a href="/app" class="ui-btn ui-btn-ghost border border-navy-border px-6">Promptomizer öffnen</a></div>
-  </section>
-  <figure class="content-screenshot mb-20"><img src="/assets/prompt_bibliothek_aktuelle_zentrale_Bibliothek.png" width="2614" height="1416" alt="Promptomizer Prompt-Bibliothek in der Kartenansicht mit Suche, Kategorien und gespeicherten Prompts" decoding="async" fetchpriority="high"></figure>
+<body>
 
-  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Nicht nur speichern. Wiederfinden und weiterarbeiten.</h2><p class="max-w-3xl mx-auto text-center mb-8">Eine Prompt-Bibliothek ist dann hilfreich, wenn du auch nach Monaten noch findest, was du suchst und direkt damit weiterarbeiten kannst.</p>
-    <div class="content-grid-3">
-      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Finden</h3><p>Durchsuche deinen Bestand und filtere ihn nach Kategorien, Favoriten, Prompt-Typ oder Einsatzbereich.</p></article>
-      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Organisieren</h3><p>Ordne Prompts und Bausteine, markiere wichtige Inhalte als Favoriten oder verschiebe Dinge ins Archiv.</p></article>
-      <article class="content-card"><h3 class="text-lg font-bold text-white mb-2">Weiterverwenden</h3><p>Öffne einen gespeicherten Prompt direkt im Editor oder füge einen Baustein in deinen aktuellen Entwurf ein.</p></article>
-    </div>
-  </section>
+<header class="mp-header">
+<div class="mp-sec mp-header-row">
+<a href="/" class="mp-brand" aria-label="Promptomizer Startseite"><span>Prompt</span><span class="mp-sky">omizer</span></a>
+<button type="button" class="mp-menu-btn" id="mp-menu-btn" aria-label="Menü öffnen" aria-controls="mp-main-nav" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+<nav class="mp-nav" id="mp-main-nav" aria-label="Hauptnavigation">
+<a href="#bereiche">Bereiche</a>
+<a href="#finden">Finden</a>
+<a href="#plaene">Pläne</a>
+<a href="#fragen">Fragen</a>
+<a href="/app?intent=register" class="ui-btn ui-btn-primary">Kostenlos registrieren</a>
+</nav>
+</div>
+</header>
 
-  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Eine Bibliothek. Zwei Bereiche: Prompts und Bausteine.</h2><p class="max-w-3xl mx-auto text-center mb-8">Prompts und Bausteine erfüllen unterschiedliche Aufgaben. Deshalb bleiben sie im Promptomizer getrennt, liegen aber an einem gemeinsamen Ort.</p>
-    <div class="content-flow mb-8" aria-label="Bereichsumschalter"><span class="content-flow-step border-brand-sky">Prompts</span><span class="text-slate-600">|</span><span class="content-flow-step">Bausteine</span></div>
-    <div class="content-grid-2 mb-8"><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Prompts</h3><p>Ein gespeicherter Prompt ist ein vollständiges Arbeitsmittel. Du kannst ihn öffnen, bearbeiten, duplizieren, einer Kategorie zuordnen, favorisieren, archivieren und erneut verwenden.</p></article><article class="content-card"><h3 class="text-xl font-bold text-white mb-3">Bausteine</h3><p class="mb-4">Bausteine sind wiederverwendbare Bestandteile eines Prompts. Sie bleiben nach Rolle und Funktion, Kontext, Aufgabe, Format und freien Bausteinen getrennt.</p><p class="text-sm">Beispiele: Persona, Arbeitsweise, Markdown-Ausgabe</p></article></div>
-    <p class="text-center text-sm text-slate-300 mb-3">So verwendest du Bausteine:</p>
-  </section>
+<main>
 
-  <section class="mb-20"><div class="max-w-3xl mx-auto text-center mb-8"><h2 class="text-2xl font-bold text-white mb-4">Wiederkehrende Teile einmal speichern</h2><p class="mb-4">Viele gute Prompts enthalten wiederverwendbare Bestandteile wie eine Rolle, Arbeitsweise, feste Vorgaben oder ein Ausgabeformat, die du immer wieder brauchst.</p><p>Durch das Konzept der Bausteine kannst du diese Bestandteile in einen Prompt einfügen oder dir aus den Bausteinen den passenden Prompt zusammenbauen.</p></div></section>
+<section class="mp-sec mp-hero">
+<p class="mp-num">Prompt-Bibliothek</p>
+<h1 class="mp-h mp-h1">Deine Prompt-Bibliothek <span class="mp-sky mp-sky-block">für Prompts und Bausteine</span></h1>
+<p class="mp-lead mp-w36 mp-mt-25">Speichere gute Prompts, finde sie in Sekunden wieder und kombiniere sie mit wiederverwendbaren Bausteinen für ChatGPT, Claude, Gemini und andere KI-Tools.</p>
+<div class="mp-cta-row"><a href="/app?intent=register" class="ui-btn ui-btn-primary mp-btn">Kostenlos registrieren</a></div>
+</section>
 
-  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Finde auch in einer großen Prompt-Sammlung schnell das Richtige</h2><p class="max-w-3xl mx-auto text-center mb-8">Suche, Kategorien, Favoriten, Archiv, Sortierungen sowie Karten- und Listenansicht halten deinen Bestand übersichtlich. Du kannst nach zuletzt verwendeten oder zuletzt geänderten Inhalten sortieren.</p><figure class="content-screenshot"><img src="/assets/prompt_bibliothek_Bibliotheksübersicht_mit_Callouts.png" width="2771" height="979" alt="Gefilterte Promptomizer Prompt-Bibliothek mit Suche und geöffneter Sortierung" loading="lazy" decoding="async"></figure></section>
+<div class="mp-sec"><hr class="mp-rule"></div>
 
-  <section class="max-w-3xl mx-auto text-center mb-20"><h2 class="text-2xl font-bold text-white mb-4">Deine Prompts entwickeln sich weiter</h2><p>Beim Bearbeiten kannst du neue Versionen anlegen. Mit Pro kannst du frühere Fassungen vergleichen und wiederherstellen.</p></section>
+<section class="mp-sec mp-shot-wrap" aria-label="Produktansicht">
+<div class="mp-shot">
+<div class="mp-shot-bar" aria-hidden="true"><span class="mp-shot-dot"></span><span class="mp-shot-dot"></span><span class="mp-shot-dot"></span><span class="mp-shot-url">promptomizer.de/app</span></div>
+<picture>
+<source srcset="/assets/prompt_bibliothek_aktuelle_zentrale_Bibliothek.webp" type="image/webp">
+<img src="/assets/prompt_bibliothek_aktuelle_zentrale_Bibliothek.png" width="2614" height="1416" alt="Promptomizer Prompt-Bibliothek in der Kartenansicht mit Suche, Kategorien und gespeicherten Prompts" decoding="async" fetchpriority="high">
+</picture>
+</div>
+</section>
 
-  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-4 text-center">Eine kleine Bibliothek kostenlos aufbauen</h2><p class="max-w-3xl mx-auto text-center mb-8">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro erweitert die Bibliothek um einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</p><div class="content-grid-2 max-w-3xl mx-auto"><article class="content-card"><h3 class="text-xl font-bold text-white mb-2">Free</h3><p class="text-brand-sky font-bold mb-3">Bis zu 10 Inhalte</p><p>Suche, Kategorien, Favoriten, Archiv und direkte Wiederverwendung.</p></article><article class="content-card content-card-accent"><h3 class="text-xl font-bold text-white mb-2">Pro</h3><p class="text-brand-sky font-bold mb-3">Unbegrenzter Bestand</p><p>Versionshistorie, Wiederherstellung, Einzel- und Mehrfachexport sowie Mehrfachverwaltung.</p></article></div><p class="text-center mt-6"><a href="/preise" class="text-brand-sky hover:underline">Pläne und Preise vergleichen</a></p></section>
+<section class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w40">Nicht nur speichern. <span class="mp-sky mp-sky-block">Wiederfinden und weiterarbeiten.</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Eine Prompt-Bibliothek ist dann hilfreich, wenn du auch nach Monaten noch findest, was du suchst und direkt damit weiterarbeiten kannst.</p>
+<div class="mp-grid-auto-3 mp-mt-35">
+<article class="mp-card mp-card-static mp-card-pad-15">
+<i class="fa-solid fa-magnifying-glass mp-card-icon" aria-hidden="true"></i>
+<h3>Finden</h3>
+<p class="mp-card-text">Durchsuche deinen Bestand und filtere ihn nach Kategorien, Favoriten, Prompt-Typ oder Einsatzbereich.</p>
+</article>
+<article class="mp-card mp-card-static mp-card-pad-15">
+<i class="fa-regular fa-folder mp-card-icon" aria-hidden="true"></i>
+<h3>Organisieren</h3>
+<p class="mp-card-text">Ordne Prompts und Bausteine, markiere wichtige Inhalte als Favoriten oder verschiebe Dinge ins Archiv.</p>
+</article>
+<article class="mp-card mp-card-static mp-card-pad-15">
+<i class="fa-solid fa-file-import mp-card-icon" aria-hidden="true"></i>
+<h3>Weiterverwenden</h3>
+<p class="mp-card-text">Öffne einen gespeicherten Prompt direkt im Editor oder füge einen Baustein in deinen aktuellen Entwurf ein.</p>
+</article>
+</div>
+</section>
 
-  <section class="mb-20"><h2 class="text-2xl font-bold text-white mb-6 text-center">Noch keinen Prompt für deine Bibliothek?</h2><div class="content-grid-2"><a href="/prompt-erstellen" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Prompt erstellen</h3><p>Baue deinen Prompt aus Rolle, Kontext, Aufgabe und Format auf oder schreibe frei.</p></a><a href="/prompt-vorlagen" class="content-card block hover:border-brand-sky"><h3 class="text-lg font-bold text-white mb-2">Prompt-Vorlagen</h3><p>Öffne eine Vorlage und passe sie mit deinen eigenen Bausteinen an.</p></a></div></section>
+<section id="bereiche" class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w40">Eine Bibliothek. <span class="mp-sky mp-sky-block">Zwei Bereiche.</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Prompts und Bausteine erfüllen unterschiedliche Aufgaben. Deshalb bleiben sie im Promptomizer getrennt, liegen aber an einem gemeinsamen Ort.</p>
+<div class="mp-seg mp-mt-2" role="group" aria-label="Bereich">
+<button type="button" data-bereich="prompts" aria-pressed="true">Prompts</button>
+<button type="button" data-bereich="bausteine" aria-pressed="false">Bausteine</button>
+</div>
+<div class="mp-grid-auto-2 mp-mt-35">
+<article class="mp-card mp-card-static mp-card-pad-15" id="bereich-prompts">
+<h3 class="mp-card-h-top mp-card-title-lg">Prompts</h3>
+<p class="mp-card-text mp-card-text-md">Ein gespeicherter Prompt ist ein vollständiges Arbeitsmittel. Du kannst ihn öffnen, bearbeiten, duplizieren, einer Kategorie zuordnen, favorisieren, archivieren und erneut verwenden.</p>
+</article>
+<article class="mp-card mp-card-static mp-card-pad-15" id="bereich-bausteine">
+<h3 class="mp-card-h-top mp-card-title-lg">Bausteine</h3>
+<p class="mp-card-text mp-card-text-md">Bausteine sind wiederverwendbare Bestandteile eines Prompts. Sie bleiben nach Rolle und Funktion, Kontext, Aufgabe, Format und freien Bausteinen getrennt.</p>
+<p class="mp-card-text" style="margin-top:1rem">Beispiele: Persona, Arbeitsweise, Markdown-Ausgabe</p>
+</article>
+</div>
+</section>
 
-  <section class="mb-16 max-w-3xl mx-auto"><h2 class="text-xl font-bold text-white mb-6">Häufige Fragen</h2><div class="space-y-3">
-    <details class="content-details"><summary>Was ist eine Prompt-Bibliothek?</summary><div class="content-details-body">Ein zentraler Ort, an dem du bewährte KI-Prompts speicherst, organisierst und wiederfindest. Im Promptomizer verwaltest du zusätzlich wiederverwendbare Bausteine.</div></details>
-    <details class="content-details"><summary>Was ist der Unterschied zwischen Prompts und Bausteinen?</summary><div class="content-details-body">Ein Prompt ist ein vollständiger Arbeitsauftrag. Ein Baustein ist ein wiederverwendbarer Bestandteil wie Rolle, Persona, Vorgabe oder Ausgabeformat.</div></details>
-    <details class="content-details"><summary>Kann ich meine Prompts durchsuchen?</summary><div class="content-details-body">Ja. Suche, Filter, Sortierung, Kategorien, Favoriten, „Zuletzt verwendet“ und Archiv helfen beim Wiederfinden.</div></details>
-    <details class="content-details"><summary>Kann ich gespeicherte Prompts weiterbearbeiten?</summary><div class="content-details-body">Ja. Mit Pro kannst du zusätzlich frühere Fassungen vergleichen und wiederherstellen.</div></details>
-    <details class="content-details"><summary>Kann ich Bausteine direkt einsetzen?</summary><div class="content-details-body">Ja. Im strukturierten Modus landen sie im passenden Feld, im freien Modus in deinem vorhandenen Text.</div></details>
-    <details class="content-details"><summary>Werden meine gespeicherten Prompts an eine KI geschickt?</summary><div class="content-details-body">Nein. Promptomizer übermittelt gespeicherte Inhalte nicht automatisch an generative KI-Anbieter.</div></details>
-    <details class="content-details"><summary>Was kostet die Prompt-Bibliothek?</summary><div class="content-details-body">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro bietet einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</div></details>
-  </div></section>
-  <section class="text-center max-w-3xl mx-auto rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow"><h2 class="text-2xl font-bold text-white mb-3">Bau dir eine Prompt-Bibliothek, die mit deiner Arbeit wächst</h2><p class="mb-6">Speichere deine besten Prompts, verwende Bausteine erneut und finde beides genau dann wieder, wenn du es brauchst.</p><a href="/app" class="ui-btn ui-btn-primary px-8">Jetzt ausprobieren</a></section>
+<section class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w40">Wiederkehrende Teile <span class="mp-sky">einmal speichern</span></h2>
+<div class="mp-w38 mp-mt-175">
+<p class="mp-p">Viele gute Prompts enthalten wiederverwendbare Bestandteile wie eine Rolle, Arbeitsweise, feste Vorgaben oder ein Ausgabeformat, die du immer wieder brauchst.</p>
+<p class="mp-p">Durch das Konzept der Bausteine kannst du diese Bestandteile in einen Prompt einfügen oder dir aus den Bausteinen den passenden Prompt zusammenbauen.</p>
+</div>
+<pre class="mp-code" aria-label="Beispiel eines strukturierten Prompts">ROLLE     Du bist erfahrener Fachredakteur.
+KONTEXT   Zielgruppe: Verwaltung, Vorkenntnisse gering.
+AUFGABE   Fasse die Vorlage auf eine Seite zusammen.
+FORMAT    Überschrift, drei Absätze, keine Aufzählung.</pre>
+</section>
+
+<section id="finden" class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w42">Finde auch in einer großen Sammlung <span class="mp-sky mp-sky-block">schnell das Richtige</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Suche, Kategorien, Favoriten, Archiv, Sortierungen sowie Karten- und Listenansicht halten deinen Bestand übersichtlich. Du kannst nach zuletzt verwendeten oder zuletzt geänderten Inhalten sortieren.</p>
+<div class="mp-shot mp-mt-35" style="border-radius:.85rem">
+<img src="/assets/prompt_bibliothek_Bibliotheksübersicht_mit_Callouts.png" width="2771" height="979" alt="Gefilterte Promptomizer Prompt-Bibliothek mit Suche und geöffneter Sortierung" loading="lazy" decoding="async">
+</div>
+</section>
+
+<section class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w40">Deine Prompts <span class="mp-sky">entwickeln sich weiter</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Beim Bearbeiten kannst du neue Versionen anlegen.</p>
+<p class="mp-lead mp-w38 mp-mt-175">Mit Pro kannst du frühere Fassungen vergleichen und wiederherstellen.</p>
+</section>
+
+<section id="plaene" class="mp-sec mp-section">
+<h2 class="mp-h mp-h2 mp-w40">Eine kleine Bibliothek <span class="mp-sky">kostenlos aufbauen</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro erweitert die Bibliothek um einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</p>
+<div class="mp-grid-plans mp-mt-25">
+<article class="mp-card mp-card-static mp-card-pad-15">
+<h3 class="mp-card-h-top mp-card-title-lg">Free</h3>
+<p class="mp-limit">Bis zu 10 Inhalte</p>
+<p class="mp-card-text">Suche, Kategorien, Favoriten, Archiv und direkte Wiederverwendung.</p>
+</article>
+<article class="mp-card mp-card-static mp-card-pad-15 mp-card-pro">
+<h3 class="mp-card-h-top mp-card-title-lg">Pro</h3>
+<p class="mp-limit">Unbegrenzter Bestand</p>
+<p class="mp-card-text">Versionshistorie, Wiederherstellung, Einzel- und Mehrfachexport sowie Mehrfachverwaltung.</p>
+</article>
+</div>
+<a class="mp-textlink" href="/preise">Pläne und Preise vergleichen →</a>
+</section>
+
+<section class="mp-sec" style="padding-top:8rem">
+<hr class="mp-rule" style="margin-bottom:4rem">
+<h2 class="mp-h mp-h2-cta-sm mp-w46">Bau dir eine Prompt-Bibliothek, <span class="mp-sky mp-sky-block">die mit deiner Arbeit wächst</span></h2>
+<p class="mp-lead mp-w38 mp-mt-175">Speichere deine besten Prompts, verwende Bausteine erneut und finde beides genau dann wieder, wenn du es brauchst.</p>
+<div class="mp-cta-row"><a href="/app" class="ui-btn ui-btn-primary mp-btn">Jetzt ausprobieren</a></div>
+</section>
+
+<div class="mp-sec" style="padding-top:8.5rem"><hr class="mp-rule"></div>
+
+<section id="fragen" class="mp-sec mp-faq-section">
+<h2 class="mp-h mp-h2">Häufige <span class="mp-sky">Fragen</span></h2>
+<div class="mp-w44">
+<details><summary class="mp-q">Was ist eine Prompt-Bibliothek?</summary><p class="mp-a">Ein zentraler Ort, an dem du bewährte KI-Prompts speicherst, organisierst und wiederfindest. Im Promptomizer verwaltest du zusätzlich wiederverwendbare Bausteine.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Was ist der Unterschied zwischen Prompts und Bausteinen?</summary><p class="mp-a">Ein Prompt ist ein vollständiger Arbeitsauftrag. Ein Baustein ist ein wiederverwendbarer Bestandteil wie Rolle, Persona, Vorgabe oder Ausgabeformat.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Kann ich meine Prompts durchsuchen?</summary><p class="mp-a">Ja. Suche, Filter, Sortierung, Kategorien, Favoriten, „Zuletzt verwendet“ und Archiv helfen beim Wiederfinden.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Kann ich gespeicherte Prompts weiterbearbeiten?</summary><p class="mp-a">Ja. Mit Pro kannst du zusätzlich frühere Fassungen vergleichen und wiederherstellen.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Kann ich Bausteine direkt einsetzen?</summary><p class="mp-a">Ja. Im strukturierten Modus landen sie im passenden Feld, im freien Modus in deinem vorhandenen Text.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Werden meine gespeicherten Prompts an eine KI geschickt?</summary><p class="mp-a">Nein. Promptomizer übermittelt gespeicherte Inhalte nicht automatisch an generative KI-Anbieter.</p></details>
+<hr class="mp-rule">
+<details><summary class="mp-q">Was kostet die Prompt-Bibliothek?</summary><p class="mp-a">Free umfasst bis zu zehn Prompts und Bausteine insgesamt. Pro bietet einen unbegrenzten Bestand und zusätzliche Verwaltungsfunktionen.</p></details>
+</div>
+</section>
+
 </main>
-<div class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500"><span>Deutschland</span><span>DSGVO</span><span>Kein KI-Training</span><span>Jederzeit kündbar</span></div></div>
-<footer class="border-t border-navy-border"><div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600"><span>&copy; 2026 Promptomizer</span><div class="flex items-center gap-4"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></div></div></footer>
-<script src="/content-pages.js"></script>
+
+<footer class="mp-footer">
+<div class="mp-sec mp-footer-row">
+<span class="mp-footer-copy">&copy; 2026 Promptomizer</span>
+<nav class="mp-nav" aria-label="Fußzeile"><a href="/preise">Preise</a><a href="/app">Zur App</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/agb">AGB</a></nav>
+</div>
+</footer>
+
+<script>
+(function () {
+    // Mobiles Menü: Nav ein-/ausklappen, nach Klick auf einen Anker wieder schließen
+    var btn = document.getElementById('mp-menu-btn');
+    var nav = document.getElementById('mp-main-nav');
+    if (btn && nav) {
+        var setOpen = function (open) {
+            nav.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', String(open));
+            btn.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+            btn.querySelector('i').className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        };
+        btn.addEventListener('click', function () { setOpen(!nav.classList.contains('is-open')); });
+        nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+    }
+
+    // Segment-Umschalter Prompts | Bausteine: visueller Zustand, hebt die passende Karte hervor
+    var seg = document.querySelector('.mp-seg');
+    if (seg) {
+        seg.addEventListener('click', function (e) {
+            var b = e.target.closest('button[data-bereich]');
+            if (!b) return;
+            seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+            ['prompts', 'bausteine'].forEach(function (k) {
+                var card = document.getElementById('bereich-' + k);
+                if (card) card.classList.toggle('mp-card-active', k === b.dataset.bereich);
+            });
+        });
+        document.getElementById('bereich-prompts').classList.add('mp-card-active');
+    }
+})();
+</script>
 </body></html>

@@ -1,11 +1,11 @@
 /*
-    Marketing-Startseite (index.html).
-    Eigenes Stylesheet nach dem Muster von wissen-page.css: Die Money-Page
-    aus dem Design-Bundle (assets/ handoff "MoneyPage.dc.html") wird 1:1
-    umgesetzt, ohne neue Tailwind-Utilities zu erzeugen (tailwind.css ist
-    gepurged und versioniert, siehe CLAUDE.md §2). Klassennamen sind bewusst
-    identisch mit dem Bundle (mp-*), damit sich Vorlage und Produktivcode
-    direkt vergleichen lassen. Die Datei wird nur von index.html geladen.
+    Gemeinsames Stylesheet der öffentlichen Money-Pages (index.html,
+    prompt-bibliothek.html, ...). Die Design-Bundles (MoneyPage.dc.html,
+    PromptBibliothek.dc.html + README) werden damit 1:1 umgesetzt, ohne neue
+    Tailwind-Utilities zu erzeugen (tailwind.css ist gepurged und versioniert,
+    siehe CLAUDE.md §2). Klassennamen sind bewusst identisch mit den Bundles
+    (mp-*), damit sich Vorlage und Produktivcode direkt vergleichen lassen.
+    Muster wie bei wissen-page.css.
 
     Abweichung von der Vorlage: Der Primärbutton nutzt .ui-btn-primary aus
     styles.css (dunkler Text auf Sky wie im Rest der Site), nicht weißen Text.
@@ -60,6 +60,11 @@ a {
     font-size: clamp(2rem, 4.5vw, 3.5rem);
 }
 
+.mp-h2-cta-sm {
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    text-wrap: balance;
+}
+
 .mp-sky {
     color: #0ea5e9;
 }
@@ -87,12 +92,15 @@ a {
 .mp-mt-175 { margin-top: 1.75rem; }
 .mp-mt-25 { margin-top: 2.5rem; }
 .mp-mt-35 { margin-top: 3.5rem; }
+.mp-mt-2 { margin-top: 2rem; }
 
 .mp-w34 { max-width: 34rem; }
 .mp-w36 { max-width: 36rem; }
 .mp-w38 { max-width: 38rem; }
 .mp-w40 { max-width: 40rem; }
 .mp-w42 { max-width: 42rem; }
+.mp-w44 { max-width: 44rem; }
+.mp-w46 { max-width: 46rem; }
 
 .mp-link {
     color: #0ea5e9;
@@ -308,6 +316,59 @@ a {
     border-color: rgba(56, 189, 248, .58);
 }
 
+/* Seiten ohne Karten-Hover (Prompt-Bibliothek) */
+.mp-card-static,
+.mp-card-static:hover {
+    transform: none;
+    border-color: #223049;
+}
+
+.mp-card-pro,
+.mp-card-active,
+.mp-card-active:hover,
+.mp-card-pro:hover {
+    border-color: #0ea5e9;
+}
+
+.mp-card-pad-15 {
+    padding: 1.5rem;
+}
+
+.mp-card-title-lg {
+    font-size: 1.25rem;
+}
+
+.mp-card-text-md {
+    font-size: .925rem;
+}
+
+.mp-limit {
+    margin: 0 0 .75rem;
+    color: #0ea5e9;
+    font-size: .925rem;
+    font-weight: 700;
+}
+
+/* Auto-fit-Raster, stapeln von selbst */
+.mp-grid-auto-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+}
+
+.mp-grid-auto-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1.25rem;
+}
+
+.mp-grid-plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1rem;
+    max-width: 52rem;
+}
+
 .mp-card-icon {
     color: #0ea5e9;
     font-size: 1rem;
@@ -347,6 +408,89 @@ a {
 
 .mp-cardfoot .mp-btn {
     display: inline-flex;
+}
+
+/* ---------- Segment-Umschalter ---------- */
+
+.mp-seg {
+    display: inline-flex;
+    gap: .25rem;
+    padding: .3rem;
+    border: 1px solid #1e293b;
+    border-radius: .75rem;
+    background: #0f172a;
+}
+
+.mp-seg button {
+    min-height: 2.5rem;
+    padding: 0 1.1rem;
+    border: 1px solid transparent;
+    border-radius: .55rem;
+    background: transparent;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.mp-seg button:hover {
+    color: #fff;
+}
+
+.mp-seg button[aria-pressed="true"] {
+    border-color: rgba(56, 189, 248, .35);
+    background: rgba(14, 165, 233, .15);
+    color: #fff;
+}
+
+.mp-seg button:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+/* ---------- Code-Block ---------- */
+
+.mp-code {
+    margin: 2rem 0 0;
+    max-width: 44rem;
+    padding: 1.15rem;
+    border: 1px solid #334155;
+    border-radius: .65rem;
+    background: #020617;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: .8125rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+/* ---------- Textabsätze ---------- */
+
+.mp-p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: .925rem;
+    line-height: 1.75;
+}
+
+.mp-p + .mp-p {
+    margin-top: 1rem;
+}
+
+.mp-textlink {
+    display: inline-block;
+    margin-top: 2rem;
+    color: #38bdf8;
+    font-size: .925rem;
+    font-weight: 600;
+    transition: color .15s ease;
+}
+
+.mp-textlink:hover {
+    color: #7dd3fc;
 }
 
 /* ---------- Preise ---------- */
@@ -519,6 +663,11 @@ details[open] .mp-q::after {
 
 .mp-footer .mp-nav a {
     font-size: .78rem;
+}
+
+.mp-footer-copy {
+    color: #64748b;
+    font-size: .75rem;
 }
 
 /* ---------- Responsive (ein Breakpoint) ---------- */
