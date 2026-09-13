@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-Stand: 16. Juli 2026
+Stand: 13. September 2026
 
 ## 1. Datenschutz auf einen Blick
 
@@ -183,6 +183,12 @@ Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO zur Vertra
 Prompts, Kategorien und Bausteine, die Sie in der App erstellen und speichern, werden in unserer Datenbank (Supabase) gespeichert. Diese Inhalte gehören Ihnen. Wir verwenden sie ausschließlich zur Erbringung des Dienstes und nicht für eigene Zwecke. Insbesondere werden Ihre Inhalte nicht zum Training eigener oder fremder KI-Modelle verwendet; die Anwendung übermittelt gespeicherte Prompts nicht automatisch an OpenAI, Anthropic, Google Gemini oder andere generative KI-Dienste.
 
 Sie können Ihre Inhalte jederzeit selbst löschen. Das Konto kann in den Kontoeinstellungen selbst gelöscht werden; bei aktivem Pro-Abonnement wird die Kontolöschung technisch blockiert, das Abonnement muss zunächst gekündigt und beendet werden. Anschließend kann das auf Free zurückgestufte Konto gelöscht werden. Rechteanfragen können zusätzlich weiterhin an info@promptomizer.de gerichtet werden.
+
+Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
+
+### Browser-Erweiterung
+
+Die Chrome-Erweiterung „Promptomizer“ greift nach Anmeldung mit Ihrem Promptomizer-Konto auf dieselbe Datenbank zu wie die Web-App und zeigt ausschließlich Ihre eigenen Prompts und Bausteine an. Zur schnellen Suche speichert die Erweiterung eine Kopie dieser Einträge sowie Ihr Sitzungs-Token lokal im Browserprofil (`chrome.storage.local`). Beim Abmelden oder Deinstallieren werden diese Daten gelöscht. Die Erweiterung liest keine Inhalte fremder Webseiten, fügt nichts automatisch ein und enthält keine Analyse-, Fehler- oder Trackingdienste. Es gelten die Angaben zu Supabase (Serverstandort Frankfurt) in dieser Erklärung.
 
 Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
 
