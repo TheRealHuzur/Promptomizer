@@ -1,7 +1,8 @@
 /*
     Gemeinsames Stylesheet der öffentlichen Money-Pages (index.html,
-    prompt-bibliothek.html, ...). Die Design-Bundles (MoneyPage.dc.html,
-    PromptBibliothek.dc.html + README) werden damit 1:1 umgesetzt, ohne neue
+    prompt-bibliothek.html, prompt-erstellen.html). Die Design-Bundles
+    (MoneyPage.dc.html, PromptBibliothek.dc.html, PromptErstellen.dc.html
+    + README) werden damit 1:1 umgesetzt, ohne neue
     Tailwind-Utilities zu erzeugen (tailwind.css ist gepurged und versioniert,
     siehe CLAUDE.md §2). Klassennamen sind bewusst identisch mit den Bundles
     (mp-*), damit sich Vorlage und Produktivcode direkt vergleichen lassen.
@@ -362,6 +363,13 @@ a {
     gap: 1.25rem;
 }
 
+/* Zwei breitere Spalten (Modus-Karten) */
+.mp-grid-auto-2-wide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1.25rem;
+}
+
 .mp-grid-plans {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
@@ -465,6 +473,111 @@ a {
     line-height: 1.7;
     white-space: pre-wrap;
     overflow-x: auto;
+}
+
+/* ---------- Herausgehobene Aussage ---------- */
+
+.mp-statement {
+    margin: 2.5rem 0 0;
+    max-width: 34rem;
+    color: #fff;
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.25;
+}
+
+/* ---------- Prompt-Builder (prompt-erstellen.html) ---------- */
+
+.mp-builder {
+    max-width: 56rem;
+}
+
+.mp-label {
+    display: block;
+    margin-bottom: .55rem;
+    color: #64748b;
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.mp-ta {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 5.5rem;
+    padding: .75rem .85rem;
+    border: 1px solid #223049;
+    border-radius: .6rem;
+    background: #030b19;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    font-size: .875rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.mp-ta::placeholder {
+    color: #64748b;
+}
+
+.mp-ta:focus {
+    outline: 0;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 1px #38bdf8, 0 4px 6px -1px rgba(0, 0, 0, .1);
+}
+
+.mp-builder-hint {
+    margin-top: 1.5rem;
+    max-width: 44rem;
+    font-size: .875rem;
+}
+
+.mp-builder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-top: 1.5rem;
+}
+
+.mp-builder-actions .ui-btn-primary {
+    padding: .65rem 1.2rem;
+}
+
+.mp-btn-ghost {
+    padding: .65rem 1.1rem;
+    border: 1px solid #223049;
+    border-radius: 10px;
+    background: transparent;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+.mp-btn-ghost:hover {
+    border-color: #38bdf8;
+    color: #fff;
+}
+
+.mp-btn-ghost:active {
+    transform: scale(.98);
+}
+
+.mp-btn-ghost:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.mp-msg {
+    color: #38bdf8;
+    font-size: .8125rem;
 }
 
 /* ---------- Textabsätze ---------- */
@@ -718,6 +831,11 @@ details[open] .mp-q::after {
 
     .mp-header .mp-nav .ui-btn {
         margin-top: .75rem;
+        min-height: 2.75rem;
+    }
+
+    .mp-builder-actions .ui-btn,
+    .mp-btn-ghost {
         min-height: 2.75rem;
     }
 }
