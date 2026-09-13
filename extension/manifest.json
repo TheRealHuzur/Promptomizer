@@ -23,7 +23,7 @@
   "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Alt+Shift+P"
+        "default": "Ctrl+Shift+K"
       },
       "description": "Promptomizer-Popup öffnen"
     }

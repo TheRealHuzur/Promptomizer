@@ -16,7 +16,7 @@ for (const forbidden of ['content_scripts', 'background', 'web_accessible_resour
     assert.ok(!(forbidden in manifest), `manifest darf kein "${forbidden}" enthalten`);
 }
 assert.equal(manifest.action.default_popup, 'popup.html');
-assert.equal(manifest.commands._execute_action.suggested_key.default, 'Alt+Shift+P');
+assert.equal(manifest.commands._execute_action.suggested_key.default, 'Ctrl+Shift+K');
 assert.equal(Object.keys(manifest.commands).length, 1);
 assert.equal(typeof manifest.key, 'string');
 assert.ok(manifest.key.length >= 300, 'manifest.key fehlt oder ist zu kurz (Base64-DER eines RSA-2048-Keys)');

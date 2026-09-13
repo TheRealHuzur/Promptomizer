@@ -1,2 +1,26 @@
-# Nicht ausliefern: Chrome-Extension (siehe extension/README.md)
+# Vercel liefert den Repo-Baum statisch aus (vercel.json ohne Ausnahmen).
+# Alles hier Gelistete ist Entwicklungs-, Betriebs- oder Backend-Material und
+# gehoert nicht ins oeffentliche Web. Bleiben muessen: HTML-Seiten, CSS/JS,
+# assets/, vendor/ (ausser Tailwind-Quellen), robots.txt, sitemap.xml,
+# manifest.json, sw.js, IndexNow-Key und Google-Verifizierungsdatei.
+
+# Chrome-Extension (siehe extension/README.md)
 extension
+
+# Tests und Werkzeuge
+tests
+tools
+
+# Supabase: Migrationen, Edge-Function-Quellen, Projektkonfiguration
+supabase
+
+# Markdown-Quellen (Rechtstexte, Anleitungen, CLAUDE.md, Roadmap);
+# die Rechtstexte werden als eigene HTML-Seiten ausgeliefert.
+*.md
+
+# Tailwind-Quellen; nur das kompilierte vendor/tailwind/tailwind.css wird gebraucht
+vendor/tailwind/tailwind.config.js
+vendor/tailwind/input.css
+
+# Git-Metadaten
+.gitignore

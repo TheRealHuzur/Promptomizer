@@ -8,7 +8,7 @@ Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/extension/`.
 
 1. `chrome://extensions` öffnen, Entwicklermodus einschalten.
 2. „Entpackte Erweiterung laden“ → diesen Ordner `extension/` wählen.
-3. Tastenkürzel: Standard `Alt+Shift+P`, umbelegbar unter `chrome://extensions/shortcuts`.
+3. Tastenkürzel: Standard `Ctrl+Shift+K`, umbelegbar unter `chrome://extensions/shortcuts`. Chrome übernimmt den Vorschlag nur bei der Installation und nur, wenn die Kombination frei ist; nach einer Änderung des Manifests das Kürzel dort von Hand setzen oder die Erweiterung entfernen und neu laden. (`Alt+Shift+P` war der erste Vorschlag und kollidierte auf dem Rechner des Inhabers mit Chromes Tabgruppen-Kürzel.)
 4. Anmeldung im Popup mit E-Mail und Passwort des Promptomizer-Kontos. Google-Nutzer setzen vorher in der App über „Passwort vergessen“ ein Passwort.
 
 Die Extension-ID bleibt dank `key` im Manifest über Neuinstallationen stabil.
