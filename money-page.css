@@ -1,8 +1,8 @@
 /*
     Gemeinsames Stylesheet der öffentlichen Money-Pages (index.html,
-    prompt-bibliothek.html, prompt-erstellen.html). Die Design-Bundles
-    (MoneyPage.dc.html, PromptBibliothek.dc.html, PromptErstellen.dc.html
-    + README) werden damit 1:1 umgesetzt, ohne neue
+    prompt-bibliothek.html, prompt-erstellen.html, prompt-vorlagen.html).
+    Die Design-Bundles (MoneyPage.dc.html, PromptBibliothek.dc.html,
+    PromptErstellen.dc.html, PromptVorlagen.dc.html + README) werden damit 1:1 umgesetzt, ohne neue
     Tailwind-Utilities zu erzeugen (tailwind.css ist gepurged und versioniert,
     siehe CLAUDE.md §2). Klassennamen sind bewusst identisch mit den Bundles
     (mp-*), damit sich Vorlage und Produktivcode direkt vergleichen lassen.
@@ -102,6 +102,7 @@ a {
 .mp-w42 { max-width: 42rem; }
 .mp-w44 { max-width: 44rem; }
 .mp-w46 { max-width: 46rem; }
+.mp-w48 { max-width: 48rem; }
 
 .mp-link {
     color: #0ea5e9;
@@ -289,6 +290,11 @@ a {
     margin-bottom: 4rem;
 }
 
+/* Abschnitt direkt nach einem Trennstrich */
+.mp-after-rule {
+    padding-top: 4.5rem;
+}
+
 /* ---------- Karten ---------- */
 
 .mp-cards {
@@ -361,6 +367,28 @@ a {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
     gap: 1.25rem;
+}
+
+/* Drei Spalten ab 17 rem (Anwendungsfall-Karten) */
+.mp-grid-auto-3-wide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 1rem;
+}
+
+/* Ganze Karte als Link */
+.mp-card-link,
+.mp-card-link:hover {
+    color: inherit;
+}
+
+.mp-card-link:hover {
+    border-color: rgba(56, 189, 248, .58);
+}
+
+.mp-card-link:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
 }
 
 /* Zwei breitere Spalten (Modus-Karten) */
@@ -578,6 +606,140 @@ a {
 .mp-msg {
     color: #38bdf8;
     font-size: .8125rem;
+}
+
+/* ---------- Haarlinien-Tabelle ---------- */
+
+.mp-tbl-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: .85rem;
+    color: #64748b;
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.mp-tbl-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+.mp-tbl-key {
+    color: #f8fafc;
+    font-size: .925rem;
+    font-weight: 600;
+}
+
+.mp-tbl-val {
+    color: #94a3b8;
+    font-size: .875rem;
+    line-height: 1.75;
+    text-align: right;
+}
+
+/* ---------- Vorlagenliste (prompt-vorlagen.html) ---------- */
+
+.mp-vt {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.35rem 0;
+    color: #f8fafc;
+    font-size: .975rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.mp-vt::-webkit-details-marker {
+    display: none;
+}
+
+.mp-vt::after {
+    content: "+";
+    color: #0ea5e9;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+details[open] .mp-vt::after {
+    content: "–";
+}
+
+.mp-vt:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.mp-vt-body {
+    padding-bottom: 1.75rem;
+}
+
+.mp-pre {
+    margin: 0;
+    padding: 1.15rem;
+    border: 1px solid #334155;
+    border-radius: .65rem;
+    background: #020617;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: .8125rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.mp-vt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.mp-copy {
+    padding: .5rem 1rem;
+    border: 1px solid #223049;
+    border-radius: 10px;
+    background: transparent;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: .8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+.mp-copy:hover {
+    border-color: #38bdf8;
+    color: #fff;
+}
+
+.mp-copy:active {
+    transform: scale(.98);
+}
+
+.mp-copy:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.mp-open-link {
+    color: #38bdf8;
+    font-size: .8125rem;
+    font-weight: 600;
+    transition: color .15s ease;
+}
+
+.mp-open-link:hover {
+    color: #7dd3fc;
 }
 
 /* ---------- Textabsätze ---------- */
@@ -835,7 +997,8 @@ details[open] .mp-q::after {
     }
 
     .mp-builder-actions .ui-btn,
-    .mp-btn-ghost {
+    .mp-btn-ghost,
+    .mp-copy {
         min-height: 2.75rem;
     }
 }
