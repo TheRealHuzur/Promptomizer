@@ -39,7 +39,7 @@ for (const href of popupHtml.matchAll(/href="(https?:[^"]+)"/g)) {
     assert.ok(href[1].startsWith('https://www.promptomizer.de/'), `externer Link nur auf promptomizer.de: ${href[1]}`);
 }
 assert.ok(popupHtml.includes('rel="stylesheet" href="popup.css"'));
-for (const id of ['view-login', 'view-library', 'login-form', 'login-email', 'login-password', 'login-error', 'logout-btn', 'tab-prompts', 'tab-snippets', 'search-input', 'result-list', 'empty-state', 'status-text', 'toast']) {
+for (const id of ['view-login', 'view-library', 'login-form', 'login-email', 'login-password', 'login-error', 'logout-btn', 'tab-prompts', 'tab-snippets', 'filter-chips', 'search-input', 'result-list', 'empty-state', 'status-text', 'toast']) {
     assert.ok(popupHtml.includes(`id="${id}"`), `DOM-Anker #${id}`);
 }
 assert.ok(popupHtml.includes('role="tablist"') && popupHtml.includes('role="listbox"'));

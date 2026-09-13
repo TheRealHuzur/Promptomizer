@@ -192,6 +192,56 @@ body {
     color: #fff;
 }
 
+/* Filter-Chips (Alle · ★ · Kategorien bzw. Feldtypen), horizontal scrollbar */
+.px-chips {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 0 0 auto;
+}
+
+.px-chips::-webkit-scrollbar { display: none; }
+
+.px-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px solid var(--navy-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+.px-chip:hover { color: var(--text); border-color: #334155; }
+
+.px-chip.active {
+    background: var(--navy-sidebar);
+    border-color: var(--brand-sky);
+    color: #fff;
+}
+
+.px-chip-fav { color: #facc15; }
+.px-chip-fav.active { color: #facc15; }
+
+.px-chip-count {
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--navy-border);
+    color: var(--muted);
+    font-size: 0.6875rem;
+}
+
+.px-chip.active .px-chip-count { background: #223049; color: var(--text); }
+
 /* Suche */
 .px-search {
     padding: 10px 14px;
@@ -206,11 +256,29 @@ body {
     padding: 0 8px 8px;
 }
 
+/* Abschnittsüberschriften in der Liste */
+.px-section {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 6px 0 2px;
+    padding: 4px 10px;
+    background: var(--navy-deep);
+    color: var(--muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.px-section-favorites { color: #facc15; }
+
+/* Kompakte Zeilen: Vorschau nur bei aktiver Zeile (Tastaturauswahl) */
 .px-item {
     display: block;
     width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 4px;
+    padding: 6px 10px;
+    margin-bottom: 2px;
     border: 1px solid transparent;
     border-radius: 10px;
     background: transparent;
@@ -263,6 +331,7 @@ body {
 .px-badge-sky { color: #7dd3fc; }
 
 .px-item-preview {
+    display: none;
     margin-top: 2px;
     color: var(--muted);
     font-size: 0.8125rem;
@@ -270,6 +339,8 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.px-item.active .px-item-preview { display: block; }
 
 .px-empty {
     margin: 0;

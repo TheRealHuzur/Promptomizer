@@ -58,11 +58,16 @@
         }
     });
 
+    const RECENT_LIMIT = 5;
+    const SNIPPET_FILTER_ORDER = ['role', 'context', 'task', 'format', 'free'];
+    const NO_CATEGORY = 'Ohne Kategorie';
+
     const state = {
         user: null,
         tab: 'prompts',
+        filter: { prompts: 'all', snippets: 'all' },
         query: '',
-        activeId: null,
+        activeIndex: -1,
         prompts: [],
         snippets: [],
         indexed: { prompts: [], snippets: [] },
@@ -82,6 +87,7 @@
         loginSubmit: document.getElementById('login-submit'),
         logoutBtn: document.getElementById('logout-btn'),
         tabs: Array.from(document.querySelectorAll('.px-tab')),
+        chips: document.getElementById('filter-chips'),
         search: document.getElementById('search-input'),
         list: document.getElementById('result-list'),
         empty: document.getElementById('empty-state'),
@@ -118,13 +124,32 @@
             .trim();
     }
 
+    function compareByName(a, b) {
+        return String(a?.name || '').localeCompare(String(b?.name || ''), 'de-DE', { sensitivity: 'base' })
+            || contract.compareLibraryOrder(a, b);
+    }
+
     function currentList() {
         return state.tab === 'prompts' ? state.prompts : state.snippets;
+    }
+
+    function currentFilter() {
+        return state.filter[state.tab] || 'all';
     }
 
     function buildIndex() {
         state.indexed.prompts = state.prompts.map(item => ({ item, tokens: contract.promptSearchTokens(item) }));
         state.indexed.snippets = state.snippets.map(item => ({ item, tokens: contract.snippetSearchTokens(item) }));
+    }
+
+    // Gruppenschlüssel eines Eintrags: Kategorie (Prompts) bzw. Feldtyp (Bausteine).
+    function groupKey(item) {
+        if (state.tab === 'prompts') return item.category ? String(item.category) : NO_CATEGORY;
+        return SNIPPET_FILTER_ORDER.includes(item.field_id) ? item.field_id : 'free';
+    }
+
+    function groupLabel(key) {
+        return state.tab === 'prompts' ? key : (FIELD_LABELS[key] || 'Baustein');
     }
 
     // ---------- Cache und UI-Einstellungen ----------
@@ -165,13 +190,20 @@
     async function readUiPrefs() {
         try {
             const result = await chrome.storage.local.get(UI_KEY);
-            const tab = result[UI_KEY]?.tab;
-            if (tab === 'prompts' || tab === 'snippets') state.tab = tab;
+            const prefs = result[UI_KEY] || {};
+            if (prefs.tab === 'prompts' || prefs.tab === 'snippets') state.tab = prefs.tab;
+            if (prefs.filter && typeof prefs.filter === 'object') {
+                for (const tab of ['prompts', 'snippets']) {
+                    if (typeof prefs.filter[tab] === 'string') state.filter[tab] = prefs.filter[tab];
+                }
+            }
         } catch (_) { }
     }
 
     async function writeUiPrefs() {
-        try { await chrome.storage.local.set({ [UI_KEY]: { tab: state.tab } }); } catch (_) { }
+        try {
+            await chrome.storage.local.set({ [UI_KEY]: { tab: state.tab, filter: { ...state.filter } } });
+        } catch (_) { }
     }
 
     // ---------- Daten ----------
@@ -227,7 +259,7 @@
             state.fetchedAt = new Date().toISOString();
             if (changed) buildIndex();
             await writeCache();
-            if (changed) renderList();
+            if (changed) { renderChips(); renderList(); }
             setStatus(statusLine());
         } catch (error) {
             console.warn('Bibliothek konnte nicht geladen werden.', error?.message);
@@ -284,10 +316,8 @@
         }
         showToast(isPrompt ? 'Prompt kopiert' : 'Baustein kopiert', 'success');
         item.last_used_at = new Date().toISOString();
-        const list = currentList();
-        list.sort(contract.compareLibraryOrder);
+        currentList().sort(contract.compareLibraryOrder);
         buildIndex();
-        state.activeId = item.id;
         renderList();
         writeCache();
         markUsed(isPrompt ? 'library' : 'snippets', item.id);
@@ -302,6 +332,7 @@
         el.logoutBtn.hidden = !loggedIn;
         if (loggedIn) {
             renderTabs();
+            renderChips();
             renderList();
             el.search.focus();
         } else {
@@ -317,13 +348,101 @@
         });
     }
 
-    function visibleItems() {
+    // Chips: Alle · ★ · Gruppen nach Häufigkeit (Prompts) bzw. in Feldreihenfolge (Bausteine).
+    function chipDefinitions() {
+        const list = currentList();
+        const counts = new Map();
+        list.forEach(item => {
+            const key = groupKey(item);
+            counts.set(key, (counts.get(key) || 0) + 1);
+        });
+        const favorites = list.filter(item => item.is_favorite).length;
+        const chips = [
+            { key: 'all', label: 'Alle', count: list.length },
+            { key: 'fav', label: '★', count: favorites, title: 'Favoriten' }
+        ];
+        let keys = Array.from(counts.keys());
+        if (state.tab === 'prompts') {
+            keys.sort((a, b) => {
+                if (a === NO_CATEGORY) return 1;
+                if (b === NO_CATEGORY) return -1;
+                return (counts.get(b) - counts.get(a)) || a.localeCompare(b, 'de-DE', { sensitivity: 'base' });
+            });
+        } else {
+            keys = SNIPPET_FILTER_ORDER.filter(key => counts.has(key));
+        }
+        keys.forEach(key => chips.push({ key: `group:${key}`, label: groupLabel(key), count: counts.get(key) }));
+        return chips;
+    }
+
+    function renderChips() {
+        const chips = chipDefinitions();
+        if (!chips.some(chip => chip.key === currentFilter())) state.filter[state.tab] = 'all';
+        el.chips.replaceChildren();
+        const fragment = document.createDocumentFragment();
+        chips.forEach(chip => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'px-chip';
+            button.dataset.filter = chip.key;
+            const active = chip.key === currentFilter();
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            if (active) button.classList.add('active');
+            if (chip.key === 'fav') button.classList.add('px-chip-fav');
+            if (chip.title) button.title = chip.title;
+            const label = document.createElement('span');
+            label.textContent = chip.label;
+            button.append(label);
+            const count = document.createElement('span');
+            count.className = 'px-chip-count';
+            count.textContent = String(chip.count);
+            button.append(count);
+            button.addEventListener('click', () => setFilter(chip.key));
+            fragment.append(button);
+        });
+        el.chips.append(fragment);
+        const activeChip = el.chips.querySelector('.px-chip.active');
+        activeChip?.scrollIntoView?.({ inline: 'nearest', block: 'nearest' });
+    }
+
+    function setFilter(key) {
+        state.filter[state.tab] = key;
+        state.activeIndex = -1;
+        renderChips();
+        renderList();
+        writeUiPrefs();
+        el.search.focus();
+    }
+
+    // Sichtbare Einträge als flache Liste von Abschnitten; ohne Filter und Suche gegliedert in
+    // Favoriten, zuletzt verwendet und alles Übrige (A–Z).
+    function buildSections() {
         const indexed = state.indexed[state.tab] || [];
         const query = state.query.trim();
-        const matches = query
-            ? indexed.filter(entry => contract.matchesSearch(entry.tokens, query))
-            : indexed;
-        return matches.slice(0, MAX_RENDERED).map(entry => entry.item);
+        const filter = currentFilter();
+        let entries = query ? indexed.filter(entry => contract.matchesSearch(entry.tokens, query)) : indexed;
+        if (filter === 'fav') entries = entries.filter(entry => entry.item.is_favorite);
+        else if (filter.startsWith('group:')) {
+            const key = filter.slice('group:'.length);
+            entries = entries.filter(entry => groupKey(entry.item) === key);
+        }
+        let items = entries.map(entry => entry.item);
+
+        if (query || filter !== 'all') {
+            items = items.slice().sort(contract.compareLibraryOrder);
+            return [{ key: 'results', label: '', items: items.slice(0, MAX_RENDERED) }];
+        }
+
+        const favorites = items.filter(item => item.is_favorite).sort(contract.compareLibraryOrder);
+        const others = items.filter(item => !item.is_favorite);
+        const recent = others.filter(item => item.last_used_at).sort(contract.compareLibraryOrder).slice(0, RECENT_LIMIT);
+        const all = others.slice().sort(compareByName);
+        const noun = state.tab === 'prompts' ? 'Prompts' : 'Bausteine';
+        const sections = [];
+        if (favorites.length) sections.push({ key: 'favorites', label: `★ Favoriten (${favorites.length})`, items: favorites });
+        if (recent.length) sections.push({ key: 'recent', label: 'Zuletzt verwendet', items: recent });
+        if (all.length) sections.push({ key: 'all', label: `Alle ${noun} (${all.length})`, items: all.slice(0, MAX_RENDERED) });
+        return sections;
     }
 
     function badgeFor(item) {
@@ -344,7 +463,9 @@
     }
 
     function renderList() {
-        state.visible = visibleItems();
+        const sections = buildSections();
+        state.visible = [];
+        sections.forEach(section => section.items.forEach(item => state.visible.push(item)));
         el.list.replaceChildren();
         const total = currentList().length;
         if (!total) {
@@ -362,70 +483,92 @@
             return;
         }
         if (!state.visible.length) {
-            el.empty.textContent = `Nichts gefunden für „${state.query.trim()}“`;
+            el.empty.textContent = state.query.trim()
+                ? `Nichts gefunden für „${state.query.trim()}“`
+                : 'Keine Einträge in dieser Auswahl.';
             el.empty.hidden = false;
             return;
         }
         el.empty.hidden = true;
+        if (state.activeIndex >= state.visible.length) state.activeIndex = -1;
 
-        if (!state.visible.some(item => item.id === state.activeId)) state.activeId = null;
-
+        const showCategory = state.tab === 'prompts' && !currentFilter().startsWith('group:');
         const fragment = document.createDocumentFragment();
-        state.visible.forEach(item => {
-            const row = document.createElement('button');
-            row.type = 'button';
-            row.className = 'px-item';
-            row.setAttribute('role', 'option');
-            row.dataset.id = String(item.id);
-            row.id = `item-${state.tab}-${item.id}`;
-            const active = item.id === state.activeId;
-            row.setAttribute('aria-selected', active ? 'true' : 'false');
-            if (active) row.classList.add('active');
-
-            const head = document.createElement('div');
-            head.className = 'px-item-head';
-            if (item.is_favorite) {
-                const star = document.createElement('span');
-                star.className = 'px-star';
-                star.textContent = '★';
-                star.setAttribute('aria-label', 'Favorit');
-                head.append(star);
+        let index = 0;
+        sections.forEach(section => {
+            if (section.label) {
+                const heading = document.createElement('div');
+                heading.className = `px-section px-section-${section.key}`;
+                heading.setAttribute('role', 'presentation');
+                heading.textContent = section.label;
+                fragment.append(heading);
             }
-            const name = document.createElement('span');
-            name.className = 'px-item-name';
-            name.textContent = item.name || 'Ohne Namen';
-            head.append(name);
-
-            const badges = badgeFor(item);
-            if (badges.category) {
-                const cat = document.createElement('span');
-                cat.className = 'px-badge px-badge-sky';
-                cat.textContent = badges.category;
-                head.append(cat);
-            }
-            const type = document.createElement('span');
-            type.className = 'px-badge';
-            type.textContent = badges.type;
-            head.append(type);
-            row.append(head);
-
-            const preview = previewFor(item);
-            if (preview) {
-                const line = document.createElement('div');
-                line.className = 'px-item-preview';
-                line.textContent = preview;
-                row.append(line);
-            }
-
-            row.addEventListener('click', () => copyItem(item));
-            fragment.append(row);
+            section.items.forEach(item => {
+                fragment.append(renderRow(item, index, showCategory));
+                index += 1;
+            });
         });
         el.list.append(fragment);
-        syncActiveDescendant();
+        syncActive();
     }
 
-    function syncActiveDescendant() {
-        const activeRow = state.activeId === null ? null : el.list.querySelector(`[data-id="${state.activeId}"]`);
+    function renderRow(item, index, showCategory) {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'px-item';
+        row.setAttribute('role', 'option');
+        row.dataset.index = String(index);
+        row.dataset.id = String(item.id);
+        row.id = `item-${state.tab}-${index}`;
+        row.setAttribute('aria-selected', 'false');
+
+        const head = document.createElement('div');
+        head.className = 'px-item-head';
+        if (item.is_favorite) {
+            const star = document.createElement('span');
+            star.className = 'px-star';
+            star.textContent = '★';
+            star.setAttribute('aria-label', 'Favorit');
+            head.append(star);
+        }
+        const name = document.createElement('span');
+        name.className = 'px-item-name';
+        name.textContent = item.name || 'Ohne Namen';
+        head.append(name);
+
+        const badges = badgeFor(item);
+        if (showCategory && badges.category) {
+            const cat = document.createElement('span');
+            cat.className = 'px-badge px-badge-sky';
+            cat.textContent = badges.category;
+            head.append(cat);
+        }
+        const type = document.createElement('span');
+        type.className = 'px-badge';
+        type.textContent = badges.type;
+        head.append(type);
+        row.append(head);
+
+        const preview = previewFor(item);
+        if (preview) {
+            const line = document.createElement('div');
+            line.className = 'px-item-preview';
+            line.textContent = preview;
+            row.append(line);
+            row.title = preview;
+        }
+
+        row.addEventListener('click', () => copyItem(item));
+        return row;
+    }
+
+    function syncActive() {
+        el.list.querySelectorAll('.px-item').forEach(row => {
+            const active = Number(row.dataset.index) === state.activeIndex;
+            row.classList.toggle('active', active);
+            row.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const activeRow = state.activeIndex >= 0 ? el.list.querySelector(`[data-index="${state.activeIndex}"]`) : null;
         if (activeRow) {
             el.search.setAttribute('aria-activedescendant', activeRow.id);
             activeRow.scrollIntoView?.({ block: 'nearest' });
@@ -436,25 +579,20 @@
 
     function moveActive(delta) {
         if (!state.visible.length) return;
-        const index = state.visible.findIndex(item => item.id === state.activeId);
-        let next = index + delta;
-        if (index === -1) next = delta > 0 ? 0 : state.visible.length - 1;
+        let next = state.activeIndex + delta;
+        if (state.activeIndex === -1) next = delta > 0 ? 0 : state.visible.length - 1;
         next = Math.max(0, Math.min(state.visible.length - 1, next));
-        state.activeId = state.visible[next].id;
-        el.list.querySelectorAll('.px-item').forEach(row => {
-            const active = row.dataset.id === String(state.activeId);
-            row.classList.toggle('active', active);
-            row.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        syncActiveDescendant();
+        state.activeIndex = next;
+        syncActive();
     }
 
     function setTab(tab) {
         if (tab !== 'prompts' && tab !== 'snippets') return;
         if (state.tab === tab) return;
         state.tab = tab;
-        state.activeId = null;
+        state.activeIndex = -1;
         renderTabs();
+        renderChips();
         renderList();
         writeUiPrefs();
         el.search.focus();
@@ -514,7 +652,7 @@
         state.snippets = [];
         state.fetchedAt = null;
         state.truncated = false;
-        state.activeId = null;
+        state.activeIndex = -1;
         buildIndex();
         await clearCache();
         setStatus('');
@@ -534,14 +672,14 @@
         } else if (event.key === 'Enter') {
             if (event.target !== el.search && !el.list.contains(event.target)) return;
             event.preventDefault();
-            const item = state.visible.find(entry => entry.id === state.activeId) || state.visible[0];
+            const item = state.activeIndex >= 0 ? state.visible[state.activeIndex] : state.visible[0];
             copyItem(item);
         } else if (event.key === 'Escape') {
             event.preventDefault();
             if (state.query) {
                 el.search.value = '';
                 state.query = '';
-                state.activeId = null;
+                state.activeIndex = -1;
                 renderList();
             } else {
                 window.close();
@@ -567,7 +705,7 @@
         });
         el.search.addEventListener('input', () => {
             state.query = el.search.value;
-            state.activeId = null;
+            state.activeIndex = -1;
             renderList();
         });
         document.addEventListener('keydown', onKeydown);
