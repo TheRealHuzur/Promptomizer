@@ -12,7 +12,7 @@ tests
 tools
 
 # Supabase: Migrationen, Edge-Function-Quellen, Projektkonfiguration
-supabase
+/supabase
 
 # Markdown-Quellen (Rechtstexte, Anleitungen, CLAUDE.md, Roadmap);
 # die Rechtstexte werden als eigene HTML-Seiten ausgeliefert.
