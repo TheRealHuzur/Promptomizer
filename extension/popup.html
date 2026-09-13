@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptomizer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <header class="px-header">
+        <div class="px-logo" aria-label="Promptomizer"><span class="px-logo-a">Prompt</span><span class="px-logo-b">omizer</span></div>
+        <button type="button" id="logout-btn" class="px-btn px-btn-ghost" hidden>Abmelden</button>
+    </header>
+
+    <section id="view-login" class="px-view" hidden>
+        <form id="login-form" class="px-login" novalidate>
+            <h1 class="px-title">Anmelden</h1>
+            <p class="px-lead">Mit deinem Promptomizer-Konto hast du deine Prompts und Bausteine in jedem KI-Tool zur Hand.</p>
+            <label class="px-label" for="login-email">E-Mail</label>
+            <input id="login-email" class="px-input" type="email" name="email" autocomplete="username" required>
+            <label class="px-label" for="login-password">Passwort</label>
+            <input id="login-password" class="px-input" type="password" name="password" autocomplete="current-password" required>
+            <p id="login-error" class="px-error" role="alert" hidden></p>
+            <button type="submit" id="login-submit" class="px-btn px-btn-primary">Anmelden</button>
+            <p class="px-hint">Mit Google registriert? Setze in der App über „Passwort vergessen“ ein Passwort.
+                <a href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Zur App</a></p>
+        </form>
+    </section>
+
+    <section id="view-library" class="px-view" hidden>
+        <div class="px-tabs" role="tablist" aria-label="Bereich">
+            <button type="button" role="tab" id="tab-prompts" class="px-tab" data-tab="prompts" aria-selected="true" aria-controls="result-list">Prompts</button>
+            <button type="button" role="tab" id="tab-snippets" class="px-tab" data-tab="snippets" aria-selected="false" aria-controls="result-list">Bausteine</button>
+        </div>
+        <div class="px-search">
+            <input id="search-input" class="px-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Suchen … (↑↓ wählen, Enter kopiert)" aria-label="Bibliothek durchsuchen" aria-controls="result-list" autofocus>
+        </div>
+        <div id="result-list" class="px-list" role="listbox" aria-label="Treffer" tabindex="-1"></div>
+        <p id="empty-state" class="px-empty" hidden></p>
+    </section>
+
+    <footer class="px-footer">
+        <span id="status-text" class="px-status" aria-live="polite"></span>
+        <a class="px-footer-link" href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Im Promptomizer öffnen</a>
+    </footer>
+
+    <div id="toast" class="px-toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="vendor/supabase.js"></script>
+    <script src="contract.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Promptomizer",
+  "short_name": "Promptomizer",
+  "version": "0.1.0",
+  "description": "Suchen, kopieren, einfügen – deine eigenen Promptomizer-Prompts und Bausteine in jedem KI-Tool.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyjOG4wenrD/Ksj822HjKgZnn8bN9SpnbeMcezAdQ5XOWG21vxpWR5WBCd63EpjW19AIdPesyUhBSR8+kKlZZSJpiglQZNpdUEF2cVHjcME/7C6foYNC4dMRuLXX/qKjlPcpLnU0ldBh5pc6A98OQi8ib2bfMvlUWxB4iVja7AZukOF2SukNp+8FjPAkG6DcfQ1uVmc/oPg9XG7FvTCBR75IFR0z3N0OoGMi5z1ZcKYyKEJGXl+MzY3qC8Php5E18ohI9hfVhgl7H/PzFoj1nyRaIbK4TsDpYgMQNJ7dqrT0Em3cVvGjlkSNuhltdCFp6bczAqpe150iSi+7ECQt8rwIDAQAB",
+  "minimum_chrome_version": "114",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Promptomizer – Prompt kopieren",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+P"
+      },
+      "description": "Promptomizer-Popup öffnen"
+    }
+  },
+  "permissions": [
+    "storage",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://nrrsroaubbpmjyexhuhi.supabase.co/*"
+  ]
+}
