@@ -143,6 +143,7 @@ Diese Checkliste vor jedem `git push` durchgehen, wenn du etwas Wesentliches ge�
 - [ ] Wenn du eine Edge Function geändert hast: `npx supabase functions deploy <name>` ausgeführt
 - [ ] Wenn du `index.html`, `preise.html`, `impressum.html`, `datenschutz.html`, `agb.html` oder neue Wissensseiten geändert hast: `python3 tools/check-seo-meta.py` ausgeführt (prüft Title/Description/Canonical/JSON-LD-Validität, siehe Phase 1 der SEO/GEO-Roadmap)
 - [ ] Wenn du neue Tailwind-Klassen in einer `.html`-Datei benutzt hast: Datei in `vendor/tailwind/tailwind.config.js` → `content` eingetragen und neu kompiliert (siehe `vendor/tailwind/README.md`, `CLAUDE.md` §2)
+- [ ] Wenn du in `app.html` an der Prompt-Zusammensetzung gearbeitet hast — `handleCopyAndSave()`, `structuredPromptToText()`, `extractStructuredFields()`, `historyParseStructuredFromText()`, `isFreePrompt()`, `prefixSearchQuery()` oder an `FIELDS` / der Feldreihenfolge: `src/editor.py` im MCP-Gateway nachgezogen (siehe Anleitung 5 und `CLAUDE.md` §7a). **Der Bruch wäre lautlos** — der Agent bekäme leere Felder oder ein abweichendes Format, ohne dass irgendwo ein Fehler auftaucht
 - [ ] Commit-Nachricht beschreibt was und warum (nicht nur "fix")
 
 ### Nach dem Push
@@ -187,5 +188,121 @@ Nur aktualisieren wenn es einen konkreten Grund gibt (Sicherheitslücke, benöti
 1. `tailwind.config.js` bei Theme-Änderungen anpassen.
 2. Mit der Tailwind-CLI neu kompilieren (`vendor/tailwind/README.md` enthält den genauen Befehl).
 3. `vendor/tailwind/tailwind.css` committen.
+
+---
+
+## Anleitung 5: Agentenzugang (Workbuddy) prüfen, abschalten, wieder anschalten
+
+### Worum geht es?
+
+Seit 14.08.2026 nutzt ein KI-Agent Promptomizer über ein **ganz normales Konto**:
+`workbuddy@promptomizer.de`, regulär registriert, Pro über ein echtes Stripe-Abo mit
+hundertprozentigem Rabatt. Er meldet sich mit gewöhnlichen Zugangsdaten an und arbeitet mit
+einem normalen Nutzer-Token gegen dieselben Endpunkte wie ein Browser — **kein
+Service-Role-Key, kein Admin-Zugriff, keine Umgehung von RLS**.
+
+Am Code in diesem Repo ändert das nichts. Die Verbindung stellt ein **Gateway-Container
+außerhalb dieses Repos** her: `/home/patrick/projects/promptomizer-mcp-gateway/`. Er liegt
+bewusst draußen, weil Vercel diesen Baum statisch ausliefert — eine `.env` hier wäre nach
+einem Commit öffentlich abrufbar.
+
+Hintergrund und Gesamtplanung: `/srv/wuw-storage/53_promptomizer/01_roadmaps/mcp`.
+Alles, was den Rechte- und Werkzeugkatalog betrifft, steht nicht hier, sondern in der
+WorkDESK-Doku (`/srv/wuw-storage/52_WorkDESK`, Abschnitte Integrationen und Betrieb).
+
+---
+
+### Prüfen, ob der Zugang lebt
+
+```bash
+curl -s http://127.0.0.1:8110/health
+```
+
+Erwartete Antwort:
+
+```json
+{"status":"ok","angemeldet_als":"0f5a21ad-...","contract_version":"promptomizer.v1"}
+```
+
+Der Healthcheck **prüft die Anmeldung mit**, nicht nur den Prozess. Steht dort etwas anderes
+als `ok`, ist entweder die Anmeldung kaputt (Passwort geändert, siehe unten) oder Supabase
+nicht erreichbar. Der Port `8110` liegt nur auf dem Loopback und ist ausschließlich für die
+Fehlersuche gedacht — nach außen tritt WorkDESK auf, nicht dieses Gateway.
+
+Protokoll ansehen:
+
+```bash
+cd /home/patrick/projects/promptomizer-mcp-gateway && docker compose logs -f promptomizer-gateway
+```
+
+---
+
+### Sehen, was der Agent angelegt hat
+
+Melde dich auf `www.promptomizer.de` mit **denselben Zugangsdaten** an
+(`workbuddy@promptomizer.de`). Du siehst dieselbe Bibliothek wie der Agent, in Echtzeit, mit
+vollem Kontozugriff. Es gibt keinen getrennten Datenbestand und keine Sonderbehandlung — genau
+das war der Sinn der Konstruktion.
+
+Das Passwort liegt bei dir, das Postfach ist bei Ionos. Das Gateway hält es nur als
+Container-Secret.
+
+---
+
+### Abschalten — drei Stufen
+
+Alle drei greifen **beim nächsten Aufruf**. Der Promptomizer-Account und sämtliche Inhalte
+bleiben in jedem Fall unangetastet.
+
+| Stufe | Wie | Wirkung |
+|---|---|---|
+| Einzelne Fähigkeit | In WorkDESK die betreffende Capability global blockieren (z.B. nur `promptomizer.delete`) | Der Agent darf weiterlesen, aber nicht mehr löschen |
+| Ganzer Dienst | In WorkDESK `mcp_server.status = 'inaktiv'` setzen | Promptomizer verschwindet komplett aus dem Werkzeugkasten, andere Dienste laufen weiter |
+| Harter Stopp | `cd /home/patrick/projects/promptomizer-mcp-gateway && docker compose down` | Der Container ist weg; WorkDESK meldet den Server als nicht erreichbar |
+
+Die beiden ersten Stufen liegen in WorkDESK, nicht in Promptomizer — dort sitzt das
+Rechte-Gate. Der genaue Weg steht in `05_BETRIEB.md` der WorkDESK-Doku.
+
+Wieder anschalten: Container mit `docker compose up -d` starten, Status in WorkDESK zurück auf
+aktiv setzen, dann den Healthcheck oben ausführen.
+
+---
+
+### Drei Dinge, die du von Promptomizer-Seite aus kaputt machen kannst
+
+**1. Passwort des Agentenkontos ändern.** Das Gateway meldet sich damit an. Nach einer Änderung
+im Supabase-Dashboard oder über „Passwort vergessen" kommt es nicht mehr rein — der
+Healthcheck fällt, der Server verschwindet aus dem Werkzeugkasten. Reparatur: neuen Wert in
+`PROMPTOMIZER_AGENT_PASSWORD` in der `.env` des Gateways eintragen (Rechte `600`, nicht im
+Repo) und `docker compose up -d --force-recreate` ausführen. **`docker compose restart` reicht
+nicht** — der Container startet dann mit seiner alten Konfiguration weiter.
+
+**2. Das Stripe-Abo mit Vollrabatt kündigen oder auslaufen lassen.** Dann setzt
+`sync-stripe-subscription` das Konto auf `free` zurück, und ab dem zehnten Inhalt (Prompts und
+Bausteine zusammen, Archiv eingerechnet) bricht jedes Anlegen mit `FREE_LIMIT_REACHED` ab.
+Bearbeiten, Exportieren und Löschen laufen weiter — der Ausfall sieht deshalb nach einem
+zufälligen Fehler aus, nicht nach einem Tarifproblem. Ein von Hand gesetztes `tier = 'pro'`
+(Anleitung 1) hilft hier **nicht** dauerhaft: der nächste Sync überschreibt es wieder. Genau
+deshalb läuft der Zugang über ein echtes Abo.
+
+**3. Die Prompt-Zusammensetzung im Frontend ändern, ohne das Gateway nachzuziehen.**
+Promptomizer speichert *Felder*, nicht den fertigen Prompttext — der entsteht erst im Browser.
+`src/editor.py` im Gateway bildet das nach. Wer `handleCopyAndSave()`,
+`structuredPromptToText()`, `extractStructuredFields()`, `historyParseStructuredFromText()`,
+`isFreePrompt()`, `prefixSearchQuery()` oder die Feldreihenfolge anfasst, muss dort nachziehen.
+**Der Bruch ist lautlos:** der Agent bekommt leere Felder oder ein abweichendes Format, ohne
+dass irgendwo etwas scheitert. Zwei Stolperstellen dabei: Index 3 des gespeicherten Arrays ist
+ein historisches, leeres `style`-Feld — wer es wegkürzt, verschiebt `format`; und im Verlauf
+zeigen „VARIANTEN" **und** „FORMAT" auf dasselbe Feld. Ausführlich in `CLAUDE.md` §7a und im
+README des Gateways.
+
+---
+
+### Was der Agent ausdrücklich nicht kann
+
+Es gibt keine Konto-, Auth-, Passwort- oder Billing-Werkzeuge und kein allgemeines „führe
+beliebiges aus". Der Agent kann seinen eigenen Tarif nicht ändern und keine Zahlungsdaten
+sehen. Die Grenze ist nicht die Oberfläche, sondern der Werkzeugkatalog — und der wird in
+WorkDESK gepflegt, nicht hier.
 
 ---

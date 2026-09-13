@@ -147,6 +147,41 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 
 ---
 
+## 7a. MCP-Gateway (seit 14.08.2026) und Chrome-Extension (seit 13.09.2026) — Kopplung beachten
+
+Ein Agent nutzt Promptomizer über ein eigenes Konto (`workbuddy@promptomizer.de`, regulär
+registriert, Pro über Stripe). Der Zugang läuft über einen **Gateway-Container außerhalb
+dieses Repos**: `/home/patrick/projects/promptomizer-mcp-gateway/`.
+
+**Am Promptomizer-Code ändert sich dafür nichts** — keine Migration, keine RLS-Änderung, keine
+UI-Sperre, keine Automationsanker. Das Gateway meldet sich mit normalen Zugangsdaten an und
+arbeitet mit einem gewöhnlichen Nutzer-Token gegen dieselben Endpunkte wie der Browser. Kein
+Service-Role-Key.
+
+⚠️ **Es gibt trotzdem eine Kopplung, und sie bricht lautlos.** Promptomizer speichert
+*Felder*, nicht den fertigen Prompttext — der entsteht erst im Frontend. `src/editor.py` im
+Gateway bildet das nach. Betroffen sind:
+
+- `FIELDS` / `STRUCTURED_STORAGE_ORDER` (Index 3 ist das historische, leere `style`-Feld),
+- `handleCopyAndSave()` / `structuredPromptToText()` — die Überschriften des fertigen Prompts,
+- `extractStructuredFields()` — die drei Speicherformen des Bestands,
+- `isFreePrompt()`, `prefixSearchQuery()` (Präfixsuche `:*`),
+- `historyParseStructuredFromText()` (dort zeigen „VARIANTEN" **und** „FORMAT" auf `format`).
+
+**Wer eine dieser Stellen ändert, muss `src/editor.py` nachziehen.** Ohne das bekommt der
+Agent leere Felder oder ein abweichendes Format, ohne dass irgendwo etwas scheitert.
+Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/mcp`.
+
+**Zweite Kopie im Repo:** Die Chrome-Extension unter `extension/` (MV3-Popup, nur suchen und
+kopieren) hält in `extension/contract.js` zeichengleiche Kopien von `prefixSearchQuery`,
+`structuredValues` und `promptToText` aus `library.js`. `node tests/extension-contract-smoke.cjs`
+vergleicht den Quelltext und muss nach jeder Änderung an diesen Funktionen grün sein; ebenso
+muss `extension/vendor/supabase.js` byteidentisch zu `vendor/supabase/supabase.js` bleiben
+(`node tests/extension-source-smoke.cjs`). `.vercelignore` hält `extension/` aus der
+Auslieferung. Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/extension/`.
+
+---
+
 ## 8. Service Worker (`sw.js`) — Kill-Switch, NICHT löschen
 
 - Vom 04.–16.01.2026 war ein **Cache-first**-Worker live, der `index.html` + CDN-Assets dauerhaft cachte. Clients aus dem Fenster hängen sonst für immer auf der alten Version.

@@ -7,3 +7,9 @@ supabase/.temp/
 # Lokale KI-Agent-Skills (z.B. per "npx skills add" installiert)
 .agents/
 skills-lock.json
+
+# Zugangsdaten gehoeren nie ins Repo. Vercel liefert diesen Baum statisch
+# aus (siehe vercel.json) - eine committete .env waere oeffentlich abrufbar.
+.env
+.env.*
+!.env.example
