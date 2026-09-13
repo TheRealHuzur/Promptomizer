@@ -33,6 +33,10 @@
     <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
     <link href="vendor/fonts/inter/inter.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="home-page.css">
+
+    <!-- Zentrales Enddatum des Pro-Einführungspreises, gleiche Quelle wie preise.html und app.html -->
+    <script src="intro-price.js"></script>
 
     <script type="application/ld+json">
     {
@@ -68,7 +72,7 @@
                 "mainEntity": [
                     {
                         "@type": "Question",
-                        "name": "Brauche ich einen Account, um Promptomizer zu nutzen?",
+                        "name": "Brauche ich ein Konto?",
                         "acceptedAnswer": {
                             "@type": "Answer",
                             "text": "Nein. Prompts erstellen und kopieren funktioniert ohne Anmeldung. Nur wer Prompts dauerhaft in der Bibliothek speichern möchte, braucht ein kostenloses Konto."
@@ -76,34 +80,26 @@
                     },
                     {
                         "@type": "Question",
-                        "name": "Mit welchen KI-Tools funktionieren die Prompts?",
+                        "name": "Was ist der Unterschied zwischen strukturiert und frei?",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "Mit allen. Promptomizer erstellt reinen Text, den du in ChatGPT, Claude, Gemini oder jedes andere KI-Tool einfügen kannst."
+                            "text": "Der strukturierte Modus führt dich durch vier Felder und baut daraus einen vollständigen Prompt. Der freie Modus ist ein Textfeld mit Formatierung – für alles, was in kein Schema passt."
                         }
                     },
                     {
                         "@type": "Question",
-                        "name": "Ist Promptomizer kostenlos?",
+                        "name": "Verarbeitet Promptomizer meine Prompts mit KI?",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "Der Free-Plan ist dauerhaft kostenlos und für den Einstieg gedacht. Wer mehr Prompts und Bausteine speichern möchte, wechselt zu Pro."
+                            "text": "Nein. Promptomizer ist kein Prompt-Generator. Du bestimmst selbst, was die KI wissen und tun soll – das Werkzeug ordnet und verwahrt, es schreibt nicht mit."
                         }
                     },
                     {
                         "@type": "Question",
-                        "name": "Sind meine gespeicherten Prompts privat?",
+                        "name": "Kann ich Bausteine direkt einsetzen?",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "Ja. Gespeicherte Prompts, Kategorien und Bausteine sind an dein Konto gebunden und für niemand anderen sichtbar."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Wie kann ich ChatGPT-Prompts speichern und organisieren?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Gute ChatGPT-Prompts kannst du in einer zentralen Prompt-Bibliothek speichern und nach Kategorien organisieren. So musst du bewährte Formulierungen nicht in alten Chatverläufen suchen oder jedes Mal neu schreiben. Mit Promptomizer kannst du Prompts speichern, strukturieren und jederzeit für ChatGPT, Claude, Gemini und andere KI-Tools wiederverwenden."
+                            "text": "Ja. Im strukturierten Modus landen sie im passenden Feld, im freien Modus in deinem vorhandenen Text."
                         }
                     }
                 ]
@@ -112,333 +108,238 @@
     }
     </script>
 
-    <style>
-        /* index.html ist jetzt die Marketing-Startseite, eine normale scrollende Seite, kein App-Shell mehr */
-        body {
-            overflow: auto;
-        }
-
-        .home-card-link {
-            display: flex;
-            flex-direction: column;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .home-card-link:focus-visible {
-            border-color: #0ea5e9;
-            outline: 3px solid #0ea5e9;
-            outline-offset: 3px;
-        }
-
-        .home-card-cta {
-            display: block;
-            margin-top: auto;
-            padding-top: 1.5rem;
-        }
-    </style>
-
     <script defer src="https://cloud.umami.is/script.js" data-website-id="5196fd86-1829-472f-8cf3-c31d420aea9c"
         data-exclude-hash="true"></script>
 </head>
 
-<body class="bg-navy-deep text-slate-400 min-h-screen">
+<body>
 
-    <!-- Kopfzeile -->
-    <header class="border-b border-navy-border">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="flex items-center select-none leading-none">
-                <span class="text-xl font-bold tracking-tight text-white">Prompt</span>
-                <span class="text-xl font-bold tracking-tight text-brand-sky">omizer</span>
-            </a>
-            <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
-                <a href="#funktionen" class="hover:text-white">Funktionen</a>
-                <a href="/preise" class="hover:text-white">Preise</a>
+    <!-- Kopfzeile (sticky) -->
+    <header class="mp-header">
+        <div class="mp-sec mp-header-row">
+            <a href="/" class="mp-brand" aria-label="Promptomizer Startseite"><span>Prompt</span><span class="mp-sky">omizer</span></a>
+            <button type="button" class="mp-menu-btn" id="mp-menu-btn" aria-label="Menü öffnen" aria-controls="mp-main-nav" aria-expanded="false">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <nav class="mp-nav" id="mp-main-nav" aria-label="Hauptnavigation">
+                <a href="#modi">Modi</a>
+                <a href="#preise">Preise</a>
+                <a href="#bibliothek">Bibliothek</a>
+                <a href="#workflow">Funktionen</a>
+                <a href="#zielgruppen">Für wen</a>
+                <a href="#fragen">Fragen</a>
+                <a href="/app?intent=register" class="ui-btn ui-btn-primary">Kostenlos starten</a>
             </nav>
-            <a href="/app?intent=register" class="ui-btn ui-btn-primary text-sm">
-                Kostenlos starten
-            </a>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-12 md:py-16">
+    <main>
 
         <!-- Hero -->
-        <section class="text-center max-w-3xl mx-auto mb-20">
-            <p class="hero-kicker text-xs md:text-sm font-semibold uppercase tracking-wider text-brand-sky mb-4">
-                Promptomizer – Die Prompt-Bibliothek für alle, die mit KI arbeiten
-            </p>
-            <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                Prompts erstellen, speichern und verwalten
-            </h1>
-            <p class="text-slate-300 text-base md:text-lg mb-4">
-                Baue Prompts strukturiert, speichere sie in deiner persönlichen Prompt-Bibliothek und verwende sie
-                in ChatGPT, Claude, Gemini &amp; Co. jederzeit wieder.
-            </p>
-            <p class="text-sm text-slate-400 mb-8">
-                Ohne Account testen · Für ChatGPT, Claude, Gemini &amp; Co. · Gespeicherte Prompts werden nicht
-                automatisch an KI-Anbieter übertragen
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="/app" class="ui-btn ui-btn-primary px-6">
-                    Jetzt kostenlos ausprobieren
-                </a>
+        <section class="mp-sec mp-hero">
+            <p class="mp-num">Prompt-Werkstatt</p>
+            <h1 class="mp-h mp-h1">Deine besten Prompts <span class="mp-sky mp-sky-block">an einem Ort</span></h1>
+            <p class="mp-lead mp-w36 mp-mt-25">Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude &amp; Co. einsetzen.</p>
+            <div class="mp-cta-row">
+                <a href="/app" class="ui-btn ui-btn-primary mp-btn">Kostenlos starten</a>
             </div>
+        </section>
 
-            <div class="mt-12 rounded-xl border-2 border-navy-border bg-navy-sidebar p-3 shadow-glow">
+        <div class="mp-sec"><hr class="mp-rule"></div>
+
+        <!-- Screenshot -->
+        <section class="mp-sec mp-shot-wrap" aria-label="Produktansicht">
+            <div class="mp-shot">
+                <div class="mp-shot-bar" aria-hidden="true">
+                    <span class="mp-shot-dot"></span>
+                    <span class="mp-shot-dot"></span>
+                    <span class="mp-shot-dot"></span>
+                    <span class="mp-shot-url">promptomizer.de/app</span>
+                </div>
                 <picture>
                     <source srcset="assets/screenshot-app.webp" type="image/webp">
                     <img src="assets/screenshot-app.png"
                         alt="Promptomizer-Oberfläche: Prompt-Bibliothek mit Kategorien links, strukturierter Editor mit Beispiel-Prompt rechts"
-                        width="1600" height="937" class="rounded-lg w-full h-auto" loading="eager" fetchpriority="high">
+                        width="1600" height="937" loading="eager" fetchpriority="high">
                 </picture>
             </div>
         </section>
 
-        <!-- Einordnung -->
-        <section class="max-w-3xl mx-auto mb-12 text-center">
-            <h2 class="text-2xl font-bold text-white mb-4">Was ist Promptomizer?</h2>
-            <p>
-                Promptomizer ist ein KI-Prompt-Tool zum Erstellen, Speichern und Verwalten von Prompts. Prompts
-                lassen sich strukturiert oder frei erstellen, in einer persönlichen Bibliothek organisieren und
-                unabhängig von ChatGPT, Claude, Gemini oder anderen KI-Tools wiederverwenden.
-            </p>
+        <!-- Was ist Promptomizer? -->
+        <section id="modi" class="mp-sec mp-section">
+            <h2 class="mp-h mp-h2 mp-w34">Was ist <span class="mp-sky">Promptomizer</span>?</h2>
+            <p class="mp-lead mp-w38 mp-mt-175">Promptomizer ist ein KI-Prompt-Tool zum Erstellen, Speichern und Verwalten von Prompts. Prompts lassen sich strukturiert oder frei erstellen, in einer persönlichen Bibliothek organisieren und unabhängig von ChatGPT, Claude, Gemini oder anderen KI-Tools wiederverwenden.</p>
         </section>
 
-        <!-- Warum -->
-        <section class="max-w-3xl mx-auto mb-20 text-center">
-            <h2 class="text-2xl font-bold text-white mb-4">Warum Prompts einen festen Ort brauchen</h2>
-            <p class="font-semibold text-slate-200 mb-4">
-                Gute Prompts entstehen durch Arbeit. Deshalb sollten sie nicht im Chatverlauf verschwinden.
-            </p>
-            <p class="mb-4">
-                Ein guter Prompt wird ausprobiert, angepasst und verbessert. Liegt er anschließend nur in ChatGPT,
-                Claude oder Gemini, ist er beim nächsten Mal oft schwer wiederzufinden – oder wird erneut von vorne
-                geschrieben.
-            </p>
-            <p class="mb-4">
-                Mit einer <strong class="text-slate-200">zentralen Prompt-Bibliothek</strong> speicherst und
-                organisierst du deine Prompts unabhängig vom verwendeten KI-Tool. Namen und Kategorien sorgen
-                dafür, dass bewährte Formulierungen schnell wieder auffindbar und sofort einsatzbereit sind.
-            </p>
-            <p>
-                So entsteht mit der Zeit deine persönliche Sammlung guter Prompts – statt einer unstrukturierten
-                Mischung aus Chatverläufen, Notizen und Textdateien.
-            </p>
+        <!-- Warum Prompts einen festen Ort brauchen -->
+        <section id="bibliothek" class="mp-sec mp-section">
+            <h2 class="mp-h mp-h2 mp-w36">Warum Prompts einen <span class="mp-sky">festen Ort brauchen</span></h2>
+            <p class="mp-lead mp-w38 mp-mt-175">Mit einer zentralen Prompt-Bibliothek speicherst und organisierst du deine Prompts unabhängig vom verwendeten KI-Tool. Namen und Kategorien sorgen dafür, dass bewährte Formulierungen schnell wieder auffindbar und sofort einsatzbereit sind.</p>
+            <p class="mp-lead mp-w38 mp-mt-175">So entsteht mit der Zeit deine persönliche Sammlung guter Prompts statt einer unstrukturierten Mischung aus Chatverläufen, Notizen und Textdateien.</p>
         </section>
 
         <!-- Funktionen -->
-        <section id="funktionen" class="mb-20">
-            <h2 class="text-2xl font-bold text-white mb-4 text-center">Alles, was einen guten Prompt-Workflow ausmacht</h2>
-            <p class="max-w-2xl mx-auto text-center mb-10">
-                Vier Bausteine, die zusammen den Unterschied zwischen einem einmaligen guten Ergebnis und einem
-                wiederholbaren Arbeitsprozess ausmachen.
-            </p>
-
-            <div class="grid md:grid-cols-2 gap-6">
-                <a href="/prompt-bibliothek" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <i class="fa-solid fa-book text-brand-sky text-xl mb-3"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Deine persönliche Prompt-Bibliothek</h3>
-                    <p class="text-sm">
-                        Jeder gespeicherte Prompt bekommt einen Namen und eine Kategorie. Statt durch alte
-                        Chatverläufe zu scrollen, findest du bewährte Prompts in Sekunden wieder – sortiert nach
-                        Thema, nicht nach Uhrzeit der Unterhaltung.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zur Prompt-Bibliothek →</span>
-                </a>
-
-                <a href="/prompt-erstellen" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <i class="fa-solid fa-table-columns text-brand-sky text-xl mb-3"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Strukturierter und freier Modus</h3>
-                    <p class="text-sm">
-                        Im strukturierten Modus füllst du einzelne Felder aus – Rolle, Aufgabe, Kontext, Format –
-                        und Promptomizer setzt daraus automatisch einen vollständigen, gut formulierten Prompt
-                        zusammen. Wer lieber direkt schreibt, wechselt in den freien Modus. Beide Wege führen zum
-                        selben Ziel: ein Prompt, der sofort einsatzbereit ist.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zu Prompt erstellen →</span>
-                </a>
-
-                <a href="/prompt-vorlagen" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <i class="fa-solid fa-puzzle-piece text-brand-sky text-xl mb-3"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Bausteine für wiederkehrende Textteile</h3>
-                    <p class="text-sm">
-                        Rollenbeschreibungen, Stilvorgaben oder Formatanweisungen, die in vielen Prompts
-                        wiederkehren, schreibst du einmal als Baustein und setzt sie danach immer wieder ein –
-                        statt sie jedes Mal neu zu tippen.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Mehr zu Prompt-Vorlagen →</span>
-                </a>
-
-                <div class="rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8">
-                    <i class="fa-solid fa-clock-rotate-left text-brand-sky text-xl mb-3"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Historie, Export und Backup</h3>
-                    <p class="text-sm">
-                        Auch nicht extra gespeicherte Prompts bleiben eine Weile in der Historie sichtbar. Mit Pro
-                        kommen unbegrenzte Kategorien, mehr Historie und ein Export deiner gesamten Bibliothek
-                        dazu – für alle, die Promptomizer regelmäßig einsetzen.
-                    </p>
+        <section id="workflow" class="mp-sec mp-section">
+            <h2 class="mp-h mp-h2 mp-w40">Alles, was einen guten <span class="mp-sky">Prompt-Workflow ausmacht</span></h2>
+            <p class="mp-lead mp-w38 mp-mt-175">Vier Bausteine, die zusammen den Unterschied zwischen einem einmaligen guten Ergebnis und einem wiederholbaren Arbeitsprozess ausmachen.</p>
+            <div class="mp-cards mp-mt-35">
+                <div class="mp-card">
+                    <i class="fa-solid fa-book mp-card-icon" aria-hidden="true"></i>
+                    <h3>Deine persönliche Prompt-Bibliothek</h3>
+                    <p class="mp-card-text">Jeder gespeicherte Prompt bekommt einen Namen und eine Kategorie. Statt durch alte Chatverläufe zu scrollen, findest du bewährte Prompts in Sekunden wieder – sortiert nach Thema, nicht nach Uhrzeit der Unterhaltung.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-bibliothek">Mehr zur Prompt-Bibliothek →</a></div>
+                </div>
+                <div class="mp-card">
+                    <i class="fa-solid fa-table-columns mp-card-icon" aria-hidden="true"></i>
+                    <h3>Strukturierter und freier Modus</h3>
+                    <p class="mp-card-text">Im strukturierten Modus füllst du einzelne Felder aus – Rolle, Aufgabe, Kontext, Format – und Promptomizer setzt daraus automatisch einen vollständigen, gut formulierten Prompt zusammen. Wer lieber direkt schreibt, wechselt in den freien Modus. Beide Wege führen zum selben Ziel: ein Prompt, der sofort einsatzbereit ist.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-erstellen">Mehr zu Prompt erstellen →</a></div>
+                </div>
+                <div class="mp-card">
+                    <i class="fa-solid fa-cube mp-card-icon" aria-hidden="true"></i>
+                    <h3>Bausteine für wiederkehrende Textteile</h3>
+                    <p class="mp-card-text">Rollenbeschreibungen, Stilvorgaben oder Formatanweisungen, die in vielen Prompts wiederkehren, schreibst du einmal als Baustein und setzt sie danach immer wieder ein – statt sie jedes Mal neu zu tippen.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-vorlagen">Mehr zu Prompt-Vorlagen →</a></div>
+                </div>
+                <div class="mp-card">
+                    <i class="fa-solid fa-clock-rotate-left mp-card-icon" aria-hidden="true"></i>
+                    <h3>Historie, Export und Backup</h3>
+                    <p class="mp-card-text">Auch nicht extra gespeicherte Prompts bleiben eine Weile in der Historie sichtbar. Mit Pro kommen unbegrenzte Kategorien, mehr Historie und ein Export deiner gesamten Bibliothek dazu – für alle, die Promptomizer regelmäßig einsetzen.</p>
                 </div>
             </div>
+        </section>
+
+        <!-- Preise -->
+        <section id="preise" class="mp-sec mp-section">
+            <h2 class="mp-h mp-h2 mp-w40">Was kostet <span class="mp-sky">Promptomizer?</span></h2>
+            <p class="mp-lead mp-w38 mp-mt-175">Du kannst Promptomizer dauerhaft kostenlos nutzen. Wenn deine Bibliothek wächst, hebt Pro die Grenzen auf.</p>
+            <div class="mp-cards mp-mt-35">
+                <div class="mp-card">
+                    <div class="mp-plan-head"><h3>Free</h3></div>
+                    <div class="mp-price">0 €</div>
+                    <p class="mp-fine">dauerhaft kostenlos, mit kostenlosem Konto</p>
+                    <p class="mp-plan-text">Zum Kennenlernen und für die ersten Prompts.</p>
+                    <ul class="mp-features">
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>10 gespeicherte Inhalte, Prompts und Bausteine zusammen</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>5 Kategorien</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>10 Einträge in der Historie</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Prompts erstellen, speichern und kopieren</span></li>
+                    </ul>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/app?intent=register">Kostenlos starten →</a></div>
+                </div>
+                <div class="mp-card">
+                    <div class="mp-plan-head"><h3>Pro</h3><span class="mp-badge">Einführungspreis</span></div>
+                    <div class="mp-price">3,99 € <span class="mp-price-suffix">pro Monat</span></div>
+                    <p class="mp-price-alt">oder 39,99 € pro Jahr, zwei Monate geschenkt</p>
+                    <p class="mp-fine mp-fine-tight">inkl. MwSt., jederzeit kündbar</p>
+                    <p class="mp-plan-text">Für alle, die regelmäßig mit KI arbeiten und ihre Prompts dauerhaft sammeln.</p>
+                    <ul class="mp-features">
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Unbegrenzt Prompts und Bausteine</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Unbegrenzt Kategorien</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>50 Einträge in der Historie</span></li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Export und Backup deiner gesamten Bibliothek</span></li>
+                    </ul>
+                    <div class="mp-cardfoot"><a href="/app?intent=checkout&amp;interval=year" class="ui-btn ui-btn-primary mp-btn">Einführungspreis sichern</a></div>
+                </div>
+            </div>
+            <p class="mp-price-note">Der Einführungspreis gilt für Abschlüsse bis zum <span id="home-intro-price-end">1. November 2026</span>.</p>
+            <p class="mp-price-more">Alle Details, Abrechnung und häufige Fragen findest du auf der <a class="mp-link" href="/preise">Preisseite →</a></p>
         </section>
 
         <!-- Zielgruppen -->
-        <section class="mb-20">
-            <div class="max-w-3xl mx-auto mb-10 text-center">
-                <h2 class="text-2xl font-bold text-white mb-4">Für wen ist Promptomizer gemacht?</h2>
-                <p>
-                    Promptomizer ist für alle, die KI regelmäßig im Arbeitsalltag einsetzen und gute Prompts nicht
-                    jedes Mal neu schreiben wollen. Entdecke passende Prompt-Vorlagen für deinen Einsatzbereich.
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <a href="/prompt-vorlagen/buero" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <h3 class="text-lg font-bold text-white mb-2">Büro &amp; Arbeitsalltag</h3>
-                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für typische Aufgaben im Büro</p>
-                    <p class="text-sm">
-                        E-Mails formulieren, Besprechungen zusammenfassen, Texte überarbeiten oder Informationen
-                        strukturieren – mit passenden Prompts erledigst du wiederkehrende Aufgaben schneller.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen fürs Büro →</span>
-                </a>
-
-                <a href="/prompt-vorlagen/verwaltung" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <h3 class="text-lg font-bold text-white mb-2">Öffentliche Verwaltung</h3>
-                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für Verwaltung, Behörden und Kommunen</p>
-                    <p class="text-sm">
-                        Vorlagen für typische Verwaltungsaufgaben – von verständlichen Texten über Zusammenfassungen
-                        bis zur strukturierten Aufbereitung von Informationen.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen für die Verwaltung →</span>
-                </a>
-
-                <a href="/prompt-vorlagen/marketing" class="home-card-link rounded-xl border-2 border-navy-border bg-navy-sidebar p-6 md:p-8 hover:border-brand-sky transition-colors">
-                    <h3 class="text-lg font-bold text-white mb-2">Marketing</h3>
-                    <p class="font-semibold text-slate-200 mb-3">KI-Prompts für Content und Marketing</p>
-                    <p class="text-sm">
-                        Erstelle mit wiederverwendbaren Prompts Texte und Ideen für Blogartikel, Social Media,
-                        Kampagnen und weitere Marketingaufgaben.
-                    </p>
-                    <span class="home-card-cta text-sm font-semibold text-brand-sky">Prompt-Vorlagen fürs Marketing →</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- So funktionierts -->
-        <section class="mb-20">
-            <h2 class="text-2xl font-bold text-white mb-10 text-center">So funktioniert Promptomizer</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="text-center">
-                    <div class="w-10 h-10 rounded-full bg-brand-sky text-navy-deep font-bold flex items-center justify-center mx-auto mb-4">1</div>
-                    <h3 class="text-white font-bold mb-2">Prompt bauen</h3>
-                    <p class="text-sm">
-                        Felder ausfüllen oder frei schreiben – ganz ohne Registrierung.
-                    </p>
+        <section id="zielgruppen" class="mp-sec mp-section">
+            <h2 class="mp-h mp-h2 mp-w40">Für wen ist <span class="mp-sky">Promptomizer gemacht?</span></h2>
+            <p class="mp-lead mp-w38 mp-mt-175">Promptomizer ist für alle, die KI regelmäßig im Arbeitsalltag einsetzen und gute Prompts nicht jedes Mal neu schreiben wollen. Entdecke passende Prompt-Vorlagen für deinen Einsatzbereich.</p>
+            <div class="mp-cards mp-cards-3 mp-mt-35">
+                <div class="mp-card">
+                    <h3 class="mp-card-h-top">Büro &amp; Arbeitsalltag</h3>
+                    <p class="mp-card-sub">KI-Prompts für typische Aufgaben im Büro</p>
+                    <p class="mp-card-text">E-Mails formulieren, Besprechungen zusammenfassen, Texte überarbeiten oder Informationen strukturieren – mit passenden Prompts erledigst du wiederkehrende Aufgaben schneller.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-vorlagen/buero">Prompt-Vorlagen fürs Büro →</a></div>
                 </div>
-                <div class="text-center">
-                    <div class="w-10 h-10 rounded-full bg-brand-sky text-navy-deep font-bold flex items-center justify-center mx-auto mb-4">2</div>
-                    <h3 class="text-white font-bold mb-2">Speichern und kopieren</h3>
-                    <p class="text-sm">Mit Name und Kategorie in der Bibliothek ablegen und direkt in die Zwischenablage kopieren.</p>
+                <div class="mp-card">
+                    <h3 class="mp-card-h-top">Öffentliche Verwaltung</h3>
+                    <p class="mp-card-sub">KI-Prompts für Verwaltung, Behörden und Kommunen</p>
+                    <p class="mp-card-text">Vorlagen für typische Verwaltungsaufgaben – von verständlichen Texten über Zusammenfassungen bis zur strukturierten Aufbereitung von Informationen.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-vorlagen/verwaltung">Prompt-Vorlagen für die Verwaltung →</a></div>
                 </div>
-                <div class="text-center">
-                    <div class="w-10 h-10 rounded-full bg-brand-sky text-navy-deep font-bold flex items-center justify-center mx-auto mb-4">3</div>
-                    <h3 class="text-white font-bold mb-2">Wiederverwenden</h3>
-                    <p class="text-sm">Beim nächsten Mal in Sekunden wiederfinden, statt neu zu formulieren.</p>
+                <div class="mp-card">
+                    <h3 class="mp-card-h-top">Marketing</h3>
+                    <p class="mp-card-sub">KI-Prompts für Content und Marketing</p>
+                    <p class="mp-card-text">Erstelle mit wiederverwendbaren Prompts Texte und Ideen für Blogartikel, Social Media, Kampagnen und weitere Marketingaufgaben.</p>
+                    <div class="mp-cardfoot"><a class="mp-link" href="/prompt-vorlagen/marketing">Prompt-Vorlagen fürs Marketing →</a></div>
                 </div>
             </div>
         </section>
+
+        <div class="mp-sec" style="padding-top:8.5rem"><hr class="mp-rule"></div>
 
         <!-- FAQ -->
-        <section class="mb-16 max-w-3xl mx-auto">
-            <h2 class="text-xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
-            <div class="space-y-2" id="home-faq">
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
-                        <span class="text-slate-200 font-medium">Brauche ich einen Account, um Promptomizer zu nutzen?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Nein. Prompts erstellen und kopieren funktioniert ohne Anmeldung. Nur wer Prompts dauerhaft
-                        in der Bibliothek speichern möchte, braucht ein kostenloses Konto.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
-                        <span class="text-slate-200 font-medium">Mit welchen KI-Tools funktionieren die Prompts?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Mit allen. Promptomizer erstellt reinen Text, den du in ChatGPT, Claude, Gemini oder jedes
-                        andere KI-Tool einfügen kannst.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
-                        <span class="text-slate-200 font-medium">Ist Promptomizer kostenlos?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Der Free-Plan ist dauerhaft kostenlos und für den Einstieg gedacht. Wer mehr Prompts und
-                        Bausteine speichern möchte, wechselt zu Pro – Details auf der <a href="/preise" class="text-brand-sky hover:underline">Preisseite</a>.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
-                        <span class="text-slate-200 font-medium">Sind meine gespeicherten Prompts privat?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Ja. Gespeicherte Prompts, Kategorien und Bausteine sind an dein Konto gebunden und für
-                        niemand anderen sichtbar.
-                    </div>
-                </div>
-                <div class="rounded-lg border border-navy-border bg-navy-sidebar overflow-hidden">
-                    <button type="button" class="home-faq-toggle w-full flex items-center justify-between p-4 text-left" onclick="toggleHomeFaq(this)">
-                        <span class="text-slate-200 font-medium">Wie kann ich ChatGPT-Prompts speichern und organisieren?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-slate-500 transition-transform"></i>
-                    </button>
-                    <div class="home-faq-body hidden px-4 pb-4 text-sm text-slate-400">
-                        Gute ChatGPT-Prompts kannst du in einer zentralen Prompt-Bibliothek speichern und nach
-                        Kategorien organisieren. So musst du bewährte Formulierungen nicht in alten Chatverläufen
-                        suchen oder jedes Mal neu schreiben. Mit Promptomizer kannst du Prompts speichern,
-                        strukturieren und jederzeit für ChatGPT, Claude, Gemini und andere KI-Tools
-                        wiederverwenden.
-                    </div>
-                </div>
+        <section id="fragen" class="mp-sec mp-faq-section">
+            <h2 class="mp-h mp-h2">Häufige <span class="mp-sky">Fragen</span></h2>
+            <div class="mp-w42">
+                <details><summary class="mp-q">Brauche ich ein Konto?</summary><p class="mp-a">Nein. Prompts erstellen und kopieren funktioniert ohne Anmeldung. Nur wer Prompts dauerhaft in der Bibliothek speichern möchte, braucht ein kostenloses Konto.</p></details>
+                <hr class="mp-rule">
+                <details><summary class="mp-q">Was ist der Unterschied zwischen strukturiert und frei?</summary><p class="mp-a">Der strukturierte Modus führt dich durch vier Felder und baut daraus einen vollständigen Prompt. Der freie Modus ist ein Textfeld mit Formatierung – für alles, was in kein Schema passt.</p></details>
+                <hr class="mp-rule">
+                <details><summary class="mp-q">Verarbeitet Promptomizer meine Prompts mit KI?</summary><p class="mp-a">Nein. Promptomizer ist kein Prompt-Generator. Du bestimmst selbst, was die KI wissen und tun soll – das Werkzeug ordnet und verwahrt, es schreibt nicht mit.</p></details>
+                <hr class="mp-rule">
+                <details><summary class="mp-q">Kann ich Bausteine direkt einsetzen?</summary><p class="mp-a">Ja. Im strukturierten Modus landen sie im passenden Feld, im freien Modus in deinem vorhandenen Text.</p></details>
             </div>
         </section>
 
-        <!-- Abschluss-CTA -->
-        <section class="text-center max-w-2xl mx-auto rounded-xl border-2 border-brand-sky bg-slate-800/40 p-8 md:p-12 shadow-glow">
-            <h2 class="text-2xl font-bold text-white mb-3">Bereit für bessere Prompts?</h2>
-            <p class="mb-6">Kostenlos starten, keine Kreditkarte nötig.</p>
-            <a href="/app" class="ui-btn ui-btn-primary px-8">Jetzt ausprobieren</a>
+        <!-- Schluss-CTA -->
+        <section class="mp-sec mp-final">
+            <hr class="mp-rule">
+            <h2 class="mp-h mp-h2-cta mp-w34">Bereit für <span class="mp-sky">bessere Prompts?</span></h2>
+            <p class="mp-lead mp-w36 mp-mt-175">Kostenlos starten, keine Zahlungsmethode nötig.</p>
+            <div class="mp-cta-row">
+                <a href="/app" class="ui-btn ui-btn-primary mp-btn">Jetzt ausprobieren</a>
+            </div>
         </section>
 
     </main>
 
-    <footer class="border-t border-navy-border mt-16">
-        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
-            <span>&copy; 2026 Promptomizer</span>
-            <div class="flex items-center gap-4">
-                <a href="/preise" class="hover:text-slate-400">Preise</a>
-                <a href="/app" class="hover:text-slate-400">Zur App</a>
-                <a href="/impressum" class="hover:text-slate-400">Impressum</a>
-                <a href="/datenschutz" class="hover:text-slate-400">Datenschutz</a>
-                <a href="/agb" class="hover:text-slate-400">AGB</a>
-            </div>
+    <footer class="mp-footer">
+        <div class="mp-sec mp-footer-row">
+            <a href="/" class="mp-brand mp-brand-footer" aria-label="Promptomizer Startseite"><span>Prompt</span><span class="mp-sky">omizer</span></a>
+            <nav class="mp-nav" aria-label="Rechtliches">
+                <a href="/impressum">Impressum</a>
+                <a href="/datenschutz">Datenschutz</a>
+                <a href="/agb">AGB</a>
+            </nav>
         </div>
     </footer>
 
     <script>
-        function toggleHomeFaq(button) {
-            const body = button.nextElementSibling;
-            const icon = button.querySelector('i');
-            const isOpen = !body.classList.contains('hidden');
-            body.classList.toggle('hidden', isOpen);
-            icon.classList.toggle('rotate-180', !isOpen);
-        }
+        (function () {
+            // Mobiles Menü: Nav ein-/ausklappen, nach Klick auf einen Anker wieder schließen
+            var btn = document.getElementById('mp-menu-btn');
+            var nav = document.getElementById('mp-main-nav');
+            if (btn && nav) {
+                var setOpen = function (open) {
+                    nav.classList.toggle('is-open', open);
+                    btn.setAttribute('aria-expanded', String(open));
+                    btn.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+                    btn.querySelector('i').className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+                };
+                btn.addEventListener('click', function () {
+                    setOpen(!nav.classList.contains('is-open'));
+                });
+                nav.addEventListener('click', function (e) {
+                    if (e.target.closest('a')) setOpen(false);
+                });
+            }
+
+            // Enddatum des Einführungspreises aus intro-price.js (Fallback: Text im Markup)
+            var end = document.getElementById('home-intro-price-end');
+            if (end && typeof INTRO_PRICE_END_DATE !== 'undefined') {
+                var d = new Date(INTRO_PRICE_END_DATE + 'T00:00:00');
+                if (!isNaN(d)) {
+                    end.textContent = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+            }
+        })();
     </script>
 </body>
 

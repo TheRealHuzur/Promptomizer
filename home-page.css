@@ -1,0 +1,574 @@
+/*
+    Marketing-Startseite (index.html).
+    Eigenes Stylesheet nach dem Muster von wissen-page.css: Die Money-Page
+    aus dem Design-Bundle (assets/ handoff "MoneyPage.dc.html") wird 1:1
+    umgesetzt, ohne neue Tailwind-Utilities zu erzeugen (tailwind.css ist
+    gepurged und versioniert, siehe CLAUDE.md §2). Klassennamen sind bewusst
+    identisch mit dem Bundle (mp-*), damit sich Vorlage und Produktivcode
+    direkt vergleichen lassen. Die Datei wird nur von index.html geladen.
+
+    Abweichung von der Vorlage: Der Primärbutton nutzt .ui-btn-primary aus
+    styles.css (dunkler Text auf Sky wie im Rest der Site), nicht weißen Text.
+*/
+
+/* ---------- Grundlagen ---------- */
+
+body {
+    margin: 0;
+    overflow: auto;
+    background: #020617;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+}
+
+.mp-sec {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.mp-rule {
+    height: 1px;
+    margin: 0;
+    border: 0;
+    background: #1e293b;
+}
+
+.mp-h {
+    margin: 0;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: 1.02;
+}
+
+.mp-h1 {
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    text-wrap: balance;
+}
+
+.mp-h2 {
+    font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+}
+
+.mp-h2-cta {
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+}
+
+.mp-sky {
+    color: #0ea5e9;
+}
+
+.mp-sky-block {
+    display: block;
+}
+
+.mp-num {
+    margin: 0 0 2.5rem;
+    color: #38bdf8;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mp-lead {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+}
+
+.mp-mt-175 { margin-top: 1.75rem; }
+.mp-mt-25 { margin-top: 2.5rem; }
+.mp-mt-35 { margin-top: 3.5rem; }
+
+.mp-w34 { max-width: 34rem; }
+.mp-w36 { max-width: 36rem; }
+.mp-w38 { max-width: 38rem; }
+.mp-w40 { max-width: 40rem; }
+.mp-w42 { max-width: 42rem; }
+
+.mp-link {
+    color: #0ea5e9;
+    font-size: .875rem;
+    font-weight: 700;
+    transition: color .15s ease;
+}
+
+.mp-link:hover {
+    color: #38bdf8;
+}
+
+.mp-cta-row {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 2.5rem;
+}
+
+/* Primärbutton-Größen aus der Vorlage (hint-size); Optik kommt aus styles.css */
+.mp-btn {
+    min-height: 2.75rem;
+    padding: 0 1.5rem;
+}
+
+.mp-btn:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+/* Sprungziele nicht unter dem sticky Header verschwinden lassen */
+[id] {
+    scroll-margin-top: 5rem;
+}
+
+/* ---------- Header ---------- */
+
+.mp-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(2, 6, 23, .88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1e293b;
+}
+
+.mp-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    height: 4rem;
+}
+
+.mp-brand {
+    display: inline-flex;
+    align-items: center;
+    font: 800 1.1875rem/1 'Inter', sans-serif;
+    letter-spacing: -.02em;
+    color: #fff;
+}
+
+.mp-brand-footer {
+    font-size: 1rem;
+}
+
+.mp-nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.mp-nav a {
+    color: #94a3b8;
+    font-size: .875rem;
+    font-weight: 500;
+    transition: color .15s ease;
+}
+
+.mp-nav a:hover {
+    color: #fff;
+}
+
+.mp-nav .ui-btn {
+    color: var(--navy-deep);
+    min-height: 2.5rem;
+    padding: 0 1.25rem;
+}
+
+.mp-nav .ui-btn:hover {
+    color: var(--navy-deep);
+}
+
+.mp-menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+
+.mp-menu-btn:hover {
+    color: #fff;
+}
+
+.mp-menu-btn:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+/* ---------- Hero ---------- */
+
+.mp-hero {
+    padding-top: 7rem;
+    padding-bottom: 6rem;
+}
+
+/* ---------- Screenshot ---------- */
+
+.mp-shot-wrap {
+    padding-top: 4.5rem;
+}
+
+.mp-shot {
+    overflow: hidden;
+    border: 1px solid #1e293b;
+    border-top-left-radius: .85rem;
+    border-top-right-radius: .85rem;
+    background: #0f172a;
+}
+
+.mp-shot-bar {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid #1e293b;
+}
+
+.mp-shot-dot {
+    width: .6rem;
+    height: .6rem;
+    border-radius: 999px;
+    background: #334155;
+}
+
+.mp-shot-url {
+    margin-left: .75rem;
+    color: #64748b;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: .7rem;
+}
+
+.mp-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ---------- Abschnitte ---------- */
+
+.mp-section {
+    padding-top: 8.5rem;
+}
+
+.mp-faq-section {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+}
+
+.mp-final {
+    padding-bottom: 7rem;
+}
+
+.mp-final .mp-rule {
+    margin-bottom: 4rem;
+}
+
+/* ---------- Karten ---------- */
+
+.mp-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.mp-cards-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mp-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem;
+    border: 1px solid #223049;
+    border-radius: .95rem;
+    background: rgba(15, 27, 49, .98);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    transition: transform .18s ease, border-color .18s ease;
+}
+
+.mp-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(56, 189, 248, .58);
+}
+
+.mp-card-icon {
+    color: #0ea5e9;
+    font-size: 1rem;
+}
+
+.mp-card h3 {
+    margin: .85rem 0 .4rem;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.mp-card h3.mp-card-h-top {
+    margin-top: 0;
+}
+
+.mp-card-sub {
+    margin: 0 0 .85rem;
+    color: #e2e8f0;
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.mp-card-text {
+    margin: 0;
+    max-width: 34rem;
+    color: #94a3b8;
+    font-size: .875rem;
+    line-height: 1.75;
+}
+
+.mp-cardfoot {
+    margin-top: auto;
+    padding-top: 1.5rem;
+}
+
+.mp-cardfoot .mp-btn {
+    display: inline-flex;
+}
+
+/* ---------- Preise ---------- */
+
+.mp-plan-head {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.mp-plan-head h3 {
+    margin: 0;
+}
+
+.mp-badge {
+    padding: .25rem .6rem;
+    border: 1px solid rgba(56, 189, 248, .45);
+    border-radius: 999px;
+    background: rgba(14, 165, 233, .07);
+    color: #7dd3fc;
+    font-size: .68rem;
+    font-weight: 750;
+    letter-spacing: .04em;
+}
+
+.mp-price {
+    margin-top: 1.15rem;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -.03em;
+}
+
+.mp-price-suffix {
+    color: #94a3b8;
+    font-size: .9rem;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.mp-price-alt {
+    margin: .45rem 0 0;
+    color: #94a3b8;
+    font-size: .8125rem;
+}
+
+.mp-fine {
+    margin: .45rem 0 0;
+    color: #64748b;
+    font-size: .78rem;
+}
+
+.mp-fine-tight {
+    margin-top: .35rem;
+}
+
+.mp-plan-text {
+    margin: 1.15rem 0 0;
+    color: #94a3b8;
+    font-size: .875rem;
+    line-height: 1.75;
+}
+
+.mp-features {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mp-features li {
+    display: flex;
+    gap: .65rem;
+    color: #cbd5e1;
+    font-size: .875rem;
+    line-height: 1.6;
+}
+
+.mp-features i {
+    margin-top: .25rem;
+    color: #0ea5e9;
+    font-size: .8rem;
+}
+
+.mp-price-note {
+    margin: 2rem 0 0;
+    max-width: 38rem;
+    color: #64748b;
+    font-size: .8125rem;
+    line-height: 1.7;
+}
+
+.mp-price-more {
+    margin: 1.25rem 0 0;
+    max-width: 38rem;
+    color: #94a3b8;
+    font-size: .9rem;
+    line-height: 1.7;
+}
+
+/* ---------- FAQ ---------- */
+
+.mp-faq-section .mp-h2 {
+    margin-bottom: 2.5rem;
+}
+
+.mp-q {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.65rem 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.mp-q::-webkit-details-marker {
+    display: none;
+}
+
+.mp-q::after {
+    content: "+";
+    color: #0ea5e9;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+details[open] .mp-q::after {
+    content: "–";
+}
+
+.mp-q:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.mp-a {
+    margin: 0 0 1.75rem;
+    color: #94a3b8;
+    font-size: .9rem;
+    line-height: 1.7;
+}
+
+/* ---------- Footer ---------- */
+
+.mp-footer {
+    margin-top: 1rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid #1e293b;
+}
+
+.mp-footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+}
+
+.mp-footer .mp-nav {
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.mp-footer .mp-nav a {
+    font-size: .78rem;
+}
+
+/* ---------- Responsive (ein Breakpoint) ---------- */
+
+@media (max-width: 900px) {
+    .mp-cards,
+    .mp-cards-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .mp-hero {
+        padding-top: 4.5rem;
+        padding-bottom: 4rem;
+    }
+
+    .mp-section {
+        padding-top: 5.5rem;
+    }
+
+    .mp-menu-btn {
+        display: inline-flex;
+    }
+
+    .mp-header .mp-nav {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: .5rem 2rem 1.25rem;
+        background: rgba(2, 6, 23, .97);
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .mp-header .mp-nav.is-open {
+        display: flex;
+    }
+
+    .mp-header .mp-nav a:not(.ui-btn) {
+        display: flex;
+        align-items: center;
+        min-height: 2.75rem;
+        font-size: 1rem;
+    }
+
+    .mp-header .mp-nav .ui-btn {
+        margin-top: .75rem;
+        min-height: 2.75rem;
+    }
+}
