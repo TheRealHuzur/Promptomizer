@@ -6438,6 +6438,7 @@
             if (!all.length) {
                 items.push('<div class="px-3 py-2 text-xs text-slate-500 italic">Keine Kategorien.</div>');
                 list.innerHTML = items.join('');
+                fitPromptCategorySubmenu(menu, list);
                 focusMobilePopup(menu);
                 return;
             }
@@ -6451,7 +6452,38 @@
             `).join(''));
 
             list.innerHTML = items.join('');
+            fitPromptCategorySubmenu(menu, list);
             focusMobilePopup(menu);
+        }
+
+        // Desktop: Das Untermenü hängt absolut am fixierten Hauptmenü und wächst mit vielen
+        // Kategorien über den Viewport hinaus, ohne dass die Seite scrollen kann. Deshalb die
+        // Liste auf die verfügbare Höhe begrenzen (scrollbar) und das Untermenü bei Bedarf
+        // nach oben verschieben. Mobil regelt styles.css die Darstellung (statisch, 40dvh).
+        function fitPromptCategorySubmenu(menu, list) {
+            menu.style.top = '';
+            list.style.maxHeight = '';
+            list.style.overflowY = '';
+            if (isMobileNavViewport()) return;
+
+            const margin = 8;
+            const viewportBottom = window.innerHeight - margin;
+            const menuRect = menu.getBoundingClientRect();
+            const listRect = list.getBoundingClientRect();
+            const headerHeight = listRect.top - menuRect.top;
+            const maxMenuHeight = Math.max(160, window.innerHeight - 2 * margin);
+
+            if (menuRect.height > maxMenuHeight) {
+                list.style.maxHeight = `${Math.max(80, maxMenuHeight - headerHeight)}px`;
+                list.style.overflowY = 'auto';
+            }
+
+            const fitted = menu.getBoundingClientRect();
+            const overflow = fitted.bottom - viewportBottom;
+            if (overflow > 0) {
+                const shift = Math.min(overflow, Math.max(0, fitted.top - margin));
+                menu.style.top = `${-shift}px`;
+            }
         }
 
         function closePromptCategorySubmenu() {

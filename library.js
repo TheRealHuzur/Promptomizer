@@ -970,6 +970,11 @@
             option.textContent = item.name;
             category.append(option);
         });
+        // Aus einer Kategorie heraus angelegt → diese Kategorie vorbelegen.
+        if (state.activeSection === 'category') {
+            const active = state.categories.find(item => String(item.id) === String(state.categoryId));
+            if (active) category.value = active.name;
+        }
         side.append(typeLabel, type, categoryLabel, category);
         form.append(main, side);
 
