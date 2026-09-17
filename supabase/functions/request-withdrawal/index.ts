@@ -15,29 +15,37 @@ import {
   pickPrimarySubscription,
   stripeRequest,
 } from "../_shared/stripe.ts";
+import nodemailer from "npm:nodemailer@^9";
 
 const WITHDRAWAL_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const OPERATOR_EMAIL = "info@promptomizer.de";
 
-async function sendBrevoMail(to: string, subject: string, htmlContent: string) {
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      accept: "application/json",
-      "api-key": getEnv("brevo_api_key"),
-    },
-    body: JSON.stringify({
-      sender: { email: OPERATOR_EMAIL, name: "Promptomizer" },
-      to: [{ email: to }],
-      subject,
-      htmlContent,
-    }),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Brevo API Fehler (${response.status}): ${errorText}`);
+let mailTransport: ReturnType<typeof nodemailer.createTransport> | null = null;
+
+// Versand ueber das Brevo-SMTP-Relay (Port 587, STARTTLS). Der Transport wird
+// pro Isolate nur einmal erzeugt und fuer beide Mails wiederverwendet.
+function getMailTransport() {
+  if (!mailTransport) {
+    mailTransport = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: getEnv("BREVO_SMTP_USER"),
+        pass: getEnv("BREVO_SMTP_KEY"),
+      },
+    });
   }
+  return mailTransport;
+}
+
+async function sendBrevoMail(to: string, subject: string, htmlContent: string) {
+  await getMailTransport().sendMail({
+    from: `"Promptomizer" <${OPERATOR_EMAIL}>`,
+    to,
+    subject,
+    html: htmlContent,
+  });
 }
 
 Deno.serve(async (req) => {
