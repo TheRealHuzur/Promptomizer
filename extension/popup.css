@@ -192,17 +192,53 @@ body {
     color: #fff;
 }
 
-/* Filter-Chips (Alle · ★ · Kategorien bzw. Feldtypen), horizontal scrollbar */
-.px-chips {
-    display: flex;
-    gap: 6px;
+/* Filter-Chips (Alle · ★ · Kategorien bzw. Feldtypen), horizontal scrollbar.
+   Der Scrollbalken ist ausgeblendet; geblättert wird über die Pfeile links/rechts,
+   die nur erscheinen, wenn in ihre Richtung noch Chips verborgen sind. */
+.px-chips-wrap {
+    position: relative;
     padding: 10px 14px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
     flex: 0 0 auto;
 }
 
+.px-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
 .px-chips::-webkit-scrollbar { display: none; }
+
+.px-chips-arrow {
+    position: absolute;
+    top: 10px;
+    bottom: 0;
+    z-index: 1;
+    width: 26px;
+    padding: 0;
+    border: 0;
+    background: var(--navy-deep);
+    color: var(--muted);
+    font: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.px-chips-arrow:hover { color: #fff; }
+
+.px-chips-arrow-prev {
+    left: 14px;
+    box-shadow: 8px 0 8px -2px var(--navy-deep);
+}
+
+.px-chips-arrow-next {
+    right: 14px;
+    box-shadow: -8px 0 8px -2px var(--navy-deep);
+}
 
 .px-chip {
     display: inline-flex;

@@ -88,6 +88,8 @@
         logoutBtn: document.getElementById('logout-btn'),
         tabs: Array.from(document.querySelectorAll('.px-tab')),
         chips: document.getElementById('filter-chips'),
+        chipsPrev: document.getElementById('chips-prev'),
+        chipsNext: document.getElementById('chips-next'),
         search: document.getElementById('search-input'),
         list: document.getElementById('result-list'),
         empty: document.getElementById('empty-state'),
@@ -403,6 +405,18 @@
         el.chips.append(fragment);
         const activeChip = el.chips.querySelector('.px-chip.active');
         activeChip?.scrollIntoView?.({ inline: 'nearest', block: 'nearest' });
+        updateChipArrows();
+    }
+
+    // Pfeile nur zeigen, wenn in ihre Richtung noch Chips verborgen sind.
+    function updateChipArrows() {
+        const maxScroll = el.chips.scrollWidth - el.chips.clientWidth;
+        el.chipsPrev.hidden = el.chips.scrollLeft <= 1;
+        el.chipsNext.hidden = el.chips.scrollLeft >= maxScroll - 1;
+    }
+
+    function scrollChips(direction) {
+        el.chips.scrollBy({ left: direction * Math.round(el.chips.clientWidth * 0.6), behavior: 'smooth' });
     }
 
     function setFilter(key) {
@@ -709,6 +723,9 @@
             renderList();
         });
         document.addEventListener('keydown', onKeydown);
+        el.chipsPrev.addEventListener('click', () => scrollChips(-1));
+        el.chipsNext.addEventListener('click', () => scrollChips(1));
+        el.chips.addEventListener('scroll', updateChipArrows, { passive: true });
 
         client.auth.onAuthStateChange((event) => {
             if (event === 'SIGNED_OUT' && state.user) handleSignedOut();
