@@ -53,6 +53,8 @@ Das ist ein echtes Sicherheitsproblem. Nutzerinhalte duerfen nicht unkontrollier
 
 **Deployment erledigt (12.06.2026):** Secret gesetzt, Migration angewendet, Function deployed, `x-welcome-secret`-Header im Webhook ergaenzt, doppelter Webhook geloescht. End-to-End verifiziert: ohne Secret 401, unbekannter User 403, echter Signup loest genau eine Mail aus, Wiederholungsaufrufe werden uebersprungen.
 
+**Nachtrag (17.09.2026):** Die separate Willkommensmail ist entfallen. Ihr Inhalt ist in die Bestaetigungsmail (E-Mail-Bestaetigung nach der Registrierung) gewandert. Die Edge Function `send-welcome-email` samt README und der zugehoerige Block in `supabase/config.toml` wurden aus dem Repo entfernt. Die Migration und die Spalte `profiles.welcome_email_sent_at` bleiben unveraendert bestehen.
+
 **Warum kritisch**
 Sobald E-Mail-Versand offen angreifbar ist, riskierst du Spam, Kosten und Reputationsschaeden.
 
