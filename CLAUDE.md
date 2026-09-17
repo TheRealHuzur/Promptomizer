@@ -97,10 +97,8 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 | `create-stripe-portal-session` | true | Öffnet Stripe Customer Portal |
 | `sync-stripe-subscription` | true | Gleicht Abo-Status nach Redirect ab |
 | `stripe-webhook` | **false** | Stripe-Events → schreibt `tier`/`stripe_*` per service_role |
-| `send-welcome-email` | true | Einmalige Willkommens-Mail |
 | `_shared/stripe.ts` | — | Gemeinsame Helfer (`deriveTier`, `ensureStripeCustomer`, …) |
 
-- **Welcome-Mail-Härtung** (siehe `supabase/functions/send-welcome-email/README.md`): geschützt durch Shared Secret `WELCOME_EMAIL_SECRET` (Header `x-welcome-secret`) + User-Existenz-Check; Einmal-Versand über `profiles.welcome_email_sent_at`. Ausgelöst durch DB-Trigger `trigger_send_welcome_email` (auf `auth.users`).
 - Deploy einer Function: `npx supabase functions deploy <name>`.
 
 ---
@@ -201,7 +199,7 @@ Auslieferung. Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/ext
   - **PowerShell-Falle bei Commit-Messages:** Eingebettete `"`-Anführungszeichen in `git commit -m @'...'@` zerlegen die Argumente. In Messages doppelte Anführungszeichen vermeiden (oder Zeichen ersetzen).
   - Commit-Messages auf Deutsch, mit `Co-Authored-By`-Trailer, wenn von der KI erstellt.
 - **Supabase ohne Docker:** `db push` und `functions deploy` brauchen **kein** Docker. Nur `db dump`/`db diff`/lokaler Stack bräuchten es (Docker Desktop ist hier nicht installiert → diese Befehle meiden).
-- **`supabase/.temp/` ist gitignored** (enthält u.a. `welcome-secret.txt`). Dort keine dauerhaften Artefakte ablegen, die ins Repo sollen.
+- **`supabase/.temp/` ist gitignored.** Dort keine dauerhaften Artefakte ablegen, die ins Repo sollen.
 
 ---
 
@@ -212,7 +210,7 @@ Auslieferung. Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/ext
   - Management-Token: Windows Credential Manager, Eintrag `Supabase CLI:supabase` (von der Supabase-CLI hinterlegt).
   - service_role/anon: Management-API `…/projects/<ref>/api-keys?reveal=true`.
   - Diese Werte nur transient verwenden (z.B. unter `supabase/.temp/`, das gitignored ist) und **nie** committen.
-- **Edge-Function-Secrets** (Stripe-Keys, `WELCOME_EMAIL_SECRET`, …) liegen in den Supabase-Function-Secrets, nicht im Repo.
+- **Edge-Function-Secrets** (Stripe-Keys, …) liegen in den Supabase-Function-Secrets, nicht im Repo.
 
 ---
 
