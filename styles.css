@@ -433,6 +433,22 @@ body.sidebar-collapsed #sidebar-left .sidebar-user-text {
     background: #dc2626;
 }
 
+/* Anlass-Hinweis im Login-/Registrierungsmodal (setAuthContextHint in app.html). */
+.auth-context-hint {
+    margin-bottom: 1rem;
+    padding: .75rem .85rem;
+    border: 1px solid rgba(56, 189, 248, .35);
+    border-radius: .5rem;
+    background: rgba(14, 165, 233, .1);
+    color: #e2e8f0;
+    font-size: .875rem;
+    line-height: 1.5;
+}
+
+.auth-context-hint.hidden {
+    display: none;
+}
+
 #input-free {
     font-family: 'Inter', sans-serif;
     white-space: pre-wrap;

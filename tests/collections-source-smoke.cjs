@@ -110,7 +110,17 @@ assert.equal(api.promptText({ fields: { mode: 'free', text: 'A [B]' } }), 'A [B]
 // Übernahme: vorhandene Wege, Limit-Vorprüfung, Upgrade-Modal, Anmeldung.
 assert(collections.includes('window.db.saveScenario('));
 assert(collections.includes("window.openUpgradeModal?.('library_full')"));
-assert(collections.includes('window.openAuthModal?.()'));
+assert(collections.includes('window.openAuthModal?.({ hint: ADOPT_LOGIN_HINT })'));
+assert(collections.includes("const ADOPT_LOGIN_HINT = 'Um Prompts in deine persönliche Bibliothek zu übernehmen, brauchst du ein Konto."));
+
+// Anlass-Hinweis im Login-/Registrierungsmodal: optional, per textContent, bleibt beim Moduswechsel erhalten.
+assert(app.includes('id="auth-context-hint" class="auth-context-hint hidden"'));
+assert(app.includes('id="register-context-hint" class="auth-context-hint hidden"'));
+assert(app.includes('function openAuthModal(options) {\n            setAuthContextHint(options);'.replace(/\n/g, app.includes('\r\n') ? '\r\n' : '\n')));
+assert(app.includes('function openRegisterModal(options) {'));
+assert(app.includes('const options = { hint: authContextHint };'));
+assert(app.includes('el.textContent = authContextHint;'));
+assert(read('styles.css').includes('.auth-context-hint {'));
 assert(collections.includes('await window.db.getPromptCount()'));
 assert(collections.includes("result.reason === 'FREE_LIMIT_REACHED'"));
 

@@ -1420,6 +1420,7 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
+            <p id="auth-context-hint" class="auth-context-hint hidden" role="note"></p>
 
             <div class="space-y-4">
                 <div>
@@ -1499,6 +1500,7 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
+            <p id="register-context-hint" class="auth-context-hint hidden" role="note"></p>
 
             <div class="space-y-4">
                 <div>
@@ -2497,7 +2499,22 @@
             }
         }
 
-        function openAuthModal() {
+        // Optionaler Anlass-Hinweis über Login/Registrierung (z. B. aus den Kollektionen).
+        // Bleibt beim Wechsel zwischen Login und Registrierung erhalten, sonst leer.
+        let authContextHint = '';
+
+        function setAuthContextHint(options) {
+            authContextHint = typeof options?.hint === 'string' ? options.hint.trim() : '';
+            ['auth-context-hint', 'register-context-hint'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = authContextHint;
+                el.classList.toggle('hidden', !authContextHint);
+            });
+        }
+
+        function openAuthModal(options) {
+            setAuthContextHint(options);
             const remember = localStorage.getItem('promptomizer_remember') !== 'false';
             const cb = document.getElementById('auth-remember');
             if (cb) {
@@ -2620,14 +2637,16 @@
         function switchAuthMode(mode) {
             closeAuthModal();
             closeRegisterModal();
+            const options = { hint: authContextHint };
             if (mode === 'register') {
-                openRegisterModal();
+                openRegisterModal(options);
             } else if (mode === 'login') {
-                openAuthModal();
+                openAuthModal(options);
             }
         }
 
-        function openRegisterModal() {
+        function openRegisterModal(options) {
+            setAuthContextHint(options);
             const err = document.getElementById('register-error');
             if (err) {
                 err.classList.add('hidden');

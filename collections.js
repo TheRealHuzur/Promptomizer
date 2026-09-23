@@ -8,6 +8,9 @@
     // Ausgenommen sind Markdown-Links [Text](url) und Checkboxen [ ] / [x].
     const PLACEHOLDER_PATTERN = /\[([^[\]\n]+)\](?!\()/g;
 
+    // Hinweis im Login-/Registrierungsmodal, wenn ein Gast einen Prompt übernehmen will.
+    const ADOPT_LOGIN_HINT = 'Um Prompts in deine persönliche Bibliothek zu übernehmen, brauchst du ein Konto. Melde dich an oder registriere dich kostenlos.';
+
     const state = {
         collectionId: null,
         openPreviews: new Set(),
@@ -309,7 +312,7 @@
     async function adoptPrompt(prompt, button) {
         if (state.busyPromptIds.has(prompt.id)) return;
         if (!window.currentUser) {
-            window.openAuthModal?.();
+            window.openAuthModal?.({ hint: ADOPT_LOGIN_HINT });
             return;
         }
 
@@ -333,7 +336,7 @@
 
             if (!result.success) {
                 if (result.reason === 'FREE_LIMIT_REACHED') window.openUpgradeModal?.('library_full');
-                else if (result.reason === 'NOT_LOGGED_IN') window.openAuthModal?.();
+                else if (result.reason === 'NOT_LOGGED_IN') window.openAuthModal?.({ hint: ADOPT_LOGIN_HINT });
                 else window.showToast?.('Prompt konnte nicht übernommen werden. Bitte erneut versuchen.', 'error');
                 return;
             }
