@@ -12,9 +12,9 @@
 // Platzhalter stehen in eckigen Klammern, z. B. [Angabe]. Sie werden in der Vorschau
 // hervorgehoben und beim Kopieren/Übernehmen unverändert weitergegeben.
 //
-// ACHTUNG: Die folgende Testkollektion dient nur der Entwicklung und wird vor dem Merge
-// durch die echten Inhalte ersetzt. Die Texte stammen aus den öffentlichen Vorlagen
-// (prompt-vorlagen.html).
+// ACHTUNG: Die folgende Testkollektion (id 'testkollektion') ist bewusst live, bis die erste
+// echte Kollektion veröffentlicht wird, und wird dabei vollständig entfernt. Die Texte stammen
+// aus den öffentlichen Vorlagen (prompt-vorlagen.html).
 window.PROMPTOMIZER_COLLECTIONS = [
     {
         id: 'testkollektion',
