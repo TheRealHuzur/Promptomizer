@@ -1,0 +1,267 @@
+/* Kollektionen: eigene Klassen, weil Tailwind gepurged ist und JS-Markup nicht scannt. */
+
+.collections-view {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+    padding-bottom: 5rem;
+}
+
+.collections-hero {
+    margin-bottom: 1.5rem;
+}
+
+.collections-hero .library-title:focus {
+    outline: none;
+}
+
+.collections-empty {
+    color: #94a3b8;
+    font-size: .9rem;
+}
+
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.collections-card {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    min-height: 180px;
+    padding: 1.15rem;
+    border: 1px solid #223049;
+    border-radius: .95rem;
+    background: rgba(15, 27, 49, .98);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    text-align: left;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.collections-card:hover,
+.collections-card:focus-visible {
+    border-color: rgba(56, 189, 248, .58);
+    box-shadow: 0 22px 65px rgba(0, 0, 0, .28);
+    transform: translateY(-3px);
+    outline: none;
+}
+
+.collections-card-count {
+    align-self: flex-start;
+    padding: .22rem .5rem;
+    border: 1px solid rgba(56, 189, 248, .2);
+    border-radius: 999px;
+    color: #7dd3fc;
+    background: rgba(14, 165, 233, .07);
+    font-size: .65rem;
+    font-weight: 750;
+    letter-spacing: .035em;
+}
+
+.collections-card-title {
+    color: #f8fafc;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.35;
+}
+
+.collections-card-benefit {
+    color: #94a3b8;
+    font-size: .82rem;
+    line-height: 1.55;
+}
+
+.collections-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1rem;
+    padding: .4rem .2rem;
+    color: #7dd3fc;
+    font-size: .84rem;
+    font-weight: 700;
+}
+
+.collections-back:hover {
+    color: #e0f2fe;
+}
+
+.collections-back:focus-visible,
+.collections-preview-toggle:focus-visible,
+.collections-copy-button:focus-visible,
+.collections-adopt-button:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
+.collections-prompt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.collections-prompt {
+    padding: 1.15rem 1.25rem;
+    border: 1px solid #223049;
+    border-radius: .95rem;
+    background: rgba(15, 27, 49, .98);
+}
+
+.collections-prompt-title {
+    color: #f8fafc;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.collections-prompt-purpose {
+    margin-top: .4rem;
+    color: #cbd5e1;
+    font-size: .88rem;
+    line-height: 1.55;
+}
+
+.collections-prompt-inputs {
+    margin-top: .75rem;
+    color: #94a3b8;
+    font-size: .82rem;
+    line-height: 1.55;
+}
+
+.collections-prompt-inputs-label {
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+.collections-prompt-inputs ul {
+    margin-top: .25rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+}
+
+.collections-preview-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .85rem;
+    padding: .3rem 0;
+    color: #7dd3fc;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.collections-preview-toggle:hover {
+    color: #e0f2fe;
+}
+
+.collections-preview {
+    margin-top: .6rem;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    border: 1px solid #1e293b;
+    border-radius: .65rem;
+    background: #030b19;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    font-size: .84rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.collections-preview[hidden] {
+    display: none;
+}
+
+/* Platzhalter: Farbe plus Hintergrund und Rahmen, Klammern bleiben sichtbar. #fde68a auf #030b19 ≈ 14:1. */
+.collections-placeholder {
+    padding: 0 .2rem;
+    border: 1px solid rgba(251, 191, 36, .6);
+    border-radius: .3rem;
+    background: rgba(245, 158, 11, .16);
+    color: #fde68a;
+    font-weight: 600;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
+.collections-prompt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.collections-adopt-button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.collections-adopt-button.is-adopted {
+    background: rgba(14, 165, 233, .12);
+    color: #7dd3fc;
+    box-shadow: none;
+    border: 1px solid rgba(56, 189, 248, .45);
+}
+
+.collections-copy-button {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .55rem .85rem;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    color: #cbd5e1;
+    font-size: .82rem;
+    font-weight: 600;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.collections-copy-button:hover {
+    color: #fff;
+    border-color: #475569;
+    background: rgba(30, 41, 59, .5);
+}
+
+.collections-copy-button.is-copied {
+    color: #86efac;
+    border-color: rgba(134, 239, 172, .45);
+}
+
+@media (max-width: 1023px) {
+    .collections-view {
+        min-width: 0;
+        padding-bottom: 1rem;
+    }
+
+    .collections-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .collections-card {
+        min-height: 0;
+    }
+
+    .collections-prompt {
+        padding: 1rem;
+    }
+
+    .collections-prompt-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .collections-adopt-button,
+    .collections-copy-button,
+    .collections-back,
+    .collections-preview-toggle {
+        min-height: 2.75rem;
+    }
+
+    .collections-copy-button {
+        justify-content: center;
+    }
+}
