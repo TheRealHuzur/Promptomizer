@@ -15,11 +15,16 @@ window.PROMPTOMIZER_COLLECTIONS = [
     {
         "id": "prozessmanagement",
         "title": "Prozessmanagement",
-        "benefit": "",
+        "benefit": "Vom Ist-Prozess zum Verbesserungsvorschlag: modellieren, analysieren, bewerten.",
         "prompts": [
             {
                 "id": "prozessmanagement-prozessmodell",
                 "title": "Prozessmodell erstellen",
+                "purpose": "Macht aus einer Prozessbeschreibung ein BPMN-2.0-Modell, das du direkt in BPMNDesk oder einem beliebigen Modellierungstool öffnen kannst.",
+                "inputs": [
+                    "Den Namen des Prozesses",
+                    "Eine Beschreibung des Ablaufs in eigenen Worten"
+                ],
                 "fields": {
                     "role": "Du bist Prozessmanager mit langjähriger Erfahrung in der Modellierung nach BPMN 2.0. Du übersetzt fachliche Beschreibungen so in Modelle, dass Fachanwender sie verstehen und Modellierungswerkzeuge sie fehlerfrei öffnen.",
                     "context": "Ich habe einen Prozess als Text beschrieben und möchte ihn als BPMN-2.0-Modell. Das Modell bildet die Beschreibung inhaltlich exakt ab: Du fügst keine Schritte, Beteiligten oder Entscheidungen hinzu und lässt nichts weg.\n\nDu arbeitest nach den BPMN-Modellierungsregeln aus diesem Wiki:\nhttps://wissen-und-werkzeug.de/wiki/bpmn/\n\nRufe die Seite auf, bevor du modellierst. Wenn du sie nicht abrufen kannst, sag mir das ausdrücklich, bevor du mit allgemeinen BPMN-Konventionen weiterarbeitest.\n\nProzessname: [Prozessname]\n\nProzessbeschreibung:\n[Prozessbeschreibung]",
@@ -30,6 +35,12 @@ window.PROMPTOMIZER_COLLECTIONS = [
             {
                 "id": "prozessmanagement-prozessanalyse",
                 "title": "Prozess analysieren",
+                "purpose": "Findet in einem kurzen Interview die Schwachstellen eines Ist-Prozesses und hält sie mit Beleg und Gewichtung in einem Word-Dokument fest.",
+                "inputs": [
+                    "Den Namen des Prozesses",
+                    "Den Anlass der Analyse",
+                    "Eine Prozessbeschreibung oder das BPMN-Modell als Datei"
+                ],
                 "fields": {
                     "role": "Du bist Prozessberater mit langjähriger Erfahrung in der Ist-Analyse von Verwaltungs- und Dienstleistungsprozessen. Du führst Analysegespräche so, dass konkrete Beobachtungen statt allgemeiner Meinungen herauskommen, und du trennst sauber zwischen belegten Schwachstellen und Vermutungen.",
                     "context": "Ich möchte die Schwachstellen eines Ist-Prozesses systematisch erfassen, bevor wir über Lösungen sprechen. Ich kenne den Prozess aus der Praxis und beantworte deine Fragen.\n\nProzess: [Prozessname]\nAnlass der Analyse: [Analyseanlass]\n\nProzessbeschreibung (alternativ: Hänge das BPMN-Modell als Datei an und schreibe hier \"siehe Anhang\"):\n[Prozessbeschreibung]\n\nDu untersuchst den Prozess in vier Kategorien:\n1. Ablauf: Schleifen, Rücksprünge, Wartezeiten, Doppelarbeit, Engpässe, Schritte ohne erkennbaren Nutzen\n2. Information und Technik: Übergaben, Medienbrüche, Mehrfacherfassung, Suchaufwand, fehlende oder ungeeignete Systeme\n3. Zuständigkeit und Steuerung: unklare Verantwortung, Freigaben und Prüfschritte, Abstimmungsaufwand, Wissen, das an einzelnen Personen hängt\n4. Ergebnis: Durchlaufzeit, Fehler und Nacharbeit, Nachforderungen, Wirkung bei den Kundinnen und Kunden des Prozesses",
@@ -40,6 +51,12 @@ window.PROMPTOMIZER_COLLECTIONS = [
             {
                 "id": "prozessmanagement-how-wow-now",
                 "title": "HOW-WOW-NOW-Einordnung",
+                "purpose": "Bewertet Verbesserungsideen nach Innovation und Machbarkeit und ordnet sie in der HOW-WOW-NOW-Matrix ein.",
+                "inputs": [
+                    "Den Namen des Prozesses",
+                    "Eine Liste der Verbesserungsideen",
+                    "Die Rahmenbedingungen, zum Beispiel Budget, IT oder Zuständigkeiten"
+                ],
                 "fields": {
                     "role": "Du bist Prozessberater mit Erfahrung in der Moderation von Verbesserungsworkshops. Du bewertest Ideen nüchtern und begründet und lässt dich nicht von gut klingenden Vorschlägen blenden.",
                     "context": "Zum Prozess [Prozessname] liegen Verbesserungsideen vor. Ich möchte sie mit der HOW-WOW-NOW-Matrix einordnen, um zu entscheiden, welche wir weiterverfolgen. \n\nIdeen:\n[Ideenliste]\n\nRahmenbedingungen:\n[Rahmenbedingungen]\n\nDie Matrix hat zwei Achsen:\n- Innovation: Wie neu ist die Idee für diese Organisation? Maßstab ist der heutige Stand hier, nicht der Stand anderswo.\n- Machbarkeit: Wie gut lässt sich die Idee unter den genannten Rahmenbedingungen umsetzen?\n\nDie vier Felder:\n- NOW: geringe Innovation, hohe Machbarkeit. Schnell umsetzbare Verbesserung.\n- WOW: hohe Innovation, hohe Machbarkeit. Vorrangig weiterverfolgen.\n- HOW: hohe Innovation, geringe Machbarkeit. Klären, wie sie möglich werden könnte.\n- AU: geringe Innovation, geringe Machbarkeit. Verwerfen.",
@@ -50,6 +67,12 @@ window.PROMPTOMIZER_COLLECTIONS = [
             {
                 "id": "prozessmanagement-fmea",
                 "title": "Prozess-FMEA",
+                "purpose": "Untersucht in einem kurzen Interview die wichtigsten Fehlermöglichkeiten eines Prozesses und schlägt Gegenmaßnahmen vor.",
+                "inputs": [
+                    "Den Namen des Prozesses",
+                    "Eine Prozessbeschreibung oder das Prozessmodell als Datei",
+                    "Optional: den Anlass oder das Ergebnis, das besonders zuverlässig sein muss"
+                ],
                 "fields": {
                     "role": "Du bist Prozessberater und moderierst mit mir eine fokussierte Prozess-FMEA. Ich kenne den Prozess aus der Praxis; du strukturierst das Gespräch, prüfst Zusammenhänge und dokumentierst die Ergebnisse verständlich.",
                     "context": "Ich möchte wenige relevante Fehlermöglichkeiten eines Prozesses untersuchen, ohne jeden Prozessschritt einzeln durchzugehen. Orientiere dich an der Methode und den Begriffen aus diesem Wiki-Artikel:\nhttps://wissen-und-werkzeug.de/wiki/prozess-fmea-methode-praxisbeispiel/\n\nRufe die Seite auf, bevor du beginnst. Falls das nicht möglich ist, sag es kurz und arbeite mit der Kette Prozessstelle → Fehlermöglichkeit → Ursache → Folge → Gegenmaßnahme weiter. Übernimm keine Beispiele aus dem Artikel als Tatsachen über meinen Prozess.\n\nProzessname: [Prozessname]\nProzessbeschreibung (alternativ: angehängtes Prozessmodell):\n[Prozessbeschreibung]\n\nAnlass oder besonders wichtiges Prozessergebnis (optional): [Anlass_oder_Prozessergebnis]",
