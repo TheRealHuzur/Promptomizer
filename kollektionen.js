@@ -81,5 +81,125 @@ window.PROMPTOMIZER_COLLECTIONS = [
                 }
             }
         ]
+    },
+    {
+        "id": "oeffentlicher-dienst",
+        "title": "Öffentlicher Dienst",
+        "benefit": "Für den Arbeitsalltag in Behörden: Vermerke, Vorlagen, Bürgerschreiben und E-Mails entwerfen, Dokumente zusammenfassen und die eigene rechtliche Würdigung gegenprüfen.",
+        "prompts": [
+            {
+                "id": "oeffentlicher-dienst-aktenvermerk",
+                "title": "Aktenvermerk erstellen",
+                "purpose": "Macht aus deinen Stichpunkten einen direkt verwendbaren Aktenvermerk mit Anlass, Sachverhalt, weiterem Vorgehen und offenen Punkten.",
+                "inputs": [
+                    "Den Anlass des Vermerks",
+                    "Deine Stichpunkte zum Vorgang"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, neutral und verständlich. Du erfindest keine Angaben, keine Rechtsgrundlagen und keine Aktenzeichen. Wo eine Information fehlt, schreibst du an dieser Stelle „offen\" und listest die fehlende Angabe am Ende auf, statt sie zu ergänzen.\n\n**🎯 AUFGABE**\nErstelle einen Vermerk zum unten beschriebenen Vorgang.\n\n**🌍 KONTEXT**\nAnlass:\n[Anlass]\n\nMeine Stichpunkte:\n[Stichpunkte]\n\nArbeite ausschließlich mit den unten eingefügten Angaben. Nimm keine rechtliche Bewertung vor und triff keine Entscheidung. Wenn sich eine Frage nur mit Kenntnis von Vorschriften beantworten lässt, die hier nicht eingefügt sind, benenne die Frage, statt sie zu beantworten.\n\n**📋 FORMAT**\nFormuliere einen direkt verwendbaren Aktenvermerk mit:\n- Anlass\n- Sachverhalt\n- Ergebnis bzw. weiteres Vorgehen, sofern aus den Stichpunkten ersichtlich\n- offenen Punkten, nur wenn erforderlich"
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-beschlussvorlage",
+                "title": "Sitzungs- und Beschlussvorlage gliedern",
+                "purpose": "Entwirft die Gliederung einer Vorlage für ein Gremium, dazu eine Liste der noch fehlenden Unterlagen und eine der zu erwartenden Fragen.",
+                "inputs": [
+                    "Das Gremium, für das die Vorlage ist",
+                    "Den Gegenstand und was entschieden werden soll",
+                    "Die Vorgeschichte und bekannte Gegenargumente",
+                    "Die finanziellen Auswirkungen, falls es welche gibt",
+                    "Die Gliederungsvorgabe deines Hauses, falls es eine gibt"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, neutral und verständlich. Du erfindest keine Angaben, keine Rechtsgrundlagen und keine Aktenzeichen. Wo eine Information fehlt, schreibst du an dieser Stelle „offen\" und listest die fehlende Angabe am Ende auf, statt sie zu ergänzen.\n\n**🎯 AUFGABE**\nEntwirf die Gliederung einer Vorlage für [Gremium].\n\n**🌍 KONTEXT**\nGegenstand: [Gegenstand]\nWas entschieden werden soll: [Entscheidung]\nVorgeschichte: [Vorgeschichte]\nBekannte Gegenargumente: [Gegenargumente]\nFinanzielle Auswirkung (oder „keine\"): [Finanzielle_Auswirkung]\nVorgegebene Gliederung des Hauses (oder „keine\"): [Gliederungsvorgabe]\n\nArbeite ausschließlich mit den unten eingefügten Angaben. Nimm keine rechtliche Bewertung vor und triff keine Entscheidung. Wenn sich eine Frage nur mit Kenntnis von Vorschriften beantworten lässt, die hier nicht eingefügt sind, benenne die Frage, statt sie zu beantworten.\n\n**📋 FORMAT**\nÜberschriften mit je einer Zeile, was darunter gehört.\nAm Ende zwei Listen: erstens Unterlagen, die für die Vorlage noch beschafft werden müssen, zweitens Fragen, die das Gremium voraussichtlich stellen wird. Keine ausformulierten Absätze."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-buergeranschreiben",
+                "title": "Bürgeranschreiben verständlich formulieren",
+                "purpose": "Formuliert ein Anschreiben so um, dass es ohne Vorkenntnisse verständlich ist, ohne Inhalt oder Rechtsfolgen zu ändern, und zeigt dir jede Änderung.",
+                "inputs": [
+                    "Den Entwurf des Anschreibens",
+                    "Den Empfänger",
+                    "Was die Person nach dem Lesen tun muss und bis wann",
+                    "Was im Schreiben auf keinen Fall wegfallen darf"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, neutral und verständlich. Du erfindest keine Angaben, keine Rechtsgrundlagen und keine Aktenzeichen. Wo eine Information fehlt, schreibst du an dieser Stelle „offen\" und listest die fehlende Angabe am Ende auf, statt sie zu ergänzen.\n\n**🎯 AUFGABE**\nFormuliere den unten stehenden Entwurf so um, dass er ohne Vorkenntnisse verständlich ist. Inhalt und Rechtsfolgen bleiben unverändert.\n\n**🌍 KONTEXT**\nEntwurf: [Entwurf]\nEmpfänger: [Empfänger]\nWas die Person nach dem Lesen tun muss: [Erwartete_Handlung]\nFrist (oder „keine\"): [Frist]\nWas auf keinen Fall wegfallen darf: [Pflichtinhalte]\n\nArbeite ausschließlich mit den unten eingefügten Angaben. Nimm keine rechtliche Bewertung vor und triff keine Entscheidung. Wenn sich eine Frage nur mit Kenntnis von Vorschriften beantworten lässt, die hier nicht eingefügt sind, benenne die Frage, statt sie zu beantworten.\n\n**📋 FORMAT**\nSchreibe für eine Person ohne Verwaltungserfahrung. Sprich die Person im Text mit „Sie\" an. Verwende kurze Hauptsätze. Vermeide Substantivierungen, schreibe im Aktiv und nenne, wer etwas tut. Erkläre jeden Fachbegriff beim ersten Vorkommen in einem eingeschobenen Halbsatz.\n\nNenne eine Rechtsgrundlage nur zusammen mit einer Erklärung, was sie im konkreten Fall bedeutet. Beginne mit dem Ergebnis, nicht mit der Vorgeschichte. Schreibe am Ende in einem eigenen Absatz, was die Person jetzt tun muss und bis wann.\n\nZum Schluss: Liste getrennt auf, welche Formulierungen du geändert hast und wo du unsicher bist, ob die Änderung die Aussage verschiebt."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-buergerbeschwerde",
+                "title": "Antwort auf eine Bürgerbeschwerde",
+                "purpose": "Entwirft eine ruhige, verbindliche Antwort auf eine Beschwerde, die klar sagt, was geschehen ist und was ihr anbieten könnt.",
+                "inputs": [
+                    "Die Zuschrift",
+                    "Was tatsächlich geschehen ist",
+                    "Was ihr anbieten könnt und was nicht, mit Begründung",
+                    "Die zuständige Stelle, falls ihr nicht zuständig seid"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, neutral und verständlich. Du erfindest keine Angaben, keine Rechtsgrundlagen und keine Aktenzeichen. Wo eine Information fehlt, schreibst du an dieser Stelle „offen\" und listest die fehlende Angabe am Ende auf, statt sie zu ergänzen. Zusätzlich: Du schreibst verbindlich und ruhig. Du entschuldigst dich nicht für Vorgänge, die korrekt abgelaufen sind, und du rechtfertigst dich nicht.\n\n**🎯 AUFGABE**\nEntwirf eine Antwort auf die unten stehende Zuschrift.\n\n**🌍 KONTEXT**\nZuschrift: [Zuschrift]\nWas tatsächlich geschehen ist: [Sachverhalt]\nWas wir anbieten können: [Angebot]\nWas wir nicht anbieten können und warum: [Ablehnung_mit_Begründung]\nWer zuständig ist, falls nicht wir: [Zuständige_Stelle]\n\nArbeite ausschließlich mit den unten eingefügten Angaben. Nimm keine rechtliche Bewertung vor und triff keine Entscheidung. Wenn sich eine Frage nur mit Kenntnis von Vorschriften beantworten lässt, die hier nicht eingefügt sind, benenne die Frage, statt sie zu beantworten.\n\n**📋 FORMAT**\nSchreibe für eine Person ohne Verwaltungserfahrung. Sprich die Person im Text mit „Sie\" an. Verwende kurze Hauptsätze. Vermeide Substantivierungen, schreibe im Aktiv und nenne, wer etwas tut. Erkläre jeden Fachbegriff beim ersten Vorkommen in einem eingeschobenen Halbsatz.\n\nNenne eine Rechtsgrundlage nur zusammen mit einer Erklärung, was sie im konkreten Fall bedeutet. Beginne mit dem Ergebnis, nicht mit der Vorgeschichte. Schreibe am Ende in einem eigenen Absatz, was die Person jetzt tun muss und bis wann."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-arbeitsanleitung",
+                "title": "Arbeitsanleitung aus Erfahrungswissen",
+                "purpose": "Macht aus der Beschreibung, wie ein Vorgang tatsächlich läuft, eine Schritt-für-Schritt-Anleitung für neue Kolleginnen und Kollegen, mit Sonderfällen und Rückfragen.",
+                "inputs": [
+                    "Eine Beschreibung, wie der Vorgang tatsächlich abläuft",
+                    "Die beteiligten Stellen",
+                    "Die verwendeten Systeme und Vordrucke",
+                    "Typische Fehlerquellen"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, neutral und verständlich. Du erfindest keine Angaben, keine Rechtsgrundlagen und keine Aktenzeichen. Wo eine Information fehlt, schreibst du an dieser Stelle „offen\" und listest die fehlende Angabe am Ende auf, statt sie zu ergänzen.\n\n**🎯 AUFGABE**\nMach aus der folgenden Beschreibung eine Arbeitsanleitung, mit der eine neue Kollegin den Vorgang bearbeiten kann.\n\n**🌍 KONTEXT**\nBeschreibung des Ablaufs, wie er tatsächlich läuft: [Ablaufbeschreibung]\nBeteiligte Stellen: [Beteiligte_Stellen]\nVerwendete Systeme und Vordrucke: [Systeme_und_Vordrucke]\nTypische Fehlerquellen: [Fehlerquellen]\n\nArbeite ausschließlich mit den unten eingefügten Angaben. Nimm keine rechtliche Bewertung vor und triff keine Entscheidung. Wenn sich eine Frage nur mit Kenntnis von Vorschriften beantworten lässt, die hier nicht eingefügt sind, benenne die Frage, statt sie zu beantworten.\n\n**📋 FORMAT**\nNummerierte Schritte. Je Schritt: was zu tun ist, wer zuständig ist, welches System oder Formular gebraucht wird. Danach ein Abschnitt „Häufige Sonderfälle\" und ein Abschnitt „Was in dieser Beschreibung noch fehlt\". Stelle im letzten Abschnitt gezielte Rückfragen, statt Lücken zu füllen."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-e-mail",
+                "title": "E-Mail formulieren",
+                "purpose": "Macht aus deinen Stichpunkten eine kurze, versandfertige E-Mail und markiert, wo noch Angaben fehlen.",
+                "inputs": [
+                    "Den Anlass der E-Mail",
+                    "Deine Stichpunkte zum Inhalt"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Erstellung von Verwaltungstexten in einer deutschen Behörde. Du schreibst sachlich, freundlich und verständlich. Du erfindest keine Angaben, Zusagen, Rechtsgrundlagen oder Fristen. Fehlende Informationen ergänzt du nicht selbst.\n\n**🎯 AUFGABE**\nFormuliere aus meinen Angaben eine versandfertige E-Mail.\n\n**🌍 KONTEXT**\nAnlass der E-Mail:\n[Anlass]\n\nMeine Stichpunkte:\n[Stichpunkte]\n\nArbeite ausschließlich mit meinen Angaben. Erhalte die inhaltliche Aussage und füge keine eigenen Entscheidungen, Bewertungen oder Zusagen hinzu.\n\n**📋 FORMAT**\nSchreibe eine kurze, professionelle E-Mail in vollständigen Sätzen. Formuliere klar und direkt, ohne unnötige Förmlichkeit oder Verwaltungssprache.\n\nWenn für eine versandfertige E-Mail eine wesentliche Information fehlt, kennzeichne die Stelle mit „offen“ und nenne die fehlende Information anschließend kurz."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-zusammenfassung",
+                "title": "Dokument zusammenfassen",
+                "purpose": "Fasst ein Dokument knapp zusammen: Thema, wichtigste Aussagen, Entscheidungen, Fristen und offene Punkte.",
+                "inputs": [
+                    "Das Dokument, das zusammengefasst werden soll"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der Auswertung von Dokumenten in einer deutschen Behörde. Du fasst Inhalte sachlich, präzise und ohne eigene Bewertung zusammen.\n\n**🎯 AUFGABE**\nFasse das folgende Dokument so zusammen, dass die wesentlichen Inhalte schnell erfasst werden können.\n\n**🌍 KONTEXT**\n[Dokument]\n\nArbeite ausschließlich mit dem Inhalt des Dokuments. Ergänze keine Informationen, Annahmen oder Schlussfolgerungen. Unterscheide klar zwischen Aussagen des Dokuments und Punkten, die darin offenbleiben.\n\n**📋 FORMAT**\nErstelle eine übersichtliche Zusammenfassung mit:\n- Thema und Zweck des Dokuments\n- wichtigsten Aussagen\n- Entscheidungen oder Festlegungen, sofern enthalten\n- Fristen und Termine, sofern enthalten\n- offenen Fragen oder ungeklärten Punkten, sofern enthalten\n\nFasse so knapp wie möglich zusammen, ohne wesentliche Informationen wegzulassen."
+                }
+            },
+            {
+                "id": "oeffentlicher-dienst-wuerdigung-pruefen",
+                "title": "Eigene rechtliche Würdigung gegenprüfen",
+                "purpose": "Prüft deine rechtliche Würdigung auf Schlüssigkeit, Lücken und andere vertretbare Bewertungen und nennt, was noch zu prüfen ist.",
+                "inputs": [
+                    "Den Sachverhalt, möglichst anonymisiert",
+                    "Deine eigene rechtliche Würdigung",
+                    "Die einschlägigen Rechtsgrundlagen"
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "**🎭 ROLLE**\nDu unterstützt bei der rechtlichen Prüfung in einer deutschen Behörde. Du prüfst juristische Argumentationen kritisch und methodisch, ohne fehlende Tatsachen oder Rechtsgrundlagen zu erfinden.\n\n**🎯 AUFGABE**\nPrüfe meine rechtliche Würdigung auf Schlüssigkeit, Vollständigkeit und mögliche Fehler.\n\n**🌍 KONTEXT**\nSachverhalt:\n[Sachverhalt]\n\nMeine rechtliche Würdigung:\n[Eigene_Würdigung]\n\nRechtsgrundlagen:\n[Rechtsgrundlagen]\n\nPrüfe insbesondere:\n- ob meine Schlussfolgerungen durch den Sachverhalt und die angegebenen Rechtsgrundlagen getragen werden,\n- ob ich Tatbestandsmerkmale oder relevante Aspekte übersehen habe,\n- ob meine Argumentation Widersprüche oder unbegründete Annahmen enthält,\n- ob auf Grundlage der angegebenen Informationen eine andere rechtliche Bewertung vertretbar ist.\n\nVerwende nur die angegebenen Rechtsgrundlagen. Wenn weitere Vorschriften oder Informationen für eine verlässliche Prüfung erforderlich wären, benenne sie als Prüfbedarf, statt ihren Inhalt zu unterstellen.\n\n**📋 FORMAT**\nNenne zuerst dein Prüfergebnis. Zeige anschließend konkret auf, welche Teile meiner Würdigung schlüssig sind und wo du Fehler, Lücken oder alternative Bewertungen siehst. Trenne sichere Feststellungen von Punkten, die noch geprüft werden müssen."
+                }
+            }
+        ]
     }
 ];
