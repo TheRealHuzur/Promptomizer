@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Erzeugt die drei statischen Use-Case-Seiten aus den redaktionellen Entwürfen."""
+"""Erzeugt statische Use-Case-Seiten aus den redaktionellen Entwürfen.
+
+prompt-vorlagen/verwaltung.html wird nicht mehr erzeugt: Sie ist seit 05.10.2026
+nach der Money-Page-Designvorlage von Hand gebaut (money-page.css) und würde
+sonst überschrieben.
+"""
 from __future__ import annotations
 
 import html
@@ -23,19 +28,6 @@ PAGES = [
         "blocks_heading": "Dein Baustein-Set für den Büroalltag",
         "prompts_heading": "Sechs Prompts für den Büroalltag",
         "bridge_heading": "Warum du diese Prompts in vier Wochen neu schreibst",
-    },
-    {
-        "key": "verwaltung",
-        "source": "Phase-03-Use-Case-Verwaltung-Entwurf.md",
-        "file": ROOT / "prompt-vorlagen" / "verwaltung.html",
-        "name": "Öffentliche Verwaltung",
-        "h1": "Prompt-Vorlagen für die öffentliche Verwaltung",
-        "title": "Prompt-Vorlagen für die öffentliche Verwaltung",
-        "description": "Sechs Prompt-Vorlagen für Vermerk, Bürgeranschreiben, Sitzungsvorlage und Arbeitsanleitung mit wiederverwendbaren Bausteinen.",
-        "same_heading": "Was in Verwaltungstexten immer gleich bleibt",
-        "blocks_heading": "Dein Baustein-Set für die Verwaltung",
-        "prompts_heading": "Sechs Vorlagen für Verwaltungsaufgaben",
-        "bridge_heading": "Wo diese Vorlagen liegen sollten",
     },
     {
         "key": "marketing",
@@ -270,8 +262,6 @@ def render(page: dict) -> str:
     block_note = ""
     if slug == "buero":
         block_note = '''<p class="mt-5 text-sm">Praktischer Hinweis: Ersetze Namen vor dem Einfügen durch Platzhalter wie [Person A], [Person B] und [Firma X]. Ob und in welchem Umfang du dienstliche Inhalte in ein KI-Tool geben darfst, steht in der Regelung deines Arbeitgebers.</p>'''
-    if slug == "verwaltung":
-        extra = '''<p class="mt-5">Wenn es dir weniger um das Werkzeug und mehr um das Vorgehen geht: Auf <a href="https://wissen-und-werkzeug.de/" class="text-brand-sky hover:underline">Wissen und Werkzeug</a> schreibe ich über Prozessmanagement und KI in der Verwaltung, aus der Verwaltung heraus. Beide Angebote stammen von mir.</p>'''
 
     entity_sentence = (
         ""
