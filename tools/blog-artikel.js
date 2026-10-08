@@ -102,6 +102,7 @@ Format: Gib den Text als fertige E-Mail aus. Betreffzeile, Anrede, Fließtext, S
 <h2>Was du mit dem Ergebnis machst</h2>
 <p>Der Prompt aus diesem Beispiel ist kein Wegwerfprodukt. Wenn du ihn einmal gebaut hast, kannst du ihn für jede ähnliche interne Kommunikation wiederverwenden – du tauschst nur Kontext und Aufgabe aus.</p>
 <p>Genau dafür ist der Promptomizer da: aus guten Prompts eine <a href="/prompt-bibliothek">persönliche Bibliothek</a> machen, die dir bei jedem neuen Thema Arbeit spart.</p>
+<p>Zum Mitnehmen: Alle fünf Schritte mit der Promptvorlage zum Ausfüllen gibt es kompakt als PDF: <a href="https://www.promptomizer.de/downloads/praezise-prompten-bauplan.pdf">Präzise Prompten: Dein Bauplan in 5 Schritten</a> (PDF, 450 KB).</p>
 <blockquote>Der Bauplan ist der erste Schritt. Die Bibliothek ist das Ziel.</blockquote>
 `
   }
