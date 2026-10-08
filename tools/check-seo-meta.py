@@ -33,6 +33,12 @@ INDEXABLE_PAGES = [
     "agb.html",
 ]
 
+# Blog: erzeugt von tools/build-blog.cjs. Geprüft wird jede Blogseite ohne noindex
+# (die Übersicht bleibt noindex, solange es keine Artikel gibt).
+for blog_page in [ROOT / "blog.html", *sorted((ROOT / "blog").glob("*.html"))]:
+    if blog_page.exists() and 'name="robots" content="noindex' not in blog_page.read_text(encoding="utf-8"):
+        INDEXABLE_PAGES.append(blog_page.relative_to(ROOT).as_posix())
+
 errors = []
 warnings = []
 

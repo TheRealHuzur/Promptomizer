@@ -97,4 +97,18 @@
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
+    <!-- BLOG:START – automatisch von tools/build-blog.cjs gepflegt, nicht von Hand ändern -->
+    <url>
+        <loc>https://www.promptomizer.de/blog</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://www.promptomizer.de/blog/prompt-bauplan-beispiel</loc>
+        <lastmod>2026-10-08</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <!-- BLOG:END -->
 </urlset>

@@ -1,0 +1,578 @@
+/*
+    Blog (blog.html, blog/<slug>.html), erzeugt von tools/build-blog.cjs.
+    Setzt den Design-Handoff „Promptomizer Blog“ (Blog.dc.html + README) um.
+    Baut auf money-page.css auf (Header, Footer, Burger-Menü, mp-h/mp-lead/mp-seg),
+    ohne neue Tailwind-Utilities. Bewusste Abweichungen vom Handoff:
+    - Mobil das Burger-Menü der Money-Pages statt „unter 640px nur Blog“.
+    - Links im Artikeltext sind unterstrichen (Farbe allein reicht für die Erkennbarkeit nicht).
+*/
+
+.bl-h {
+    line-height: 1.05;
+}
+
+.bl-h-cta {
+    font-size: clamp(1.875rem, 4vw, 3rem);
+}
+
+.mp-nav a.bl-nav-active {
+    color: #fff;
+}
+
+.bl-hero {
+    padding-top: 7rem;
+    padding-bottom: 4rem;
+}
+
+.bl-list {
+    padding-top: 3rem;
+}
+
+.bl-section {
+    padding-top: 8.5rem;
+}
+
+.bl-cta-rule {
+    margin-bottom: 4rem;
+}
+
+.bl-footer {
+    margin-top: 8.5rem;
+}
+
+.bl-footer .mp-nav {
+    gap: 1.25rem;
+}
+
+.bl-footer .mp-nav a {
+    color: #64748b;
+    font-size: .75rem;
+}
+
+.bl-footer .mp-nav a:hover {
+    color: #fff;
+}
+
+.bl-empty {
+    margin: 0;
+}
+
+/* Autorenzeile unter dem Hero-Lead: dezenter als der Lead, #7c8aa0 auf #020617 = 5,8:1 (WCAG AA) */
+.bl-byline {
+    margin: 1.25rem 0 0;
+    color: #7c8aa0;
+    font-size: .8125rem;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.bl-byline a {
+    color: #cbd5e1;
+    text-decoration: underline;
+    text-decoration-color: rgba(203, 213, 225, .35);
+    text-underline-offset: 3px;
+    transition: color .15s ease;
+}
+
+.bl-byline a:hover {
+    color: #fff;
+}
+
+.bl-byline a:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+@keyframes bl-fade {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ---------- Filter ---------- */
+
+.bl-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.bl-filter {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.bl-filter button {
+    flex: none;
+    white-space: nowrap;
+}
+
+/* ---------- Kachelraster ---------- */
+
+.bl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.bl-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 250px;
+    box-sizing: border-box;
+    padding: 1.35rem 1.15rem 1.1rem;
+    border: 1px solid #223049;
+    border-radius: .95rem;
+    background: rgba(15, 27, 49, .98);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    color: #94a3b8;
+    animation: bl-fade .3s ease-out;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.bl-card[hidden] {
+    display: none;
+}
+
+.bl-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(56, 189, 248, .58);
+    box-shadow: 0 22px 65px rgba(0, 0, 0, .28);
+}
+
+.bl-card:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+/* In der Standardkachel fließen beide Hälften als eine Spalte */
+.bl-card-main,
+.bl-card-side {
+    display: contents;
+}
+
+.bl-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.bl-badges {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+}
+
+.bl-badge {
+    max-width: 100%;
+    overflow: hidden;
+    padding: .22rem .48rem;
+    border: 1px solid #26364e;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, .7);
+    color: #94a3b8;
+    font-size: .62rem;
+    font-weight: 750;
+    letter-spacing: .035em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bl-badge-type {
+    border-color: rgba(56, 189, 248, .2);
+    background: rgba(14, 165, 233, .07);
+    color: #7dd3fc;
+}
+
+.bl-date {
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.bl-card-title {
+    margin: 1.75rem 0 0;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.25;
+    text-wrap: pretty;
+}
+
+.bl-card-excerpt {
+    margin: .85rem 0 0;
+    color: #94a3b8;
+    font-size: .875rem;
+    line-height: 1.65;
+}
+
+.bl-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 500;
+}
+
+.bl-card-foot .fa-clock {
+    margin-right: .4rem;
+}
+
+.bl-more {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    color: #cbd5e1;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: color .15s ease;
+}
+
+.bl-more i {
+    font-size: .7rem;
+    transition: transform .15s ease;
+}
+
+.bl-card:hover .bl-more {
+    color: #38bdf8;
+}
+
+.bl-card:hover .bl-more i {
+    transform: translateX(3px);
+}
+
+.bl-feat-only {
+    display: none;
+}
+
+/* ---------- Hervorgehobene Kachel ---------- */
+
+.bl-card.bl-feat {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    min-height: 300px;
+    padding: 2rem 2rem 1.6rem;
+}
+
+.bl-feat .bl-card-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.bl-feat .bl-card-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1.5rem;
+}
+
+.bl-feat .bl-feat-only {
+    display: inline;
+}
+
+.bl-feat .bl-std-only {
+    display: none;
+}
+
+.bl-feat .bl-card-title {
+    margin: auto 0 0;
+    padding-top: 2.5rem;
+    font-size: clamp(1.6rem, 2.8vw, 2.35rem);
+    letter-spacing: -.035em;
+    line-height: 1.1;
+    text-wrap: balance;
+}
+
+.bl-feat .bl-card-excerpt {
+    margin: 0;
+    font-size: .975rem;
+    line-height: 1.7;
+}
+
+.bl-feat .bl-card-foot {
+    margin-top: 0;
+    padding-top: 1rem;
+    border-top: 1px solid #223049;
+    font-size: .78rem;
+}
+
+.bl-feat .bl-more i {
+    font-size: .75rem;
+}
+
+/* ---------- Artikel ---------- */
+
+.bl-article {
+    animation: bl-fade .3s ease-out;
+}
+
+.bl-art-hero {
+    padding-top: 4rem;
+    padding-bottom: 4.5rem;
+}
+
+.bl-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: #94a3b8;
+    font-size: .875rem;
+    font-weight: 500;
+    transition: color .15s ease;
+}
+
+.bl-back:hover {
+    color: #fff;
+}
+
+.bl-back i {
+    font-size: .75rem;
+}
+
+.bl-kicker {
+    margin-top: 4rem;
+}
+
+.bl-art-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    color: #64748b;
+    font-size: .8125rem;
+    font-weight: 500;
+}
+
+.bl-art-meta i {
+    margin-right: .45rem;
+}
+
+.bl-art-body {
+    padding-top: 4rem;
+}
+
+.bl-body {
+    max-width: 38rem;
+    color: #94a3b8;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.bl-body p {
+    margin: 0 0 1.35rem;
+}
+
+.bl-body h2 {
+    margin: 3rem 0 1rem;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -.025em;
+    line-height: 1.2;
+}
+
+.bl-body h3 {
+    margin: 2.25rem 0 .75rem;
+    color: #f8fafc;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.bl-body ul,
+.bl-body ol {
+    margin: 0 0 1.35rem;
+    padding-left: 1.25rem;
+}
+
+.bl-body ul {
+    list-style: disc;
+}
+
+.bl-body ol {
+    list-style: decimal;
+}
+
+.bl-body li {
+    margin: .35rem 0;
+}
+
+.bl-body li > ul,
+.bl-body li > ol {
+    margin: .35rem 0 0;
+}
+
+.bl-body li::marker {
+    color: #0ea5e9;
+}
+
+.bl-body strong {
+    color: #e2e8f0;
+}
+
+.bl-body a {
+    color: #38bdf8;
+    text-decoration: underline;
+    text-decoration-color: rgba(56, 189, 248, .45);
+    text-underline-offset: 3px;
+    transition: color .15s ease;
+}
+
+.bl-body a:hover {
+    color: #fff;
+}
+
+.bl-body pre {
+    margin: 2rem 0;
+    padding: 1.15rem;
+    border: 1px solid #334155;
+    border-radius: .65rem;
+    background: #020617;
+    color: #cbd5e1;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: .8125rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.bl-body blockquote {
+    margin: 2.25rem 0;
+    padding: 0;
+    color: #f8fafc;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: -.015em;
+}
+
+.bl-body blockquote::before {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 1px;
+    margin-bottom: 1.1rem;
+    background: #0ea5e9;
+}
+
+.bl-body > :first-child {
+    margin-top: 0;
+}
+
+/* ---------- Weiterlesen ---------- */
+
+.bl-more-h {
+    margin-bottom: 2.5rem;
+}
+
+.bl-rows {
+    border-bottom: 1px solid #1e293b;
+}
+
+.bl-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.85rem 0;
+    border-top: 1px solid #1e293b;
+    transition: padding-left .15s ease;
+}
+
+.bl-row:hover {
+    padding-left: .5rem;
+}
+
+.bl-row:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 2px;
+}
+
+.bl-row-meta {
+    margin-bottom: .5rem;
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 500;
+}
+
+.bl-row-title {
+    margin: 0;
+    color: #fff;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    transition: color .15s ease;
+}
+
+.bl-row:hover .bl-row-title {
+    color: #38bdf8;
+}
+
+.bl-row i {
+    color: #0ea5e9;
+    font-size: .875rem;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1000px) {
+    .bl-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bl-card.bl-feat {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+}
+
+/* Abstände wie bei den Money-Pages (money-page.css, 900px) */
+@media (max-width: 900px) {
+    .bl-hero {
+        padding-top: 4.5rem;
+        padding-bottom: 3rem;
+    }
+
+    .bl-section {
+        padding-top: 5.5rem;
+    }
+
+    .bl-footer {
+        margin-top: 5.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .bl-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bl-card,
+    .bl-article {
+        animation: none;
+    }
+
+    .bl-card,
+    .bl-card:hover,
+    .bl-row,
+    .bl-row:hover {
+        transform: none;
+        transition: none;
+    }
+
+    .bl-row:hover {
+        padding-left: 0;
+    }
+}
