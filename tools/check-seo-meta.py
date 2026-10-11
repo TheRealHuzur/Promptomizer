@@ -33,8 +33,8 @@ INDEXABLE_PAGES = [
     "agb.html",
 ]
 
-# Blog: erzeugt von tools/build-blog.cjs. Geprüft wird jede Blogseite ohne noindex
-# (die Übersicht bleibt noindex, solange es keine Artikel gibt).
+# Blog: seit 11.10.2026 im eigenen Repo promptomizer-blog (Rewrite /blog/* in vercel.json) und dort
+# geprüft. Die Schleife bleibt, falls hier noch einmal Blogseiten liegen sollten.
 for blog_page in [ROOT / "blog.html", *sorted((ROOT / "blog").glob("*.html"))]:
     if blog_page.exists() and 'name="robots" content="noindex' not in blog_page.read_text(encoding="utf-8"):
         INDEXABLE_PAGES.append(blog_page.relative_to(ROOT).as_posix())

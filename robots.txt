@@ -21,3 +21,5 @@ Allow: /
 # CCBot           (Common Crawl)               -> erlaubt
 
 Sitemap: https://www.promptomizer.de/sitemap.xml
+# Der Blog hat seit 11.10.2026 ein eigenes Repo und eine eigene Sitemap (promptomizer-blog):
+Sitemap: https://www.promptomizer.de/blog/sitemap.xml

@@ -2,6 +2,20 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/index.html", "destination": "/", "permanent": true }
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/blog",
+      "destination": "https://promptomizer-blog.vercel.app/blog"
+    },
+    {
+      "source": "/blog/:path*",
+      "destination": "https://promptomizer-blog.vercel.app/blog/:path*"
+    }
   ]
 }
