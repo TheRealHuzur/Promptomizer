@@ -4,9 +4,10 @@
 (function () {
     'use strict';
 
-    // Platzhalter: eckige Klammern mit freiem Text auf einer Zeile, z. B. [Angabe] oder [Anrede: du/Sie].
+    // Platzhalter: eckige Klammern mit freiem Text auf einer Zeile, z. B. [Angabe] oder [Anrede: du/Sie],
+    // auch doppelt wie [[Name]] (dann samt beider Klammerpaare hervorgehoben).
     // Ausgenommen sind Markdown-Links [Text](url) und Checkboxen [ ] / [x].
-    const PLACEHOLDER_PATTERN = /\[([^[\]\n]+)\](?!\()/g;
+    const PLACEHOLDER_PATTERN = /\[\[([^[\]\n]+)\]\]|\[([^[\]\n]+)\](?!\()/g;
 
     // Hinweis im Login-/Registrierungsmodal, wenn ein Gast einen Prompt übernehmen will.
     const ADOPT_LOGIN_HINT = 'Um Prompts in deine persönliche Bibliothek zu übernehmen, brauchst du ein Konto. Melde dich an oder registriere dich kostenlos.';
@@ -14,6 +15,7 @@
     const state = {
         collectionId: null,
         openPreviews: new Set(),
+        openGuides: new Set(),
         adoptedPromptIds: new Set(),
         busyPromptIds: new Set()
     };
@@ -32,7 +34,7 @@
         PLACEHOLDER_PATTERN.lastIndex = 0;
         let match;
         while ((match = PLACEHOLDER_PATTERN.exec(value)) !== null) {
-            const inner = match[1].trim();
+            const inner = (match[1] ?? match[2]).trim();
             if (!inner || /^x$/i.test(inner)) continue;
             matches.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
         }
@@ -237,7 +239,77 @@
         const hero = renderHero(collection.title, collection.benefit || '');
         const list = element('div', 'collections-prompt-list');
         (collection.prompts || []).forEach(prompt => list.append(buildPromptItem(prompt)));
-        view.replaceChildren(back, hero, list);
+        const parts = [back, hero];
+        if (typeof collection.guide === 'string' && collection.guide.trim()) parts.push(buildGuide(collection));
+        parts.push(list);
+        view.replaceChildren(...parts);
+    }
+
+    // **fett** als <strong>, alles andere als Textknoten; kein HTML aus den Daten.
+    function appendInlineText(container, text) {
+        String(text ?? '').split(/\*\*(.+?)\*\*/g).forEach((part, index) => {
+            if (!part) return;
+            container.append(index % 2 ? element('strong', '', part) : document.createTextNode(part));
+        });
+    }
+
+    // Anleitung einer Kollektion (collection.guide) als kleines Markdown-Subset. Blöcke sind durch
+    // Leerzeilen getrennt: "## "/"### " Überschrift, "1. " nummerierte Liste, "- " Aufzählung, sonst Absatz.
+    function buildGuideContent(guide) {
+        const content = element('div', 'collections-guide-content');
+        String(guide ?? '').replace(/\r\n/g, '\n').split(/\n{2,}/).forEach(block => {
+            const lines = block.trim().split('\n');
+            if (!lines[0]) return;
+            const heading = lines.length === 1 && lines[0].match(/^(#{2,3}) (.+)$/);
+            if (heading) {
+                const node = element(heading[1].length === 2 ? 'h3' : 'h4', 'collections-guide-heading');
+                appendInlineText(node, heading[2]);
+                content.append(node);
+                return;
+            }
+            const ordered = lines.every(line => /^\d+\. /.test(line));
+            const bullets = lines.every(line => /^- /.test(line));
+            if (ordered || bullets) {
+                const list = element(ordered ? 'ol' : 'ul');
+                lines.forEach(line => {
+                    const item = element('li');
+                    appendInlineText(item, line.replace(ordered ? /^\d+\. / : /^- /, ''));
+                    list.append(item);
+                });
+                content.append(list);
+                return;
+            }
+            const paragraph = element('p');
+            appendInlineText(paragraph, lines.join(' '));
+            content.append(paragraph);
+        });
+        return content;
+    }
+
+    function buildGuide(collection) {
+        const guideId = `collections-guide-${collection.id}`;
+        const section = element('section', 'collections-guide');
+        const toggle = element('button', 'collections-preview-toggle collections-guide-toggle');
+        toggle.type = 'button';
+        toggle.setAttribute('aria-controls', guideId);
+        const content = buildGuideContent(collection.guide);
+        content.id = guideId;
+
+        const setOpen = open => {
+            content.hidden = !open;
+            toggle.setAttribute('aria-expanded', String(open));
+            setButtonContent(toggle, open ? 'fa-chevron-down' : 'fa-chevron-right', open ? 'Anleitung ausblenden' : 'Anleitung anzeigen');
+        };
+        setOpen(state.openGuides.has(collection.id));
+        toggle.addEventListener('click', () => {
+            const open = content.hidden;
+            if (open) state.openGuides.add(collection.id);
+            else state.openGuides.delete(collection.id);
+            setOpen(open);
+        });
+
+        section.append(toggle, content);
+        return section;
     }
 
     function buildPromptItem(prompt) {
@@ -408,6 +480,7 @@
         toStorageFields,
         promptText,
         appendHighlightedText,
+        buildGuideContent,
         open: () => window.switchView?.('collections')
     };
 

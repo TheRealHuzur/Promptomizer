@@ -61,12 +61,14 @@ list.forEach(collection => {
     collectionIds.add(collection.id);
     assert(typeof collection.title === 'string' && collection.title.trim(), 'Kollektion braucht title');
     assert(Array.isArray(collection.prompts) && collection.prompts.length > 0, 'Kollektion braucht Prompts');
+    assert(collection.guide === undefined || (typeof collection.guide === 'string' && collection.guide.trim()), `Ungültige guide in ${collection.id}`);
     collection.prompts.forEach(prompt => {
         assert(typeof prompt.id === 'string' && prompt.id, 'Prompt braucht id');
         assert(!promptIds.has(prompt.id), `Doppelte Prompt-id ${prompt.id}`);
         promptIds.add(prompt.id);
         assert(typeof prompt.title === 'string' && prompt.title.trim(), 'Prompt braucht title');
         assert(prompt.title.length <= 200, 'Prompttitel zu lang');
+        assert(prompt.inputs === undefined || (Array.isArray(prompt.inputs) && prompt.inputs.every(input => typeof input === 'string' && input.trim())), `Ungültige inputs in ${prompt.id}`);
         const fields = prompt.fields || {};
         if (fields.mode === 'free') {
             assert(typeof fields.text === 'string' && fields.text.trim(), `Freier Prompt ${prompt.id} ohne Text`);
@@ -94,6 +96,10 @@ assert.deepEqual(
     ['[Anrede: du/Sie]', '[viel/wenig]', '[Handlung oder „nichts“]', '[Person A]']
 );
 assert.equal(api.findPlaceholders('Ohne Platzhalter.').length, 0);
+assert.deepEqual(
+    Array.from(api.findPlaceholders('An [[Empfänger]] zu [Thema], [[Ziel der Nachricht]].'), item => item.text),
+    ['[[Empfänger]]', '[Thema]', '[[Ziel der Nachricht]]']
+);
 assert.equal(api.findPlaceholders('[a\nb]').length, 0);
 
 // Hervorhebung per DOM-API, Text bleibt vollständig und unverändert.
@@ -103,6 +109,29 @@ assert.equal(container.textContent, 'Für [Zielgruppe] schreiben: [einfügen]');
 const marks = container.children.filter(child => child.tagName === 'span');
 assert.equal(marks.length, 2);
 assert(marks.every(mark => mark.className === 'collections-placeholder'));
+
+// Anleitung (guide): Überschriften, Listen, Absätze und **fett** per DOM-API, Text unverändert.
+const guide = api.buildGuideContent('## Test\n\n1. **Wählen:** A\n2. B\n\nAbsatz\nmit Umbruch\n\n### Prompt\n\n- C\n- D [[X]]');
+assert.deepEqual(guide.children.map(child => child.tagName), ['h3', 'ol', 'p', 'h4', 'ul']);
+assert.equal(guide.children[1].children.length, 2);
+assert.equal(guide.children[1].children[0].children[0].tagName, 'strong');
+assert.equal(guide.children[1].children[0].textContent, 'Wählen: A');
+assert.equal(guide.children[2].textContent, 'Absatz mit Umbruch');
+assert.equal(guide.children[4].children[1].textContent, 'D [[X]]');
+assert(collections.includes("'Anleitung anzeigen'") && collections.includes("'Anleitung ausblenden'"));
+assert(collections.includes("toggle.setAttribute('aria-expanded', String(open))"));
+
+// Neue Kollektion „Modelltest mit eigenem Material“: genau einmal, guide vorhanden, Platzhalter konsistent.
+const modelltest = list.filter(collection => collection.title === 'Modelltest mit eigenem Material');
+assert.equal(modelltest.length, 1, 'Kollektion Modelltest genau einmal');
+assert.equal(modelltest[0].prompts.length, 5);
+assert(modelltest[0].guide.includes('## So funktioniert der Test') && modelltest[0].guide.includes('## So wertest du aus') && modelltest[0].guide.includes('## Fallenvorschläge'));
+modelltest[0].prompts.forEach(prompt => {
+    const used = new Set(Array.from(api.findPlaceholders(prompt.fields.text), item => item.text.slice(2, -2)));
+    const listed = new Set(prompt.inputs.map(input => input.split(':')[0]));
+    assert.deepEqual([...used].sort(), [...listed].sort(), `Platzhalter und inputs passen nicht in ${prompt.id}`);
+    assert(!prompt.fields.text.includes('Fallen'), `Fallenvorschläge im Prompttext ${prompt.id}`);
+});
 
 // Kopiertext = Vorschautext, frei unverändert.
 assert.equal(api.promptText({ fields: { mode: 'free', text: 'A [B]' } }), 'A [B]');

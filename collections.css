@@ -187,6 +187,74 @@
     box-decoration-break: clone;
 }
 
+/* Anleitung einer Kollektion (collection.guide), eingeklappt zwischen Kopf und Prompts. */
+.collections-guide {
+    margin-bottom: 1rem;
+    padding: .35rem 1.25rem;
+    border: 1px solid #223049;
+    border-radius: .95rem;
+    background: rgba(15, 27, 49, .98);
+}
+
+.collections-guide-toggle {
+    margin-top: 0;
+}
+
+.collections-guide-content {
+    padding: .1rem 0 .9rem;
+    color: #cbd5e1;
+    font-size: .88rem;
+    line-height: 1.6;
+}
+
+.collections-guide-content[hidden] {
+    display: none;
+}
+
+.collections-guide-content > * + * {
+    margin-top: .6rem;
+}
+
+.collections-guide-content > .collections-guide-heading:not(:first-child) {
+    margin-top: 1.15rem;
+}
+
+.collections-guide-heading {
+    color: #f8fafc;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+h3.collections-guide-heading {
+    font-size: .98rem;
+}
+
+h4.collections-guide-heading {
+    font-size: .9rem;
+}
+
+.collections-guide-content ol,
+.collections-guide-content ul {
+    padding-left: 1.3rem;
+}
+
+.collections-guide-content ol {
+    list-style: decimal;
+}
+
+.collections-guide-content ul {
+    list-style: disc;
+}
+
+.collections-guide-content li + li {
+    margin-top: .3rem;
+}
+
+.collections-guide-content strong {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
 .collections-prompt-actions {
     display: flex;
     flex-wrap: wrap;
@@ -247,6 +315,10 @@
 
     .collections-prompt {
         padding: 1rem;
+    }
+
+    .collections-guide {
+        padding: .25rem 1rem;
     }
 
     .collections-prompt-actions {

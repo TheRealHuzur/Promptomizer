@@ -3,13 +3,17 @@
 // (Grundlage für spätere Dublettenerkennung und Deep-Links, ids nach Veröffentlichung nicht ändern).
 //
 // Aufbau:
-// { id, title, benefit, prompts: [
+// { id, title, benefit, guide?, prompts: [
 //     { id, title, purpose, inputs: ['…'],
 //       fields: { role, context, task, format }   // strukturierter Prompt
 //       // oder fields: { mode: 'free', text }     // freier Prompt (Markdown)
 //     } ] }
 //
-// Platzhalter stehen in eckigen Klammern, z. B. [Angabe]. Sie werden in der Vorschau
+// guide (optional): Anleitung zur Kollektion, in der Detailansicht eingeklappt über den Prompts.
+// Kleines Markdown-Subset, Blöcke durch Leerzeilen getrennt: "## "/"### " Überschrift,
+// "1. " nummerierte Liste, "- " Aufzählung, sonst Absatz; **fett**. Wird nie kopiert oder übernommen.
+//
+// Platzhalter stehen in eckigen Klammern, z. B. [Angabe] oder [[Angabe]]. Sie werden in der Vorschau
 // hervorgehoben und beim Kopieren/Übernehmen unverändert weitergegeben.
 window.PROMPTOMIZER_COLLECTIONS = [
     {
@@ -198,6 +202,83 @@ window.PROMPTOMIZER_COLLECTIONS = [
                 "fields": {
                     "mode": "free",
                     "text": "**🎭 ROLLE**\nDu unterstützt bei der rechtlichen Prüfung in einer deutschen Behörde. Du prüfst juristische Argumentationen kritisch und methodisch, ohne fehlende Tatsachen oder Rechtsgrundlagen zu erfinden.\n\n**🎯 AUFGABE**\nPrüfe meine rechtliche Würdigung auf Schlüssigkeit, Vollständigkeit und mögliche Fehler.\n\n**🌍 KONTEXT**\nSachverhalt:\n[Sachverhalt]\n\nMeine rechtliche Würdigung:\n[Eigene_Würdigung]\n\nRechtsgrundlagen:\n[Rechtsgrundlagen]\n\nPrüfe insbesondere:\n- ob meine Schlussfolgerungen durch den Sachverhalt und die angegebenen Rechtsgrundlagen getragen werden,\n- ob ich Tatbestandsmerkmale oder relevante Aspekte übersehen habe,\n- ob meine Argumentation Widersprüche oder unbegründete Annahmen enthält,\n- ob auf Grundlage der angegebenen Informationen eine andere rechtliche Bewertung vertretbar ist.\n\nVerwende nur die angegebenen Rechtsgrundlagen. Wenn weitere Vorschriften oder Informationen für eine verlässliche Prüfung erforderlich wären, benenne sie als Prüfbedarf, statt ihren Inhalt zu unterstellen.\n\n**📋 FORMAT**\nNenne zuerst dein Prüfergebnis. Zeige anschließend konkret auf, welche Teile meiner Würdigung schlüssig sind und wo du Fehler, Lücken oder alternative Bewertungen siehst. Trenne sichere Feststellungen von Punkten, die noch geprüft werden müssen."
+                }
+            }
+        ]
+    },
+    {
+        "id": "modelltest-eigenes-material",
+        "title": "Modelltest mit eigenem Material",
+        "benefit": "Für alle, die mehrere KI-Modelle nutzen und herausfinden wollen, welches ihre wiederkehrenden Aufgaben mit der wenigsten Nacharbeit erledigt. Du testest mit deinem eigenen Material, in das du zwei Fehler einbaust, und siehst sofort, welches Modell sie bemerkt.",
+        "guide": "## So funktioniert der Test\n\n1. **Material wählen:** Nimm einen echten, typischen Vorgang aus deinem Alltag und anonymisiere Namen, Aktenzeichen und Kontaktdaten. Das Material geht an mehrere Anbieter.\n2. **Zwei Fallen einbauen:** Nutze die Fallenvorschläge zum jeweiligen Prompt am Ende dieser Anleitung. Notiere dir, was du geändert hast. Die Fallen sollen wie normale Fehler aussehen, nicht markiert und nicht direkt nebeneinander.\n3. **Testen:** Fülle den Prompt aus und gib ihn unverändert an jedes Modell, jeweils in einem neuen Chat, mit gleichen Einstellungen und nur einem Versuch. Die Prompts enthalten bewusst keinen Hinweis, auf Fehler zu achten. Ergänze auch keinen, sonst misst der Test nichts mehr.\n4. **Auswerten:** siehe „So wertest du aus“.\n\n## So wertest du aus\n\nLege deine Notiz mit den Fallen neben die Antworten und prüfe jede Antwort mit vier Fragen:\n\n1. Ist die Aufgabe korrekt erledigt?\n2. Wurde Falle 1 erkannt und benannt?\n3. Wurde Falle 2 erkannt und benannt?\n4. Wie viel müsstest du nachbessern, bevor du das Ergebnis verwendest?\n\nKorrigiert ein Modell eine Falle stillschweigend, ist das besser als eine Übernahme, aber schlechter als ein Hinweis. Im Alltag willst du wissen, wenn dein Material einen Fehler hatte.\n\n**Entscheidung:** Hat ein Modell eine Falle übersehen, wiederhole denselben Test mit höherer Denkstufe. Das günstigste Modell, das besteht, wird dein Standard. Erst wenn es denselben Fehler auch mit höherer Denkstufe wiederholt, wechselst du auf ein leistungsfähigeres Modell. Teste neu, wenn ein Modell eine neue Version bekommt oder sich deine Aufgabe deutlich ändert.\n\n## Fallenvorschläge\n\n### E-Mail aus Stichpunkten\n\n- Nenne ein Datum, z. B. einen Starttermin, an zwei Stellen unterschiedlich.\n- Ergänze eine Zusage, die nirgends belegt ist, z. B. eine Garantie oder eine Bearbeitungszeit.\n\n### Zusammenfassung eines Dokuments\n\n- Ändere eine Zahl im Fließtext so, dass sie einer Tabelle oder einer anderen Textstelle widerspricht.\n- Ergänze im Fazit eine Schlussfolgerung, die der Hauptteil nicht stützt.\n\n### Protokoll aus Gesprächsnotizen\n\n- Nenne einen Termin, z. B. die nächste Sitzung oder eine Frist, an zwei Stellen unterschiedlich.\n- Lass bei einer vereinbarten Aufgabe die verantwortliche Person weg.\n\n### Auswertung von Zahlen oder einer Tabelle\n\n- Ändere eine Summen- oder Gesamtzeile so, dass sie nicht zu den Einzelwerten passt.\n- Gib einen Wert in einer anderen Einheit oder für einen anderen Zeitraum an als die übrigen, ohne es zu kennzeichnen.\n\n### Stellungnahme zu einem Entwurf\n\n- Lass eine Kosten- oder Zeitangabe in der Zusammenfassung des Entwurfs von der Angabe im Detailteil abweichen.\n- Ergänze eine Wirkungsbehauptung ohne Beleg, z. B. „spart 30 Prozent Bearbeitungszeit“.",
+        "prompts": [
+            {
+                "id": "modelltest-e-mail",
+                "title": "E-Mail aus Stichpunkten",
+                "purpose": "Wenn du regelmäßig aus Notizen oder Stichpunkten Nachrichten an Kunden, Kollegen oder Partner formulierst.",
+                "inputs": [
+                    "Empfänger: Wer die Nachricht bekommt und in welcher Beziehung ihr zueinander steht.",
+                    "Ziel der Nachricht: Was der Empfänger nach dem Lesen wissen oder tun soll.",
+                    "Testmaterial: Dein anonymisiertes Material mit den zwei eingebauten Fallen, also Stichpunkte, Dokument, Notizen, Tabelle oder Entwurf."
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "## Rolle\nDu bist erfahren in der beruflichen Korrespondenz und schreibst Nachrichten, die beim ersten Lesen verstanden werden und genau eine klare nächste Handlung auslösen.\n\n## Kontext\nIch muss aus meinen Stichpunkten eine E-Mail formulieren.\n\nEmpfänger:\n[[Empfänger]]\n\nZiel der Nachricht:\n[[Ziel der Nachricht]]\n\nMeine Stichpunkte:\n[[Testmaterial]]\n\n## Aufgabe\nSchreibe die E-Mail auf Grundlage der Stichpunkte.\n- Die wichtigste Information steht in den ersten zwei Sätzen.\n- Übernimm Daten, Beträge und Zusagen genau aus den Stichpunkten. Erfinde keine Angaben, die dort nicht stehen.\n- Formuliere eine konkrete Handlungsaufforderung mit Frist, wenn das Ziel eine Reaktion erfordert.\n- Vermeide Floskeln wie „Ich hoffe, es geht Ihnen gut“ oder „Bei Fragen stehe ich gerne zur Verfügung“, wenn sie keine Funktion haben.\n- Passe Anrede und Ton an die Beziehung zum Empfänger an.\n\n## Format\nBetreffzeile, dann der E-Mail-Text. Höchstens 200 Wörter. Danach in maximal drei Sätzen alles, was ich vor dem Versand wissen sollte."
+                }
+            },
+            {
+                "id": "modelltest-zusammenfassung",
+                "title": "Zusammenfassung eines Dokuments",
+                "purpose": "Wenn du regelmäßig längere Berichte, Vorlagen oder Fachtexte für andere auf das Wesentliche verdichtest.",
+                "inputs": [
+                    "Zielgruppe: Wer das Ergebnis liest und was diese Person schon weiß.",
+                    "Verwendungszweck: Wofür die Zusammenfassung gebraucht wird, z. B. Entscheidungsvorlage oder Information.",
+                    "Testmaterial: Dein anonymisiertes Material mit den zwei eingebauten Fallen, also Stichpunkte, Dokument, Notizen, Tabelle oder Entwurf."
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "## Rolle\nDu bist erfahren im Verdichten von Fachtexten für Entscheider. Du trennst sauber zwischen dem, was ein Dokument belegt, und dem, was es nur behauptet.\n\n## Kontext\nIch brauche eine Zusammenfassung des folgenden Dokuments.\n\nZielgruppe:\n[[Zielgruppe]]\n\nVerwendungszweck:\n[[Verwendungszweck]]\n\nDokument:\n[[Testmaterial]]\n\n## Aufgabe\nFasse das Dokument so zusammen, dass die Zielgruppe es für den Verwendungszweck nutzen kann, ohne das Original zu lesen.\n- Beginne mit der Kernaussage in einem Satz.\n- Übernimm Zahlen, Daten und Namen exakt. Runde nur, wenn das Original rundet.\n- Unterscheide zwischen belegten Ergebnissen und Einschätzungen oder Empfehlungen der Verfasser.\n- Lass Hintergrund und Methodik weg, sofern sie für den Verwendungszweck keine Rolle spielen.\n- Füge keine eigenen Bewertungen oder Informationen hinzu, die nicht im Dokument stehen.\n\n## Format\n1. Kernaussage: ein Satz\n2. Wichtigste Inhalte: drei bis sechs Punkte, je ein bis zwei Sätze\n3. Empfehlungen oder offene Punkte laut Dokument: kurze Liste\n4. Anmerkungen: höchstens drei Sätze zu allem, was ich beim Weitergeben beachten sollte\nInsgesamt höchstens 300 Wörter."
+                }
+            },
+            {
+                "id": "modelltest-protokoll",
+                "title": "Protokoll aus Gesprächsnotizen",
+                "purpose": "Wenn du regelmäßig aus Mitschriften ein Ergebnisprotokoll erstellst, das andere verbindlich weiterverwenden.",
+                "inputs": [
+                    "Besprechungsanlass: Art und Thema der Besprechung.",
+                    "Testmaterial: Dein anonymisiertes Material mit den zwei eingebauten Fallen, also Stichpunkte, Dokument, Notizen, Tabelle oder Entwurf."
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "## Rolle\nDu bist erfahren in der Protokollführung und schreibst Ergebnisprotokolle, aus denen jede teilnehmende Person sofort erkennt, was beschlossen wurde und was sie bis wann zu tun hat.\n\n## Kontext\nIch brauche ein Ergebnisprotokoll aus meinen Notizen.\n\nBesprechungsanlass:\n[[Besprechungsanlass]]\n\nMeine Notizen:\n[[Testmaterial]]\n\n## Aufgabe\nErstelle aus den Notizen ein Ergebnisprotokoll.\n- Halte Ergebnisse und Beschlüsse fest, keinen Gesprächsverlauf und keine Wortbeiträge.\n- Formuliere Beschlüsse so, dass sie ohne Kenntnis der Diskussion verständlich sind.\n- Erfasse jede vereinbarte Aufgabe mit Inhalt, verantwortlicher Person und Termin, so wie sie in den Notizen stehen.\n- Übernimm Termine und Namen exakt. Erfinde keine Angaben, die nicht in den Notizen stehen.\n- Halte offene Punkte getrennt fest.\n\n## Format\n1. Kopf: Anlass, Datum und Teilnehmende laut Notizen\n2. Ergebnisse und Beschlüsse: nummerierte Liste\n3. Aufgaben: Tabelle mit den Spalten Aufgabe, verantwortlich, Termin\n4. Offene Punkte: Liste\n5. Nächster Termin\nDanach in höchstens drei Sätzen alles, was ich vor dem Versand klären sollte."
+                }
+            },
+            {
+                "id": "modelltest-zahlenauswertung",
+                "title": "Auswertung von Zahlen oder einer Tabelle",
+                "purpose": "Wenn du regelmäßig Tabellen, Statistiken oder Kennzahlen auswertest und die Ergebnisse für andere aufbereitest.",
+                "inputs": [
+                    "Fragestellung: Was du aus den Zahlen wissen willst.",
+                    "Zielgruppe: Wer das Ergebnis liest und was diese Person schon weiß.",
+                    "Testmaterial: Dein anonymisiertes Material mit den zwei eingebauten Fallen, also Stichpunkte, Dokument, Notizen, Tabelle oder Entwurf."
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "## Rolle\nDu bist erfahren in der Datenauswertung für Fachbereiche ohne Statistikkenntnisse. Du rechnest nachvollziehbar, trennst Befund von Interpretation und vermeidest Scheinpräzision.\n\n## Kontext\nIch brauche eine Auswertung der folgenden Daten.\n\nFragestellung:\n[[Fragestellung]]\n\nZielgruppe:\n[[Zielgruppe]]\n\nDaten:\n[[Testmaterial]]\n\n## Aufgabe\nBeantworte die Fragestellung auf Grundlage der Daten.\n- Nenne für jede Aussage, auf welche Werte sie sich stützt.\n- Mache jede Berechnung, die du durchführst, nachvollziehbar: Ausgangswerte, Rechenweg, Ergebnis.\n- Trenne, was die Zahlen zeigen, von möglichen Erklärungen dafür.\n- Runde sinnvoll für die Zielgruppe und gib keine Genauigkeit vor, die die Daten nicht hergeben.\n- Ziehe keine Schlüsse, die über die vorliegenden Daten hinausgehen.\n\n## Format\n1. Antwort auf die Fragestellung: höchstens drei Sätze\n2. Wichtigste Befunde: drei bis fünf Punkte mit Wertangabe\n3. Berechnungen: kurze Tabelle oder Liste\n4. Mögliche Erklärungen: als solche gekennzeichnet, höchstens drei\n5. Anmerkungen zu den Daten: höchstens drei Sätze"
+                }
+            },
+            {
+                "id": "modelltest-stellungnahme",
+                "title": "Stellungnahme zu einem Entwurf",
+                "purpose": "Wenn du regelmäßig Konzepte, Vorlagen oder Vorschläge anderer bewertest und eine begründete Stellungnahme abgibst.",
+                "inputs": [
+                    "Perspektive: Aus welcher Rolle die Stellungnahme geschrieben wird.",
+                    "Entscheidungsfrage: Worüber auf Grundlage der Stellungnahme entschieden wird.",
+                    "Testmaterial: Dein anonymisiertes Material mit den zwei eingebauten Fallen, also Stichpunkte, Dokument, Notizen, Tabelle oder Entwurf."
+                ],
+                "fields": {
+                    "mode": "free",
+                    "text": "## Rolle\nDu bist erfahrener Gutachter für Konzepte und Vorlagen. Deine Stellungnahmen sind fair, konkret und so begründet, dass die Verfasser genau wissen, was sie ändern müssen.\n\n## Kontext\nIch soll zu dem folgenden Entwurf Stellung nehmen.\n\nPerspektive:\n[[Perspektive]]\n\nEntscheidungsfrage:\n[[Entscheidungsfrage]]\n\nEntwurf:\n[[Testmaterial]]\n\n## Aufgabe\nSchreibe eine Stellungnahme aus der genannten Perspektive, die bei der Entscheidungsfrage hilft.\n- Beziehe dich bei jeder Einschätzung auf eine konkrete Stelle im Entwurf.\n- Benenne Stärken, die erhalten bleiben sollen, nicht nur Schwächen.\n- Unterscheide zwischen grundsätzlichen Einwänden und Verbesserungsvorschlägen im Detail.\n- Gewichte nach Bedeutung für die Entscheidungsfrage, nicht nach Reihenfolge im Entwurf.\n- Formuliere Empfehlungen so konkret, dass klar ist, was zu ändern ist.\n\n## Format\n1. Gesamteinschätzung: zwei bis drei Sätze mit klarer Empfehlung zur Entscheidungsfrage\n2. Stärken: kurze Liste\n3. Grundsätzliche Einwände: Liste mit Fundstelle und Begründung\n4. Verbesserungsvorschläge im Detail: Liste mit Fundstelle\nSachlich, ohne Abschwächungen wie „vielleicht könnte man überlegen“. Höchstens 400 Wörter."
                 }
             }
         ]
