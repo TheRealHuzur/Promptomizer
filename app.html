@@ -186,14 +186,21 @@
                     </div>
 
                     <div>
-                        <button onclick="toggleSnippetsSection()"
-                            class="w-full flex items-center justify-between px-4 py-3 text-left">
-                            <span class="flex items-center gap-2 text-base font-bold text-slate-400">
-                                <i class="fa-solid fa-cube"></i> Bausteine
-                            </span>
-                            <i id="snippets-toggle-icon"
-                                class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
-                        </button>
+                        <div class="flex items-center">
+                            <button onclick="toggleSnippetsSection()"
+                                class="flex-1 min-w-0 flex items-center justify-between px-4 py-3 text-left">
+                                <span class="flex items-center gap-2 text-base font-bold text-slate-400">
+                                    <i class="fa-solid fa-cube"></i> Bausteine
+                                </span>
+                                <i id="snippets-toggle-icon"
+                                    class="fa-solid fa-chevron-down text-xs rotate-icon rotate-180"></i>
+                            </button>
+                            <button id="sidebar-new-snippet-btn" type="button" onclick="openNewSnippetModal()"
+                                class="p-1.5 mr-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white leading-none flex-none"
+                                title="Baustein anlegen" aria-label="Baustein anlegen">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </div>
                         <div id="snippets-body" class="px-4 pt-1 pb-2">
                             <div id="library-snippets" class="space-y-0.5">
                                 <div class="text-xs text-slate-600 italic py-2">Wähle ein Feld im Editor.</div>
@@ -1323,10 +1330,10 @@
             <div class="space-y-4">
                 <div>
                     <label class="ui-label">Name</label>
-                    <input id="snippet-name" type="text" class="ui-input" placeholder="z.B. Kontext-Short" />
+                    <input id="snippet-name" type="text" class="ui-input" placeholder="z. B. Firmenkontext" />
                 </div>
                 <div>
-                    <label class="ui-label">Kategorie</label>
+                    <label class="ui-label">Einsatzbereich</label>
                     <select id="snippet-category" class="ui-select">
                         <option value="role">Rolle & Funktion</option>
                         <option value="context">Kontext</option>
@@ -1339,6 +1346,7 @@
                     <label class="ui-label">Baustein-Text</label>
                     <textarea id="snippet-content" class="ui-textarea"
                         placeholder="Text für den Baustein..."></textarea>
+                    <p class="mt-1 text-xs text-slate-500">Tipp: Lege wiederkehrende Angaben wie Firmenkontext oder Schreibstil als Baustein an und füge sie in die Platzhalter von Kollektions-Prompts ein.</p>
                 </div>
             </div>
             <div class="ui-actions">
@@ -3036,6 +3044,12 @@
                             <span class="text-brand-sky text-sm font-medium">Kategorie anlegen</span>
                         </button>
                     `;
+                } else if (settingsCurrentPage === 'snippets') {
+                    actionEl.innerHTML = `
+                        <button onclick="openSnippetModal({ categoryId: 'context' })" class="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800/50">
+                            <span class="text-brand-sky text-sm font-medium">Baustein anlegen</span>
+                        </button>
+                    `;
                 } else {
                     actionEl.innerHTML = '';
                 }
@@ -3167,9 +3181,9 @@
 
                           <h3 class="text-lg font-semibold text-white">Neuen Baustein anlegen</h3>
                           <ol class="list-decimal pl-6 space-y-2">
-                            <li>Klicke auf <strong>Neuer Baustein</strong>.</li>
-                            <li>Vergib einen <strong>Namen</strong> (z. B. „Tabellen-Format kurz“).</li>
-                            <li>Wähle die passende <strong>Kategorie</strong> (Rolle &amp; Funktion / Kontext / Aufgabe / Format / Freie Bausteine).</li>
+                            <li>Klicke in der Seitenleiste auf das <strong>+</strong> neben <strong>Bausteine</strong> oder unter <strong>Einstellungen &amp; Hilfe</strong> → <strong>Bausteine verwalten</strong> auf <strong>Baustein anlegen</strong>. Alternativ speichert die Diskette am Editorfeld dessen Inhalt als Baustein.</li>
+                            <li>Vergib einen <strong>Namen</strong> (z. B. „Firmenkontext“).</li>
+                            <li>Wähle den passenden <strong>Einsatzbereich</strong> (Rolle &amp; Funktion / Kontext / Aufgabe / Format / Freie Bausteine).</li>
                             <li>Füge den <strong>Baustein-Text</strong> ein.</li>
                             <li>Klicke auf <strong>Speichern</strong>.</li>
                           </ol>
@@ -6777,6 +6791,15 @@
             });
         }
 
+        function openNewSnippetModal() {
+            const structuredIds = ['role', 'context', 'task', 'format'];
+            const categoryId = currentMode === 'free'
+                ? 'free'
+                : (structuredIds.includes(activeFieldId) ? activeFieldId : 'context');
+            closeMobileNav({ restoreFocus: false });
+            openSnippetModal({ categoryId });
+        }
+
         function openFreeSnippetSaveModal() {
             freeSyncHtmlToMarkdown();
             const text = freeGetMarkdown();
@@ -7086,6 +7109,7 @@
                 const oldCategory = editingSnippetOriginalCategoryId;
                 editingSnippetOriginalCategoryId = null;
                 snippetOpenState[category] = true;
+                if (!isSnippetsOpen) toggleSnippetsSection();
                 renderSnippetsAccordion();
                 if (oldCategory && oldCategory !== category) {
                     const oldBody = document.getElementById(`snip-body-${oldCategory}`);
@@ -7098,6 +7122,8 @@
                 if (settingsCurrentPage === 'snippets') {
                     await loadManageSnippetsPage();
                 }
+                await updatePromptCounter();
+                await window.SnippetLibrary?.refreshAll?.();
             } else if (result.reason === 'FREE_LIMIT_REACHED') {
                 openUpgradeModal('library_full');
             } else {
