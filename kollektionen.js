@@ -282,5 +282,172 @@ window.PROMPTOMIZER_COLLECTIONS = [
                 }
             }
         ]
+    },
+    {
+        "id": "service-design",
+        "title": "Service Design",
+        "benefit": "Führt dich durch den Double Diamond und hilft dir, Nutzer zu verstehen, kreativ Ideen zu entwickeln und neue Services mit wenig Aufwand zu testen.",
+        "guide": "## So arbeitest du mit dieser Kollektion\n\n1. Lege vor dem ersten Prompt die Bausteine an, die du brauchst. Sonst tippst du dieselben Angaben in jeden Prompt neu.\n2. Benenne jeden Baustein nach dem Muster \"Platzhalter: kurze Beschreibung\", z. B. \"Zielgruppe: Erstantragsteller Wohngeld\". So erkennst du ihn sofort und kannst mehrere Varianten anlegen.\n3. Setze die Bausteine in die Platzhalter der Prompts ein. Den Platzhalter [Blueprint-Art] füllst du direkt mit Ist oder Soll.\n4. Gibt es neue Erkenntnisse, aktualisiere den Baustein. Beim nächsten Einsatz arbeiten alle Prompts mit dem neuen Stand.\n\n## Diese Bausteine brauchst du\n\n- **Service:** was er leistet, wer ihn anbietet, wie er heute aus Nutzersicht abläuft. Für alle Prompts außer Prototyp- und Testplan.\n- **Zielgruppe:** wer den Service nutzt, Anlass, Vorwissen, Häufigkeit. Für alle Prompts außer Service Blueprint, Analogien und Radikale Einschränkungen.\n- **Problemstellung:** das Problem aus Nutzersicht, konkret und ohne vorweggenommene Lösung. Für Kopfstand, Analogien und Radikale Einschränkungen.\n- **Rahmenbedingungen:** Budget, Personal, Zeit, Technik, Vorgaben und was davon nicht verhandelbar ist. Für Navigator, Radikale Einschränkungen und Prototyp- und Testplan.\n- **Recherchematerial:** Interviewnotizen, Umfragen, Beschwerden oder Nutzungsdaten, mit Quelle und Stand. Für Persona, Journey Map und Jobs to be Done.\n- **Ziel:** was sich durch das Vorhaben ändern soll und woran du es erkennst. Für den Navigator.\n- **Interne Abläufe:** Schritte hinter den Kulissen, Beteiligte, Systeme, Übergaben. Für den Service Blueprint.\n- **Idee:** Kern der Lösung, für wen sie gedacht ist, was anders ist als heute. Für Prototyp- und Testplan.",
+        "prompts": [
+            {
+                "id": "service-design-double-diamond",
+                "title": "Double-Diamond-Navigator",
+                "purpose": "Führt dich Phase für Phase durch Discover, Define, Develop und Deliver und liefert am Ende einen Ergebnisbericht mit Grundlagen, Entscheidungen und offenen Fragen je Phase.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe",
+                    "Das Ziel des Vorhabens",
+                    "Deine Rahmenbedingungen wie Budget, Personal und Zeit"
+                ],
+                "fields": {
+                    "role": "Du bist Service Designer mit langjähriger Erfahrung und moderierst Projekte nach dem Double Diamond. Du achtest besonders darauf, dass Teams nicht zu früh in Lösungen springen.",
+                    "context": "Ich will folgenden Service verbessern oder neu gestalten.\nService: [Service]\nZielgruppe: [Zielgruppe]\nZiel des Vorhabens: [Ziel]\nRahmenbedingungen: [Rahmenbedingungen]",
+                    "task": "Führe mich durch die vier Phasen. Bearbeite immer nur eine Phase und stelle pro Nachricht höchstens drei Fragen.\n1. Discover: Kläre, was wir über Nutzer, Kontext und heutigen Ablauf wissen und was nur vermutet ist. Schlage vor, wie fehlende Erkenntnisse beschafft werden können.\n2. Define: Verdichte die Erkenntnisse zu einer Problemdefinition und zwei bis drei How-might-we-Fragen.\n3. Develop: Entwickle mit mir Lösungsideen, erst in der Breite, dann ausgewählt nach Wirkung für die Zielgruppe und Machbarkeit.\n4. Deliver: Plane, wie die ausgewählte Idee mit einem einfachen Prototyp getestet wird.\n\nVor jedem Phasenwechsel prüfst du:\n- Discover zu Define: Stützt sich die Problemdefinition auf Beobachtungen und nicht nur auf Annahmen?\n- Define zu Develop: Beschreibt die Problemdefinition ein Nutzerproblem, ohne eine Lösung vorwegzunehmen?\n- Develop zu Deliver: Wurden mindestens zwei grundverschiedene Lösungsrichtungen betrachtet?\nIst eine Prüfung nicht bestanden, sag das offen und benenne, was fehlt. Ich entscheide, ob wir trotzdem weitergehen.\n\nVermeide: Lösungsvorschläge in Discover und Define, Fachbegriffe ohne Erklärung, lange Theorieabschnitte.",
+                    "format": "Beginne jede Phase mit einer Zeile, in welcher Phase wir sind und welches Ergebnis sie liefern soll. Schließe jede Phase mit den Ergebnissen als Stichpunkte ab.\n\nNach Deliver erstellst du einen Ergebnisbericht:\n1. Kurzfassung: Problem, gewählte Lösung, nächster Schritt in höchstens fünf Sätzen\n2. Ein Abschnitt je Phase mit\n   - Ergebnis der Phase\n   - Grundlage: worauf das Ergebnis beruht (Beobachtungen, Daten, Annahmen)\n   - Entscheidungen und verworfene Alternativen mit Begründung\n   - Offene Fragen\n3. Empfohlene nächste Schritte\nJeder Phasenabschnitt umfasst höchstens eine halbe Seite. Übernimm nur, was im Gespräch erarbeitet wurde, und ergänze nichts Neues."
+                }
+            },
+            {
+                "id": "service-design-persona",
+                "title": "Persona mit Belegcheck",
+                "purpose": "Erstellt aus deinem Recherchematerial eine Persona und zeigt bei jeder Aussage, ob sie belegt oder nur angenommen ist.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe",
+                    "Dein Recherchematerial wie Interviewnotizen, Umfragen oder Beschwerden"
+                ],
+                "fields": {
+                    "role": "Du bist UX-Researcher und baust Personas ausschließlich auf Daten auf. Personas, die nach Marketing-Wunschbild klingen, lehnst du ab.",
+                    "context": "Die Persona soll dem Team helfen, Entscheidungen für den Service aus Nutzersicht zu treffen.\nService: [Service]\nZielgruppe: [Zielgruppe]\nRecherchematerial: [Recherchematerial]",
+                    "task": "Erstelle eine Persona aus dem Recherchematerial.\n- Konzentriere dich auf Ziele, Verhalten, Hindernisse und Auslöser rund um den Service. Demografische Angaben nur, wenn sie das Verhalten erklären.\n- Kennzeichne jede Aussage mit (belegt) oder (Annahme). Nenne bei belegten Aussagen kurz die Stelle im Material.\n- Zeigt das Material deutlich verschiedene Verhaltensmuster, schlage eine zweite Persona vor, statt alles in eine zu mischen.\n- Vermeide Klischees, Hobbys ohne Bezug zum Service und erfundene Zitate.",
+                    "format": "1. Name und ein Satz, der die Persona charakterisiert\n2. Ziele\n3. Typisches Verhalten im Umgang mit dem Service\n4. Hindernisse und Frustrationen\n5. Was sie zum Handeln bringt\n6. Die drei wichtigsten offenen Annahmen und wie sie geprüft werden können\nStichpunkte, insgesamt höchstens eine Seite."
+                }
+            },
+            {
+                "id": "service-design-journey-map",
+                "title": "Customer Journey Map",
+                "purpose": "Bildet die heutige Nutzung des Service Phase für Phase ab und zeigt, wo Nutzer zweifeln, warten oder abbrechen.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe",
+                    "Dein Recherchematerial wie Interviewnotizen, Umfragen oder Beschwerden"
+                ],
+                "fields": {
+                    "role": "Du bist Service Designer mit Schwerpunkt Customer Journeys. Dein Blick gilt den Momenten, in denen Nutzer zweifeln, warten oder abbrechen.",
+                    "context": "Service: [Service]\nZielgruppe: [Zielgruppe]\nRecherchematerial: [Recherchematerial]",
+                    "task": "Erstelle eine Customer Journey Map der heutigen Nutzung.\n- Beginne vor dem ersten Kontakt (Auslöser, Suche, Erwartung) und ende nach der eigentlichen Leistung (Nachbereitung, Wiederkehr, Weiterempfehlung).\n- Gliedere in fünf bis acht Phasen aus Nutzersicht, nicht nach internen Zuständigkeiten.\n- Erfasse pro Phase: Ziel der Nutzer, Handlungen, Touchpoints, Gedanken und Gefühle, Pain Points.\n- Markiere die zwei bis drei Momente, die über die Gesamterfahrung entscheiden, und begründe die Auswahl.\n- Trenne erkennbar, was aus dem Material stammt und was du ergänzt hast.",
+                    "format": "Tabelle mit den Phasen als Zeilen und den genannten Ebenen als Spalten. Gefühle als Stichwort mit Einordnung positiv, neutral oder negativ. Darunter die entscheidenden Momente und die drei größten Verbesserungshebel als Stichpunkte."
+                }
+            },
+            {
+                "id": "service-design-blueprint",
+                "title": "Service Blueprint",
+                "purpose": "Zeigt im Ist-Modus, warum Probleme im Service entstehen, und beschreibt im Soll-Modus einen neuen Service so, dass er umgesetzt werden kann.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Was du über die internen Abläufe, Systeme und Beteiligten weißt",
+                    "Die Entscheidung, ob du den heutigen Stand (Ist) oder den künftigen (Soll) abbilden willst"
+                ],
+                "fields": {
+                    "role": "Du bist Service Designer mit Hintergrund im Prozessmanagement. Du denkst einen Service von der Nutzeroberfläche bis zu den Systemen dahinter.",
+                    "context": "Service: [Service]\nInterne Abläufe: [Interne_Abläufe]\nArt des Blueprints: [Blueprint-Art]",
+                    "task": "Erstelle einen Service Blueprint mit den Ebenen Handlungen der Nutzer, Frontstage (sichtbare Mitarbeitende und Touchpoints), Backstage (unsichtbare Tätigkeiten) sowie unterstützende Prozesse und Systeme. Trenne die Ebenen strikt.\n\nBei einem Ist-Blueprint suchst du Bruchstellen: Medienbrüche, Übergaben zwischen Personen oder Abteilungen, Wartezeiten, doppelte Datenerfassung, Schritte ohne klare Zuständigkeit. Nenne zu jeder Bruchstelle ihre Auswirkung auf die Nutzer.\n\nBei einem Soll-Blueprint prüfst du jeden Schritt: Gibt es eine verantwortliche Rolle, ein auslösendes Ereignis und ein klares Ergebnis? Wo hängt der Service an einer einzelnen Person oder einem einzelnen System?\n\nLücken in meinen Angaben füllst du nicht stillschweigend, sondern listest sie als offene Fragen.",
+                    "format": "Tabelle mit den Schritten als Zeilen und den Ebenen als Spalten. Darunter Bruchstellen oder Prüfergebnisse als nummerierte Liste mit Schritt, Befund und Vorschlag, danach die offenen Fragen."
+                }
+            },
+            {
+                "id": "service-design-kopfstand",
+                "title": "Kopfstandmethode",
+                "purpose": "Sammelt Wege, den Service maximal schlecht zu machen, und dreht die ergiebigsten in konkrete Verbesserungsideen um.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe",
+                    "Das Problem oder die Frage, an der du arbeitest"
+                ],
+                "fields": {
+                    "role": "Du bist Kreativmoderator und setzt die Kopfstandmethode ein, um eingefahrene Denkmuster aufzubrechen.",
+                    "context": "Service: [Service]\nZielgruppe: [Zielgruppe]\nProblemstellung: [Problemstellung]",
+                    "task": "1. Drehe die Problemstellung ins Gegenteil: Wie machen wir den Service für die Zielgruppe so frustrierend und nutzlos wie möglich?\n2. Sammle 15 Antworten. Sei konkret und ruhig bösartig, aber realistisch: Die besten Antworten beschreiben etwas, das in ähnlichen Services tatsächlich vorkommt.\n3. Markiere die Antworten, die beim Service heute schon teilweise zutreffen.\n4. Kehre die zehn ergiebigsten Antworten in Verbesserungsideen um. Eine bloße Verneinung wie \"nicht lange warten lassen\" reicht nicht, formuliere eine konkrete Maßnahme.",
+                    "format": "- Umgekehrte Fragestellung in einem Satz\n- Nummerierte Liste der 15 Verschlechterungen, zutreffende markiert mit (heute schon)\n- Tabelle mit den Spalten Verschlechterung, Verbesserungsidee, erster Umsetzungsschritt"
+                }
+            },
+            {
+                "id": "service-design-jobs-to-be-done",
+                "title": "Jobs to be Done",
+                "purpose": "Arbeitet heraus, welchen Fortschritt Nutzer mit dem Service eigentlich suchen, womit er wirklich konkurriert, und leitet daraus Job Stories und Ansatzpunkte ab.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe",
+                    "Dein Recherchematerial wie Interviewnotizen, Umfragen oder Beschwerden"
+                ],
+                "fields": {
+                    "role": "Du bist Innovationsberater und arbeitest mit dem Jobs-to-be-Done-Ansatz. Du fragst nicht, was Nutzer wollen, sondern welchen Fortschritt sie in ihrer Situation erreichen wollen.",
+                    "context": "Service: [Service]\nZielgruppe: [Zielgruppe]\nRecherchematerial: [Recherchematerial]",
+                    "task": "1. Formuliere den Hauptjob lösungsneutral: Er muss auch gelten, wenn es den Service nicht gäbe.\n2. Ergänze funktionale, emotionale und soziale Jobs.\n3. Beschreibe die Kräfte beim Wechsel: Was treibt weg von der heutigen Lösung, was zieht zur neuen, welche Gewohnheiten und Ängste halten zurück?\n4. Nenne, womit die Zielgruppe den Job heute außerdem erledigt, auch Behelfslösungen wie Tabellen, Anrufe oder Nichtstun. Das sind die eigentlichen Wettbewerber.\n5. Formuliere fünf Job Stories nach dem Muster: Wenn ich in Situation X bin, möchte ich Y, damit Z.\n6. Leite drei Ansatzpunkte für den Service ab.\n\nVermeide: Jobs, die nur Funktionen des Service umschreiben, und Merkmale wie Alter oder Beruf als Erklärung für Verhalten.",
+                    "format": "Ein kurzer Abschnitt je Schritt, Stichpunkte. Kennzeichne mit (Annahme), was nicht aus dem Recherchematerial stammt."
+                }
+            },
+            {
+                "id": "service-design-besucher-zukunft",
+                "title": "Der Besucher aus der Zukunft",
+                "purpose": "Lässt einen Besucher, der uns 200 Jahre voraus ist, über den Service lächeln und Dinge vermissen, und übersetzt seine Beobachtungen in heute umsetzbare Ideen.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Die Zielgruppe"
+                ],
+                "fields": {
+                    "role": "Du bist ein Besucher aus einer Zivilisation, die der Menschheit 200 Jahre voraus ist. Du bist wohlwollend, neugierig und hast trockenen Humor. Du kennst die Bedürfnisse hinter dem Service, aber nicht die Gewohnheiten, die ihn geformt haben.",
+                    "context": "Du erlebst heute zum ersten Mal diesen Service.\nService: [Service]\nZielgruppe: [Zielgruppe]",
+                    "task": "1. Worüber lächelst du? Nenne sieben Dinge, die dir umständlich, überflüssig oder seltsam erscheinen. Sag jeweils, welches Bedürfnis dahinter steckt und wie es in deiner Zeit erfüllt wird.\n2. Was vermisst du? Nenne sieben Dinge, die in deiner Zeit selbstverständlich sind und hier fehlen.\n3. Verlasse danach die Rolle und übersetze die Beobachtungen in Ideen, die mit heutigen Mitteln umsetzbar sind. Ordne jede ein: sofort machbar, mittelfristig oder visionär.\n\nVermeide: Technikfantasien wie Teleportation ohne Bezug zum Bedürfnis. Der Wert liegt darin, Selbstverständliches infrage zu stellen.",
+                    "format": "Teil 1 und 2 in der Ich-Form des Besuchers, höchstens zwei Sätze pro Punkt. Teil 3 als Tabelle mit den Spalten Beobachtung, Idee für heute, Einordnung."
+                }
+            },
+            {
+                "id": "service-design-analogien",
+                "title": "Analogien aus fremden Branchen",
+                "purpose": "Sucht Branchen, die dein Problem im Kern längst gelöst haben, und überträgt ihre Lösungsprinzipien auf deinen Service.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Das Problem oder die Frage, an der du arbeitest"
+                ],
+                "fields": {
+                    "role": "Du bist Innovationsberater mit breitem Wissen über Abläufe und Geschäftsmodelle vieler Branchen. Deine Stärke ist es, Lösungsprinzipien von einem Feld auf ein anderes zu übertragen.",
+                    "context": "Service: [Service]\nProblemstellung: [Problemstellung]",
+                    "task": "1. Abstrahiere die Problemstellung auf ihr Grundprinzip, z. B. \"Menschen müssen eine unangenehme Wartezeit überbrücken\" oder \"Laien müssen eine komplexe Entscheidung treffen\".\n2. Suche sechs Branchen oder Organisationen, die genau dieses Prinzip besonders gut gelöst haben. Wähle bewusst Felder, die weit vom Service entfernt sind.\n3. Beschreibe pro Analogie, wie sie das Problem löst und welches Prinzip dahinter steckt.\n4. Übertrage jedes Prinzip in eine konkrete Idee für den Service.\n\nVermeide: naheliegende Vergleiche aus der eigenen Branche und Beispiele, die nur oberflächlich ähneln.",
+                    "format": "Grundprinzip in einem Satz, dann eine Tabelle mit den Spalten Branche, Lösung dort, Prinzip, Idee für unseren Service. Zum Schluss die zwei vielversprechendsten Ideen mit kurzer Begründung."
+                }
+            },
+            {
+                "id": "service-design-radikale-einschraenkungen",
+                "title": "Radikale Einschränkungen",
+                "purpose": "Zwingt durch künstliche Einschränkungen zu neuen Lösungen und filtert die Ideen heraus, die auch unter echten Bedingungen wirken.",
+                "inputs": [
+                    "Eine Beschreibung des Service",
+                    "Das Problem oder die Frage, an der du arbeitest",
+                    "Deine heutigen Rahmenbedingungen wie Budget, Personal und Technik"
+                ],
+                "fields": {
+                    "role": "Du bist Kreativmoderator und nutzt künstliche Einschränkungen, um Teams aus gewohnten Lösungen zu holen.",
+                    "context": "Service: [Service]\nProblemstellung: [Problemstellung]\nHeutige Rahmenbedingungen: [Rahmenbedingungen]",
+                    "task": "Entwickle Lösungen unter diesen sechs Einschränkungen. Ersetze höchstens zwei durch passendere, wenn sie für den Service keinen Sinn ergeben.\n- Es gibt kein Personal, das mit Nutzern spricht.\n- Das Budget beträgt ein Zehntel.\n- Nutzer haben nur eine Minute Zeit.\n- Die Zahl der Nutzer verzehnfacht sich über Nacht.\n- Es gibt keine App und keine Website.\n- Nutzer dürfen nichts ausfüllen.\nEntwickle je Einschränkung zwei Ideen, die das Problem trotzdem lösen. Prüfe danach, welche Ideen auch ohne die Einschränkung den heutigen Service verbessern.",
+                    "format": "Pro Einschränkung eine Überschrift mit zwei Ideen in je ein bis zwei Sätzen. Abschließend die drei Ideen mit der größten Wirkung unter den echten Rahmenbedingungen, jeweils mit Begründung."
+                }
+            },
+            {
+                "id": "service-design-prototyp-testplan",
+                "title": "Prototyp- und Testplan",
+                "purpose": "Findet die riskanteste Annahme hinter deiner Idee und plant den einfachsten Test, der sie bestätigt oder widerlegt.",
+                "inputs": [
+                    "Deine Lösungsidee",
+                    "Die Zielgruppe",
+                    "Deine Rahmenbedingungen wie Budget, Personal und Zeit"
+                ],
+                "fields": {
+                    "role": "Du bist Service Designer mit Schwerpunkt auf schnellem Testen. Dein Grundsatz: so wenig bauen wie möglich, um so viel wie möglich zu lernen.",
+                    "context": "Lösungsidee: [Idee]\nZielgruppe: [Zielgruppe]\nRahmenbedingungen: [Rahmenbedingungen]",
+                    "task": "1. Liste die Annahmen, die wahr sein müssen, damit die Idee funktioniert: zu Nutzerverhalten, Nutzen, Machbarkeit und Wirtschaftlichkeit.\n2. Bewerte jede Annahme nach Risiko (wie wahrscheinlich falsch) und Folgen (was passiert, wenn sie falsch ist). Wähle die riskanteste aus.\n3. Schlage den einfachsten Prototyp vor, der genau diese Annahme prüft, z. B. Papierprototyp, Rollenspiel, Wizard of Oz oder Landingpage. Begründe, warum nichts Aufwendigeres nötig ist.\n4. Plane den Test: wer, wie viele Personen, Ablauf, was beobachtet oder gemessen wird.\n5. Lege vorab fest, welches Ergebnis die Annahme bestätigt und welches sie widerlegt.\n\nVermeide: Tests, bei denen Nutzer nur gefragt werden, ob sie die Idee gut finden. Beobachtetes Verhalten zählt mehr als Meinungen.",
+                    "format": "Ein Abschnitt je Schritt. Annahmen als Tabelle mit Risiko und Folgen jeweils als hoch, mittel oder niedrig, alles Weitere in Stichpunkten. Insgesamt höchstens eine Seite."
+                }
+            }
+        ]
     }
 ];
