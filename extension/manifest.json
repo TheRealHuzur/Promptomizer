@@ -3,8 +3,8 @@
   "name": "Promptomizer",
   "short_name": "Promptomizer",
   "version": "1.0.0",
-  "description": "Suchen, kopieren, einfügen – deine eigenen Promptomizer-Prompts und Bausteine in jedem KI-Tool.",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyjOG4wenrD/Ksj822HjKgZnn8bN9SpnbeMcezAdQ5XOWG21vxpWR5WBCd63EpjW19AIdPesyUhBSR8+kKlZZSJpiglQZNpdUEF2cVHjcME/7C6foYNC4dMRuLXX/qKjlPcpLnU0ldBh5pc6A98OQi8ib2bfMvlUWxB4iVja7AZukOF2SukNp+8FjPAkG6DcfQ1uVmc/oPg9XG7FvTCBR75IFR0z3N0OoGMi5z1ZcKYyKEJGXl+MzY3qC8Php5E18ohI9hfVhgl7H/PzFoj1nyRaIbK4TsDpYgMQNJ7dqrT0Em3cVvGjlkSNuhltdCFp6bczAqpe150iSi+7ECQt8rwIDAQAB",
+  "description": "Deine Prompt-Bibliothek im Browser: eigene Prompts und Bausteine aus Promptomizer suchen und in jedes KI-Tool einfügen.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyBcmfLtAzVg/Mohqk8sUk/1ua0ZT+w8Fwp5gUVexQGpwJ05L+zXpDwSoj83Ot7g45dqM758g/CjhgT89WzR34nRya9JFRGGiELgvvc0YafEzwf8dtsE8BAsRgE69FCPLFanqNouarcs8c/49leN0X17P0uXjgl2kZ8yi8UifFNm9Fu7xeKYFPmLdbIjeBBgLPUlRpUk51c7O/obp8yXeO+Tcqx2TlPD0qYYU5MifT8BlC0ZSMJ/8o7Qb/qyObQgWP3g8358Rr2J2s95ns7RNfSu0Zc9p++MDfyAinSr8zliZqZrObUN4N8vGnDQAORf5IHxH152Q32jxpIOutVquKQIDAQAB",
   "minimum_chrome_version": "114",
   "icons": {
     "16": "icons/icon-16.png",

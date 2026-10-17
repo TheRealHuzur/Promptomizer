@@ -42,14 +42,11 @@ node tests/extension-contract-smoke.cjs
 
 ## Schlüssel
 
-`key` im Manifest ist der öffentliche Teil eines RSA-2048-Schlüssels. Der private Schlüssel (`promptomizer-extension.pem`) liegt **nicht** im Repo und wird nur für `--pack-extension` gebraucht. Erzeugung:
+`key` im Manifest ist seit dem 17.10.2026 der öffentliche Schlüssel der Store-Version (Developer-Dashboard → Paket). Damit hat die entpackte Erweiterung dieselbe ID wie die Store-Version: `omeecepdhgklmakffbbllbmfjejkjknl`. Den privaten Schlüssel verwaltet der Store.
 
-```
-openssl genrsa -out promptomizer-extension.pem 2048
-openssl rsa -in promptomizer-extension.pem -pubout -outform DER | openssl base64 -A
-```
+Store-Zips werden ohne `key` gebaut. Entpackte Version und Store-Version lassen sich wegen der gleichen ID nicht gleichzeitig installieren.
 
-Nach dem ersten Upload in den Chrome Web Store vergibt der Store einen eigenen Schlüssel; soll die entpackte ID mit der Store-ID übereinstimmen, wird dessen öffentlicher Schlüssel in das Manifest übernommen.
+Der frühere eigene Schlüssel (`promptomizer-extension.pem`, ID `jnhnhiengejeoajkjefmfgnemcpmdopm`) wird nicht mehr verwendet.
 
 ## Auslieferung
 
