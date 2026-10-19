@@ -12,6 +12,14 @@
     // Hinweis im Login-/Registrierungsmodal, wenn ein Gast einen Prompt übernehmen will.
     const ADOPT_LOGIN_HINT = 'Um Prompts in deine persönliche Bibliothek zu übernehmen, brauchst du ein Konto. Melde dich an oder registriere dich kostenlos.';
 
+    // Hinweis für Gäste über Übersicht und Detailansicht; ersetzt beim Einstieg über einen
+    // Kollektionslink das Onboarding (router.js). Erst sichtbar, wenn der Login-Status feststeht.
+    const GUEST_INTRO_TITLE = 'Neu bei Promptomizer?';
+    const GUEST_INTRO_TEXT = 'Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen.';
+    const GUEST_INTRO_NOTE = 'Direkt kopieren, ohne Anmeldung. Mit einem kostenlosen Konto übernimmst du bis zu zehn Prompts und Bausteine in deine eigene Bibliothek.';
+    const GUEST_REGISTER_LABEL = 'Kostenlos starten';
+    const GUEST_LOGIN_LABEL = 'Anmelden';
+
     const state = {
         collectionId: null,
         openPreviews: new Set(),
@@ -102,6 +110,36 @@
 
     function setButtonContent(button, iconName, label) {
         button.replaceChildren(icon(iconName), element('span', '', label));
+    }
+
+    function isGuest() {
+        return Boolean(window.authStateKnown) && !window.currentUser;
+    }
+
+    function buildGuestIntro() {
+        if (!isGuest()) return null;
+        const box = element('aside', 'collections-guest');
+        box.setAttribute('aria-label', 'Über Promptomizer');
+        const register = element('button', 'ui-btn ui-btn-primary collections-guest-register', GUEST_REGISTER_LABEL);
+        register.type = 'button';
+        register.addEventListener('click', () => window.openRegisterModal?.());
+        const login = element('button', 'collections-guest-login', GUEST_LOGIN_LABEL);
+        login.type = 'button';
+        login.addEventListener('click', () => window.openAuthModal?.());
+        const actions = element('div', 'collections-guest-actions');
+        actions.append(register, login);
+        box.append(
+            element('strong', 'collections-guest-title', GUEST_INTRO_TITLE),
+            element('p', 'collections-guest-text', GUEST_INTRO_TEXT),
+            element('p', 'collections-guest-note', GUEST_INTRO_NOTE),
+            actions
+        );
+        return box;
+    }
+
+    // router.js hält die Adresse aktuell, wenn der Nutzer eine Kollektion öffnet oder schließt.
+    function notifyRoute() {
+        window.dispatchEvent(new CustomEvent('collections-route', { detail: { collectionId: state.collectionId } }));
     }
 
     function promptCountLabel(count) {
@@ -210,7 +248,7 @@
             card.addEventListener('click', () => openCollection(collection.id));
             grid.append(card);
         });
-        view.replaceChildren(hero, grid);
+        view.replaceChildren(...[hero, buildGuestIntro(), grid].filter(Boolean));
     }
 
     function openCollection(id) {
@@ -218,6 +256,7 @@
         render();
         scrollToTop();
         document.getElementById('collections-heading')?.focus();
+        notifyRoute();
     }
 
     function closeCollection() {
@@ -228,6 +267,16 @@
         const card = Array.from(document.querySelectorAll('.collections-card'))
             .find(item => item.dataset.collectionId === previousId);
         card?.focus();
+        notifyRoute();
+    }
+
+    // Für router.js: Kollektion vor dem Einblenden der View setzen (null = Übersicht).
+    // Liefert false, wenn es die id nicht gibt; dann erscheint die Übersicht.
+    function showCollection(id) {
+        const found = !id || Boolean(findCollection(id));
+        state.collectionId = found ? id || null : null;
+        scrollToTop();
+        return found;
     }
 
     function renderDetail(view, collection) {
@@ -239,7 +288,7 @@
         const hero = renderHero(collection.title, collection.benefit || '');
         const list = element('div', 'collections-prompt-list');
         (collection.prompts || []).forEach(prompt => list.append(buildPromptItem(prompt)));
-        const parts = [back, hero];
+        const parts = [back, hero, buildGuestIntro()].filter(Boolean);
         if (typeof collection.guide === 'string' && collection.guide.trim()) parts.push(buildGuide(collection));
         parts.push(list);
         view.replaceChildren(...parts);
@@ -481,7 +530,10 @@
         promptText,
         appendHighlightedText,
         buildGuideContent,
-        open: () => window.switchView?.('collections')
+        open: () => window.switchView?.('collections'),
+        exists: id => Boolean(findCollection(id)),
+        showCollection,
+        getCollectionId: () => state.collectionId
     };
 
     init();

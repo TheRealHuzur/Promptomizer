@@ -58,6 +58,9 @@ const promptIds = new Set();
 list.forEach(collection => {
     assert(typeof collection.id === 'string' && collection.id, 'Kollektion braucht id');
     assert(!collectionIds.has(collection.id), `Doppelte Kollektions-id ${collection.id}`);
+    // Die id ist der Pfad /app/kollektionen/<id> in Posts und Mails: kleingeschrieben, ASCII, Bindestriche,
+    // ab Veröffentlichung unveränderlich (Umbenennen nur über title).
+    assert(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(collection.id), `Kollektions-id ${collection.id} ist nicht URL-tauglich`);
     collectionIds.add(collection.id);
     assert(typeof collection.title === 'string' && collection.title.trim(), 'Kollektion braucht title');
     assert(Array.isArray(collection.prompts) && collection.prompts.length > 0, 'Kollektion braucht Prompts');
@@ -65,6 +68,7 @@ list.forEach(collection => {
     collection.prompts.forEach(prompt => {
         assert(typeof prompt.id === 'string' && prompt.id, 'Prompt braucht id');
         assert(!promptIds.has(prompt.id), `Doppelte Prompt-id ${prompt.id}`);
+        assert(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(prompt.id), `Prompt-id ${prompt.id} ist nicht URL-tauglich`);
         promptIds.add(prompt.id);
         assert(typeof prompt.title === 'string' && prompt.title.trim(), 'Prompt braucht title');
         assert(prompt.title.length <= 200, 'Prompttitel zu lang');
@@ -174,6 +178,19 @@ assert(collections.includes("view.id = 'view-collections'"));
 assert(collections.includes('__collectionsPatched'));
 assert(collections.includes("'In meine Bibliothek übernehmen'"));
 assert(collections.includes("'ui-btn ui-btn-primary collections-adopt-button'"));
+
+// Routing-Schnittstelle für router.js und Gast-Hinweis.
+assert(collections.includes("new CustomEvent('collections-route'"));
+['exists:', 'showCollection,', 'getCollectionId:'].forEach(key => assert(collections.includes(key), `PromptCollections.${key} fehlt`));
+assert(sandbox.window.PromptCollections.exists('oeffentlicher-dienst'));
+assert(!sandbox.window.PromptCollections.exists('gibt-es-nicht'));
+assert.equal(sandbox.window.PromptCollections.showCollection('gibt-es-nicht'), false);
+assert.equal(sandbox.window.PromptCollections.getCollectionId(), null);
+assert.equal(sandbox.window.PromptCollections.showCollection('oeffentlicher-dienst'), true);
+assert.equal(sandbox.window.PromptCollections.getCollectionId(), 'oeffentlicher-dienst');
+assert.equal(sandbox.window.PromptCollections.showCollection(null), true);
+assert(collections.includes('window.authStateKnown) && !window.currentUser'), 'Gast-Hinweis erst bei bekanntem Login-Status');
+assert(css.includes('.collections-guest {'));
 
 // CSS: eigene Klassen inkl. Platzhalter mit Hintergrund und Rahmen.
 assert(css.includes('.collections-placeholder'));

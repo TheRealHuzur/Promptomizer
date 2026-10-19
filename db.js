@@ -39,6 +39,8 @@ function initSupabaseClient() {
         }
 
         window.currentUser = session?.user || null;
+        // Ab dem ersten Ereignis steht fest, ob jemand angemeldet ist (z. B. für den Gast-Hinweis der Kollektionen).
+        window.authStateKnown = true;
         const authEvent = new CustomEvent('auth-state-changed', { detail: window.currentUser });
         window.dispatchEvent(authEvent);
     });

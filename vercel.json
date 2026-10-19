@@ -10,12 +10,40 @@
   ],
   "rewrites": [
     {
+      "source": "/app/kollektionen",
+      "destination": "/app"
+    },
+    {
+      "source": "/app/kollektionen/:id",
+      "destination": "/app"
+    },
+    {
       "source": "/blog",
       "destination": "https://promptomizer-blog.vercel.app/blog"
     },
     {
       "source": "/blog/:path*",
       "destination": "https://promptomizer-blog.vercel.app/blog/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/app",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
+    },
+    {
+      "source": "/app/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
     }
   ]
 }

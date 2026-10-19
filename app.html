@@ -8,6 +8,21 @@
          (styles.css, vendor/..., db.js) gegen die Domain-Wurzel auflösen, unabhängig von der Request-URL. -->
     <base href="/">
     <meta name="robots" content="noindex, follow">
+    <!-- Vorschau-Karte für geteilte App-Links (z. B. /app/kollektionen/<id>), Texte wie index.html.
+         Bewusst ohne og:url und canonical: Die App hat viele Adressen und bleibt noindex. -->
+    <meta name="description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen. Kostenlos starten.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Promptomizer">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:title" content="Promptomizer – Prompts erstellen, optimieren und verwalten">
+    <meta property="og:description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen. Kostenlos starten.">
+    <meta property="og:image" content="https://www.promptomizer.de/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Promptomizer – Prompts erstellen, optimieren und verwalten">
+    <meta name="twitter:description" content="Promptomizer ist die persönliche Werkstatt für KI-Prompts: strukturiert bauen, in einer Bibliothek organisieren und mit wiederverwendbaren Bausteinen sofort in ChatGPT, Claude & Co. einsetzen.">
+    <meta name="twitter:image" content="https://www.promptomizer.de/assets/og-image.png">
     <script
         src="https://js-de.sentry-cdn.com/512c66ce8708042334c396a8fccc8083.min.js"
         crossorigin="anonymous"
@@ -2447,7 +2462,8 @@
             editorPreferenceAppliedForUserId = user.id;
             if (promptEditSession || !isEditorEmptyForDefaultPreference()) return;
             const preferredMode = normalizeDefaultEditorMode(settings?.default_editor_mode);
-            if (currentMode !== preferredMode) setEditorMode(preferredMode);
+            // keepView: Wer über einen Kollektionslink kommt, bleibt in den Kollektionen.
+            if (currentMode !== preferredMode) setEditorMode(preferredMode, { keepView: true });
         }
 
         async function updateUIAuth(user) {
@@ -4272,7 +4288,7 @@
             if (viewId === 'history' && window.db) loadHistory();
         }
 
-        function setEditorMode(mode) {
+        function setEditorMode(mode, options = {}) {
             if (promptEditSession && mode !== promptEditSession.mode) {
                 showToast('Der Prompt-Typ bleibt beim Bearbeiten erhalten.', 'info');
                 return;
@@ -4280,7 +4296,7 @@
 
             // If not in editor view, switch to it
             const editorView = document.getElementById('view-editor');
-            if (editorView && editorView.classList.contains('hidden')) {
+            if (!options.keepView && editorView && editorView.classList.contains('hidden')) {
                 switchView('editor');
             }
 
@@ -7376,6 +7392,8 @@
         async function checkOnboarding(user) {
             if (window.onboardingChecked) return;
             if (window.isPasswordRecovery) return;
+            // Einstieg über einen Kollektionslink: Onboarding erst beim ersten Wechsel in den Editor (router.js).
+            if (window.PromptRouter?.isOnboardingDeferred?.()) return;
             window.onboardingChecked = true;
 
             if (!user) {
@@ -7708,7 +7726,14 @@
             params.delete('billing');
             const nextQuery = params.toString();
             const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`;
-            window.history.replaceState({}, '', nextUrl);
+            replaceUrlSilently(nextUrl);
+        }
+
+        // Adresse ändern, ohne dass Umami einen zweiten Seitenaufruf zählt: Umami hängt sich an
+        // history.replaceState, nicht an History.prototype.replaceState. Der History-Zustand
+        // (Ansicht für router.js) bleibt erhalten, solange kein neuer übergeben wird.
+        function replaceUrlSilently(url, state = window.history.state) {
+            History.prototype.replaceState.call(window.history, state, '', url);
         }
 
         // Deep-Links von preise.html: ?intent=register oder ?intent=checkout&interval=month|year
@@ -7721,7 +7746,7 @@
                 if (!user) switchAuthMode('register');
                 params.delete('intent');
                 const nextQuery = params.toString();
-                window.history.replaceState({}, '', `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`);
+                replaceUrlSilently(`${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`);
                 return;
             }
 
@@ -7736,7 +7761,7 @@
                 params.delete('intent');
                 params.delete('interval');
                 const nextQuery = params.toString();
-                window.history.replaceState({}, '', `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`);
+                replaceUrlSilently(`${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`);
             }
         }
 
@@ -7833,6 +7858,7 @@
     <script src="snippet-library.js" data-cookieconsent="ignore"></script>
     <script src="kollektionen.js" data-cookieconsent="ignore"></script>
     <script src="collections.js" data-cookieconsent="ignore"></script>
+    <script src="router.js" data-cookieconsent="ignore"></script>
 </body>
 
 </html>

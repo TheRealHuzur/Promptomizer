@@ -6,8 +6,13 @@
 # eigene Inhalte in Trainingsdaten landen. Einzelbegründung siehe
 # /srv/wuw-storage/53_promptomizer/01_roadmaps/seo_geo/Phase-01-Technisches-SEO-und-Messbarkeit.md
 
+# /app ist seit 2026-10-19 bewusst NICHT mehr gesperrt (Entscheidung in
+# 04_ENTSCHEIDUNGEN.md, ersetzt die Sperre aus Phase 1): Die App wird per
+# X-Robots-Tag (vercel.json) und Meta-Tag als noindex markiert. Ein Disallow
+# würde Suchmaschinen genau dieses noindex verbergen, und extern verlinkte
+# Kollektionsadressen (/app/kollektionen/<id>) könnten ohne Inhalt im Index landen.
+
 User-agent: *
-Disallow: /app
 Allow: /
 
 # Explizit erlaubte KI-Crawler (kein Disallow nötig, Default-Regel oben deckt

@@ -305,6 +305,60 @@ h4.collections-guide-heading {
     border-color: rgba(134, 239, 172, .45);
 }
 
+/* Hinweis für Gäste: was Promptomizer ist und wie man startet. */
+.collections-guest {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(56, 189, 248, .28);
+    border-radius: .95rem;
+    background: rgba(14, 165, 233, .06);
+}
+
+.collections-guest-title {
+    color: #f8fafc;
+    font-size: .95rem;
+    font-weight: 750;
+}
+
+.collections-guest-text,
+.collections-guest-note {
+    color: #cbd5e1;
+    font-size: .86rem;
+    line-height: 1.55;
+}
+
+.collections-guest-note {
+    color: #94a3b8;
+}
+
+.collections-guest-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-top: .4rem;
+}
+
+.collections-guest-login {
+    padding: .4rem .2rem;
+    color: #7dd3fc;
+    font-size: .84rem;
+    font-weight: 700;
+}
+
+.collections-guest-login:hover {
+    color: #e0f2fe;
+}
+
+.collections-guest-register:focus-visible,
+.collections-guest-login:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
 @media (max-width: 1023px) {
     .collections-view {
         min-width: 0;
@@ -337,5 +391,15 @@ h4.collections-guide-heading {
 
     .collections-copy-button {
         justify-content: center;
+    }
+
+    .collections-guest-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .collections-guest-register,
+    .collections-guest-login {
+        min-height: 2.75rem;
     }
 }
