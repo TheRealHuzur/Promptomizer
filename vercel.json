@@ -28,6 +28,19 @@
   ],
   "headers": [
     {
+      "source": "/kollektionen.json",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
       "source": "/app",
       "headers": [
         {

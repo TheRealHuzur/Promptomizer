@@ -10,6 +10,9 @@
 //   node tools/sync-collection-pages.cjs --check  nur prüfen (Exit 1 bei Abweichung)
 //
 // tests/collection-pages-smoke.cjs prüft dasselbe ohne zu schreiben.
+//
+// Seit der Chrome-Extension 1.1 zieht das Skript auch kollektionen.json nach
+// (tools/build-kollektionen-json.cjs), die Datenquelle der Seitenleiste.
 'use strict';
 
 const fs = require('node:fs');
@@ -79,6 +82,20 @@ if (require.main === module) {
             fs.writeFileSync(result.file, result.updated, 'utf8');
             console.log(`${result.page}: aktualisiert: ${result.stale.join(', ')}`);
         }
+    }
+    // kollektionen.json für die Chrome-Extension.
+    const { buildJson } = require('./build-kollektionen-json.cjs');
+    const jsonFile = path.join(ROOT, 'kollektionen.json');
+    const json = buildJson();
+    const currentJson = fs.existsSync(jsonFile) ? fs.readFileSync(jsonFile, 'utf8') : null;
+    if (currentJson === json) {
+        console.log('kollektionen.json: aktuell');
+    } else if (checkOnly) {
+        failed = true;
+        console.log('kollektionen.json: veraltet');
+    } else {
+        fs.writeFileSync(jsonFile, json, 'utf8');
+        console.log('kollektionen.json: aktualisiert');
     }
     if (failed) {
         console.log('\nAktualisieren mit: node tools/sync-collection-pages.cjs');

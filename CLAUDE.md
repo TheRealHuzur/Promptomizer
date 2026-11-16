@@ -52,6 +52,7 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 | `snippet-library.js` | Bausteinbereich der zentralen Bibliothek: Suche, Karten/Liste, Filter, Bearbeitung, Archiv, Export und Pro-Massenaktionen |
 | `snippet-library.css` | Ergänzende Styles für Bereichsumschalter, Bausteinbearbeitung und Zielauswahl |
 | `kollektionen.js` | Statische, öffentliche Kollektionsdaten (`window.PROMPTOMIZER_COLLECTIONS`), Pflege per Git; stabile `id`s |
+| `kollektionen.json` | Aus `kollektionen.js` erzeugte Daten für die Chrome-Extension (seit 1.1), ausgeliefert mit CORS-Header (`vercel.json`). Nach jeder Kollektionsänderung `node tools/sync-collection-pages.cjs` (zieht Seiten-Fallback und JSON nach) oder nur `node tools/build-kollektionen-json.cjs`; `tests/collections-json-smoke.cjs` meldet Abweichungen |
 | `collections.js` / `collections.css` | Ansicht „Kollektionen“: Vorschau mit Platzhalter-Hervorhebung, Kopieren (frei) und Übernahme in die eigene Bibliothek |
 | `router.js` | Deep Links auf Kollektionen (siehe §7 „Kollektions-Adressen“); äußerste `switchView`-Schicht, nach `collections.js` geladen |
 | `tools/dev-server.cjs` | Lokale Vorschau ohne Abhängigkeiten, die `vercel.json` nachbildet (cleanUrls, Rewrites, Header): `node tools/dev-server.cjs [port]` |
@@ -114,8 +115,10 @@ Ein Web-Tool, mit dem Nutzer strukturierte KI-Prompts bauen, in einer persönlic
 - **Session-Persistenz:** `localStorage` wenn „Angemeldet bleiben" aktiv, sonst `sessionStorage`. Umschalten über `window.setRememberPref(bool)` (re-initialisiert den Client). `detectSessionInUrl: true` übernimmt Tokens aus dem URL-Fragment.
 - **Supabase Auth-Config (Management-API):**
   - `site_url = https://www.promptomizer.de` — ⚠️ war zwischenzeitlich kaputt (führendes Leerzeichen, falsche Domain), was Bestätigungs-/Reset-Mails ins Leere laufen ließ. **Beim Anlegen neuer Umgebungen prüfen.**
-  - `uri_allow_list` enthält die Produktiv-Domains + localhost-Ports. Für lokale Auth-Tests ggf. temporär den Preview-Port (`4173`) hinzufügen und **danach wieder entfernen**.
+  - `uri_allow_list` enthält die Produktiv-Domains + localhost-Ports, für Vercel-Previews nur `https://promptomizer-*-patrick-rosskothens-projects.vercel.app/**` (seit 10.11.2026; vorher `https://*.vercel.app/**`, das jede fremde Vercel-Seite als Rücksprungziel erlaubte — nicht wieder öffnen). Für lokale Auth-Tests ggf. temporär den Preview-Port (`4173`) hinzufügen und **danach wieder entfernen**.
 - `registerUser` und `requestPasswordReset` setzen `emailRedirectTo`/`redirectTo` auf `window.location.origin`, damit der Link zur richtigen Domain zurückführt.
+- **Abmelden nur lokal:** `handleLogout` ruft `signOut({ scope: 'local' })` (E4). Ohne Scope meldet Supabase global ab und wirft die Chrome-Extension und andere Geräte mit hinaus. Nicht zurückdrehen.
+- **Chrome-Extension:** `https://omeecepdhgklmakffbbllbmfjejkjknl.chromiumapp.org/**` steht seit 09.11.2026 in `uri_allow_list` (Google-Anmeldung der Extension über `chrome.identity`). Hängt an der festen Extension-ID aus `key` im Manifest.
 
 ---
 
@@ -184,13 +187,20 @@ Gateway bildet das nach. Betroffen sind:
 Agent leere Felder oder ein abweichendes Format, ohne dass irgendwo etwas scheitert.
 Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/mcp`.
 
-**Zweite Kopie im Repo:** Die Chrome-Extension unter `extension/` (MV3-Popup, nur suchen und
-kopieren) hält in `extension/contract.js` zeichengleiche Kopien von `prefixSearchQuery`,
-`structuredValues` und `promptToText` aus `library.js`. `node tests/extension-contract-smoke.cjs`
-vergleicht den Quelltext und muss nach jeder Änderung an diesen Funktionen grün sein; ebenso
-muss `extension/vendor/supabase.js` byteidentisch zu `vendor/supabase/supabase.js` bleiben
-(`node tests/extension-source-smoke.cjs`). `.vercelignore` hält `extension/` aus der
-Auslieferung. Führender Plan: `/srv/wuw-storage/53_promptomizer/01_roadmaps/extension/`.
+**Zweite Kopie im Repo:** Die Chrome-Extension unter `extension/` (seit 1.1 MV3-Seitenleiste:
+suchen, kopieren, Prompts bearbeiten und anlegen, Bausteine und Kategorien anlegen, Kollektionen
+übernehmen; kein Löschen) **schreibt** in `library`, `snippets`, `prompt_categories` und
+`prompt_history`. `extension/contract.js` hält zeichengleiche Kopien von `prefixSearchQuery`,
+`structuredValues` und `promptToText` aus `library.js` sowie `isFreeCollectionPrompt` und
+`toStorageFields` aus `collections.js`; `libraryFieldsPayload` bildet `getCurrentLibraryFieldsPayload`
+in `app.html` nach, `snippetModeFor` die `mode`-Regel aus `saveEditor` in `snippet-library.js`.
+`node tests/extension-contract-smoke.cjs` vergleicht Quelltext bzw. führt die App-Funktion mit
+nachgebautem DOM aus und muss nach jeder Änderung an diesen Stellen grün sein; ebenso muss
+`extension/vendor/supabase.js` byteidentisch zu `vendor/supabase/supabase.js` bleiben
+(`node tests/extension-source-smoke.cjs`). Die Extension lädt die Kollektionen aus
+`kollektionen.json` (siehe §3) und meldet sich auch mit Google an (`chrome.identity`, PKCE).
+`.vercelignore` hält `extension/` aus der Auslieferung. Führender Plan:
+`/srv/wuw-storage/53_promptomizer/01_roadmaps/extension/`.
 
 ---
 

@@ -657,7 +657,7 @@
                     </div>
 
                     <div class="space-y-6 text-slate-300 leading-relaxed overflow-y-auto pr-2">
-                        <p class="italic text-sm">Stand: 13. September 2026</p>
+                        <p class="italic text-sm">Stand: 9. November 2026</p>
 
                         <section>
                             <h3 class="text-xl font-bold text-white mb-3">1. Datenschutz auf einen Blick</h3>
@@ -915,7 +915,7 @@
                                 info@promptomizer.de gerichtet werden.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Browser-Erweiterung</h4>
-                            <p>Die Chrome-Erweiterung „Promptomizer“ greift nach Anmeldung mit Ihrem Promptomizer-Konto auf dieselbe Datenbank zu wie die Web-App und zeigt ausschließlich Ihre eigenen Prompts und Bausteine an. Zur schnellen Suche speichert die Erweiterung eine Kopie dieser Einträge sowie Ihr Sitzungs-Token lokal im Browserprofil (<code>chrome.storage.local</code>). Beim Abmelden oder Deinstallieren werden diese Daten gelöscht. Die Erweiterung liest keine Inhalte fremder Webseiten, fügt nichts automatisch ein und enthält keine Analyse-, Fehler- oder Trackingdienste. Es gelten die Angaben zu Supabase (Serverstandort Frankfurt) in dieser Erklärung.</p>
+                            <p>Die Chrome-Erweiterung „Promptomizer“ öffnet sich als Seitenleiste im Browser. Nach Anmeldung mit Ihrem Promptomizer-Konto, mit E-Mail-Adresse und Passwort oder über Google (siehe „Anmeldung mit Google“), greift sie auf dieselbe Datenbank zu wie die Web-App. Sie zeigt ausschließlich Ihre eigenen Prompts, Bausteine und Kategorien an. Sie können dort Prompts, Bausteine und Kategorien anlegen und ändern sowie Prompts aus den öffentlichen Kollektionen in Ihre Bibliothek übernehmen; wie in der Web-App wird beim Kopieren eines eigenen Prompts ein Eintrag in Ihrem Verlauf gespeichert. Zur schnellen Suche speichert die Erweiterung eine Kopie Ihrer Einträge, Ihr Sitzungs-Token, Ansichtseinstellungen und eine Kopie der öffentlichen Kollektionen lokal im Browserprofil (<code>chrome.storage.local</code>). Die Kollektionen ruft die Erweiterung als Datendatei von www.promptomizer.de ab; dabei werden keine Kontodaten übermittelt, für den Abruf gelten die Angaben zu Vercel. Endet die Anmeldung oder wird die Erweiterung deinstalliert, werden die lokal gespeicherten Kontodaten gelöscht. Die Erweiterung liest keine Inhalte fremder Webseiten, fügt nichts automatisch ein und enthält keine Analyse-, Fehler- oder Trackingdienste. Es gelten die Angaben zu Supabase (Serverstandort Frankfurt) in dieser Erklärung.</p>
 
                             <h4 class="text-lg font-semibold text-white mt-6 mb-2">Zahlungsabwicklung (Stripe)</h4>
                             <p>Für die Abwicklung von Abonnements setzen wir Stripe für den Bestellvorgang, die
@@ -4113,7 +4113,8 @@
                     throw new Error(err.error ?? res.statusText);
                 }
                 showToast('Dein Konto wurde gelöscht.', 'info', 6000);
-                setTimeout(() => window.db.handleLogout(), 1500);
+                // handleLogout ist global aus db.js (nicht Teil von window.db), wie beim Abmelden-Knopf.
+                setTimeout(() => handleLogout(), 1500);
             } catch (e) {
                 console.error('confirmDeleteAccount Fehler:', e);
                 showToast('Konto löschen fehlgeschlagen: ' + e.message, 'error');

@@ -116,7 +116,9 @@ async function loginUser(email, password) {
 }
 
 async function handleLogout() {
-    const { error } = await supabaseClient.auth.signOut();
+    // Nur diese Sitzung beenden. Ohne Scope meldet Supabase global ab und wirft damit
+    // auch die Chrome-Extension und andere Geräte hinaus (Entscheidung E4, 2026-10-24).
+    const { error } = await supabaseClient.auth.signOut({ scope: 'local' });
     if (error) console.error('Logout Fehler:', error);
 }
 

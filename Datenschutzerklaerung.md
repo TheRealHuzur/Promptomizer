@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-Stand: 13. September 2026
+Stand: 9. November 2026
 
 ## 1. Datenschutz auf einen Blick
 
@@ -188,7 +188,7 @@ Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
 
 ### Browser-Erweiterung
 
-Die Chrome-Erweiterung „Promptomizer“ greift nach Anmeldung mit Ihrem Promptomizer-Konto auf dieselbe Datenbank zu wie die Web-App und zeigt ausschließlich Ihre eigenen Prompts und Bausteine an. Zur schnellen Suche speichert die Erweiterung eine Kopie dieser Einträge sowie Ihr Sitzungs-Token lokal im Browserprofil (`chrome.storage.local`). Beim Abmelden oder Deinstallieren werden diese Daten gelöscht. Die Erweiterung liest keine Inhalte fremder Webseiten, fügt nichts automatisch ein und enthält keine Analyse-, Fehler- oder Trackingdienste. Es gelten die Angaben zu Supabase (Serverstandort Frankfurt) in dieser Erklärung.
+Die Chrome-Erweiterung „Promptomizer“ öffnet sich als Seitenleiste im Browser. Nach Anmeldung mit Ihrem Promptomizer-Konto, mit E-Mail-Adresse und Passwort oder über Google (siehe „Anmeldung mit Google“), greift sie auf dieselbe Datenbank zu wie die Web-App. Sie zeigt ausschließlich Ihre eigenen Prompts, Bausteine und Kategorien an. Sie können dort Prompts, Bausteine und Kategorien anlegen und ändern sowie Prompts aus den öffentlichen Kollektionen in Ihre Bibliothek übernehmen; wie in der Web-App wird beim Kopieren eines eigenen Prompts ein Eintrag in Ihrem Verlauf gespeichert. Zur schnellen Suche speichert die Erweiterung eine Kopie Ihrer Einträge, Ihr Sitzungs-Token, Ansichtseinstellungen und eine Kopie der öffentlichen Kollektionen lokal im Browserprofil (`chrome.storage.local`). Die Kollektionen ruft die Erweiterung als Datendatei von www.promptomizer.de ab; dabei werden keine Kontodaten übermittelt, für den Abruf gelten die Angaben zu Vercel. Endet die Anmeldung oder wird die Erweiterung deinstalliert, werden die lokal gespeicherten Kontodaten gelöscht. Die Erweiterung liest keine Inhalte fremder Webseiten, fügt nichts automatisch ein und enthält keine Analyse-, Fehler- oder Trackingdienste. Es gelten die Angaben zu Supabase (Serverstandort Frankfurt) in dieser Erklärung.
 
 Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO.
 
