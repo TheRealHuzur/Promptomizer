@@ -1,9 +1,10 @@
 // Promptomizer Chrome-Extension – Vertragsfunktionen.
 //
 // Die Funktionen prefixSearchQuery, structuredValues und promptToText sind
-// zeichengleiche Kopien aus library.js (siehe CLAUDE.md §7a, Kopplung).
-// tests/extension-contract-smoke.cjs vergleicht den Quelltext beider Dateien;
-// wer library.js ändert, muss hier nachziehen.
+// zeichengleiche Kopien aus library.js, isFreeCollectionPrompt und toStorageFields
+// aus collections.js (siehe CLAUDE.md §7a, Kopplung). tests/extension-contract-smoke.cjs
+// vergleicht den Quelltext und prüft libraryFieldsPayload gegen getCurrentLibraryFieldsPayload
+// in app.html; wer diese Stellen in der App ändert, muss hier nachziehen.
 //
 // Die Datei ist ein klassisches Browser-Skript (Global PromptomizerContract)
 // und zugleich per require() aus Node ladbar.
@@ -56,6 +57,51 @@ const PromptomizerContract = (() => {
             .join('\n\n');
     }
 
+    // Zeichengleiche Kopien aus collections.js: Speicherformat bei der Übernahme
+    // eines Kollektions-Prompts in die Bibliothek.
+    function isFreeCollectionPrompt(prompt) {
+        return prompt?.fields?.mode === 'free';
+    }
+
+    function toStorageFields(prompt) {
+        const fields = prompt?.fields || {};
+        if (isFreeCollectionPrompt(prompt)) {
+            return { mode: 'free', text: String(fields.text ?? '').replace(/\r\n/g, '\n') };
+        }
+        return [
+            String(fields.role ?? ''),
+            String(fields.context ?? ''),
+            String(fields.task ?? ''),
+            '',
+            String(fields.format ?? '')
+        ];
+    }
+
+    // Speicherformat beim Anlegen und Ändern eines Prompts, wie getCurrentLibraryFieldsPayload
+    // in app.html: strukturiert [role, context, task, '', format], frei { mode: 'free', text }.
+    // Die App liest die Werte aus dem DOM, deshalb kein Quelltextvergleich: der Drift-Test
+    // führt die App-Funktion mit nachgebautem DOM aus und vergleicht die Ergebnisse.
+    function libraryFieldsPayload(mode, values) {
+        if (mode === 'free') {
+            return {
+                mode: 'free',
+                text: String(values?.text || '').replace(/\r\n/g, '\n')
+            };
+        }
+        return [
+            values?.role || '',
+            values?.context || '',
+            values?.task || '',
+            '',
+            values?.format || ''
+        ];
+    }
+
+    // Einsatzbereich eines Bausteins wie saveEditor in snippet-library.js.
+    function snippetModeFor(fieldId) {
+        return fieldId === 'free' ? 'free' : 'structured';
+    }
+
     // Ab hier Ergänzungen nur für die Extension (kein Gegenstück in library.js).
 
     // Baustein-Kopiertext ist der unveränderte Inhalt (snippet-library.js copySnippet).
@@ -106,6 +152,10 @@ const PromptomizerContract = (() => {
         prefixSearchQuery,
         structuredValues,
         promptToText,
+        isFreeCollectionPrompt,
+        toStorageFields,
+        libraryFieldsPayload,
+        snippetModeFor,
         snippetToText,
         searchTerms,
         matchesSearch,

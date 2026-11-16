@@ -4,53 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promptomizer</title>
+    <link rel="stylesheet" href="vendor/inter/inter.css">
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <header class="px-header">
-        <div class="px-logo" aria-label="Promptomizer"><span class="px-logo-a">Prompt</span><span class="px-logo-b">omizer</span></div>
-        <button type="button" id="logout-btn" class="px-btn px-btn-ghost" hidden>Abmelden</button>
-    </header>
-
-    <section id="view-login" class="px-view" hidden>
-        <form id="login-form" class="px-login" novalidate>
-            <h1 class="px-title">Anmelden</h1>
-            <p class="px-lead">Mit deinem Promptomizer-Konto hast du deine Prompts und Bausteine in jedem KI-Tool zur Hand.</p>
-            <label class="px-label" for="login-email">E-Mail</label>
-            <input id="login-email" class="px-input" type="email" name="email" autocomplete="username" required>
-            <label class="px-label" for="login-password">Passwort</label>
-            <input id="login-password" class="px-input" type="password" name="password" autocomplete="current-password" required>
-            <p id="login-error" class="px-error" role="alert" hidden></p>
-            <button type="submit" id="login-submit" class="px-btn px-btn-primary">Anmelden</button>
-            <p class="px-hint">Mit Google registriert? Setze in der App über „Passwort vergessen“ ein Passwort.
-                <a href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Zur App</a></p>
-        </form>
+    <section id="view-login" class="px-screen" hidden>
+        <header class="px-header">
+            <a class="px-logo" href="https://www.promptomizer.de/app" target="_blank" rel="noopener" aria-label="Promptomizer in neuem Tab öffnen"><span class="px-logo-a">Prompt</span><span class="px-logo-b">omizer</span><span class="px-logo-ext" data-icon="external" aria-hidden="true"></span></a>
+        </header>
+        <div class="px-scroll">
+            <div class="px-login">
+                <h1 class="px-title">Anmelden</h1>
+                <p class="px-lead">Mit deinem Promptomizer-Konto hast du deine Prompts und Bausteine in jedem KI-Tool zur Hand.</p>
+                <form id="login-form" class="px-login-form" novalidate>
+                    <label class="px-label" for="login-email">E-Mail</label>
+                    <input id="login-email" class="px-input" type="email" name="email" autocomplete="username" required>
+                    <label class="px-label" for="login-password">Passwort</label>
+                    <div class="px-password">
+                        <input id="login-password" class="px-input" type="password" name="password" autocomplete="current-password" required>
+                        <button type="button" id="login-password-toggle" class="px-password-toggle" aria-pressed="false" aria-controls="login-password">Anzeigen</button>
+                    </div>
+                    <p id="login-error" class="px-error" role="alert" hidden></p>
+                    <button type="submit" id="login-submit" class="px-btn px-btn-secondary px-btn-block">Mit E-Mail anmelden</button>
+                </form>
+                <p class="px-login-links">
+                    <a href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Passwort vergessen?</a>
+                    <a href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Konto anlegen</a>
+                </p>
+                <p class="px-divider"><span>oder</span></p>
+                <button type="button" id="login-google" class="px-btn px-btn-google px-btn-block">
+                    <svg class="px-google-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <span>Mit Google anmelden</span>
+                </button>
+                <p class="px-legal">Ohne Konto legt die Anmeldung mit Google eins an. Dann gelten unsere
+                    <a href="https://www.promptomizer.de/agb" target="_blank" rel="noopener">AGB</a>, Hinweise zum Datenschutz stehen in der
+                    <a href="https://www.promptomizer.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
+            </div>
+        </div>
     </section>
 
-    <section id="view-library" class="px-view" hidden>
-        <div class="px-tabs" role="tablist" aria-label="Bereich">
-            <button type="button" role="tab" id="tab-prompts" class="px-tab" data-tab="prompts" aria-selected="true" aria-controls="result-list">Prompts</button>
-            <button type="button" role="tab" id="tab-snippets" class="px-tab" data-tab="snippets" aria-selected="false" aria-controls="result-list">Bausteine</button>
-        </div>
-        <div class="px-chips-wrap">
-            <button type="button" id="chips-prev" class="px-chips-arrow px-chips-arrow-prev" aria-label="Filter nach links blättern" tabindex="-1" hidden>&lsaquo;</button>
-            <div id="filter-chips" class="px-chips" role="group" aria-label="Filter"></div>
-            <button type="button" id="chips-next" class="px-chips-arrow px-chips-arrow-next" aria-label="Filter nach rechts blättern" tabindex="-1" hidden>&rsaquo;</button>
-        </div>
+    <section id="view-main" class="px-screen" hidden>
+        <header class="px-header">
+            <a class="px-logo" href="https://www.promptomizer.de/app" target="_blank" rel="noopener" aria-label="Promptomizer in neuem Tab öffnen"><span class="px-logo-a">Prompt</span><span class="px-logo-b">omizer</span><span class="px-logo-ext" data-icon="external" aria-hidden="true"></span></a>
+            <a id="upgrade-pill" class="px-upgrade" href="https://www.promptomizer.de/preise" target="_blank" rel="noopener" hidden><span data-icon="crown" aria-hidden="true"></span>Upgrade</a>
+        </header>
         <div class="px-search">
-            <input id="search-input" class="px-input" type="search" autocomplete="off" spellcheck="false"
-                placeholder="Suchen … (↑↓ wählen, Enter kopiert)" aria-label="Bibliothek durchsuchen" aria-controls="result-list" autofocus>
+            <span class="px-search-icon" data-icon="search" aria-hidden="true"></span>
+            <input id="search-input" class="px-search-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Suchen..." aria-label="Bibliothek durchsuchen" aria-controls="main-list" autofocus>
+            <button type="button" id="search-clear" class="px-search-clear" aria-label="Suche leeren" hidden><span data-icon="x" aria-hidden="true"></span></button>
         </div>
-        <div id="result-list" class="px-list" role="listbox" aria-label="Treffer" tabindex="-1"></div>
-        <p id="empty-state" class="px-empty" hidden></p>
+        <div id="filter-chips" class="px-chips" role="group" aria-label="Filter">
+            <button type="button" id="chip-all" class="px-chip" aria-pressed="true"><span>Alle</span><span class="px-chip-count" id="chip-all-count">0</span></button>
+            <button type="button" id="chip-fav" class="px-chip" aria-pressed="false" aria-label="Favoriten"><span class="px-chip-star" data-icon="star-fill" aria-hidden="true"></span><span class="px-chip-count" id="chip-fav-count">0</span></button>
+            <button type="button" id="chip-cat" class="px-chip px-chip-select" aria-pressed="false" aria-haspopup="listbox" aria-expanded="false"><span id="chip-cat-label" class="px-chip-label">Kategorie</span><span class="px-chip-caret" data-icon="chevron-down" aria-hidden="true"></span></button>
+        </div>
+        <div id="main-list" class="px-scroll px-list" role="list" aria-label="Bibliothek"></div>
+        <div id="limit-bar" class="px-limit" hidden>
+            <div class="px-limit-row">
+                <span id="limit-text" class="px-limit-text"></span>
+                <a class="px-limit-link" href="https://www.promptomizer.de/preise" target="_blank" rel="noopener">Pro ansehen <span data-icon="chevron-right" aria-hidden="true"></span></a>
+            </div>
+            <div id="limit-progress" class="px-progress" role="progressbar" aria-label="Genutzte Inhalte im Free-Tarif" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+                <div id="limit-progress-fill" class="px-progress-fill"></div>
+            </div>
+        </div>
+        <div class="px-actionbar">
+            <button type="button" id="new-action" class="px-newbar-btn"><span data-icon="plus" aria-hidden="true"></span><span>Neuer Prompt</span></button>
+        </div>
+        <nav class="px-tabbar" aria-label="Bereiche">
+            <button type="button" id="tab-library" class="px-tabbar-btn" data-area="library" aria-current="page"><span data-icon="library" aria-hidden="true"></span><span>Bibliothek</span></button>
+            <button type="button" id="tab-snippets" class="px-tabbar-btn" data-area="snippets"><span data-icon="box" aria-hidden="true"></span><span>Bausteine</span></button>
+            <button type="button" id="tab-collections" class="px-tabbar-btn" data-area="collections"><span data-icon="layers" aria-hidden="true"></span><span>Kollektionen</span></button>
+        </nav>
     </section>
 
-    <footer class="px-footer">
-        <span id="status-text" class="px-status" aria-live="polite"></span>
-        <a class="px-footer-link" href="https://www.promptomizer.de/app" target="_blank" rel="noopener">Im Promptomizer öffnen</a>
-    </footer>
+    <section id="view-sub" class="px-screen" hidden></section>
 
-    <div id="toast" class="px-toast" role="status" aria-live="polite" hidden></div>
+    <div id="menu-layer"></div>
+    <div id="sheet-layer" hidden></div>
+    <div id="toast" class="px-toast" aria-hidden="true"></div>
+    <div id="live" class="px-sr-only" role="status" aria-live="polite"></div>
 
     <script src="vendor/supabase.js"></script>
     <script src="contract.js"></script>

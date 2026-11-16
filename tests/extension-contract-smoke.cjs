@@ -103,4 +103,56 @@ for (const name of ['prefixSearchQuery', 'structuredValues', 'promptToText']) {
     );
 }
 
+// --- Schreibformate (Extension legt seit 1.1 Prompts, Bausteine und Übernahmen an).
+
+assert.deepEqual(contract.libraryFieldsPayload('structured', { role: 'R', context: 'K', task: 'A', format: 'F' }), ['R', 'K', 'A', '', 'F']);
+assert.deepEqual(contract.libraryFieldsPayload('structured', { task: 'A' }), ['', '', 'A', '', '']);
+assert.deepEqual(contract.libraryFieldsPayload('free', { text: 'a\r\nb' }), { mode: 'free', text: 'a\nb' });
+assert.deepEqual(contract.toStorageFields({ fields: { role: 'R', task: 'A' } }), ['R', '', 'A', '', '']);
+assert.deepEqual(contract.toStorageFields({ fields: { mode: 'free', text: 'x\r\ny' } }), { mode: 'free', text: 'x\ny' });
+assert.equal(contract.snippetModeFor('free'), 'free');
+assert.equal(contract.snippetModeFor('context'), 'structured');
+// Rundlauf: in der Leiste gespeichert → derselbe Kopiertext wie in der App.
+assert.equal(contract.promptToText({ fields: contract.libraryFieldsPayload('structured', { role: 'R', task: 'A' }) }), '**🎭 ROLLE**\nR\n\n**🎯 AUFGABE**\nA');
+
+// Zeichengleich mit collections.js (Übernahme aus Kollektionen).
+const collectionsJs = fs.readFileSync(path.join(root, 'collections.js'), 'utf8');
+for (const name of ['isFreeCollectionPrompt', 'toStorageFields']) {
+    assert.equal(
+        normalize(extractFunction(contractJs, name)),
+        normalize(extractFunction(collectionsJs, name)),
+        `extension/contract.js: ${name} weicht von collections.js ab – nachziehen (CLAUDE.md §7a)`
+    );
+}
+
+// getCurrentLibraryFieldsPayload (app.html) liest aus dem DOM: mit nachgebautem DOM ausführen und vergleichen.
+const appHtml = fs.readFileSync(path.join(root, 'app.html'), 'utf8');
+const appPayloadSource = extractFunction(appHtml, 'getCurrentLibraryFieldsPayload');
+function appPayload(mode, values) {
+    const document = { getElementById: id => (id.startsWith('input-') && id.slice(6) in values ? { value: values[id.slice(6)] } : null) };
+    const run = new Function('currentMode', 'document', 'getFreeMarkdownFromEditor', `${appPayloadSource}\nreturn getCurrentLibraryFieldsPayload();`);
+    return run(mode, document, () => values.text);
+}
+for (const [mode, values] of [
+    ['structured', { role: 'R', context: 'K', task: 'A', format: 'F' }],
+    ['structured', { role: '', context: '', task: 'Nur Aufgabe', format: '' }],
+    ['structured', { role: 'R' }],
+    ['free', { text: 'Zeile 1\r\nZeile 2' }],
+    ['free', { text: '' }]
+]) {
+    const domValues = mode === 'structured' ? Object.fromEntries(['role', 'context', 'task', 'format'].filter(key => key in values).map(key => [key, values[key]])) : values;
+    assert.deepEqual(
+        contract.libraryFieldsPayload(mode, values),
+        appPayload(mode, domValues),
+        `extension/contract.js: libraryFieldsPayload weicht von getCurrentLibraryFieldsPayload in app.html ab (${mode})`
+    );
+}
+
+// Einsatzbereich → mode wie saveEditor in snippet-library.js.
+const snippetLibraryJs = fs.readFileSync(path.join(root, 'snippet-library.js'), 'utf8');
+assert.ok(
+    snippetLibraryJs.includes("const mode = fieldId === 'free' ? 'free' : 'structured';"),
+    'snippet-library.js: Regel für mode geändert – contract.snippetModeFor nachziehen'
+);
+
 console.log('extension contract smoke: ok');
